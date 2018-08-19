@@ -1,0 +1,63 @@
+1)  Render a sample overworld - DONE!
+2)  Move around the overworld - DONE!
+3)  Move around but block on mountains and water - DONE!
+4)  Render the player character - DONE!
+5)  Add a sample city with transitions to/from the the overworld - DONE!
+6)  Add a second area (stairs) to the sample city - DONE!
+7)  Add stationary NPCs, chests, and doors to the sample city - DONE!
+8)  Add support for hidden items (search) - DONE!
+9)  Add talking to NPCs - DONE!
+10) Add level, HP, MP, gold, exp, status, inventory, items (weapons, armor, shields, torchs, keys) - DONE!
+11) Add green slime monster encounters to overworld only (monsters always perform basic attack) - DONE!
+12) Add red slime monster encounters to overworld only (monsters always perform basic attack) - DONE!
+13) Add leveling up - DONE!
+14) Add definition for monster sets per area - no longer limited to overworld - DONE!
+15) Add save game NPC - DONE!
+16) Add an inn to the sample city - DONE!
+17) Expand the overworld - DONE!
+18) Add more monsters - DONE!
+19) Add merchant NPCs - DONE!
+20) game.xml changes to make it easier to seed cities with innkeepers and vendors - DONE!
+21) Add terain health effects - DONE!
+22) Add magic restore NPC - DONE!
+23) Add moving NPCs - DONE!
+24) Add a cave with limited visibility - DONE!
+25) Add spells - Partially implemented
+26) Add item control (equip, unequip, drop, use) - Partially implemented
+27) Improved monster AI (running, spells, different attack types) - Partially implemented
+28) game.xml changes to make it easier to specify chest contents
+29) game.xml changes to make it easier to specify transitions
+30) Add special monsters
+31) Door, chest, hidden item, and special monster respawn control
+32) Add armor healing
+33) Add roofs to cities
+34) Add title screen and create/load/delete menu on start
+35) Add more cities
+36) Add more caves
+37) Implement quest items
+38) Move sound selections into game.xml
+
+
+Make custom images
+Area clearing - make the monster sets per area dynamic
+Add fort creation to suppress monsters?
+Add companions?
+Add boats?
+Add branching dialog?
+   Dialog changes as story progresses (due to events)
+   Dialog changes as level increases  (due to growing fame)
+Add different spells?
+Add cheats?
+Events (planned and random):
+   Infestations (monster nests form) form and spread in forests or hills and need to be cleared - cleared by killing monsters at each nest tile
+   Corruption forms and spreads imposing HP and/or MP penalties - may block or negate magic - cleared by killing a boss monster at the source tile of the corruption
+   Monster sieges of cities/towns
+   Monster champions and hordes
+Side quests
+   Escort a temporary companion
+   Fetch something by searching in wilderness for special items or acquiring common items from source
+   Protect a town (kill X monsters in the vicinity)
+Raise an army
+   Construct forts to defend against the monster hordes
+   Recruit and rescue other knights to man them
+   Fight to reclaim forts claimed by the monsters

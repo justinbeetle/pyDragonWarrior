@@ -1,0 +1,939 @@
+<Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_snes" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+   <Tiles>
+      <Tile name="water" image="water.png" symbol="w" walkable="no" boatable="yes" hpPenalty="0" speed="1.0" spawnRate="0" specialEdges="yes"/>
+      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no" boatable="no"/>
+      <Tile name="plain" image="plain.png" symbol="_" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
+      <Tile name="forest" image="forest.png" symbol="f" walkable="yes" boatable="no" hpPenalty="0" speed="0.9" spawnRate="1/16"/>
+      <Tile name="hill" image="hill.png" symbol="m" walkable="yes" boatable="no" hpPenalty="0" speed="0.7" spawnRate="1/8"/>
+      <Tile name="desert" image="desert.png" symbol="-" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/8"/>
+      <Tile name="swamp" image="swamp.png" symbol="s" walkable="yes" boatable="no" hpPenalty="2" speed="1.0" spawnRate="1/16"/>
+      <Tile name="bridge" image="bridge.png" symbol="b" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
+      <Tile name="stone" image="stone.png" symbol="S" walkable="no" boatable="no" spawnRate="0" hpPenalty="1"/>
+      <Tile name="roof" image="roof.png" symbol="R" walkable="no" boatable="no"/>
+      <Tile name="roofWalkable" image="roof.png" symbol="r" walkable="yes" boatable="no"/>
+      <Tile name="path" image="path.png" symbol=" " walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/16"/>
+      <Tile name="counter" image="counter.png" symbol="n" walkable="no" boatable="no" canTalkOver="yes"/>
+      <Tile name="inn" image="inn.png" symbol="i" walkable="no" boatable="no"/>
+      <Tile name="armor" image="armor.png" symbol="a" walkable="no" boatable="no"/>
+      <Tile name="barrier" image="barrier.png" symbol="B" walkable="yes" boatable="no" hpPenalty="10" spawnRate="1/16"/>
+
+      <!-- The following are deprecated in favor of decorations -->
+      <Tile name="cave" image="cave.png" symbol="o" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/8"/>
+      <Tile name="city" image="city.png" symbol="c" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
+      <Tile name="town" image="town.png" symbol="t" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
+      <Tile name="downstairs" image="downstairs.png" symbol="d" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
+      <Tile name="upstairs" image="upstairs.png" symbol="u" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
+      <Tile name="door" image="door.png" symbol="D" walkable="yes" boatable="no"/>
+   </Tiles>
+
+   <Decorations>
+      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"/>
+      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes"/>
+      <Decoration name="downstairs" image="downstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="upstairs" image="upstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneCastleA" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneCastleB" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneCastleC" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="tallStoneCastle" image="tallStoneCastle.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="largeStoneTownA" image="largeStoneTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="largeWoodTownA" image="largeWoodTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTownA" image="stoneTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTownB" image="stoneTownB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTownC" image="stoneTownC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTownD" image="stoneTownD.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="woodTownA" image="woodTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="woodTownB" image="woodTownB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="woodTownC" image="woodTownC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="woodTownD" image="woodTownD.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="woodTownE" image="woodTownE.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="smallTownA" image="smallTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="smallStoneTower" image="smallStoneTower.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTowerA" image="stoneTowerA.png" widthTiles="1" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneTowerB" image="stoneTowerA.png" widthTiles="1" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneShrineA" image="stoneShrineA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneShrineB" image="stoneShrineB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="stoneShrineC" image="stoneShrineC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+   </Decorations>
+
+   <CharacterTypes>
+      <CharacterType type="hero"     image="hero.png"/>
+      <CharacterType type="king"     image="king.png"/>
+      <CharacterType type="princess" image="princess.png"/>
+      <CharacterType type="guard"    image="guard.png"/>
+      <CharacterType type="warrior"  image="warrior.png"/>
+      <CharacterType type="sage"     image="sage.png"/>
+      <CharacterType type="boy"      image="boy.png"/>
+      <CharacterType type="girl"     image="girl.png"/>
+      <CharacterType type="merchant" image="merchant.png"/>
+   </CharacterTypes>
+
+   <Maps>
+      <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightRadius="unlimited">
+         <PointTransition decoration="stoneCastleA"    fromX="44"  fromY="44"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH"/>
+         <PointTransition decoration="largeStoneTownA" fromX="49"  fromY="42"  toMap="brecconary"         toX="1"  toY="15" toDir="EAST"/>
+         <PointTransition decoration="stoneTownC"      fromX="3"   fromY="3"   toMap="garinham"           toX="20" toY="13" toDir="WEST"/>
+         <PointTransition decoration="woodTownE"       fromX="105" fromY="11"  toMap="kol"                toX="20" toY="24" toDir="NORTH"/>
+         <PointTransition decoration="stoneTownA"      fromX="103" fromY="73"  toMap="rimuldar"           toX="30" toY="15" toDir="WEST"/>
+         <PointTransition decoration="woodTownB"       fromX="26"  fromY="90"  toMap="hauksness"          toX="1"  toY="11" toDir="EAST"/>
+         <PointTransition decoration="stoneTownB"      fromX="74"  fromY="103" toMap="cantlin"            toX="15" toY="1"  toDir="SOUTH"/>
+         <PointTransition decoration="cave"            fromX="29"  fromY="13"  toMap="erdricks_tomb_lvl1" toX="1"  toY="1"  toDir="EAST" />
+         <PointTransition decoration="cave"            fromX="30"  fromY="58"  toMap="mountain_cave_lvl1" toX="1"  toY="8"  toDir="EAST" />
+         <PointTransition decoration="cave"            fromX="105" fromY="45"  toMap="swamp_cave"         toX="1"  toY="1"  toDir="SOUTH" />
+         <PointTransition decoration="cave"            fromX="105" fromY="50"  toMap="swamp_cave"         toX="1"  toY="31" toDir="EAST" />
+         <PointTransition decoration="stoneShrineA"    fromX="82"  fromY="2"   toMap="northern_shrine"    toX="5"  toY="10" toDir="NORTH"/>
+         <PointTransition decoration="stoneShrineB"    fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"/>
+         <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH"/>
+
+         <MonsterZones>
+            <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="31"  y="1"   w="15" h="15" set="2"/>
+            <MonsterZone x="46"  y="1"   w="15" h="15" set="2"/>
+            <MonsterZone x="61"  y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="76"  y="1"   w="15" h="15" set="5"/>
+            <MonsterZone x="91"  y="1"   w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="1"   w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="16"  y="16"  w="15" h="15" set="2"/>
+            <MonsterZone x="31"  y="16"  w="15" h="15" set="1"/>
+            <MonsterZone x="46"  y="16"  w="15" h="15" set="2"/>
+            <MonsterZone x="61"  y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="76"  y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="91"  y="16"  w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="16"  w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="31"  w="15" h="15" set="4"/>
+            <MonsterZone x="16"  y="31"  w="15" h="15" set="1"/>
+            <MonsterZone x="31"  y="31"  w="15" h="15" set="0"/>
+            <MonsterZone x="46"  y="31"  w="15" h="15" set="0"/>
+            <MonsterZone x="61"  y="31"  w="15" h="15" set="1"/>
+            <MonsterZone x="76"  y="31"  w="15" h="15" set="3"/>
+            <MonsterZone x="91"  y="31"  w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="31"  w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="46"  w="15" h="15" set="5"/>
+            <MonsterZone x="16"  y="46"  w="15" h="15" set="1"/>
+            <MonsterZone x="31"  y="46"  w="15" h="15" set="1"/>
+            <MonsterZone x="46"  y="46"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="46"  w="15" h="15" set="9"/>
+            <MonsterZone x="76"  y="46"  w="15" h="15" set="6"/>
+            <MonsterZone x="91"  y="46"  w="15" h="15" set="6"/>
+            <MonsterZone x="106" y="46"  w="15" h="15" set="6"/>
+
+            <MonsterZone x="1"   y="61"  w="15" h="15" set="5"/>
+            <MonsterZone x="16"  y="61"  w="15" h="15" set="5"/>
+            <MonsterZone x="31"  y="61"  w="15" h="15" set="4"/>
+            <MonsterZone x="46"  y="61"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="61"  w="15" h="15" set="12"/>
+            <MonsterZone x="76"  y="61"  w="15" h="15" set="7"/>
+            <MonsterZone x="91"  y="61"  w="15" h="15" set="7"/>
+            <MonsterZone x="106" y="61"  w="15" h="15" set="7"/>
+
+            <MonsterZone x="1"   y="76"  w="15" h="15" set="10"/>
+            <MonsterZone x="16"  y="76"  w="15" h="15" set="9"/>
+            <MonsterZone x="31"  y="76"  w="15" h="15" set="8"/>
+            <MonsterZone x="46"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="76"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="91"  y="76"  w="15" h="15" set="8"/>
+            <MonsterZone x="106" y="76"  w="15" h="15" set="7"/>
+
+            <MonsterZone x="1"   y="91"  w="15" h="15" set="10"/>
+            <MonsterZone x="16"  y="91"  w="15" h="15" set="10"/>
+            <MonsterZone x="31"  y="91"  w="15" h="15" set="11"/>
+            <MonsterZone x="46"  y="91"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="91"  w="15" h="15" set="13"/>
+            <MonsterZone x="76"  y="91"  w="15" h="15" set="13"/>
+            <MonsterZone x="91"  y="91"  w="15" h="15" set="9"/>
+            <MonsterZone x="106" y="91"  w="15" h="15" set="8"/>
+
+            <MonsterZone x="1"   y="106" w="15" h="15" set="11"/>
+            <MonsterZone x="16"  y="106" w="15" h="15" set="11"/>
+            <MonsterZone x="31"  y="106" w="15" h="15" set="12"/>
+            <MonsterZone x="46"  y="106" w="15" h="15" set="13"/>
+            <MonsterZone x="61"  y="106" w="15" h="15" set="13"/>
+            <MonsterZone x="76"  y="106" w="15" h="15" set="12"/>
+            <MonsterZone x="91"  y="106" w="15" h="15" set="9"/>
+            <MonsterZone x="106" y="106" w="15" h="15" set="9"/>
+         </MonsterZones>
+      </Map>
+
+      <Map name="camden" tiles="camden_world.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png">
+      </Map>
+
+      <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="44" toY="44" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="8" fromY="8"  toMap="tantegel_lvl2" toX="9" toY="8" toDir="WEST"/>
+         <PointTransition decoration="downstairs" fromX="30" fromY="30" toMap="tantegel_lvl0" toX="1" toY="5" toDir="EAST" />
+         <MapDecoration type="door"  x="5"  y="14"/>
+         <MapDecoration type="door"  x="19" y="7"/>
+         <MapDecoration type="chest" x="2"  y="14">
+            <DialogAction type="GAIN_ITEM" item="gp" count="8"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found 8 gold pieces.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="2"  y="16">
+            <DialogAction type="GAIN_ITEM" item="gp" count="9"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found 9 gold pieces.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="3"  y="15">
+            <DialogAction type="GAIN_ITEM" item="gp" count="13"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found 13 gold pieces.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="4"  y="16">
+            <DialogAction type="GAIN_ITEM" item="gp" count="11"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found 11 gold pieces.</Dialog></MapDecoration>
+
+         <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no">
+            <Dialog>King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="9" y="9" dir="NORTH" walking="no">
+            <Dialog>If thou art planning to take a rest, first see King Lorik.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="12" y="12" dir="SOUTH" walking="yes">
+            <Dialog>There was a time when Brecconary was a paradise. Then the Dragonlord's minions came.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes">
+            <Dialog>Where oh where can I find Princess Gwaelin?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="3" y="22" dir="EAST" walking="yes">
+            <Dialog>We are merchants who have traveled much in this land. Many of our colleagues have been killed by servants of the Dragonlord.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="7" y="24" dir="NORTH" walking="yes">
+            <Dialog>Rumor has it that entire towns have been destroyed by the Dragonlord's servants.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="3" y="13" dir="NORTH" walking="yes">
+            <Dialog>Never does a brave person steal.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="20" y="14" dir="SOUTH" walking="yes">
+            <Dialog>Let us wish the warrior well! May the light be thy strength!</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="27" y="16" dir="NORTH" walking="no">
+            <Dialog>If thy Hit Points are high enough, by all means, enter.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="3" y="9" dir="EAST" walking="yes">
+            <Dialog>To become strong enough to face future trials thou must first battle many foes.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="28" y="6" dir="WEST" walking="no">
+            <Dialog>When the sun and rain meet, a Rainbow Bridge shall appear. It's a legend.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="10" y="28" dir="EAST" walking="no">
+            <Dialog>Welcome to Tantegel Castle.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="13" y="28" dir="WEST" walking="no">
+            <Dialog>Welcome to Tantegel Castle.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="16" y="21" dir="EAST" walking="no">
+            <Dialog>Where oh where can I find Princess Gwaelin?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
+            <DialogAction type="MAGIC_RESTORE"/>
+            <Dialog>[NAME]'s coming was foretold by legend. May the light shine upon this brave warrior.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="25" y="22" dir="NORTH" walking="yes">
+            <Dialog>In Garinham, look for the grave of Garin. Thou must push on a wall of darkness there.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="25" y="2" dir="SOUTH" walking="no">
+            <DialogVariable name="[COST]" value="85"/>
+            <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
+      </Map>
+
+      <Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightRadius="unlimited">
+         <PointTransition decoration="downstairs" fromX="9" fromY="8"  toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
+
+         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no">
+            <Dialog>I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points.</Dialog>
+            <Dialog>Will thou tell me now of thy deeds so they won't be forgotten?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <DialogAction type="SAVE_GAME"/>
+                  <Dialog>Thy deeds have been recorded on the Imperial Scrolls of Honor.</Dialog></DialogOption>
+               <DialogOption name="No"/></DialogOptions>
+               <Dialog>Goodbye now, [NAME]. Take care and tempt not the Fates.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="4" y="6" dir="EAST" walking="no">
+            <Dialog>East of this castle is a town where armor, weapons, and many other items may be purchased. Return to the Inn for a rest if thou art wounded in battle, [NAME]. Sleep heals all.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="6" y="6" dir="WEST" walking="no">
+            <Dialog>If thou hast collected all the Treasure Chests, a key will be found. Once used, the key will disappear, but the door will be open and thou may pass through.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="8" y="5" dir="WEST" walking="yes">
+            <Dialog>Dost thou know about Princess Gwaelin?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>[NAME], please save the Princess.</Dialog></DialogOption>
+               <DialogOption name="No">
+                   <Dialog>Half a year now hath passed since the Princess was kidnapped by the enemy. Never does the King speak of it, but he must be suffering much. Hero, please save the Princess.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+         <MapDecoration type="None" x="2" y="2">
+            <Dialog>Something here smells foul...</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="tantegel_lvl0" tiles="tantegel_lvl0.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightRadius="unlimited">
+         <PointTransition decoration="upstairs" fromX="1" fromY="5"  toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
+         <NonPlayerCharacter type="sage" x="5" y="7" dir="SOUTH" walking="no"><Dialog>Be gone with you!!!</Dialog></NonPlayerCharacter>
+      </Map>
+
+      <Map name="brecconary" tiles="brecconary.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="49" toY="42" toDir="SOUTH"/>
+         <MapDecoration type="door" x="22" y="7"/>
+         <MapDecoration type="door" x="6"  y="24"/>
+
+         <NonPlayerCharacter type="boy" x="2" y="14" dir="SOUTH" walking="no">
+            <Dialog>Thou art most welcome in Brecconary.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="5" y="8" dir="SOUTH" walking="no">
+            <Dialog>Welcome! Enter the shop and speak to its keeper across the desk.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="11" y="27" dir="NORTH" walking="no">
+            <Dialog>Tell King Lorik that the search for his daughter hath failed. I am almost gone...</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="29" y="14" dir="SOUTH" walking="no">
+            <Dialog>See King Lorik when thy experience levels are raised.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="21" y="11" dir="SOUTH" walking="no">
+            <Dialog>There is a town where magic keys can be purchased.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="25" y="11" dir="SOUTH" walking="no">
+            <Dialog>If thou art cursed, come again.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="29" y="2" dir="SOUTH" walking="no">
+            <Dialog>Beware the bridges! Danger grows when thou crosses.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="21" y="24" dir="NORTH" walking="no">
+            <Dialog>Within sight of Tantegel Castle to the south is Charlock, the fortress of the Dragonlord.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="15" y="26" dir="WEST" walking="yes">
+            <Dialog>No, I am not Princess Gwaelin.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="25" y="22" dir="WEST" walking="yes">
+            <Dialog>Enter where thou can.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="10" y="8" dir="SOUTH" walking="yes">
+            <Dialog>Watch thy Hit Points when in the Poisonous Marsh.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="6" y="18" dir="EAST" walking="yes">
+            <Dialog>Go north to the seashore, then follow the coastline west until thou hath reached Garinham.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="20" y="17" dir="SOUTH" walking="yes">
+            <Dialog>Art thou the descendant of Erdrick? Hast thou any proof?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="15" y="7" dir="SOUTH" walking="yes">
+            <Dialog>Many have been the warriors who have perished on this quest. But for thee I wish success, Hero.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="12" y="5" dir="WEST" walking="yes">
+            <Dialog>Please, save us from the minions of the Dragonlord.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="4" y="23" dir="SOUTH" walking="yes">
+            <Dialog>Some say that Garin's grave is home to a Silver Harp.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="6" y="5" dir="SOUTH" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Bamboo Pole" gp="8"/>
+               <Item name="Club"/>
+               <Item name="Clothes"/>
+               <Item name="Leather Armor"/>
+               <Item name="Leather Shield"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="25" y="5" dir="WEST" walking="no">
+            <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="26" y="26" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Herb"/>
+               <Item name="Torch"/>
+               <Item name="Dragon's Scale"/>
+            </DialogVariable>
+            <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="11" y="22" dir="WEST" walking="no">
+            <DialogVariable name="[COST]" value="6"/>
+            <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+      </Map>
+
+      <Map name="garinham" tiles="garinham.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="3" toY="3" toDir="SOUTH"/>
+         <!--<PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="grave_of_garinham_lvl1" toX="1" toY="1" toDir="EAST"/>-->
+         <MapDecoration type="door"  x="18" y="11"/>
+         <MapDecoration type="door"  x="5"  y="7"/>
+         <MapDecoration type="chest" x="9"  y="6"/>
+         <MapDecoration type="chest" x="10" y="6"/>
+         <MapDecoration type="chest" x="9"  y="7"/>
+
+         <NonPlayerCharacter type="girl" x="12" y="13" dir="SOUTH" walking="yes">
+            <Dialog>Welcome to Garinham. May thy stay be a peaceful one.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="3" y="11" dir="SOUTH" walking="no">
+            <Dialog>Garin, a wandering minstrel of legendary fame, is said to have built this town.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="3" y="18" dir="EAST" walking="no">
+            <Dialog>Many believe that Princess Gwaelin is hidden away in a cave.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="7" y="17" dir="NORTH" walking="yes">
+            <Dialog>I have heard of one named Nester. Dost thou know such a one?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="19" y="12" dir="SOUTH" walking="yes">
+            <Dialog>It is said that the Princess was kidnapped and taken eastward.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="11" y="19" dir="NORTH" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Club"/>
+               <Item name="Copper Sword"/>
+               <Item name="Hand Axe"/>
+               <Item name="Leather Armor"/>
+               <Item name="Chain Mail"/>
+               <Item name="Half Plate"/>
+               <Item name="Iron Shield"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="6" y="12" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Herb"/>
+               <Item name="Torch"/>
+               <Item name="Dragon's Scale"/>
+            </DialogVariable>
+            <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="18" y="16" dir="WEST" walking="no">
+            <DialogVariable name="[COST]" value="25"/>
+            <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+      </Map>
+
+      <Map name="kol" tiles="kol.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="105" toY="11" toDir="SOUTH"/>
+         <MapDecoration type="door"  x="8"  y="13"/>
+         <MapDecoration type="door"  x="2"  y="15"/>
+         <MapDecoration type="chest" x="16" y="21"/>
+         <MapDecoration type="chest" x="16" y="22"/>
+         <MapDecoration type="chest" x="16" y="23"/>
+      </Map>
+
+      <Map name="rimuldar" tiles="rimuldar.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="103" toY="73" toDir="SOUTH"/>
+         <MapDecoration type="door"  x="22" y="22"/>
+         <MapDecoration type="door"  x="23" y="24"/>
+         <MapDecoration type="chest" x="25" y="24"/>
+      </Map>
+
+      <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="battle_background.png" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="26" toY="90" toDir="SOUTH"/>
+         <MapDecoration type="None" x="19" y="13">
+            <DialogAction type="GAIN_ITEM" item="Erdrick's Armor"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Armor.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="cantlin" tiles="cantlin.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <LeavingTransition toMap="overworld" toX="74" toY="103" toDir="SOUTH"/>
+         <MapDecoration type="door"  x="5"  y="22"/>
+         <MapDecoration type="door"  x="9"  y="26"/>
+         <MapDecoration type="door"  x="15" y="26"/>
+         <MapDecoration type="door"  x="16" y="26"/>
+         <MapDecoration type="door"  x="27" y="10"/>
+         <MapDecoration type="chest" x="28" y="26"/>
+         <MapDecoration type="chest" x="28" y="28"/>
+         <MapDecoration type="chest" x="3"  y="28"/>
+      </Map>
+
+      <Map name="erdricks_tomb_lvl1" tiles="erdricks_tomb_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs" fromX="1" fromY="1" toMap="overworld" toX="29" toY="13" toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="10" fromY="10" toMap="erdricks_tomb_lvl2" toX="9" toY="10" toDir="SOUTH"/>
+      </Map>
+
+      <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs" fromX="9" fromY="10" toMap="erdricks_tomb_lvl1" toX="10" toY="10" toDir="SOUTH"/>
+         <MapDecoration type="chest" x="10" y="4">
+            <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
+            <Dialog>The tablet reads as follows:  'I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!'</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs" fromX="1"    fromY="8"  toMap="overworld"          toX="30" toY="58" toDir="WEST"/>
+         <PointTransition decoration="downstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl2" toX="1"  toY="1"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl2" toX="7"  toY="6"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl2" toX="13" toY="13" toDir="SOUTH"/>
+         <MapDecoration type="chest" x="14" y="6">
+            <DialogAction type="GAIN_ITEM" item="Herb"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl1" toX="1"  toY="1"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl1" toX="7"  toY="6"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl1" toX="13" toY="13" toDir="SOUTH"/>
+         <MapDecoration type="chest" x="3" y="3">
+            <DialogAction type="GAIN_ITEM" item="Torch"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="4" y="3">
+            <DialogAction type="GAIN_ITEM" item="Fighter's Ring"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="2" y="7">
+            <DialogAction type="GAIN_ITEM" item="Gold" count="14"/> <!-- TODO: Change to 10-17 -->
+            <Dialog>Fortune smiles upon thee!  Thou hast found 14 gold pieces.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="11" y="10">
+            <DialogAction type="GAIN_ITEM" item="Gold" count="115"/> <!-- TODO: Change to 100-128 -->
+            <Dialog>Fortune smiles upon thee!  Thou hast found 115 gold pieces.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs" fromX="1" fromY="1"  toMap="overworld" toX="105" toY="45" toDir="NORTH"/>
+         <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
+         <MapDecoration type="door"  x="6"  y="21"/>
+      </Map>
+
+      <Map name="northern_shrine" tiles="northern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
+         <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no"><Dialog>Be gone with you!!!</Dialog></NonPlayerCharacter>
+         <MapDecoration type="chest" x="4" y="5"/>
+      </Map>
+
+      <Map name="southern_shrine" tiles="southern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
+         <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
+         <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no"><Dialog>Be gone with you!!!</Dialog></NonPlayerCharacter>
+         <MapDecoration type="chest" x="6" y="6"/>
+      </Map>
+   </Maps>
+
+   <DialogScripts>
+      <DialogScript label="weapon_and_armor_vendor">
+         <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
+            <InventoryItemType type="Weapon"/>
+            <InventoryItemType type="Armor"/>
+            <InventoryItemType type="Shield"/>
+         </DialogVariable>
+         <Dialog>We deal in weapons and armor. Dost thou wish to buy or sell anything today?</Dialog>
+         <DialogOptions label="buy_or_sell_weapon_and_armor_option">
+            <DialogOption name="Buy">
+               <Dialog>What dost thou wish to buy?</Dialog>
+               <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogCheck item="gp" count="[COST]">
+                  <Dialog>Sorry. Thou hast not enough gold.</Dialog>
+                  <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogCheck>
+               <Dialog>The [ITEM]?  Is that okay?</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
+            <DialogOption name="Sell">
+               <Dialog>What dost thou wish to sell?</Dialog>
+               <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="LOSE_ITEM" item="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" item="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
+            <DialogOption name="No Thank Thee">
+               <Dialog>Very well then.  If you change your mind you know where to find me.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="tool_vendor">
+         <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
+            <InventoryItemType type="Tool"/>
+         </DialogVariable>
+         <Dialog>Welcome. We deal in tools. What can I do for thee?</Dialog>
+         <DialogOptions label="buy_or_sell_tool_option">
+            <DialogOption name="Buy">
+               <Dialog>What dost thou want?</Dialog>
+               <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogCheck item="gp" count="[COST]">
+                  <Dialog>Sorry. Thou hast not enough gold.</Dialog>
+                  <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogCheck>
+               <Dialog>The [ITEM]?  Is that okay?</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
+            <DialogOption name="Sell">
+               <Dialog>What dost thou want to sell?</Dialog>
+               <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="LOSE_ITEM" item="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" item="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
+            <DialogOption name="No Thank Thee">
+               <Dialog>I will be waiting for thy next visit.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="key_vendor">
+         <DialogVariable name="[ITEM]" value="Key"/>
+         <Dialog>Magic keys! They will unlock any door. Dost thou wish to purchase one for [COST] gold peices?</Dialog>
+         <DialogOptions>
+            <DialogOption name="Yes" label="key_buy_option">
+               <DialogCheck item="gp" count="[COST]">
+                  <Dialog>Thou dost not have enough gold.</Dialog>
+                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+               <Dialog>Here you go.</Dialog>
+               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <Dialog>Here, take this key. Dost thou wish to purchase more?</Dialog>
+               <DialogGoTo label="key_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>I will see thee later.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="fairy_water_vendor">
+         <Dialog>Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?</Dialog>
+         <DialogOptions>
+            <DialogOption name="Yes" label="fairy_water_buy_option">
+               <DialogCheck item="gp" count="[COST]">
+                  <Dialog>Thou dost not have enough gold.</Dialog>
+                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+               <Dialog>Here you go.</Dialog>
+               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <Dialog>I thank thee. Won't thou buy one more bottle? </Dialog>
+               <DialogGoTo label="fairy_water_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>All the best to thee.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="single_item_vendor_buy_option">
+         <DialogOptions>
+            <DialogOption name="Yes">
+               <DialogCheck item="gp" count="[COST]">
+                  <Dialog>Thou dost not have enough gold.</Dialog>
+                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+               <Dialog>Here you go.</Dialog>
+               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <Dialog>Would you like to buy another?</Dialog>
+               <DialogGoTo label="single_item_vendor_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>All the best to thee.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="innkeeper">
+         <Dialog>Welcome to the Traveler's Inn. Room and board is [COST] gold pieces per night. Dost thou want a room?</Dialog>
+         <DialogOptions>
+            <DialogOption name="Yes">
+               <DialogCheck item="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
+               <Dialog>Have a great night!</Dialog>
+               <DialogAction type="NIGHT_AT_INN"/>
+               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <Dialog>Good morning!</Dialog></DialogOption>
+            <DialogOption name="No">
+               <Dialog>Okay. Good-bye, traveler.</Dialog></DialogOption></DialogOptions></DialogScript>
+   </DialogScripts>
+
+   <Monsters>
+      <!-- TODO: Add attack patterns -->
+      <Monster name="Stopper"                image="stopper.png"                strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Slime"                  image="slime.png"                  strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Red Slime"              image="red_slime.png"              strength="7"   agility="3"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Drakee"                 image="drakee.png"                 strength="9"   agility="6"   hp="5-6"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="2"/>
+      <Monster name="Ghost"                  image="ghost.png"                  strength="11"  agility="8"   hp="6-7"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="3"   gp="3-4"/>
+      <Monster name="Magician"               image="magician.png"               strength="11"  agility="12"  hp="10-13"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="4"   gp="9-11"/>
+      <Monster name="Magidrakee"             image="magidrakee.png"             strength="14"  agility="14"  hp="12-15"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="5"   gp="9-11"/>
+      <Monster name="Scorpion"               image="scorpion.png"               strength="18"  agility="16"  hp="16-20"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="6"   gp="12-15"/>
+      <Monster name="Druin"                  image="druin.png"                  strength="20"  agility="18"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="7"   gp="12-15"/>
+      <Monster name="Poltergeist"            image="poltergeist.png"            strength="18"  agility="20"  hp="18-23"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="8"   gp="13-17"/>
+      <Monster name="Droll"                  image="droll.png"                  strength="24"  agility="24"  hp="19-25"   sleepResist="0/16"  stopspellResist="14/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="10"  gp="18-24"/>
+      <Monster name="Drakeema"               image="drakeema.png"               strength="22"  agility="26"  hp="16-20"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="11"  gp="15-19"/>
+      <Monster name="Skeleton"               image="skeleton.png"               strength="28"  agility="22"  hp="23-30"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="11"  gp="22-29"/>
+      <Monster name="Warlock"                image="warlock.png"                strength="28"  agility="22"  hp="23-30"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="13"  gp="26-34"/>
+      <Monster name="Metal Scorpion"         image="metal_scorpion.png"         strength="36"  agility="42"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="14"  gp="30-39"/>
+      <Monster name="Wolf"                   image="wolf.png"                   strength="40"  agility="30"  hp="26-34"   sleepResist="1/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="16"  gp="37-49"/>
+      <Monster name="Wraith"                 image="wraith.png"                 strength="44"  agility="34"  hp="28-36"   sleepResist="7/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="17"  gp="45-59"/>
+      <Monster name="Metal Slime"            image="metal_slime.png"            strength="10"  agility="255" hp="4"       sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="1/64"  blockFactor="0.25"  xp="115" gp="4-5"/>
+      <Monster name="Specter"                image="specter.png"                strength="40"  agility="38"  hp="28-36"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="18"  gp="52-69"/>
+      <Monster name="Wolflord"               image="wolflord.png"               strength="50"  agility="36"  hp="29-38"   sleepResist="4/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="20"  gp="60-79"/>
+      <Monster name="Druinlord"              image="druinlord.png"              strength="47"  agility="40"  hp="27-35"   sleepResist="15/16" stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="20"  gp="63-84"/>
+      <Monster name="Drollmagi"              image="drollmagi.png"              strength="52"  agility="50"  hp="29-38"   sleepResist="2/16"  stopspellResist="2/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="22"  gp="67-89"/>
+      <Monster name="Wyvern"                 image="wyvern.png"                 strength="56"  agility="48"  hp="32-42"   sleepResist="4/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="24"  gp="75-99"/>
+      <Monster name="Rogue Scorpion"         image="rogue_scorpion.png"         strength="60"  agility="90"  hp="27-35"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="26"  gp="82-109"/>
+      <Monster name="Wraith Knight"          image="wraith_knight.png"          strength="68"  agility="56"  hp="35-46"   sleepResist="5/16"  stopspellResist="0/16"  hurtResist="3/16"  dodge="4/64"  blockFactor="0.375" xp="28"  gp="90-119"/>
+      <Monster name="Golem"                  image="golem.png"                  strength="120" agility="60"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="0.375" xp="5"   gp="7-9"/>
+      <Monster name="Goldman"                image="goldman.png"                strength="48"  agility="40"  hp="38-50"   sleepResist="13/16" stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="6"   gp="150-199"/>
+      <Monster name="Knight"                 image="knight.png"                 strength="76"  agility="78"  hp="42-55"   sleepResist="6/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="33"  gp="97-129"/>
+      <Monster name="Magiwyvern"             image="magiwyvern.png"             strength="78"  agility="68"  hp="44-58"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="34"  gp="105-139"/>
+      <Monster name="Demon Knight"           image="demon_knight.png"           strength="79"  agility="64"  hp="38-50"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="15/64" blockFactor="0.375" xp="37"  gp="112-149"/>
+      <Monster name="Werewolf"               image="werewolf.png"               strength="86"  agility="70"  hp="46-60"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="7/64"  blockFactor="0.375" xp="40"  gp="116-154"/>
+      <Monster name="Green Dragon"           image="green_dragon.png"           strength="88"  agility="74"  hp="49-65"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="2/16"  dodge="2/64"  blockFactor="0.5"   xp="45"  gp="120-159"/>
+      <Monster name="Starwyvern"             image="starwyvern.png"             strength="86"  agility="80"  hp="49-65"   sleepResist="8/16"  stopspellResist="0/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="0.5"   xp="43"  gp="120-159"/>
+      <Monster name="Wizard"                 image="wizard.png"                 strength="80"  agility="70"  hp="49-65"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="0.5"   xp="50"  gp="123-164"/>
+      <Monster name="Axe Knight"             image="axe_knight.png"             strength="94"  agility="82"  hp="53-70"   sleepResist="15/16" stopspellResist="3/16"  hurtResist="1/16"  dodge="1/64"  blockFactor="0.5"   xp="54"  gp="123-164"/>
+      <Monster name="Blue Dragon"            image="blue_dragon.png"            strength="98"  agility="84"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="7/16"  dodge="2/64"  blockFactor="0.5"   xp="60"  gp="112-149"/>
+      <Monster name="Stoneman"               image="stoneman.png"               strength="100" agility="40"  hp="121-160" sleepResist="2/16"  stopspellResist="15/16" hurtResist="1/16"  dodge="1/64"  blockFactor="1.0"   xp="65"  gp="105-139"/>
+      <Monster name="Armored Knight"         image="armored_knight.png"         strength="105" agility="86"  hp="68-90"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="1.0"   xp="70"  gp="105-139"/>
+      <Monster name="Red Dragon"             image="red_dragon.png"             strength="120" agility="90"  hp="76-100"  sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="1.0"   xp="100" gp="105-139"/>
+      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0"/>
+      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0"/>
+   </Monsters>
+
+   <MonsterSets>
+      <MonsterSet name="0">
+         <Monster name="Slime"/>
+         <Monster name="Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+      </MonsterSet>
+      <MonsterSet name="1">
+         <Monster name="Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+      </MonsterSet>
+      <MonsterSet name="2">
+         <Monster name="Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Ghost"/>
+         <Monster name="Ghost"/>
+      </MonsterSet>
+      <MonsterSet name="3">
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+      </MonsterSet>
+      <MonsterSet name="4">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+      </MonsterSet>
+      <MonsterSet name="5">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Skeleton"/>
+      </MonsterSet>
+      <MonsterSet name="6">
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+         <Monster name="Wolf"/>
+      </MonsterSet>
+      <MonsterSet name="7">
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+         <Monster name="Metal Scorpion"/>
+         <Monster name="Wolf"/>
+         <Monster name="Wolf"/>
+      </MonsterSet>
+      <MonsterSet name="8">
+         <Monster name="Metal Scorpion"/>
+         <Monster name="Wraith"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Goldman"/>
+      </MonsterSet>
+      <MonsterSet name="9">
+         <Monster name="Wraith"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Goldman"/>
+         <Monster name="Wyvern"/>
+         <Monster name="Wyvern"/>
+      </MonsterSet>
+      <MonsterSet name="10">
+         <Monster name="Wyvern"/>
+         <Monster name="Rogue Scorpion"/>
+         <Monster name="Wraith Knight"/>
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+      </MonsterSet>
+      <MonsterSet name="11">
+         <Monster name="Wraith Knight"/>
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+         <Monster name="Magiwyvern"/>
+         <Monster name="Metal Slime"/>
+      </MonsterSet>
+      <MonsterSet name="12">
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+         <Monster name="Magiwyvern"/>
+         <Monster name="Werewolf"/>
+         <Monster name="Starwyvern"/>
+      </MonsterSet>
+      <MonsterSet name="13">
+         <Monster name="Werewolf"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Green Dragon"/>
+         <Monster name="Wizard"/>
+      </MonsterSet>
+      <MonsterSet name="14">
+         <Monster name="Poltergeist"/>
+         <Monster name="Droll"/>
+         <Monster name="Drakeema"/>
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+      </MonsterSet>
+      <MonsterSet name="15">
+         <Monster name="Specter"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Druinlord"/>
+         <Monster name="Drollmagi"/>
+         <Monster name="Wraith Knight"/>
+      </MonsterSet>
+      <MonsterSet name="16">
+         <Monster name="Werewolf"/>
+         <Monster name="Green Dragon"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Wizard"/>
+         <Monster name="Axe Knight"/>
+      </MonsterSet>
+      <MonsterSet name="17">
+         <Monster name="Wizard"/>
+         <Monster name="Axe Knight"/>
+         <Monster name="Blue Dragon"/>
+         <Monster name="Blue Dragon"/>
+         <Monster name="Stoneman"/>
+      </MonsterSet>
+      <MonsterSet name="18">
+         <Monster name="Wizard"/>
+         <Monster name="Stoneman"/>
+         <Monster name="Armored Knight"/>
+         <Monster name="Armored Knight"/>
+         <Monster name="Red Dragon"/>
+      </MonsterSet>
+      <MonsterSet name="19">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Druin"/>
+         <Monster name="Druin"/>
+      </MonsterSet>
+   </MonsterSets>
+
+   <Levels>
+      <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
+      <Level name="2"  xp="7"     strength="6"   agility="5"   hp="22"  mp="0"/>
+      <Level name="3"  xp="23"    strength="8"   agility="7"   hp="24"  mp="6"/>
+      <Level name="4"  xp="47"    strength="8"   agility="9"   hp="31"  mp="16"/>
+      <Level name="5"  xp="110"   strength="13"  agility="11"  hp="35"  mp="20"/>
+      <Level name="6"  xp="220"   strength="17"  agility="11"  hp="38"  mp="24"/>
+      <Level name="7"  xp="450"   strength="19"  agility="18"  hp="40"  mp="26"/>
+      <Level name="8"  xp="800"   strength="23"  agility="21"  hp="46"  mp="29"/>
+      <Level name="9"  xp="1300"  strength="31"  agility="23"  hp="50"  mp="36"/>
+      <Level name="10" xp="2000"  strength="36"  agility="32"  hp="54"  mp="40"/>
+      <Level name="11" xp="2900"  strength="41"  agility="36"  hp="62"  mp="50"/>
+      <Level name="12" xp="4000"  strength="49"  agility="41"  hp="63"  mp="58"/>
+      <Level name="13" xp="5500"  strength="53"  agility="49"  hp="70"  mp="64"/>
+      <Level name="14" xp="7500"  strength="61"  agility="56"  hp="78"  mp="70"/>
+      <Level name="15" xp="10000" strength="69"  agility="65"  hp="86"  mp="72"/>
+      <Level name="16" xp="13000" strength="73"  agility="71"  hp="92"  mp="95"/>
+      <Level name="17" xp="17000" strength="73"  agility="79"  hp="100" mp="100"/>
+      <Level name="18" xp="21000" strength="86"  agility="85"  hp="115" mp="108"/>
+      <Level name="19" xp="25000" strength="88"  agility="87"  hp="130" mp="115"/>
+      <Level name="20" xp="29000" strength="93"  agility="89"  hp="138" mp="128"/>
+      <Level name="21" xp="33000" strength="96"  agility="91"  hp="149" mp="135"/>
+      <Level name="22" xp="37000" strength="98"  agility="91"  hp="158" mp="146"/>
+      <Level name="23" xp="41000" strength="100" agility="95"  hp="165" mp="153"/>
+      <Level name="24" xp="45000" strength="104" agility="99"  hp="170" mp="161"/>
+      <Level name="25" xp="49000" strength="114" agility="101" hp="174" mp="161"/>
+      <Level name="26" xp="53000" strength="118" agility="106" hp="180" mp="168"/>
+      <Level name="27" xp="57000" strength="126" agility="108" hp="189" mp="175"/>
+      <Level name="28" xp="61000" strength="131" agility="116" hp="195" mp="180"/>
+      <Level name="29" xp="65000" strength="136" agility="121" hp="200" mp="190"/>
+      <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
+   </Levels>
+
+   <Spells>
+      <Spell name="Heal"      level="3"  mp="4"  availableInCombat="yes" availableOutsideCombat="yes" hpRecover="10-17"/>
+      <Spell name="Hurt"      level="4"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="5-12" damageByMonster="3-10"/>
+      <Spell name="Sleep"     level="7"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
+      <Spell name="Radiant"   level="9"  mp="3"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Stopspell" level="10" mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
+      <Spell name="Outside"   level="12" mp="6"  availableInCombat="no"  availableOutsideCombat="yes" excludedMap="overworld"/>
+      <Spell name="Return"    level="13" mp="8"  availableInCombat="no"  availableOutsideCombat="yes" includedMap="overworld"/>
+      <Spell name="Repel"     level="15" mp="2"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Healmore"  level="17" mp="10" availableInCombat="yes" availableOutsideCombat="yes" hpRecover="85-100"/>
+      <Spell name="Hurtmore"  level="19" mp="5"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="58-65" damageByMonster="20-30"/>
+   </Spells>
+
+   <Items>
+      <Weapons>
+         <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"/>
+         <Weapon name="Club"             attackBonus="4"   gp="60"/>
+         <Weapon name="Copper Sword"     attackBonus="10"  gp="180"/>
+         <Weapon name="Hand Axe"         attackBonus="15"  gp="560"/>
+         <Weapon name="Broad Sword"      attackBonus="20"  gp="1500"/>
+         <Weapon name="Flame Sword"      attackBonus="28"  gp="9800"/>
+         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="1"/>
+      </Weapons>
+      <Armors>
+         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
+         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
+         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
+         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
+         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
+         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" hpRegenTiles="3"/>
+         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="1"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" hpRegenTiles="1"/>
+      </Armors>
+      <Shields>
+         <Shield name="Leather Shield"   defenseBonus="4"  gp="90"/>
+         <Shield name="Iron Shield"      defenseBonus="10" gp="800"/>
+         <Shield name="Silver Shield"    defenseBonus="20" gp="14800"/>
+         <Shield name="Erdrick's Shield" defenseBonus="25" gp="1"/>
+      </Shields>
+      <Tools>
+         <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes" usable="no"/>
+         <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
+         <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes" usable="no"/>
+         <Tool name="Herb"               hpRecover="23-30" gp="24"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
+
+         <Tool name="Key"                opensDoors="yes"  gp="53"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
+         <Tool name="Key Ring"           opensDoors="yes"  gp="1000" droppable="yes" equippable="no"  usable="yes" consumeOnUse="no"/>
+
+         <Tool name="Torch"              lightRadius="1"   gp="8"    droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes">
+            <DialogCheck item="lightRadius" count="unlimited"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogCheck>
+            <DialogAction type="LIGHT_RADIUS" size="1" fadeSteps="unlimited"/>
+            <Dialog>[NAME] lit a torch.</Dialog></Tool>
+
+         <Tool name="Lantern"            lightRadius="1"   gp="125"  droppable="yes" equippable="no"  usable="yes" consumeOnUse="no">
+            <DialogCheck item="lightRadius" count="unlimited"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogCheck>
+            <DialogAction type="LIGHT_RADIUS" size="1" fadeSteps="unlimited"/>
+            <Dialog>[NAME] lit a lattern.</Dialog></Tool>
+
+         <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
+         <Tool name="Ball of Light"                                  droppable="no"  equippable="no"  usable="no"/>
+         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
+         <Tool name="Erdrick's Token"                                droppable="no"  equippable="no"  usable="no"/>
+         <Tool name="Staff of Rain"                                  droppable="no"  equippable="no"  usable="no"/>
+         <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no"  usable="no"/>
+         <Tool name="Silver Harp"                                    droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
+         <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
+      </Tools>
+   </Items>
+
+   <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero" xp="0" gp="0">
+      <Dialog>Descendant of Erdrick, listen now to my words. It is told that in ages past Erdrick fought demons with a Ball of Light. Then came the Dragonlord who stole the precious globe and hid it in the darkness.</Dialog>
+      <Dialog>Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land. The Dragonlord must be defeated.</Dialog>
+      <Dialog>Take now whatever thou may find in these Treasure Chests to aid thee in thy quest. Then speak with the guards, for they have much knowledge that may aid thee. May the light shine upon thee, [NAME].</Dialog> 
+      
+      <MapDecoration type="chest" x="6" y="5">
+         <DialogAction type="GAIN_ITEM" item="Torch"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
+      <MapDecoration type="chest" x="6" y="2">
+         <DialogAction type="GAIN_ITEM" item="Key"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a key.</Dialog></MapDecoration>
+      <MapDecoration type="chest" x="8" y="2">
+         <DialogAction type="GAIN_ITEM" item="gp" count="120"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found 120 gold pieces.</Dialog></MapDecoration>
+      <MapDecoration type="door" x="5" y="7"/>
+   </InitialState>
+   <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">
+      <Dialog>Death should not have taken thee [NAME].</Dialog></DeathState>
+</Game>

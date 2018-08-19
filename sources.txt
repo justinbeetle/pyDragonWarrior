@@ -1,0 +1,47 @@
+Music:
+   http://www.vgmpf.com/Wiki/index.php/Dragon_Warrior_(NES)
+   http://www.woodus.com/den/music/mp3.php?desc=dq1nes
+   http://ultimacodex.com/archive/ftp/sound/
+
+
+Sound Effects:
+   https://www.sounds-resource.com/nes/dragonwarrior/sound/4229/
+   https://www.sounds-resource.com/nes/dragonwarrioriv/sound/4232/
+Ultima Music:
+   http://ultimacodex.com/archive/ftp/sound/
+   http://www.moongates.com/music/
+Images:
+   https://github.com/bmoriya/DragonWarrior/tree/master/data
+   https://github.com/bobbylight/DragonWarriorJS/tree/master/src/res
+   http://mikesrpgcenter.com/dw1/index.html
+   http://www.realmofdarkness.net/dq/games/nes/dw
+
+Formulas:     https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/61640
+Item Info:    https://strategywiki.org/wiki/Dragon_Warrior/Items_and_Equipment
+Level Info:   https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/18342
+Monster Info: http://www.woodus.com/den/games/dw1nes/monsters.php
+
+
+
+
+
+
+
+C:\Users\Justin\AppData\Roaming\Python\Python36\site-packages\pygame\examples
+http://www.py2exe.org/
+http://www.pyinstaller.org/
+
+
+
+
+
+cd C:\Users\Justin\AppData\Local\Programs\Python\Python36-32
+python -m ensurepip
+python -m ensurepip --upgrade
+cd C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts
+pip install pygame
+pip install pyinstaller
+cd C:\Users\Justin\Desktop\Adventure\Adventure
+C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts\pyinstaller Game.py
+copy game.xml, data, and saves from C:\Users\Justin\Desktop\Adventure\Adventure to C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game
+run C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game\Game.exe
