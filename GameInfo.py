@@ -146,7 +146,7 @@ class GameInfo:
          if 'specialEdges' in element.attrib:
             specialEdges = element.attrib['specialEdges'] == 'yes'
             
-         #print('Loading image', tileImageFileName)
+         #print('Loading image', tileImageFileName, flush=True)
          tileImageUnscaled = pygame.image.load(tileImageFileName).convert()
          if specialEdges:
             tileImageScaled = []
@@ -186,7 +186,7 @@ class GameInfo:
             removeWithKey = element.attrib['removeWithKey'] == 'yes'
             
          decorationImageFileName = os.path.join( decorationPath, element.attrib['image'] )
-         #print('Loading image', decorationImageFileName)
+         #print('Loading image', decorationImageFileName, flush=True)
          decorationImageUnscaled = pygame.image.load(decorationImageFileName).convert()
          unscaledSize_pixels = Point( decorationImageUnscaled.get_size() )
          maxScaledSize_pixels = Point( widthTiles, heightTiles ) * self.tileSize_pixels
@@ -203,7 +203,7 @@ class GameInfo:
       for element in xmlRoot.findall("./CharacterTypes/CharacterType"):
          characterType = element.attrib['type']
          characterTypeFileName = os.path.join( characterPath, element.attrib['image'] )
-         #print('Loading image', characterTypeFileName)
+         #print('Loading image', characterTypeFileName, flush=True)
          characterTypeImage = pygame.image.load(characterTypeFileName).convert()
          characterTypeImages = {}
          x_px = 0
@@ -222,7 +222,7 @@ class GameInfo:
       self.maps = {}
       for element in xmlRoot.findall("./Maps/Map"):
          mapName = element.attrib['name']
-         #print( 'mapName =', mapName )
+         #print( 'mapName =', mapName, flush=True )
          mapDatFileName = os.path.join( mapsPath, element.attrib['tiles'] )
          music = element.attrib['music']
          lightRadius = None
@@ -422,7 +422,7 @@ class GameInfo:
       if savedGameFile is not None:
          saveGameFilePath = os.path.join( self.savesPath, savedGameFile + '.xml' )
          if os.path.isfile(saveGameFilePath):
-            print('Loading save game from file ' + saveGameFilePath)
+            print('Loading save game from file ' + saveGameFilePath, flush=True)
             initialStateElement = xml.etree.ElementTree.parse(saveGameFilePath).getroot()
          else:
             self.pc_name = savedGameFile
@@ -454,7 +454,7 @@ class GameInfo:
          elif itemName in self.items:
             self.pc_otherEquippedItems.append( self.items[itemName] )
          else:
-            print( 'ERROR: Unsupported item', itemName )
+            print( 'ERROR: Unsupported item', itemName, flush=True )
             
       for itemElement in initialStateElement.findall("./UnequippedItems/Item"):
          itemName = itemElement.attrib['name']
@@ -464,7 +464,7 @@ class GameInfo:
          if itemName in self.items:
             self.pc_unequippedItems[ self.items[itemName] ] = itemCount
          else:
-            print( 'ERROR: Unsupported item', itemName )
+            print( 'ERROR: Unsupported item', itemName, flush=True )
       
       self.initialMapDecorations = []
       for decorationElement in initialStateElement.findall("./MapDecoration"):
@@ -504,7 +504,7 @@ class GameInfo:
    def parseDialog( self, dialogRootElement ):
       dialog = []
       for element in dialogRootElement:
-         #print( 'in parseDialog: element =', element )
+         #print( 'in parseDialog: element =', element, flush=True )
          
          label = None
          if 'label' in element.attrib and element.attrib['label'] != 'None':
@@ -764,7 +764,7 @@ def main():
             elif e.type == pygame.QUIT:
                isRunning = False
             else:
-               print( 'e.type =', e.type )
+               print( 'e.type =', e.type, flush=True )
          clock.tick(30)
 
    # Terminate pygame

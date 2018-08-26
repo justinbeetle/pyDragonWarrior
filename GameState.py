@@ -30,7 +30,7 @@ class GameState:
 
       self.isRunning = True
       self.phase = Phase.A
-      self.phaseCount = 0
+      self.tickCount = 1
       self.gameInfo = GameInfo( basePath, gameXmlPath, tileSize_pixels, savedGameFile)
 
       # Set character state for new game
@@ -142,7 +142,7 @@ class GameState:
       for y in [tile.y-1, tile.y+1]:
          if self.canMoveToTile( Point(tile.x, y), enforceNpcHpPenaltyLimit, False ):
             degreesOfFreedom += 1
-      #print('DOF for tile', tile, 'is', degreesOfFreedom)
+      #print('DOF for tile', tile, 'is', degreesOfFreedom, flush=True)
       return degreesOfFreedom
 
    def canMoveToTile(self, tile, enforceNpcHpPenaltyLimit = False, enforceNpcDofLimit = False):
@@ -153,33 +153,33 @@ class GameState:
          movementAllowed = True
          if movementAllowed and enforceNpcHpPenaltyLimit and self.getTileInfo(tile).hpPenalty != 0:
             movementAllowed = False
-            #print('Movement not allowed: NPC HP penalty limited')
+            #print('Movement not allowed: NPC HP penalty limited', flush=True)
          if movementAllowed and enforceNpcDofLimit and self.getTileDegreesOfFreedom(tile, enforceNpcHpPenaltyLimit) < 2:
             movementAllowed = False
-            #print('Movement not allowed: NPC degree-of-freedom limit not met')
+            #print('Movement not allowed: NPC degree-of-freedom limit not met', flush=True)
          if tile == self.pc.currPos_datTile or tile == self.pc.destPos_datTile:
             movementAllowed = False
-            #print('Movement not allowed: PC in the way')
+            #print('Movement not allowed: PC in the way', flush=True)
          if movementAllowed:
             for npc in self.npcs:
                if tile == npc.currPos_datTile or tile == npc.destPos_datTile:
                   movementAllowed = False
-                  #print('Movement not allowed: NPC in the way')
+                  #print('Movement not allowed: NPC in the way', flush=True)
                   break
          if movementAllowed:
             for decoration in self.mapDecorations:
                if tile == decoration.point and decoration.type is not None and not self.gameInfo.decorations[decoration.type].walkable:
                   movementAllowed = False
-                  #print('Movement not allowed: decoration not walkable')
+                  #print('Movement not allowed: decoration not walkable', flush=True)
                   break
       #else:
-      #   print('Movement not allowed: tile not walkable')
+      #   print('Movement not allowed: tile not walkable', flush=True)
       return movementAllowed
 
    def getTileMonsters(self, tile):
       for mz in self.gameInfo.maps[self.mapState.mapName].monsterZones:
          if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
-            #print( 'in monsterZone of monster set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName] )
+            #print( 'in monsterZone of monster set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True )
             return self.gameInfo.monsterSets[mz.setName]
       return []
 
@@ -231,7 +231,6 @@ class GameState:
 
       self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
       self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
-      self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
       self.npcs = []
       for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
          self.npcs.append( CharacterState.createNpcState( npc ) )
@@ -274,10 +273,12 @@ class GameState:
          pygame.display.flip()
 
    def advanceTick(self, charactersErased=False):
+      PHASE_TICKS = 20
+      NPC_MOVE_STEPS = 60
+
       phaseChanged = False
-      if self.phaseCount >= 20:
+      if self.tickCount % PHASE_TICKS == 0:
          phaseChanged = True
-         self.phaseCount = 0
          if self.phase == Phase.A:
             self.phase = Phase.B
          else:
@@ -296,7 +297,7 @@ class GameState:
          if npc.npcInfo.walking:
             
             # Start moving NPC by setting a destination tile
-            if self.phase == Phase.A and self.phaseCount == 0:
+            if self.tickCount % NPC_MOVE_STEPS == 0:
                # TODO: Determine where to move instead of blindly moving forward
                npc.dir = random.choice( list( Direction ) )
                destTile = npc.currPos_datTile + getDirectionVector( npc.dir )
@@ -323,11 +324,11 @@ class GameState:
       if redrawMap:
          pygame.display.flip()
             
-      self.phaseCount += 1
+      self.tickCount += 1
       pygame.time.Clock().tick(40)
 
 def main():
-   print( 'Not implemented' )
+   print( 'Not implemented', flush=True )
 
 if __name__ == '__main__':
    main()

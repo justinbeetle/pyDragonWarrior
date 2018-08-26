@@ -51,6 +51,9 @@ class SurfaceEffects:
          pygame.display.flip()
          pygame.time.Clock().tick(30)
 
+   def pinkTinge(screen):
+      pass
+
 def main():
    # Initialize pygame
    pygame.init()

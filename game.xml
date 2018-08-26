@@ -85,6 +85,12 @@
          <PointTransition decoration="stoneShrineB"    fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"/>
          <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH"/>
 
+         <MapDecoration type="None" x="84" y="114">
+            <DialogCheck item="Erdrick's Token" count="1">
+               <DialogAction type="GAIN_ITEM" item="Erdrick's Token"/>
+               <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></DialogCheck>
+            <DialogGoTo label="found_nothing"/></MapDecoration>
+
          <MonsterZones>
             <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
             <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
@@ -407,6 +413,84 @@
          <MapDecoration type="chest" x="16" y="21"/>
          <MapDecoration type="chest" x="16" y="22"/>
          <MapDecoration type="chest" x="16" y="23"/>
+
+         <MapDecoration type="None" x="10" y="7">
+            <DialogCheck item="Fairy Flute" count="1">
+               <DialogAction type="GAIN_ITEM" item="Fairy Flute"/>
+               <Dialog>Fortune smiles upon thee!  Thou hast found the Fairy Flute.</Dialog></DialogCheck>
+            <DialogGoTo label="found_nothing"/></MapDecoration>
+
+         <NonPlayerCharacter type="sage" x="21" y="20" dir="SOUTH" walking="no">
+            <Dialog>This is the village of Kol.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="12" y="16" dir="SOUTH" walking="yes">
+            <Dialog>Please, save us from the minions of the Dragonlord</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="15" y="15" dir="SOUTH" walking="yes">
+            <Dialog>Dreadful is the South Island. Great strength and skill and wit only will bring thee back from that place.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="14" y="10" dir="SOUTH" walking="yes">
+            <Dialog>Golem is afraid of the music of the flute, so 'tis said.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="21" y="14" dir="NORTH" walking="no">
+            <Dialog>East of Hauksness there is a town, 'tis said, where one may purchase weapons of extraordinary quality.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="23" y="13" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Copper Sword"/>
+               <Item name="Hand Axe"/>
+               <Item name="Half Plate"/>
+               <Item name="Full Plate"/>
+               <Item name="Leather Shield"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="20" y="9" dir="SOUTH" walking="no">
+            <Dialog>In legends it is said that fairies know how to put Golem to sleep.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="20" y="5" dir="NORTH" walking="no">
+            <DialogVariable name="[COST]" value="20"/>
+            <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="13" y="2" dir="SOUTH" walking="no">
+            <Dialog>This bath cures rheumatism.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="warrior" x="7" y="7" dir="SOUTH" walking="yes">
+            <Dialog>Hast thou seen Nester? I think he may need help.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="2" y="2" dir="SOUTH" walking="no">
+            <Dialog>Though thou art as brave as thy ancestor, Hero, thou cannot defeat the great Dragonlord with such weapons. Thou shouldst come here again.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="6" y="13" dir="SOUTH" walking="yes">
+            <Dialog>Art thou the descendant of Erdrick? Hast thou any proof?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="2" y="24" dir="SOUTH" walking="no">
+            <Dialog>Rimuldar is the place to buy keys.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="8" y="20" dir="SOUTH" walking="yes">
+            <Dialog>Hast thou been to the southern island?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>I have heard that powerful enemies live there.</Dialog></DialogOption>
+               <DialogOption name="No">
+                   <Dialog>To the south, I believe, there is a town called Rimuldar.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="15" y="22" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Herb"/>
+               <Item name="Torch"/>
+               <Item name="Wings"/>
+               <Item name="Dragon's Scale"/>
+            </DialogVariable>
+            <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="3" y="13" dir="SOUTH" walking="no">
+            <Dialog>Hast thou found the flute?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>Go to the town of Cantlin.</Dialog></DialogOption>
+               <DialogOption name="No">
+                   <Dialog>Howard had it, but he went to Rimuldar and never returned.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
       <Map name="rimuldar" tiles="rimuldar.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
@@ -419,8 +503,10 @@
       <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="battle_background.png" lightRadius="unlimited">
          <LeavingTransition toMap="overworld" toX="26" toY="90" toDir="SOUTH"/>
          <MapDecoration type="None" x="19" y="13">
-            <DialogAction type="GAIN_ITEM" item="Erdrick's Armor"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Armor.</Dialog></MapDecoration>
+            <DialogCheck item="Erdrick's Armor" count="1">
+               <DialogAction type="GAIN_ITEM" item="Erdrick's Armor"/>
+               <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Armor.</Dialog></DialogCheck>
+            <DialogGoTo label="found_nothing"/></MapDecoration>
       </Map>
 
       <Map name="cantlin" tiles="cantlin.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
@@ -623,6 +709,11 @@
                <Dialog>Good morning!</Dialog></DialogOption>
             <DialogOption name="No">
                <Dialog>Okay. Good-bye, traveler.</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="found_nothing">
+         <Dialog>[NAME] searched the ground and found nothing.</Dialog></DialogScript>
+
+      <DialogScript label="end_of_dialog"/>
    </DialogScripts>
 
    <Monsters>
@@ -913,6 +1004,7 @@
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no"  usable="no"/>
          <Tool name="Staff of Rain"                                  droppable="no"  equippable="no"  usable="no"/>
          <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no"  usable="no"/>
+         <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no"  usable="yes" consumeOnUse="yes"/>
          <Tool name="Silver Harp"                                    droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
       </Tools>

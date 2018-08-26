@@ -20,7 +20,7 @@ time = pygame.time
 class AudioPlayer:
    class __AudioPlayer:
       def __init__(self):
-         #print ('in AudioPlayer::__AudioPlayer::__init__')
+         #print ('in AudioPlayer::__AudioPlayer::__init__', flush=True)
 
          #choose a desired audio format
          mixer.init(11025) #raises exception on fail
@@ -36,27 +36,27 @@ class AudioPlayer:
          self.musicThread.start()
          
       def __del__(self):
-         #print ('in AudioPlayer::__AudioPlayer::__del__')
+         #print ('in AudioPlayer::__AudioPlayer::__del__', flush=True)
          self.terminate()
          self.musicThread.join()
          mixer.quit()
          
       def setMusicPath(self, musicPath):
-         #print ('in AudioPlayer::__AudioPlayer::setMusicPath')
+         #print ('in AudioPlayer::__AudioPlayer::setMusicPath', flush=True)
          self.musicPath = musicPath
          
       def setSoundPath(self, soundPath):
-         #print ('in AudioPlayer::__AudioPlayer::setSoundPath')
+         #print ('in AudioPlayer::__AudioPlayer::setSoundPath', flush=True)
          self.soundPath = soundPath
          
       def playMusic(self, musicRelFilePath1, musicRelFilePath2 = None):
-         #print ('in AudioPlayer::__AudioPlayer::playMusic')
+         #print ('in AudioPlayer::__AudioPlayer::playMusic', flush=True)
          self.musicRelFilePath1 = self.musicRelFilePath2 = musicRelFilePath1
          if musicRelFilePath2 is not None:
             self.musicRelFilePath2 = musicRelFilePath2
          
       def __musicThread(self):
-         #print ('in AudioPlayer::__AudioPlayer::__musicThread')
+         #print ('in AudioPlayer::__AudioPlayer::__musicThread', flush=True)
          firstTime = True
          currentMusicRelFilePath1 = None
          currentMusicRelFilePath2 = None
@@ -79,7 +79,7 @@ class AudioPlayer:
                firstTime = False
 
                #start playing
-               #print ('Playing Sound...')
+               #print ('Playing Sound...', flush=True)
                channel = sound.play()
 
                #poll until finished
@@ -87,9 +87,9 @@ class AudioPlayer:
                        channel.get_busy() and
                        currentMusicRelFilePath1 == self.musicRelFilePath1 and
                        currentMusicRelFilePath2 == self.musicRelFilePath2 ): #still playing and not changed
-                  #print ('  ...still going...')
+                  #print ('  ...still going...', flush=True)
                   time.wait(100)
-               #print ('Stopping Sound...')
+               #print ('Stopping Sound...', flush=True)
                channel.stop()'''
 
                #load the music
@@ -100,7 +100,7 @@ class AudioPlayer:
                firstTime = False
 
                #start playing
-               #print ('Playing Music...')
+               #print ('Playing Music...', flush=True)
                mixer.music.play()
 
                #poll until finished
@@ -108,39 +108,39 @@ class AudioPlayer:
                        mixer.music.get_busy() and
                        currentMusicRelFilePath1 == self.musicRelFilePath1 and
                        currentMusicRelFilePath2 == self.musicRelFilePath2 ): #still playing and not changed
-                  #print ('  ...still going...')
+                  #print ('  ...still going...', flush=True)
                   time.wait(100)
-               #print ('Stopping Music...')
+               #print ('Stopping Music...', flush=True)
                mixer.music.stop()
 
-               #print ('...Finished')
+               #print ('...Finished', flush=True)
 
             time.wait(100)
-         #print ('exitted AudioPlayer::__AudioPlayer::__musicThread')
+         #print ('exitted AudioPlayer::__AudioPlayer::__musicThread', flush=True)
          
       def playSound(self, soundRelFilePath):
-         #print ('in AudioPlayer::__AudioPlayer::playSound')
+         #print ('in AudioPlayer::__AudioPlayer::playSound', flush=True)
          soundThread = threading.Thread( target=self.__soundThread, args=[soundRelFilePath] )
          soundThread.start()
          
       def __soundThread(self, soundRelFilePath):
-         #print ('in AudioPlayer::__AudioPlayer::__soundThread')
+         #print ('in AudioPlayer::__AudioPlayer::__soundThread', flush=True)
          # Load the sound if not previously loaded
          if not soundRelFilePath in self.sounds:
-            #print ('Loading sound ', soundRelFilePath)
+            #print ('Loading sound ', soundRelFilePath, flush=True)
             self.sounds[soundRelFilePath] =  mixer.Sound( os.path.join(self.soundPath, soundRelFilePath) )
 
          channel = self.sounds[soundRelFilePath].play()
          while self.running and channel.get_busy():
             time.wait(10)
-         #print ('exitted AudioPlayer::__AudioPlayer::__soundThread')
+         #print ('exitted AudioPlayer::__AudioPlayer::__soundThread', flush=True)
             
       def stopMusic(self):
-         #print ('in AudioPlayer::__AudioPlayer::stopMusic')
+         #print ('in AudioPlayer::__AudioPlayer::stopMusic', flush=True)
          self.musicRelFilePath1 = self.musicRelFilePath2 = None
          
       def terminate(self):
-         #print ('in AudioPlayer::__AudioPlayer::terminate')
+         #print ('in AudioPlayer::__AudioPlayer::terminate', flush=True)
          self.running = False
             
    instance = None
@@ -179,28 +179,28 @@ def main():
    audioPlayer.setMusicPath( os.path.join(basePath, 'data', 'music') )
    audioPlayer.setSoundPath( os.path.join(basePath, 'data', 'sounds') )
 
-   print ('Play Overture...')
+   print ('Play Overture...', flush=True)
    audioPlayer.playMusic( '01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg' )
    time.wait(1000)
-   print ('Play sound...')
+   print ('Play sound...', flush=True)
    audioPlayer.playSound( 'walking.wav' )
    time.wait(1000)
 
-   print ('Stop music...')
+   print ('Stop music...', flush=True)
    audioPlayer.stopMusic()
    time.wait(1000)
-   print ('Play sound...')
+   print ('Play sound...', flush=True)
    audioPlayer.playSound( 'walking.wav' )
    time.wait(1000)
 
-   print ('Play Overture...')
+   print ('Play Overture...', flush=True)
    audioPlayer.playMusic( '01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg' )
    time.wait(1000)
-   print ('Play sound...')
+   print ('Play sound...', flush=True)
    audioPlayer.playSound( 'walking.wav' )
    time.wait(1000)
 
-   print ('Terminate...')
+   print ('Terminate...', flush=True)
    audioPlayer.terminate()
 
 if __name__ == '__main__':

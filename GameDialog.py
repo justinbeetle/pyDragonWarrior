@@ -31,12 +31,12 @@ class GameDialog:
       #while pygame.font.SysFont( 'arial', GameDialog.fontSize ).get_height() < tileSize_pixels:
       #   GameDialog.fontSize += 1
       #GameDialog.fontSize -= 1
-      #print( 'GameDialog.fontSize =', GameDialog.fontSize )
+      #print( 'GameDialog.fontSize =', GameDialog.fontSize, flush=True )
 
       # Create font
       # TODO: Size font to tileSize_pixels
-      #print( 'pygame.font.get_default_font() =', pygame.font.get_default_font() )
-      #print( 'pygame.font.get_fonts() =', pygame.font.get_fonts() )
+      #print( 'pygame.font.get_default_font() =', pygame.font.get_default_font(), flush=True )
+      #print( 'pygame.font.get_fonts() =', pygame.font.get_fonts(), flush=True )
       GameDialog.font = pygame.font.SysFont( 'arial', GameDialog.fontSize )
       #GameDialog.font = pygame.font.Font( None, GameDialog.tileSize_pixels )
 
@@ -220,20 +220,20 @@ class GameDialog:
       for line in newMessage.split('\n'):
          lineToDisplay = None
          for word in line.split(' '):
-            #print('word =', word)
+            #print('word =', word, flush=True)
             if lineToDisplay == None:
                lineToEvaluate = word
             else:
                lineToEvaluate = lineToDisplay + ' ' + word
             lineToEvaluateSize = Point( GameDialog.font.size(lineToEvaluate) )
-            #print('lineToEvaluate =', lineToEvaluate)
+            #print('lineToEvaluate =', lineToEvaluate, flush=True)
             if lineToEvaluateSize[0] + 2 * GameDialog.outsideSpacing_pixels <= self.image.get_width():
                lineToDisplay = lineToEvaluate
-               #print('lineToDisplay =', lineToDisplay)
+               #print('lineToDisplay =', lineToDisplay, flush=True)
             else:
                newMessageLines.append( lineToDisplay )
                lineToDisplay = word
-               #print('lineToDisplay =', lineToDisplay)
+               #print('lineToDisplay =', lineToDisplay, flush=True)
          if lineToDisplay is not None:
             newMessageLines.append( lineToDisplay )
             
@@ -369,7 +369,7 @@ class GameDialog:
       if len(rowData)>0:
          numCols = len(rowData[0])
       if spacingType == GameDialogSpacing.OUTSIDE_JUSTIFIED and numCols % 2 != 0:
-         print( 'ERROR: addRowData invoked with isOutsideJustified set for odd numCols =', numCols )
+         print( 'ERROR: addRowData invoked with isOutsideJustified set for odd numCols =', numCols, flush=True )
       firstColPosX = GameDialog.outsideSpacing_pixels
       colPosX = firstColPosX
       if prompt is not None:
@@ -532,7 +532,7 @@ def main():
                isAwaitingSelection = False
             elif e.key == pygame.K_RETURN:
                isAwaitingSelection = False
-               print( 'Selection made =', menu.getSelectedMenuOption() )
+               print( 'Selection made =', menu.getSelectedMenuOption(), flush=True )
             else:
                menu.processEvent( e, screen )
          elif e.type == pygame.QUIT:
@@ -553,7 +553,7 @@ def main():
                isAwaitingSelection = False
             elif e.key == pygame.K_RETURN:
                isAwaitingSelection = False
-               print( 'Selection made =', menu.getSelectedMenuOption() )
+               print( 'Selection made =', menu.getSelectedMenuOption(), flush=True )
             else:
                menu.processEvent( e, screen )
          elif e.type == pygame.QUIT:
@@ -572,6 +572,7 @@ def main():
       
    #messageDialog.addEncounterPrompt()
    messageDialog.addMenuPrompt( ['Yes', 'No'], 2, GameDialogSpacing.SPACERS )
+   messageDialog.setFontColor( pygame.Color(252, 116, 96) )
    messageDialog.blit( screen, True )
    isAwaitingSelection = True
    while isAwaitingSelection:
@@ -581,7 +582,7 @@ def main():
                isAwaitingSelection = False
             elif e.key == pygame.K_RETURN:
                isAwaitingSelection = False
-               print( 'Selection made =', messageDialog.getSelectedMenuOption() )
+               print( 'Selection made =', messageDialog.getSelectedMenuOption(), flush=True )
             else:
                messageDialog.processEvent( e, screen )
          elif e.type == pygame.QUIT:

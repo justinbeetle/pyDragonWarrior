@@ -106,13 +106,16 @@ class CharacterState:
       return retVal
 
    def hasItem( self, itemName ):
-      retVal = False
+      return self.getItemCount( itemName) > 0
+
+   def getItemCount( self, itemName ):
+      retVal = 0
       for item in self.unequippedItems:
-         if itemName == item.name and self.unequippedItems[item] > 0:
-            retVal = True
+         if itemName == item.name:
+            retVal = self.unequippedItems[item]
             break
-      if not retVal and self.isItemEquipped( itemName ):
-         retVal = True
+      if self.isItemEquipped( itemName ):
+         retVal += 1
       return retVal
 
    def getItemOptions( self, itemName ):
@@ -157,12 +160,12 @@ class CharacterState:
             elif isinstance( item, Tool ) and item.equippable:
                self.otherEquippedItems.append( item )
             else:
-               print( 'ERROR: Item cannot be equipped:', item )
+               print( 'ERROR: Item cannot be equipped:', item, flush=True )
                self.gainItem( item )
          else:
-            print( 'WARN: Item not in inventory:', itemName )
+            print( 'WARN: Item not in inventory:', itemName, flush=True )
       else:
-         print( 'WARN: Item already equipped:', itemName )
+         print( 'WARN: Item already equipped:', itemName, flush=True )
          
    def unequipItem( self, itemName ):
       # Unequip an equipped item by removing it as eqipped and adding it as unequipped
@@ -297,8 +300,8 @@ class CharacterState:
    # TODO: Add spell checks and damage calc methods
 
    def calcDamage( minDamage, maxDamage ):
-      #print( 'minDamage =', minDamage )
-      #print( 'maxDamage =', maxDamage )
+      #print( 'minDamage =', minDamage, flush=True )
+      #print( 'maxDamage =', maxDamage, flush=True )
       damage = math.floor( minDamage + random.uniform(0, 1) * ( maxDamage - minDamage ) )
       if damage < 1:
          if random.uniform(0, 1) < 0.5:
@@ -378,13 +381,13 @@ def main():
    
    # Test out character states
    pcState = CharacterState( 'hero', Point(5,6), Direction.SOUTH, 'CAMDEN', gameInfo.levels['7'] )
-   print( pcState )
+   print( pcState, flush=True )
    pcState.hp += 2
-   print( pcState )
+   print( pcState, flush=True )
    for mapName in gameInfo.maps:
       for npc in gameInfo.maps[mapName].nonPlayerCharacters:
          npcState = CharacterState.createNpcState( npc )
-         print( npcState )
+         print( npcState, flush=True )
 
    # Terminate pygame
    audioPlayer.terminate()

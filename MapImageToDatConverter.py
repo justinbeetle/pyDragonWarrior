@@ -25,16 +25,16 @@ def main():
    # Load the map image to convert to dat file
    basePath = os.path.split(os.path.abspath(__file__))[0]
    mapImageFileName = os.path.join(basePath, sys.argv[1])
-   print( 'mapImageFileName =', mapImageFileName )
+   print( 'mapImageFileName =', mapImageFileName, flush=True )
    mapDatFileName = os.path.join(basePath, sys.argv[2])
-   print( 'mapDatFileName =', mapDatFileName )
+   print( 'mapDatFileName =', mapDatFileName, flush=True )
    mapImage = pygame.image.load(mapImageFileName).convert()
-   print( 'mapImage.get_width() =', mapImage.get_width() )
-   print( 'mapImage.get_width() / tileSize_pixels =', mapImage.get_width() / tileSize_pixels )
-   print( 'mapImage.get_height() =', mapImage.get_height() )
-   print( 'mapImage.get_height() / tileSize_pixels =', mapImage.get_height() / tileSize_pixels )
+   print( 'mapImage.get_width() =', mapImage.get_width(), flush=True )
+   print( 'mapImage.get_width() / tileSize_pixels =', mapImage.get_width() / tileSize_pixels, flush=True )
+   print( 'mapImage.get_height() =', mapImage.get_height(), flush=True )
+   print( 'mapImage.get_height() / tileSize_pixels =', mapImage.get_height() / tileSize_pixels, flush=True )
 
-   print( 'Enter symbol for border:' )
+   print( 'Enter symbol for border:', flush=True )
    borderSymbol = '\n'
    while borderSymbol == '\n':
       borderSymbol = sys.stdin.read(1)
@@ -76,7 +76,7 @@ def main():
             pygame.event.pump()
             clock.tick(5)
             # Prompt user for tile symbol
-            print( 'Enter symbol for this tile ' + str(map_x) + ',' + str(map_y) + ':' )
+            print( 'Enter symbol for this tile ' + str(map_x) + ',' + str(map_y) + ':', flush=True )
             symbol = '\n'
             while symbol == '\n':
                symbol = sys.stdin.read(1)

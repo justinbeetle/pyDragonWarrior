@@ -7,14 +7,14 @@ import pygame
 def main():
    # Initialize pygame
    pygame.init()
-   print( 'pygame.joystick.get_count() =', pygame.joystick.get_count() )
+   print( 'pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True )
    joysticks = []
    for x in range(pygame.joystick.get_count()):
       joystick = pygame.joystick.Joystick(x)
-      print( 'joystick.get_id() =', joystick.get_id() )
-      print( 'joystick.get_name() =', joystick.get_name() )
+      print( 'joystick.get_id() =', joystick.get_id(), flush=True )
+      print( 'joystick.get_name() =', joystick.get_name(), flush=True )
       if joystick.get_name() == 'Controller (Xbox One For Windows)':
-         print( 'Initializing joystick...' )
+         print( 'Initializing joystick...', flush=True )
          joystick.init()
          joysticks.append( joystick ) 
 
@@ -25,16 +25,16 @@ def main():
    isRunning = True
    while isRunning:
       for e in pygame.event.get():
-         #print( 'e =', e )
+         #print( 'e =', e, flush=True )
          if e.type == pygame.KEYDOWN:
             if e.key == pygame.K_ESCAPE:
                isRunning = False
          elif e.type == pygame.JOYBUTTONDOWN:
-            print( 'e =', e )
-            print( 'e.button =', e.button )
+            print( 'e =', e, flush=True )
+            print( 'e.button =', e.button, flush=True )
          elif e.type == pygame.JOYHATMOTION:
-            print( 'e =', e )
-            print( 'e.value =', e.value )
+            print( 'e =', e, flush=True )
+            print( 'e.value =', e.value, flush=True )
          elif e.type == pygame.QUIT:
             isRunning = False
       pygame.time.Clock().tick(30)
