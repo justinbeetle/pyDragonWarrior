@@ -331,4 +331,8 @@ def main():
    print( 'Not implemented', flush=True )
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

@@ -133,4 +133,8 @@ def main():
    print( '(p3 / 2).ceil() =', (p3 / 2).ceil(), flush=True )
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

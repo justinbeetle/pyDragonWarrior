@@ -36,7 +36,7 @@
 36) Add more caves
 37) Implement quest items
 38) Move sound selections into game.xml
-
+39) Make traversing stairs in caves optional
 
 Make custom images
 Area clearing - make the monster sets per area dynamic

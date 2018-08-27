@@ -975,4 +975,8 @@ def main():
    pygame.quit()
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

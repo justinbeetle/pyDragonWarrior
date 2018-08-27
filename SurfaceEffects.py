@@ -52,7 +52,13 @@ class SurfaceEffects:
          pygame.time.Clock().tick(30)
 
    def pinkTinge(screen):
-      pass
+      PINK = pygame.Color(252, 116, 96)
+      for x in range(screen.get_width()):
+         for y in range(screen.get_height()):
+            c = screen.get_at( (x, y) )
+            if c.r > 200 and c.g > 200 and c.b > 200:
+               screen.set_at( (x, y), PINK )
+      pygame.display.flip()
 
 def main():
    # Initialize pygame
@@ -62,4 +68,8 @@ def main():
    pygame.quit()
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

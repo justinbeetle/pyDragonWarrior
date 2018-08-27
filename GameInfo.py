@@ -223,13 +223,13 @@ class GameInfo:
       for element in xmlRoot.findall("./Maps/Map"):
          mapName = element.attrib['name']
          #print( 'mapName =', mapName, flush=True )
-         mapDatFileName = os.path.join( mapsPath, element.attrib['tiles'] )
          music = element.attrib['music']
          lightRadius = None
          if 'lightRadius' in element.attrib and element.attrib['lightRadius'] != 'unlimited':
             lightRadius = int(element.attrib['lightRadius'])
 
          # Parse transitions
+         #print( 'Parse transitions', flush=True )
          leavingTransition = None
          pointTransitions = []
          mapDecorations = []
@@ -252,6 +252,7 @@ class GameInfo:
                mapDecorations.append( MapDecoration( decorationType, fromPoint, None ) )
 
          # Parse NPCs
+         #print( 'Parse NPCs', flush=True )
          nonPlayerCharacters = []
          for npcElement in element.findall('NonPlayerCharacter'):
             nonPlayerCharacters.append( NonPlayerCharacter( npcElement.attrib['type'],
@@ -259,9 +260,10 @@ class GameInfo:
                                                                    int(npcElement.attrib['y']) ),
                                                             Direction[npcElement.attrib['dir']],
                                                             npcElement.attrib['walking'] == 'yes',
-                                                            self.parseDialog( npcElement ) ) ) #npcElement.find('Dialog').text ) )
+                                                            self.parseDialog( npcElement ) ) )
 
          # Parse standalone decorations
+         #print( 'Parse standalone decorations', flush=True )
          for decorationElement in element.findall('MapDecoration'):
             decorationType = None
             if 'type' in decorationElement.attrib and decorationElement.attrib['type'] != 'None':
@@ -271,9 +273,22 @@ class GameInfo:
                   Point( int(decorationElement.attrib['x']),
                          int(decorationElement.attrib['y']) ),
                   self.parseDialog( decorationElement ) ) )
+
+         # Parse special monsters
+         #print( 'Parse special monsters', flush=True )
+         specialMonsters = []
+         for monsterElement in element.findall('Monster'):
+            print( 'monsterElement =', monsterElement, flush=True )
+            print( 'monsterElement.attrib =', monsterElement.attrib, flush=True )
+            specialMonsters.append( SpecialMonster(
+                  monsterElement.attrib['name'],
+                  Point( int(monsterElement.attrib['x']),
+                         int(monsterElement.attrib['y']) ) ) )
          
          # Load map dat file
+         #print( 'Load map dat file', flush=True )
          mapDat = []
+         mapDatFileName = os.path.join( mapsPath, element.attrib['tiles'] )
          mapDatFile = open(mapDatFileName, 'r')
          # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
          for line in mapDatFile:
@@ -282,8 +297,26 @@ class GameInfo:
             # TODO: Validate the map is rectangular and all tiles are defined
          mapDatFile.close()
          mapDatSize = Point( len( mapDat[0] ), len( mapDat ) )
+                                    
+         # Conditionally load map dat overlap file
+         mapOverlayDat = None
+         if 'overlayTiles' in element.attrib:
+            #print( 'Load map overlay dat file', flush=True )
+            mapOverlayDat = []
+            mapOverlayDatFileName = os.path.join( mapsPath, element.attrib['overlayTiles'] )
+            mapOverlayDatFile = open(mapOverlayDatFileName, 'r')
+            # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
+            for line in mapOverlayDatFile:
+               line = line.strip('\n')
+               mapOverlayDat.append(line)
+               # TODO: Validate the map is rectangular and all tiles are defined
+            mapOverlayDatFile.close()
+            mapOverlayDatSize = Point( len( mapOverlayDat[0] ), len( mapOverlayDat ) )
+            if mapDatSize != mapOverlayDatSize:
+               print( 'ERROR: Size mismatch between the map and map overlaps.  Map size =', mapDatSize, '; Overlay size =', mapOverlayDatSize, flush=True )
 
          # Parse map monster info
+         #print( 'Parse map monster info', flush=True )
          monsterZones = []
          if 'monsterSet' in element.attrib:
             monsterZones.append( MonsterZone( 0, 0, mapDatSize.w, mapDatSize.h, element.attrib['monsterSet'] ) )
@@ -297,13 +330,16 @@ class GameInfo:
                   monsterZoneElement.attrib['set'] ) )
          
          # Load the encounter image
+         #print( 'Load the encounter image', flush=True )
          encounterImage = None
          if len(monsterZones):
             encounterImageFileName = os.path.join( encounterPath, element.attrib['encounterBackground'] )
             unscaledEncounterImage = pygame.image.load(encounterImageFileName).convert()
             encounterImage = pygame.transform.scale( unscaledEncounterImage, ( unscaledEncounterImage.get_width() * monsterScaleFactor, unscaledEncounterImage.get_height() * monsterScaleFactor ) )
-         
-         self.maps[mapName] = Map(mapName, mapDat, mapDatSize, music, lightRadius, leavingTransition, pointTransitions, nonPlayerCharacters, mapDecorations, monsterZones, encounterImage)
+
+         # Save the map information
+         #print( 'Save the map information', flush=True )
+         self.maps[mapName] = Map(mapName, mapDat, mapOverlayDat, mapDatSize, music, lightRadius, leavingTransition, pointTransitions, nonPlayerCharacters, mapDecorations, monsterZones, encounterImage, specialMonsters)
 
       # Parse dialog scripts
       for element in xmlRoot.findall("./DialogScripts/DialogScript"):
@@ -772,4 +808,8 @@ def main():
    pygame.quit()
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

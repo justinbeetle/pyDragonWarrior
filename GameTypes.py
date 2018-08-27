@@ -120,8 +120,12 @@ MapDecoration = namedtuple('MapDecoration', ['type',
                                              'point',
                                              'dialog'], verbose=False)
 
+SpecialMonster = namedtuple('SpecialMonster', ['name',
+                                               'point'], verbose=False)
+
 Map = namedtuple('Map', ['name',
                          'dat',
+                         'overlayDat',
                          'size',
                          'music',
                          'lightRadius',
@@ -130,7 +134,8 @@ Map = namedtuple('Map', ['name',
                          'nonPlayerCharacters',
                          'mapDecorations',
                          'monsterZones',
-                         'encounterImage'], verbose=False)
+                         'encounterImage',
+                         'specialMonsters'], verbose=False)
 
 Monster = namedtuple('Monster', ['name',
                                  'image',
