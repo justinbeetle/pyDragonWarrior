@@ -1,6 +1,6 @@
 <Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_snes" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0" speed="1.0" spawnRate="0" specialEdges="yes"/>
+      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no" hpPenalty="0" speed="1.0" spawnRate="0" specialEdges="yes"/>
       <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"/>
       <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/24"/>
       <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0" speed="0.9" spawnRate="1/16"/>
@@ -359,7 +359,7 @@
 
       <Map name="garinham" tiles="garinham.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">
          <LeavingTransition toMap="overworld" toX="3" toY="3" toDir="SOUTH"/>
-         <!--<PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="grave_of_garinham_lvl1" toX="1" toY="1" toDir="EAST"/>-->
+         <PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="garins_grave_lvl1" toX="7" toY="12" toDir="EAST"/>
          <MapDecoration type="door"  x="18" y="11"/>
          <MapDecoration type="door"  x="5"  y="7"/>
          <MapDecoration type="chest" x="9"  y="6"/>
@@ -699,7 +699,7 @@
          <PointTransition decoration="downstairs" fromX="10" fromY="10" toMap="erdricks_tomb_lvl2" toX="9" toY="10" toDir="SOUTH"/>
       </Map>
 
-      <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightRadius="0">
+      <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" encounterBackground="cave_battle_background.png" lightRadius="0">
          <PointTransition decoration="upstairs" fromX="9" fromY="10" toMap="erdricks_tomb_lvl1" toX="10" toY="10" toDir="SOUTH"/>
          <MapDecoration type="chest" x="10" y="4">
             <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
@@ -750,6 +750,43 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
          <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no"><Dialog>Be gone with you!!!</Dialog></NonPlayerCharacter>
          <MapDecoration type="chest" x="6" y="6"/>
+      </Map>
+
+      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs"   fromX="7"  fromY="12" toMap="garinham"          toX="20" toY="1"  toDir="WEST"/>
+         <PointTransition decoration="downstairs" fromX="2"  fromY="19" toMap="garins_grave_lvl2" toX="12" toY="3"  toDir="EAST"/><!--A-->
+         <MapDecoration type="door"  x="18" y="18"/>
+         <MapDecoration type="chest" x="12" y="1"/>
+         <MapDecoration type="chest" x="13" y="1"/>
+         <MapDecoration type="chest" x="14" y="1"/>
+      </Map>
+
+      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs"   fromX="12" fromY="3"  toMap="garins_grave_lvl1" toX="2"  toY="19" toDir="WEST"/><!--A-->
+         <PointTransition decoration="downstairs" fromX="2"  fromY="2"  toMap="garins_grave_lvl3" toX="17" toY="2"  toDir="EAST"/><!--C-->
+         <PointTransition decoration="downstairs" fromX="13" fromY="2"  toMap="garins_grave_lvl3" toX="19" toY="2"  toDir="EAST"/><!--B-->
+         <PointTransition decoration="downstairs" fromX="6"  fromY="7"  toMap="garins_grave_lvl3" toX="7"  toY="12" toDir="EAST"/><!--D-->
+         <PointTransition decoration="downstairs" fromX="2"  fromY="11" toMap="garins_grave_lvl3" toX="3"  toY="18" toDir="EAST"/><!--E-->
+         <PointTransition decoration="downstairs" fromX="13" fromY="11" toMap="garins_grave_lvl3" toX="19" toY="14" toDir="EAST"/><!--F-->
+      </Map>
+
+      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs"   fromX="15" fromY="2"  toMap="garins_grave_lvl2" toX="2"  toY="2"  toDir="WEST"/><!--C-->
+         <PointTransition decoration="upstairs"   fromX="19" fromY="2"  toMap="garins_grave_lvl2" toX="13" toY="2"  toDir="WEST"/><!--B-->
+         <PointTransition decoration="upstairs"   fromX="7"  fromY="12" toMap="garins_grave_lvl2" toX="6"  toY="7"  toDir="WEST"/><!--D-->
+         <PointTransition decoration="upstairs"   fromX="19" fromY="14" toMap="garins_grave_lvl2" toX="13" toY="11" toDir="WEST"/><!--F-->
+         <PointTransition decoration="upstairs"   fromX="3"  fromY="18" toMap="garins_grave_lvl2" toX="2"  toY="11" toDir="WEST"/><!--E-->
+         <PointTransition decoration="downstairs" fromX="10" fromY="6"  toMap="garins_grave_lvl4" toX="1"  toY="5"  toDir="EAST"/><!--G-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="10" toMap="garins_grave_lvl4" toX="6"  toY="5"  toDir="EAST"/><!--H-->
+         <MapDecoration type="chest" x="2"  y="2"/>
+         <MapDecoration type="chest" x="14" y="7">
+            <DialogAction type="GAIN_ITEM" item="Silver Harp"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightRadius="0">
+         <PointTransition decoration="upstairs"   fromX="1"  fromY="5"  toMap="garins_grave_lvl3" toX="10" toY="6"  toDir="WEST"/><!--G-->
+         <PointTransition decoration="upstairs"   fromX="6"  fromY="5"  toMap="garins_grave_lvl3" toX="11" toY="10" toDir="WEST"/><!--H-->
       </Map>
    </Maps>
 
