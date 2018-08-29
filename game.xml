@@ -341,6 +341,7 @@
             <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="25" y="5" dir="WEST" walking="no">
+            <DialogVariable name="[COST]" value="38"/>
             <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="26" y="26" dir="WEST" walking="no">
@@ -597,6 +598,100 @@
          <MapDecoration type="chest" x="28" y="26"/>
          <MapDecoration type="chest" x="28" y="28"/>
          <MapDecoration type="chest" x="3"  y="28"/>
+
+         <NonPlayerCharacter type="merchant" x="9" y="4" dir="SOUTH" walking="no">
+            <DialogVariable name="[COST]" value="100"/>
+            <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="23" y="6" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Bamboo Pole"/>
+               <Item name="Club"/>
+               <Item name="Copper Sword"/>
+               <Item name="Leather Armor"/>
+               <Item name="Chain Mail"/>
+               <Item name="Iron Shield"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="16" y="7" dir="SOUTH" walking="yes">
+            <Dialog>Welcome to Cantlin, the castle town.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="28" y="7" dir="SOUTH" walking="no">
+            <DialogVariable name="[COST]" value="98"/>
+            <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="3" y="8" dir="EAST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Herb"/>
+               <Item name="Torch"/>
+            </DialogVariable>
+            <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="6" y="8" dir="SOUTH" walking="yes">
+            <Dialog>'Tis said that the Dragonlord hath claws that can cleave iron and fiery breath that can melt stone. Dost thou still wish to go on?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>Thou art truly brave.</Dialog></DialogOption>
+               <DialogOption name="No">
+                   <Dialog>That is good. No one will say thou art afraid.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="23" y="10" dir="SOUTH" walking="yes">
+            <Dialog>It is said that many have held Erdrick's armor. The last to have it was a fellow named Wynn.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="3" y="13" dir="EAST" walking="no">
+            <Dialog>Come buy my radishes! They are fresh and cheap. Buy thy radishes today!</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="8" y="13" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Dragon's Scale"/>
+               <Item name="Wings"/>
+            </DialogVariable>
+            <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="25" y="13" dir="EAST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Flame Sword"/>
+               <Item name="Silver Shield"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="23" y="14" dir="WEST" walking="no">
+            <DialogVariable name="[COST]" value="38"/>
+            <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="5" y="15" dir="WEST" walking="yes">
+            <Dialog>What shall I get for thy dinner?</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="11" y="15" dir="EAST" walking="yes">
+            <Dialog>I know nothing.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="16" y="17" dir="SOUTH" walking="no">
+            <Dialog>To learn how proof may be obtained that thy ancestor was the great Erdrick, see a man in this very town.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="26" y="18" dir="SOUTH" walking="yes">
+            <Dialog>Grandfather used to say that his friend, Wynn, had buried something of great value at the foot of a tree behind his shop.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="21" y="19" dir="SOUTH" walking="yes">
+            <Dialog>I'm Nester. Hey, where am I? No, don't tell me!</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="23" y="23" dir="SOUTH" walking="no">
+            <Dialog>'Tis said that Erdrick's sword could cleave steel.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="28" y="27" dir="WEST" walking="no">
+            <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+               <Item name="Hand Axe"/>
+               <Item name="Broad Sword"/>
+               <Item name="Full Plate"/>
+               <Item name="Magic Armor"/>
+            </DialogVariable>
+            <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="4" y="28" dir="SOUTH" walking="yes">
+            <Dialog>My Grandfather Wynn once had a shop on the east side of Hauksness.</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="15" y="29" dir="SOUTH" walking="no">
+            <Dialog>Let us wish the warrior well! May the light be thy strength! Thou may go and search. From Tantegel Castle travel 70 leagues to the south and 40 to the east.</Dialog></NonPlayerCharacter>
       </Map>
 
       <Map name="erdricks_tomb_lvl1" tiles="erdricks_tomb_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightRadius="0">
@@ -734,8 +829,8 @@
       <DialogScript label="key_vendor">
          <DialogVariable name="[ITEM]" value="Key"/>
          <Dialog>Magic keys! They will unlock any door. Dost thou wish to purchase one for [COST] gold peices?</Dialog>
-         <DialogOptions>
-            <DialogOption name="Yes" label="key_buy_option">
+         <DialogOptions label="key_buy_option">
+            <DialogOption name="Yes">
                <DialogCheck item="gp" count="[COST]">
                   <Dialog>Thou dost not have enough gold.</Dialog>
                   <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
@@ -748,16 +843,17 @@
                <Dialog>I will see thee later.</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="fairy_water_vendor">
+         <DialogVariable name="[ITEM]" value="Fairy Water"/>
          <Dialog>Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?</Dialog>
-         <DialogOptions>
-            <DialogOption name="Yes" label="fairy_water_buy_option">
+         <DialogOptions label="fairy_water_buy_option">
+            <DialogOption name="Yes">
                <DialogCheck item="gp" count="[COST]">
                   <Dialog>Thou dost not have enough gold.</Dialog>
                   <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
-               <Dialog>I thank thee. Won't thou buy one more bottle? </Dialog>
+               <Dialog>I thank thee. Won't thou buy one more bottle?</Dialog>
                <DialogGoTo label="fairy_water_buy_option"/></DialogOption>
             <DialogOption name="No">
                <Dialog>All the best to thee.</Dialog></DialogOption></DialogOptions></DialogScript>
@@ -784,7 +880,7 @@
                <Dialog>Have a great night!</Dialog>
                <DialogAction type="NIGHT_AT_INN"/>
                <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
-               <Dialog>Good morning!</Dialog></DialogOption>
+               <Dialog>Good morning!  Thou seems to have spent a good night.  I shall see thee again.</Dialog></DialogOption>
             <DialogOption name="No">
                <Dialog>Okay. Good-bye, traveler.</Dialog></DialogOption></DialogOptions></DialogScript>
 
@@ -1040,7 +1136,7 @@
          <Weapon name="Hand Axe"         attackBonus="15"  gp="560"/>
          <Weapon name="Broad Sword"      attackBonus="20"  gp="1500"/>
          <Weapon name="Flame Sword"      attackBonus="28"  gp="9800"/>
-         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="1"/>
+         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"/>
       </Weapons>
       <Armors>
          <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
@@ -1049,13 +1145,13 @@
          <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
          <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
          <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" hpRegenTiles="3"/>
-         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="1"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" hpRegenTiles="1"/>
+         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" hpRegenTiles="1"/>
       </Armors>
       <Shields>
          <Shield name="Leather Shield"   defenseBonus="4"  gp="90"/>
          <Shield name="Iron Shield"      defenseBonus="10" gp="800"/>
          <Shield name="Silver Shield"    defenseBonus="20" gp="14800"/>
-         <Shield name="Erdrick's Shield" defenseBonus="25" gp="1"/>
+         <Shield name="Erdrick's Shield" defenseBonus="25" gp="2"/>
       </Shields>
       <Tools>
          <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes" usable="no"/>
