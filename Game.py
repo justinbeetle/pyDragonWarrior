@@ -930,11 +930,14 @@ class Game:
 
          # At destination - now determine if an encounter should start
          if transition is not None:
-            self.gameState.setMap( transition.destMap )
             self.gameState.pc.currPos_datTile = transition.destPoint
             self.gameState.pc.destPos_datTile = transition.destPoint
             self.gameState.pc.currPosOffset_imgPx = Point(0,0)
             self.gameState.pc.dir = transition.destDir
+            if transition.destMap != self.gameState.mapState.mapName:
+               self.gameState.setMap( transition.destMap )
+            else:
+               self.gameState.drawMap( True )
          elif ( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and
                 random.uniform(0, 1) < destTileType.spawnRate ):
             # TODO: Check for special monsters!!!
