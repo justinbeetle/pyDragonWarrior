@@ -90,6 +90,8 @@
                <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></DialogCheck>
             <DialogGoTo label="found_nothing"/></MapDecoration>
 
+         <Monster name="Golem" x="74" y="101"/> <!-- TODO: Make one-time -->
+
          <MonsterZones>
             <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
             <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
@@ -738,6 +740,8 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="1"  toMap="overworld" toX="105" toY="45" toDir="NORTH"/>
          <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
          <MapDecoration type="door"  x="6"  y="21"/>
+
+         <Monster name="Green Dragon" x="5" y="15"/> <!-- TODO: Make one-time -->
       </Map>
 
       <Map name="northern_shrine" tiles="northern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited">

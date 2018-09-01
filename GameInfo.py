@@ -474,6 +474,12 @@ class GameInfo:
          self.pc_name = initialStateElement.attrib['name']
       self.pc_xp = int(initialStateElement.attrib['xp'])
       self.pc_gp = int(initialStateElement.attrib['gp'])
+      self.pc_hp = None
+      self.pc_mp = None
+      if 'hp' in initialStateElement.attrib:
+         self.pc_hp = int(initialStateElement.attrib['hp'])
+      if 'mp' in initialStateElement.attrib:
+         self.pc_mp = int(initialStateElement.attrib['mp'])
       self.pc_weapon = None
       self.pc_armor = None
       self.pc_shield = None

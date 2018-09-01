@@ -499,16 +499,19 @@ class Game:
                               hpRecover = random.randrange( spell.minHpRecover, spell.maxHpRecover )
                               self.gameState.pc.hp = min( self.gameState.pc.level.hp, self.gameState.pc.hp + hpRecover )
                            elif spell.name == 'Radiant':
-                              if self.gameState.lightRadius is not None and self.gameState.lightRadius < 8:
+                              if self.gameState.lightRadius is not None and self.gameState.lightRadius < 6:
                                  # TODO: Add diminishing light radius
-                                 self.gameState.lightRadius = 8
+                                 self.gameState.lightRadius = 6
                                  self.gameState.drawMap()
                            elif spell.name == 'Outside':
                               # TODO: If not on the overworld map, go to the last coordinates from the overworld map
                               print( 'Spell not implemented', flush=True )
                            elif spell.name == 'Return':
-                              # TODO: If on the overworld map, go to some coordinates
-                              print( 'Spell not implemented', flush=True )
+                              # TODO: Return shouldn't work from caves and the return coordinates shouldn't be hardcoded
+                              self.gameState.pc.currPos_datTile = Point(43, 44)
+                              self.gameState.pc.currPosOffset_imgPx = Point(0,0)
+                              self.gameState.pc.dir = Direction.SOUTH
+                              self.gameState.setMap( 'overworld' )
                            elif spell.name == 'Repel':
                               print( 'Spell not implemented', flush=True )
                            
@@ -637,8 +640,17 @@ class Game:
       pygame.event.get() # Clear event queue
       origScreen = self.gameState.screen.copy()
       
+      # Check for special monsters
+      monster = None
+      for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
+         if specialMonster.point == self.gameState.pc.currPos_datTile:
+            monster = self.gameState.gameInfo.monsters[ specialMonster.name ]
+            
       # Pick the monster
-      monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
+      if monster is None:
+         monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
+
+      # Pick monster HP and GP
       if monster.minHp == monster.maxHp:
          monster_hp = monster.minHp
       else:
@@ -833,6 +845,7 @@ class Game:
    def checkForPlayerDeath( self, messageDialog = None ):
       if self.gameState.pc.hp <= 0:
          # Player death
+         self.gameState.pc.hp = 0
          audioPlayer = AudioPlayer()
          AudioPlayer().stopMusic()
          AudioPlayer().playSound( '20_-_Dragon_Warrior_-_NES_-_Dead.ogg' )
@@ -842,7 +855,6 @@ class Game:
          else:
             messageDialog.addMessage( 'Thou art dead.' )
             self.waitForAcknowledgement( messageDialog )
-         self.gameState.mapState = self.gameState.gameInfo.getMapImageInfo( self.gameState.gameInfo.deathMap, self.gameState.imagePad_tiles )
          self.gameState.pc.currPos_datTile = self.gameState.gameInfo.deathHeroPos_datTile
          self.gameState.pc.currPosOffset_imgPx = Point(0,0)
          self.gameState.pc.dir = self.gameState.gameInfo.deathHeroPos_dir
@@ -850,7 +862,7 @@ class Game:
          self.gameState.pc.hp = self.gameState.pc.level.hp
          self.gameState.pc.mp = self.gameState.pc.level.mp
          self.gameState.pc.gp = math.floor( self.gameState.pc.gp / 2 )
-      
+         self.gameState.setMap( self.gameState.gameInfo.deathMap )
 
    def scrollTile(self): # return (destMap, destPoint) if making transition, else None
 
@@ -886,8 +898,8 @@ class Game:
             # See if this tile has any associated transitions
             print('Check for transitions at', heroDest_datTile, flush=True) # TODO: Uncomment for coordinate logging
             for pointTransition in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].pointTransitions:
-               #print ('Found transition at point: ', pointTransition.srcPoint, flush=True)
                if pointTransition.srcPoint == heroDest_datTile:
+                  #print ('Found transition at point: ', pointTransition.srcPoint, flush=True)
                   transition = pointTransition
 
          # Check for tile penalty effects
@@ -938,10 +950,18 @@ class Game:
                self.gameState.setMap( transition.destMap )
             else:
                self.gameState.drawMap( True )
-         elif ( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and
+         else:
+            # Check for special monster encounters
+            monster = None
+            for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
+               if specialMonster.point == self.gameState.pc.currPos_datTile:
+                  print ('Found monster at point: ', specialMonster.point, flush=True)
+                  self.gameMode = GameMode.ENCOUNTER
+
+            # Check for random encounters
+            if( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and
                 random.uniform(0, 1) < destTileType.spawnRate ):
-            # TODO: Check for special monsters!!!
-            self.gameMode = GameMode.ENCOUNTER
+               self.gameMode = GameMode.ENCOUNTER
 
 def main():
    pygame.init()

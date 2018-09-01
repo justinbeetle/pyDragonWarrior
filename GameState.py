@@ -45,6 +45,10 @@ class GameState:
          CharacterState.calcLevel( self.gameInfo.levels, self.gameInfo.pc_xp ) )
       self.pc.xp = self.gameInfo.pc_xp
       self.pc.gp = self.gameInfo.pc_gp
+      if self.gameInfo.pc_hp is not None and self.gameInfo.pc_hp < self.pc.hp:
+         self.pc.hp = self.gameInfo.pc_hp
+      if self.gameInfo.pc_mp is not None and self.gameInfo.pc_mp < self.pc.mp:
+         self.pc.mp = self.gameInfo.pc_mp
       self.pc.weapon = self.gameInfo.pc_weapon
       self.pc.armor = self.gameInfo.pc_armor
       self.pc.shield = self.gameInfo.pc_shield
@@ -60,6 +64,8 @@ class GameState:
       xmlRoot.attrib['dir'] = self.pc.dir.name
       xmlRoot.attrib['xp'] = str(self.pc.xp)
       xmlRoot.attrib['gp'] = str(self.pc.gp)
+      xmlRoot.attrib['hp'] = str(self.pc.hp)
+      xmlRoot.attrib['mp'] = str(self.pc.mp)
 
       itemsElement = xml.etree.ElementTree.SubElement( xmlRoot, 'EquippedItems' )
       if self.pc.weapon is not None:
