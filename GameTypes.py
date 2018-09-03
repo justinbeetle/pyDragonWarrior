@@ -27,13 +27,33 @@ class Phase(Enum):
    A = 1
    B = 2
 
-class DialogActionEnum(Enum):
-   SAVE_GAME = 1
-   MAGIC_RESTORE = 2
-   NIGHT_AT_INN = 3
-   LOSE_ITEM = 4
-   GAIN_ITEM = 5
+# Conditionals supported for dialog checks
+class DialogCheckEnum(Enum):
+   HAS_ITEM = 1                      # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
+   IS_FACING_DOOR = 2                # attributes: <none>
+   IS_OUTSIDE = 3                    # attributes: count (number, range, or unlimited)
+   IS_INSIDE = 4                     # attributes: count (number, range, or unlimited)
+   IS_DARK = 5                       # attributes: <none>
+   IS_AT_COORDINATES = 6             # attributes: map, x, y
 
+# Actions that can be triggered from dialog
+class DialogActionEnum(Enum):
+   SAVE_GAME = 1                     # attributes: <none>
+   MAGIC_RESTORE = 2                 # attributes: count (number, range, or unlimited)
+   HEALTH_RESTORE = 3                # attributes: count (number, range, or unlimited)
+   LOSE_ITEM = 4                     # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
+   GAIN_ITEM = 5                     # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
+   SET_LIGHT_RADIUS = 6              # attributes: count, decay (number or unlimited)
+   REPEL_MONSTERS = 7                # attributes: decay
+   GOTO_COORDINATES = 8              # attributes: map, x, y, dir
+   GOTO_LAST_OUTSIDE_COORDINATES = 9 # attributes: <none>
+   PLAY_SOUND = 10                   # attributes: name
+   PLAY_MUSIC = 11                   # attributes: name (currently play it once and return to looping on the prior music)
+   VISUAL_EFFECT = 12                # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect)
+   ATTACK_MONSTER = 13               # attributes: name
+   OPEN_DOOR = 14                    # attributes: <none>
+
+# Branch to a labeled dialog state
 class DialogGoTo:
    def __init__(self, label):
       self.label = label
@@ -55,24 +75,34 @@ class DialogVendorSellOptions:
    def __str__(self):
       return "%s(%s)" % (self.__class__.__name__, self.itemTypes)
 
+# Conditionally branch dialog if the check condition is not met
 class DialogCheck:
-   def __init__(self, itemName, itemCount, failedCheckDialog ):
-      self.itemName = itemName
-      self.itemCount = itemCount
-      self.failedCheckDialog = failedCheckDialog
-      
-   def __str__(self):
-      return "%s(%s, %s, %s)" % (self.__class__.__name__, self.itemName, self.itemCount, self.failedCheckDialog)
-
-class DialogAction:
-   def __init__(self, type, itemName = None, itemCount = 1):
+   def __init__(self, type, failedCheckDialog, name = None, count = 1, mapName = None, mapPos = None ):
       self.type = type
-      self.itemName = itemName
-      self.itemCount = itemCount
+      self.failedCheckDialog = failedCheckDialog
+      self.name = name
+      self.count = count
+      self.mapName = mapName
+      self.mapPos = mapPos
       
    def __str__(self):
-      return "%s(%s, %s, %s)" % (self.__class__.__name__, self.type, self.itemName, self.itemCount)
+      return "%s(%s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.type, self.failedCheckDialog, self.name, self.count, self.mapName, self.mapPos)
 
+# Conditionally branch dialog if the check condition is not met
+class DialogAction:
+   def __init__(self, type, name = None, count = 1, decaySteps = None, mapName = None, mapPos = None, mapDir = None):
+      self.type = type
+      self.name = name
+      self.count = count
+      self.decaySteps = decaySteps
+      self.mapName = mapName
+      self.mapPos = mapPos
+      self.mapDir = mapDir
+      
+   def __str__(self):
+      return "%s(%s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.type, self.name, self.count, self.decaySteps, self.mapName, self.mapPos, self.mapDir)
+
+# Set a variaable to be used in substitution for the remainder of the dialog session
 class DialogVariable:
    def __init__(self, name, value):
       self.name = name
@@ -200,17 +230,20 @@ Shield = namedtuple('Shield', ['name',
                                'defenseBonus',
                                'gp'], verbose=False)
 
-Tool = namedtuple('Tool', ['name',
-                           'attackBonus',
-                           'defenseBonus',
-                           'minHpRecover',
-                           'maxHpRecover',
-                           'lightRadius',
-                           'gp',
-                           'droppable',
-                           'equippable',
-                           'usable',
-                           'consumeOnUse'], verbose=False)
+# Tool as class as the namedtuple variant wasn't hashable for use in a dict
+class Tool:
+   def __init__(self, name, attackBonus, defenseBonus, gp, droppable, equippable, useDialog):
+      self.name = name
+      self.attackBonus = attackBonus
+      self.defenseBonus = defenseBonus
+      self.gp = gp
+      self.droppable = droppable
+      self.equippable = equippable
+      self.useDialog = useDialog
+      
+   def __str__(self):
+      return "%s(%s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.name, self.attackBonus, self.defenseBonus, self.gp, self.droppable, self.equippable, self.useDialog)
+   
 
 MapImageInfo = namedtuple('MapImageInfo', ['mapName',
                                            'mapImage',

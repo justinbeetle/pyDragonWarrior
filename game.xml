@@ -85,8 +85,8 @@
          <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH"/>
 
          <MapDecoration type="None" x="84" y="114">
-            <DialogCheck item="Erdrick's Token" count="1">
-               <DialogAction type="GAIN_ITEM" item="Erdrick's Token"/>
+            <DialogCheck type="HAS_ITEM" name="Erdrick's Token" count="1">
+               <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
                <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></DialogCheck>
             <DialogGoTo label="found_nothing"/></MapDecoration>
 
@@ -177,16 +177,16 @@
          <MapDecoration type="door"  x="5"  y="14"/>
          <MapDecoration type="door"  x="19" y="7"/>
          <MapDecoration type="chest" x="2"  y="14">
-            <DialogAction type="GAIN_ITEM" item="gp" count="8"/>
+            <DialogAction type="GAIN_ITEM" name="gp" count="8"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found 8 gold pieces.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="2"  y="16">
-            <DialogAction type="GAIN_ITEM" item="gp" count="9"/>
+            <DialogAction type="GAIN_ITEM" name="gp" count="9"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found 9 gold pieces.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="3"  y="15">
-            <DialogAction type="GAIN_ITEM" item="gp" count="13"/>
+            <DialogAction type="GAIN_ITEM" name="gp" count="13"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found 13 gold pieces.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="4"  y="16">
-            <DialogAction type="GAIN_ITEM" item="gp" count="11"/>
+            <DialogAction type="GAIN_ITEM" name="gp" count="11"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found 11 gold pieces.</Dialog></MapDecoration>
 
          <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no">
@@ -232,7 +232,8 @@
             <Dialog>Where oh where can I find Princess Gwaelin?</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
-            <DialogAction type="MAGIC_RESTORE"/>
+            <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+            <DialogAction type="MAGIC_RESTORE" count="unlimited"/>
             <Dialog>[NAME]'s coming was foretold by legend. May the light shine upon this brave warrior.</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="25" y="22" dir="NORTH" walking="yes">
@@ -417,8 +418,8 @@
          <MapDecoration type="chest" x="16" y="23"/>
 
          <MapDecoration type="None" x="10" y="7">
-            <DialogCheck item="Fairy Flute" count="1">
-               <DialogAction type="GAIN_ITEM" item="Fairy Flute"/>
+            <DialogCheck type="HAS_ITEM" name="Fairy Flute" count="1">
+               <DialogAction type="GAIN_ITEM" name="Fairy Flute"/>
                <Dialog>Fortune smiles upon thee!  Thou hast found the Fairy Flute.</Dialog></DialogCheck>
             <DialogGoTo label="found_nothing"/></MapDecoration>
 
@@ -541,7 +542,7 @@
             <Dialog>Thou shalt find the Stones of Sunlight in Tantegel Castle, if thou has not found them yet.</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="16" y="27" dir="SOUTH" walking="yes">
-            <DialogCheck item="Fighter's Ring" count="1">
+            <DialogCheck type="HAS_ITEM" name="Fighter's Ring" count="1">
                <Dialog>All true warriors wear a ring.</Dialog></DialogCheck>
             <Dialog>Is that a wedding ring? Thou seems too young to be married.</Dialog></NonPlayerCharacter>
 
@@ -582,8 +583,8 @@
       <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="battle_background.png" lightRadius="unlimited">
          <LeavingTransition toMap="overworld" toX="26" toY="90" toDir="SOUTH"/>
          <MapDecoration type="None" x="19" y="13">
-            <DialogCheck item="Erdrick's Armor" count="1">
-               <DialogAction type="GAIN_ITEM" item="Erdrick's Armor"/>
+            <DialogCheck type="HAS_ITEM" name="Erdrick's Armor" count="1">
+               <DialogAction type="GAIN_ITEM" name="Erdrick's Armor"/>
                <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Armor.</Dialog></DialogCheck>
             <DialogGoTo label="found_nothing"/></MapDecoration>
 
@@ -714,7 +715,7 @@
          <PointTransition decoration="downstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl2" toX="7"  toY="6"  toDir="SOUTH"/>
          <PointTransition decoration="downstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl2" toX="13" toY="13" toDir="SOUTH"/>
          <MapDecoration type="chest" x="14" y="6">
-            <DialogAction type="GAIN_ITEM" item="Herb"/>
+            <DialogAction type="GAIN_ITEM" name="Herb"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
@@ -723,16 +724,16 @@
          <PointTransition decoration="upstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl1" toX="7"  toY="6"  toDir="SOUTH"/>
          <PointTransition decoration="upstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl1" toX="13" toY="13" toDir="SOUTH"/>
          <MapDecoration type="chest" x="3" y="3">
-            <DialogAction type="GAIN_ITEM" item="Torch"/>
+            <DialogAction type="GAIN_ITEM" name="Torch"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="4" y="3">
-            <DialogAction type="GAIN_ITEM" item="Fighter's Ring"/>
+            <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="2" y="7">
-            <DialogAction type="GAIN_ITEM" item="Gold" count="14"/> <!-- TODO: Change to 10-17 -->
+            <DialogAction type="GAIN_ITEM" name="Gold" count="14"/> <!-- TODO: Change to 10-17 -->
             <Dialog>Fortune smiles upon thee!  Thou hast found 14 gold pieces.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="11" y="10">
-            <DialogAction type="GAIN_ITEM" item="Gold" count="115"/> <!-- TODO: Change to 100-128 -->
+            <DialogAction type="GAIN_ITEM" name="Gold" count="115"/> <!-- TODO: Change to 100-128 -->
             <Dialog>Fortune smiles upon thee!  Thou hast found 115 gold pieces.</Dialog></MapDecoration>
       </Map>
 
@@ -784,7 +785,7 @@
          <PointTransition decoration="downstairs" fromX="11" fromY="10" toMap="garins_grave_lvl4" toX="6"  toY="5"  toDir="EAST"/><!--H-->
          <MapDecoration type="chest" x="2"  y="2"/>
          <MapDecoration type="chest" x="14" y="7">
-            <DialogAction type="GAIN_ITEM" item="Silver Harp"/>
+            <DialogAction type="GAIN_ITEM" name="Silver Harp"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
       </Map>
 
@@ -830,7 +831,7 @@
          <PointTransition decoration="downstairs" fromX="1"  fromY="9"  toMap="charlock_lvl4"  toX="6"  toY="5"  toDir="EAST"/><!--M-->
          <PointTransition decoration="downstairs" fromX="2"  fromY="10" toMap="charlock_lvl4"  toX="1"  toY="10" toDir="EAST"/><!--N-->
          <MapDecoration type="chest" x="6" y="6">
-            <DialogAction type="GAIN_ITEM" item="Erdrick's Sword"/>
+            <DialogAction type="GAIN_ITEM" name="Erdrick's Sword"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
 
@@ -894,15 +895,15 @@
             <DialogOption name="Buy">
                <Dialog>What dost thou wish to buy?</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
-               <DialogCheck item="gp" count="[COST]">
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>Sorry. Thou hast not enough gold.</Dialog>
                   <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                   <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogCheck>
                <Dialog>The [ITEM]?  Is that okay?</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
-                     <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
-                     <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/></DialogOption>
+                     <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
                <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
@@ -912,8 +913,8 @@
                <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
-                     <DialogAction type="LOSE_ITEM" item="[ITEM]"/>
-                     <DialogAction type="GAIN_ITEM" item="gp" count="[COST]"/></DialogOption>
+                     <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
                <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
@@ -929,15 +930,15 @@
             <DialogOption name="Buy">
                <Dialog>What dost thou want?</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
-               <DialogCheck item="gp" count="[COST]">
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>Sorry. Thou hast not enough gold.</Dialog>
                   <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                   <DialogGoTo label="buy_or_sell_tool_option"/></DialogCheck>
                <Dialog>The [ITEM]?  Is that okay?</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
-                     <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
-                     <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/></DialogOption>
+                     <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
                <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
@@ -947,8 +948,8 @@
                <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
-                     <DialogAction type="LOSE_ITEM" item="[ITEM]"/>
-                     <DialogAction type="GAIN_ITEM" item="gp" count="[COST]"/></DialogOption>
+                     <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
                <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
                <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
@@ -960,12 +961,12 @@
          <Dialog>Magic keys! They will unlock any door. Dost thou wish to purchase one for [COST] gold peices?</Dialog>
          <DialogOptions label="key_buy_option">
             <DialogOption name="Yes">
-               <DialogCheck item="gp" count="[COST]">
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>Thou dost not have enough gold.</Dialog>
                   <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
-               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
-               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>Here, take this key. Dost thou wish to purchase more?</Dialog>
                <DialogGoTo label="key_buy_option"/></DialogOption>
             <DialogOption name="No">
@@ -976,12 +977,12 @@
          <Dialog>Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?</Dialog>
          <DialogOptions label="fairy_water_buy_option">
             <DialogOption name="Yes">
-               <DialogCheck item="gp" count="[COST]">
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>Thou dost not have enough gold.</Dialog>
                   <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
-               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
-               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>I thank thee. Won't thou buy one more bottle?</Dialog>
                <DialogGoTo label="fairy_water_buy_option"/></DialogOption>
             <DialogOption name="No">
@@ -990,12 +991,12 @@
       <DialogScript label="single_item_vendor_buy_option">
          <DialogOptions>
             <DialogOption name="Yes">
-               <DialogCheck item="gp" count="[COST]">
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>Thou dost not have enough gold.</Dialog>
                   <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
-               <DialogAction type="GAIN_ITEM" item="[ITEM]"/>
-               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>Would you like to buy another?</Dialog>
                <DialogGoTo label="single_item_vendor_buy_option"/></DialogOption>
             <DialogOption name="No">
@@ -1005,10 +1006,13 @@
          <Dialog>Welcome to the Traveler's Inn. Room and board is [COST] gold pieces per night. Dost thou want a room?</Dialog>
          <DialogOptions>
             <DialogOption name="Yes">
-               <DialogCheck item="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
+               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
                <Dialog>Have a great night!</Dialog>
-               <DialogAction type="NIGHT_AT_INN"/>
-               <DialogAction type="LOSE_ITEM" item="gp" count="[COST]"/>
+               <DialogAction type="PLAY_MUSIC" name="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"/>
+               <DialogAction type="VISUAL_EFFECT" name="fadeToBlackAndBack"/>
+               <DialogAction type="MAGIC_RESTORE" count="unlimited"/>
+               <DialogAction type="HEALTH_RESTORE" count="unlimited"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>Good morning!  Thou seems to have spent a good night.  I shall see thee again.</Dialog></DialogOption>
             <DialogOption name="No">
                <Dialog>Okay. Good-bye, traveler.</Dialog></DialogOption></DialogOptions></DialogScript>
@@ -1283,33 +1287,73 @@
          <Shield name="Erdrick's Shield" defenseBonus="25" gp="2"/>
       </Shields>
       <Tools>
-         <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes" usable="no"/>
-         <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
-         <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes" usable="no"/>
-         <Tool name="Herb"               hpRecover="23-30" gp="24"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
+         <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes"/>
 
-         <Tool name="Key"                opensDoors="yes"  gp="53"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
-         <Tool name="Key Ring"           opensDoors="yes"  gp="1000" droppable="yes" equippable="no"  usable="yes" consumeOnUse="no"/>
+         <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no">
+            <DialogAction type="REPEL_MONSTERS" decay="128"/>
+            <DialogAction type="LOSE_ITEM" name="Fairy Water" count="1"/>
+            <Dialog>[NAME] drank the vial of Fairy Water.</Dialog></Tool>
 
-         <Tool name="Torch"              lightRadius="1"   gp="8"    droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes">
-            <DialogCheck item="lightRadius" count="unlimited"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogCheck>
-            <DialogAction type="LIGHT_RADIUS" size="1" fadeSteps="unlimited"/>
+         <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
+
+         <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no">
+            <DialogAction type="HEALTH_RESTORE" count="23-30"/>
+            <DialogAction type="LOSE_ITEM" name="Herb" count="1"/>
+            <Dialog>[NAME] ate the Herb.</Dialog></Tool>
+
+         <Tool name="Key"                opensDoors="yes"  gp="53"   droppable="yes" equippable="no">
+            <DialogCheck type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogCheck>
+            <DialogAction type="LOSE_ITEM" name="Key" count="1"/>
+            <DialogAction type="OPEN_DOOR"/></Tool>
+
+         <Tool name="Key Ring"           opensDoors="yes"  gp="1000" droppable="yes" equippable="no">
+            <DialogCheck type="IS_FACING_DOOR"><Dialog>A key ring will open a locked door.  Unlike a key it is reusable.</Dialog></DialogCheck>
+            <DialogAction type="OPEN_DOOR"/></Tool>
+
+         <Tool name="Torch"              lightRadius="1"   gp="8"    droppable="yes" equippable="no">
+            <DialogCheck type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogCheck>
+            <DialogAction type="LOSE_ITEM" name="Torch" count="1"/>
+            <DialogAction type="SET_LIGHT_RADIUS" count="1" decay="unlimited"/>
             <Dialog>[NAME] lit a torch.</Dialog></Tool>
 
-         <Tool name="Lantern"            lightRadius="1"   gp="125"  droppable="yes" equippable="no"  usable="yes" consumeOnUse="no">
-            <DialogCheck item="lightRadius" count="unlimited"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogCheck>
-            <DialogAction type="LIGHT_RADIUS" size="1" fadeSteps="unlimited"/>
+         <Tool name="Lantern"            lightRadius="1"   gp="125"  droppable="yes" equippable="no">
+            <DialogCheck type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogCheck>
+            <DialogAction type="SET_LIGHT_RADIUS" count="1" decay="unlimited"/>
             <Dialog>[NAME] lit a lattern.</Dialog></Tool>
 
-         <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no"  usable="yes" consumeOnUse="yes"/>
-         <Tool name="Ball of Light"                                  droppable="no"  equippable="no"  usable="no"/>
-         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
-         <Tool name="Erdrick's Token"                                droppable="no"  equippable="no"  usable="no"/>
-         <Tool name="Staff of Rain"                                  droppable="no"  equippable="no"  usable="no"/>
-         <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no"  usable="no"/>
-         <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no"  usable="yes" consumeOnUse="yes"/>
-         <Tool name="Silver Harp"                                    droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
-         <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no"  usable="yes" consumeOnUse="no"/>
+         <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no">
+            <DialogCheck type="IS_OUTSIDE"><Dialog>[NAME] held the Wings, but nothing happened.</Dialog></DialogCheck>
+            <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+            <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
+            <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
+            <Dialog>[NAME] held the wings.</Dialog></Tool>
+
+         <Tool name="Ball of Light"                                  droppable="no"  equippable="no"/>
+
+         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
+            <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
+            <Dialog>[NAME] played the Fairy Flute, but nothing happened.</Dialog></Tool>
+
+         <Tool name="Erdrick's Token"                                droppable="no"  equippable="no"/>
+
+         <Tool name="Staff of Rain"                                  droppable="no"  equippable="no"/>
+
+         <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no"/>
+
+         <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
+            <DialogCheck type="IS_AT_COORDINATES" map="overworld" x="43" y="44"><Dialog>[NAME] held the Rainbow Drop, but nothing happened.</Dialog></DialogCheck> <!-- TODO: Get coordinates for creating rainbow bridge -->
+            <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
+            <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>
+            <DialogAction type="GAIN_ITEM" name="Created_Rainbow_Bridge"/>
+            <DialogAction type="LOSE_ITEM" name="Rainbow Drop" count="1"/>
+            <DialogAction type="GOTO_COORDINATES"/></Tool>
+
+         <Tool name="Silver Harp"                                    droppable="no"  equippable="no">
+            <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
+            <Dialog>[NAME] played the Silver Harp.</Dialog>
+            <DialogAction type="ATTACK_MONSTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool>
+
+         <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no"/> <!-- Make usable -->
       </Tools>
    </Items>
 
@@ -1320,16 +1364,17 @@
       
       <!-- TODO: Change to one time decorations.  Add one-time monsters. -->
       <MapDecoration type="chest" x="6" y="5">
-         <DialogAction type="GAIN_ITEM" item="Torch"/>
+         <DialogAction type="GAIN_ITEM" name="Torch"/>
          <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
       <MapDecoration type="chest" x="6" y="2">
-         <DialogAction type="GAIN_ITEM" item="Key"/>
+         <DialogAction type="GAIN_ITEM" name="Key"/>
          <Dialog>Fortune smiles upon thee!  Thou hast found a key.</Dialog></MapDecoration>
       <MapDecoration type="chest" x="8" y="2">
-         <DialogAction type="GAIN_ITEM" item="gp" count="120"/>
+         <DialogAction type="GAIN_ITEM" name="gp" count="120"/>
          <Dialog>Fortune smiles upon thee!  Thou hast found 120 gold pieces.</Dialog></MapDecoration>
       <MapDecoration type="door" x="5" y="7"/>
    </InitialState>
+
    <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">
       <Dialog>Death should not have taken thee [NAME].</Dialog></DeathState>
 </Game>

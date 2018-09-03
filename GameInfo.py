@@ -85,36 +85,22 @@ class GameInfo:
          itemName = element.attrib['name']
          attackBonus = 0
          defenseBonus = 0
-         minHpRecover = 0
-         maxHpRecover = 0
-         lightRadius = 0
          gp = 0
-         consumeOnUse = True
          if 'attackBonus' in element.attrib:
             attackBonus = int(element.attrib['attackBonus'])
          if 'defenseBonus' in element.attrib:
             defenseBonus = int(element.attrib['defenseBonus'])
-         if 'hpRecover' in element.attrib:
-            (minHpRecover, maxHpRecover) = GameInfo.parseIntRange(element.attrib['hpRecover'])
-         if 'lightRadius' in element.attrib:
-            lightRadius = int(element.attrib['lightRadius'])
          if 'gp' in element.attrib:
             gp = int(element.attrib['gp'])
-         if 'consumeOnUse' in element.attrib:
-            consumeOnUse = element.attrib['consumeOnUse'] == 'yes'
 
          self.tools[itemName] = Tool(
             itemName,
             attackBonus,
             defenseBonus,
-            minHpRecover,
-            maxHpRecover,
-            lightRadius,
             gp,
             element.attrib['droppable'] == 'yes',
             element.attrib['equippable'] == 'yes',
-            element.attrib['usable'] == 'yes',
-            consumeOnUse )
+            self.parseDialog( element ) )
          self.items[itemName] = self.tools[itemName]
 
       # Parse tiles
@@ -343,7 +329,7 @@ class GameInfo:
 
       # Parse dialog scripts
       for element in xmlRoot.findall("./DialogScripts/DialogScript"):
-         self.dialogSequences[ element.attrib['label'] ] =  self.parseDialog( element )
+         self.dialogSequences[ element.attrib['label'] ] = self.parseDialog( element )
 
       # Parse monsters
       self.monsters = {}
@@ -454,6 +440,7 @@ class GameInfo:
          
       # Parse initial game state
       self.pc_name = None
+      
       initialStateElement = xmlRoot.find('InitialState')
       if savedGameFile is not None:
          saveGameFilePath = os.path.join( self.savesPath, savedGameFile + '.xml' )
@@ -484,7 +471,6 @@ class GameInfo:
       self.pc_armor = None
       self.pc_shield = None
       self.pc_otherEquippedItems = []
-      self.pc_unequippedItems = {}
       for itemElement in initialStateElement.findall("./EquippedItems/Item"):
          itemName = itemElement.attrib['name']
          if itemName in self.weapons:
@@ -498,6 +484,7 @@ class GameInfo:
          else:
             print( 'ERROR: Unsupported item', itemName, flush=True )
             
+      self.pc_unequippedItems = {}
       for itemElement in initialStateElement.findall("./UnequippedItems/Item"):
          itemName = itemElement.attrib['name']
          itemCount = 1
@@ -507,6 +494,11 @@ class GameInfo:
             self.pc_unequippedItems[ self.items[itemName] ] = itemCount
          else:
             print( 'ERROR: Unsupported item', itemName, flush=True )
+
+      self.pc_progressMarkers = []
+      for progressMarkerElement in initialStateElement.findall("./ProgressMarkers/ProgressMarker"):
+         self.pc_progressMarkers.append( progressMarkerElement.attrib['name'] )
+         print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
       
       self.initialMapDecorations = []
       for decorationElement in initialStateElement.findall("./MapDecoration"):
@@ -529,14 +521,14 @@ class GameInfo:
       self.deathDialog = self.parseDialog( deathStateElement )
 
    def parseFloat(value):
-      if '/' in value:
+      if isinstance(value, str) and '/' in value:
          retVal = int(value.split('/')[0]) / int(value.split('/')[1])
       else:
          retVal = float(value)
       return retVal
 
    def parseIntRange(value):
-      if '-' in value:
+      if isinstance(value, str) and '-' in value:
          minVal = int(value.split('-')[0])
          maxVal = int(value.split('-')[1])
       else:
@@ -551,14 +543,32 @@ class GameInfo:
          label = None
          if 'label' in element.attrib and element.attrib['label'] != 'None':
             label = element.attrib['label']
-         
-         if element.tag == 'DialogSubTree':
-            dialogSubTree = self.parseDialog( element )
-            dialog.append( dialogSubTree )
-            if label is not None:
-               self.dialogSequences[label] = dialogSubTree
+
+         name = None
+         if 'name' in element.attrib:
+            name = element.attrib['name']
+         count = 1
+         if 'count' in element.attrib:
+            if 'unlimited' == element.attrib['count'] or ( '[' == element.attrib['count'][0] and ']' == element.attrib['count'][-1] ):
+               count = element.attrib['count']
+            else:
+               try:
+                  count = int(element.attrib['count'])
+               except:
+                  GameInfo.parseIntRange(element.attrib['count'])
+                  count = element.attrib['count']
+         mapName = None
+         if 'map' in element.attrib:
+            mapName = element.attrib['map']
+         mapPos = None
+         if 'x' in element.attrib and 'y' in element.attrib:
+            mapPos = Point( int(element.attrib['x']),
+                            int(element.attrib['y']) )
+         mapDir = None
+         if 'dir' in element.attrib:
+            mapDir = Direction[element.attrib['dir']]
                
-         elif element.tag == 'DialogGoTo':
+         if element.tag == 'DialogGoTo':
             dialog.append( DialogGoTo( label ) )
             
          elif element.tag == 'Dialog':
@@ -595,26 +605,20 @@ class GameInfo:
             dialog.append( DialogVendorSellOptions( dialogVendorSellOptions ) )
                
          elif element.tag == 'DialogCheck':
-            item = element.attrib['item']
-            count = 1
-            if 'count' in element.attrib:
-               try:
-                  count = int(element.attrib['count'])
-               except:
-                  count = element.attrib['count']
-            dialog.append( DialogCheck( item, count, self.parseDialog( element ) ) )
+            dialog.append( DialogCheck( DialogCheckEnum[ element.attrib['type'] ],
+                                        self.parseDialog( element ),
+                                        name = name,
+                                        count = count,
+                                        mapName = mapName,
+                                        mapPos = mapPos ) )
             
          elif element.tag == 'DialogAction':
-            item = None
-            count = 1
-            if 'item' in element.attrib:
-               item = element.attrib['item']
-            if 'count' in element.attrib:
-               try:
-                  count = int(element.attrib['count'])
-               except:
-                  count = element.attrib['count']
-            dialog.append( DialogAction( DialogActionEnum[ element.attrib['type'] ], item, count ) )
+            dialog.append( DialogAction( DialogActionEnum[ element.attrib['type'] ],
+                                         name = name,
+                                         count = count,
+                                         mapName = mapName,
+                                         mapPos = mapPos,
+                                         mapDir = mapDir ) )
             
          elif element.tag == 'DialogVariable':
             name = element.attrib['name']

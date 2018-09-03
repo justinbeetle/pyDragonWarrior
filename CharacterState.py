@@ -47,6 +47,7 @@ class CharacterState:
 
       self.otherEquippedItems = []
       self.unequippedItems = {} # Dictionary where keys are items and values are the item counts
+      self.progressMarkers = []
 
    def createNpcState( npc ):
       return CharacterState( npc.type, npc.point, npc.dir, None, None, npc )
@@ -80,6 +81,9 @@ class CharacterState:
                itemPassedTypeFilter = True
                break
             elif filterType == 'Armor' and isinstance( item, Armor ):
+               itemPassedTypeFilter = True
+               break
+            elif filterType == 'Shield' and isinstance( item, Shield ):
                itemPassedTypeFilter = True
                break
             elif filterType == 'Tool' and isinstance( item, Tool ):
@@ -129,7 +133,7 @@ class CharacterState:
          if itemName == item.name:
             if (not isinstance(item, Tool) or item.equippable) and not isEquipped:
                itemOptions.append( 'EQUIP' )
-            if isinstance(item, Tool) and item.usable:
+            if isinstance(item, Tool) and item.useDialog is not None:
                itemOptions.append( 'USE' )
             if (not isinstance(item, Tool) or item.droppable) and not isEquipped:
                itemOptions.append( 'DROP' )
@@ -194,14 +198,6 @@ class CharacterState:
          self.unequippedItems[item] += count
       else:
          self.unequippedItems[item] = count
-
-   def useItem( self, itemName ):
-      # Usable items are never (at least not yet) equippable
-      for item in self.unequippedItems:
-         if itemName == item.name:
-            if item.consumeOnUse:
-               self.loseItem( itemName )
-            break
 
    def loseItem( self, itemName, count=1 ):
       # Lost items are taken from unequippedItems where possible, else equipped items

@@ -222,53 +222,83 @@ class Game:
          elif isinstance( item, DialogCheck ):
             #print( 'Dialog Check =', item, flush=True )
 
-            # Perform variable replacement
-            itemName = item.itemName;
-            itemCount = item.itemCount;
-            for variable in self.dialogVariableReplacment:
-               if isinstance( self.dialogVariableReplacment[variable], str ):
-                  itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
-                  if isinstance(itemCount, str):
-                     itemCount = itemCount.replace(variable, self.dialogVariableReplacment[variable])
-            try:
-               itemCount = int(itemCount)
-            except:
-               print( 'ERROR: Failed to convert itemCount to int:', itemCount, flush=True )
-            if itemName == 'gp':
-               checkValue = self.gameState.pc.gp
-            elif itemName == 'lv':
-               checkValue = self.gameState.pc.level.number
-            else:
-               checkValue = self.gameState.pc.getItemCount( itemName )
-            #print( 'checkValue =', checkValue, flush=True )
-            #print( 'itemName =', itemName, flush=True )
-            #print( 'itemCount =', itemCount, flush=True )
-            if checkValue < itemCount:
+            checkResult = True
+
+            if item.type == DialogCheckEnum.HAS_ITEM:
+               # Perform variable replacement
+               itemName = item.name;
+               itemCount = item.count;
+               for variable in self.dialogVariableReplacment:
+                  if isinstance( self.dialogVariableReplacment[variable], str ):
+                     itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
+                     if isinstance(itemCount, str):
+                        itemCount = itemCount.replace(variable, self.dialogVariableReplacment[variable])
+               try:
+                  itemCount = int(itemCount)
+               except:
+                  print( 'ERROR: Failed to convert itemCount to int:', itemCount, flush=True )
+               if itemName == 'gp':
+                  checkValue = self.gameState.pc.gp
+               elif itemName == 'lv':
+                  checkValue = self.gameState.pc.level.number
+               else:
+                  checkValue = self.gameState.pc.getItemCount( itemName )
+               #print( 'checkValue =', checkValue, flush=True )
+               #print( 'itemName =', itemName, flush=True )
+               #print( 'itemCount =', itemCount, flush=True )
+               checkResult = checkValue >= itemCount
+
+            elif item.type == DialogCheckEnum.IS_FACING_DOOR:
+               print( 'ERROR: DialogCheckEnum.IS_FACING_DOOR is not implemented', flush=True )
+
+            elif item.type == DialogCheckEnum.IS_OUTSIDE:
+               print( 'ERROR: DialogCheckEnum.IS_OUTSIDE is not implemented (correctly)', flush=True )
+               checkResult = not self.gameState.isLightRestricted()
+
+            elif item.type == DialogCheckEnum.IS_INSIDE:
+               print( 'ERROR: DialogCheckEnum.IS_INSIDE is not implemented (correctly)', flush=True )
+               checkResult = self.gameState.isLightRestricted()
+
+            elif item.type == DialogCheckEnum.IS_DARK:
+               checkResult = self.gameState.isLightRestricted()
+
+            elif item.type == DialogCheckEnum.IS_AT_COORDINATES:
+               checkResult = self.gameState.mapState.mapName == item.mapName and self.gameState.pc.currPos_datTile == item.mapPos
+
+            if not checkResult:
                self.traverseDialog( messageDialog, item.failedCheckDialog, depth+1 )
                break
                
          elif isinstance( item, DialogAction ):
             #print( 'Dialog Action =', item, flush=True )
+            
+            self.traverseDialogWaitBeforeNewText = False
+            #print( 'Set self.traverseDialogWaitBeforeNewText to False', flush=True )
+            
             if item.type == DialogActionEnum.SAVE_GAME:
                self.gameState.save()
             elif item.type == DialogActionEnum.MAGIC_RESTORE:
-               # TODO: Add sounds and flash
-               SurfaceEffects.flickering( self.gameState.screen )
-               self.gameState.pc.mp = self.gameState.pc.level.mp
+               if item.count == 'unlimited':
+                  self.gameState.pc.mp = self.gameState.pc.level.mp
+               else:
+                  (minRestore, maxRestore) = GameInfo.parseIntRange(item.count)
+                  self.gameState.pc.mp += random.randint( minRestore, maxRestore )
+               self.gameState.pc.mp = min( self.gameState.pc.mp, self.gameState.pc.level.mp )
                GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
-            elif item.type == DialogActionEnum.NIGHT_AT_INN:
-               AudioPlayer().playMusic(
-                  '19_-_Dragon_Warrior_-_NES_-_Inn.ogg',
-                  self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].music )
-               SurfaceEffects.fadeToBlackAndBack( self.gameState.screen )
-               self.gameState.pc.hp = self.gameState.pc.level.hp
-               self.gameState.pc.mp = self.gameState.pc.level.mp
+               
+            elif item.type == DialogActionEnum.HEALTH_RESTORE:
+               if item.count == 'unlimited':
+                  self.gameState.pc.hp = self.gameState.pc.level.hp
+               else:
+                  (minRestore, maxRestore) = GameInfo.parseIntRange(item.count)
+                  self.gameState.pc.hp += random.randint( minRestore, maxRestore )
+               self.gameState.pc.hp = min( self.gameState.pc.hp, self.gameState.pc.level.hp )
                GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
-               self.traverseDialogWaitBeforeNewText = False
-            else: # GAIN or LOSE item
+
+            elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
                # Perform variable replacement
-               itemName = item.itemName;
-               itemCount = item.itemCount;
+               itemName = item.name;
+               itemCount = item.count;
                for variable in self.dialogVariableReplacment:
                   if isinstance( self.dialogVariableReplacment[variable], str ):
                      itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
@@ -292,21 +322,69 @@ class Game:
                elif item.type == DialogActionEnum.LOSE_ITEM:
                   self.gameState.pc.loseItem( itemName, itemCount )
                   
-         else:
-            print( 'ERROR: Not a supported type', flush=True )
+            elif item.type == DialogActionEnum.SET_LIGHT_RADIUS:
+               self.gameState.lightRadius = item.count
+               self.gameState.drawMap()
+                  
+            elif item.type == DialogActionEnum.REPEL_MONSTERS:
+               print( 'ERROR: DialogActionEnum.REPEL_MONSTERS is not implemented', flush=True )
+                  
+            elif item.type == DialogActionEnum.GOTO_COORDINATES:
+               self.gameState.pc.currPosOffset_imgPx = Point(0,0)
+               if item.mapPos is not None:
+                  self.gameState.pc.currPos_datTile = item.mapPos
+               if item.mapDir is not None:
+                  self.gameState.pc.dir = item.mapDir
+               if item.mapName is not None:
+                  self.gameState.setMap( item.mapName )
+               self.gameState.drawMap( True )
+                  
+            elif item.type == DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES:
+               print( 'ERROR: DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES is not implemented', flush=True )
+                  
+            elif item.type == DialogActionEnum.PLAY_SOUND:
+               #print( 'Play sound', item.name, flush=True )
+               AudioPlayer().playSound( item.name )
+                  
+            elif item.type == DialogActionEnum.PLAY_MUSIC:
+               #print( 'Play music', item.name, flush=True )
+               AudioPlayer().playMusic( item.name,
+                  self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].music )
+                  
+            elif item.type == DialogActionEnum.VISUAL_EFFECT:
+               if item.name == 'fadeToBlackAndBack':
+                  SurfaceEffects.fadeToBlackAndBack( self.gameState.screen )
+               elif item.name == 'flickering':
+                  SurfaceEffects.flickering( self.gameState.screen )
+               elif item.name == 'rainbowEffect':
+                  SurfaceEffects.rainbowEffect( self.gameState.screen, self.gameState.gameInfo.tiles['water'].image[0] )
+               else:
+                  print( 'ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name, flush=True )
+                  
+            elif item.type == DialogActionEnum.ATTACK_MONSTER:
+               print( 'ERROR: Monster selection for DialogActionEnum.ATTACK_MONSTER is not implemented', flush=True )
+               self.gameMode = GameMode.ENCOUNTER
+                  
+            elif item.type == DialogActionEnum.OPEN_DOOR:
+               print( 'ERROR: DialogActionEnum.OPEN_DOOR is not implemented', flush=True )
 
-      if depth==0:
+            else:
+               print( 'ERROR: Unsupported DialogActionEnum of', item.type, flush=True )
+                  
+         else:
+            print( 'ERROR: Not a supported type', item, flush=True )
+
+      if depth==0 and not messageDialog.isEmpty():
          self.waitForAcknowledgement( messageDialog )
 
    def dialogLoop(self, dialog):
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
       
-      # Save off initial screen and key repeat settings
+      # Save off initial key repeat settings
       (origRepeat1, origRepeat2) = pygame.key.get_repeat()
       pygame.key.set_repeat()
       #print( 'Disabled key repeat', flush=True )
       self.getEvents() # Clear event queue
-      origScreen = self.gameState.screen.copy()
 
       # Create the status and message dialogs
       GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
@@ -314,10 +392,11 @@ class Game:
 
       self.traverseDialog( messageDialog, dialog )
 
-      # Restore initial screen and key repeat settings
+      # Restore initial key repeat settings
       pygame.key.set_repeat( origRepeat1, origRepeat2 )
-      self.gameState.screen.blit( origScreen, (0, 0) )
-      pygame.display.flip()
+
+      # Redraw the map
+      self.gameState.drawMap( True )
 
    def waitForAcknowledgement( self, messageDialog = None ):
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
@@ -467,6 +546,8 @@ class Game:
                if menuResult == 'TALK':
                   talking = True
                elif menuResult == 'STAIRS':
+                  #SurfaceEffects.pinkTinge( self.gameState.screen )
+                  #SurfaceEffects.rainbowEffect( self.gameState.screen, self.gameState.gameInfo.tiles['water'].image[0] )
                   self.dialogLoop( 'Does thou not like traversing stairs automatically?' )
                elif menuResult == 'STATUS':
                   GameDialog.createFullStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
@@ -496,7 +577,7 @@ class Game:
                            SurfaceEffects.flickering( self.gameState.screen )
                            
                            if spell.maxHpRecover > 0:
-                              hpRecover = random.randrange( spell.minHpRecover, spell.maxHpRecover )
+                              hpRecover = random.randint( spell.minHpRecover, spell.maxHpRecover )
                               self.gameState.pc.hp = min( self.gameState.pc.level.hp, self.gameState.pc.hp + hpRecover )
                            elif spell.name == 'Radiant':
                               if self.gameState.lightRadius is not None and self.gameState.lightRadius < 6:
@@ -559,6 +640,8 @@ class Game:
                            elif actionResult == 'UNEQUIP':
                               self.gameState.pc.unequipItem( itemResult )
                            elif actionResult == 'USE':
+                              self.dialogLoop( self.gameState.gameInfo.items[itemResult].useDialog )
+                              ''' TODO: Dead code follows
                               # TODO: Actually apply item effects here
                               usedItem = False
                               if itemResult == 'Key':
@@ -573,6 +656,7 @@ class Game:
 
                               if usedItem:
                                  self.gameState.pc.useItem( itemResult )
+                              '''
                   
                   # TODO: Implement door opening from the item list
                elif menuResult != None:
@@ -651,15 +735,8 @@ class Game:
          monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
 
       # Pick monster HP and GP
-      if monster.minHp == monster.maxHp:
-         monster_hp = monster.minHp
-      else:
-         monster_hp = random.randrange( monster.minHp, monster.maxHp )
-         
-      if monster.minGp == monster.maxGp:
-         monster_gp = monster.minGp
-      else:
-         monster_gp = random.randrange( monster.minGp, monster.maxGp )
+      monster_hp = random.randint( monster.minHp, monster.maxHp )
+      monster_gp = random.randint( monster.minGp, monster.maxGp )
 
       # Start enounter music
       audioPlayer = AudioPlayer();

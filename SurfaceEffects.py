@@ -53,11 +53,33 @@ class SurfaceEffects:
 
    def pinkTinge(screen):
       PINK = pygame.Color(252, 116, 96)
-      for x in range(screen.get_width()):
-         for y in range(screen.get_height()):
-            c = screen.get_at( (x, y) )
-            if c.r > 200 and c.g > 200 and c.b > 200:
-               screen.set_at( (x, y), PINK )
+      pygame.transform.threshold(screen, screen, search_color=pygame.Color('white'), threshold=pygame.Color(50, 50, 50), set_color=PINK, inverse_set=True)
+      pygame.display.flip()
+
+   def rainbowEffect(screen, waterTile):
+      origScreen = screen.copy()
+      waterColor = pygame.transform.average_color(waterTile)
+      rainbowColors = [pygame.Color('red'),
+                       pygame.Color('orange'),
+                       pygame.Color('yellow'),
+                       pygame.Color('green'),
+                       pygame.Color('blue'),
+                       pygame.Color('green'),
+                       pygame.Color(75,0,130), #pygame.Color('indigo'),
+                       pygame.Color('violet')]
+      
+      # Cycle through the rainbow colors
+      for i in range( 5 ):
+         for rainbowColor in rainbowColors:
+            try:
+               pygame.transform.threshold(screen, origScreen, search_color=waterColor, threshold=pygame.Color(50, 50, 50), set_color=rainbowColor, inverse_set=True)
+               pygame.display.flip()
+               pygame.time.Clock().tick(15)
+            except:
+               print( 'Color not found: ', color, flush=True )
+
+      # Restore original screen
+      screen.blit( origScreen, (0, 0) )
       pygame.display.flip()
 
 def main():

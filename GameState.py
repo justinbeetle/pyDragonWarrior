@@ -54,6 +54,7 @@ class GameState:
       self.pc.shield = self.gameInfo.pc_shield
       self.pc.otherEquippedItems = self.gameInfo.pc_otherEquippedItems
       self.pc.unequippedItems = self.gameInfo.pc_unequippedItems
+      self.pc.progressMarkers = self.gameInfo.pc_progressMarkers
 
    def save(self):
       xmlRoot = xml.etree.ElementTree.Element('SaveState')
@@ -87,6 +88,11 @@ class GameState:
             itemElement = xml.etree.ElementTree.SubElement( itemsElement, 'Item' )
             itemElement.attrib['name'] = item.name
             itemElement.attrib['count'] = str(self.pc.unequippedItems[item])
+
+      progressMarkersElement = xml.etree.ElementTree.SubElement( xmlRoot, 'ProgressMarkers' )
+      for progressMarker in self.pc.progressMarkers:
+         progressMarkerElement = xml.etree.ElementTree.SubElement( progressMarkersElement, 'ProgressMarker' )
+         progressMarkerElement.attrib['name'] = progressMarker
             
       dialogElement = xml.etree.ElementTree.SubElement( xmlRoot, 'Dialog' )
       dialogElement.text = 'I am glad thou hast returned. All our hopes are riding on thee. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points. See me again when thy level has increased.'
@@ -230,7 +236,7 @@ class GameState:
          # Update light radius if different between new and old maps
          # Don't always update as this would cancel out light radius changing affects (torchs, etc.)
          oldMapName = self.mapState.mapName
-         if self.gameInfo.maps[newMapName].lightRadius != self.gameInfo.maps[oldMapName].lightRadius:
+         if ( self.gameInfo.maps[newMapName].lightRadius != self.gameInfo.maps[oldMapName].lightRadius ):
             self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
       else:
          self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
