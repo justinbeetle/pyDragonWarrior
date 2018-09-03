@@ -53,7 +53,7 @@ class SurfaceEffects:
 
    def pinkTinge(screen):
       PINK = pygame.Color(252, 116, 96)
-      pygame.transform.threshold(screen, screen, search_color=pygame.Color('white'), threshold=pygame.Color(50, 50, 50), set_color=PINK, inverse_set=True)
+      pygame.transform.threshold(screen, screen, search_color=pygame.Color('white'), threshold=pygame.Color(3, 3, 3), set_color=PINK, inverse_set=True)
       pygame.display.flip()
 
    def rainbowEffect(screen, waterTile):

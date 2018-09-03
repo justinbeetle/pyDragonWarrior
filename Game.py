@@ -249,21 +249,29 @@ class Game:
                checkResult = checkValue >= itemCount
 
             elif item.type == DialogCheckEnum.IS_FACING_DOOR:
-               print( 'ERROR: DialogCheckEnum.IS_FACING_DOOR is not implemented', flush=True )
+               checkResult = self.gameState.isFacingDoor()
 
             elif item.type == DialogCheckEnum.IS_OUTSIDE:
-               print( 'ERROR: DialogCheckEnum.IS_OUTSIDE is not implemented (correctly)', flush=True )
-               checkResult = not self.gameState.isLightRestricted()
+               checkResult = self.gameState.isOutside()
 
             elif item.type == DialogCheckEnum.IS_INSIDE:
-               print( 'ERROR: DialogCheckEnum.IS_INSIDE is not implemented (correctly)', flush=True )
-               checkResult = self.gameState.isLightRestricted()
+               checkResult = not self.gameState.isOutside()
 
             elif item.type == DialogCheckEnum.IS_DARK:
                checkResult = self.gameState.isLightRestricted()
 
             elif item.type == DialogCheckEnum.IS_AT_COORDINATES:
-               checkResult = self.gameState.mapState.mapName == item.mapName and self.gameState.pc.currPos_datTile == item.mapPos
+               checkResult = item.mapName == self.gameState.mapState.mapName and ( item.mapPos is None or item.mapPos == self.gameState.pc.currPos_datTile )
+
+            elif item.type == DialogCheckEnum.IS_IN_COMBAT:
+               print( 'ERROR: DialogCheckEnum.IS_IN_COMBAT is not implemented to check the monster type', flush=True )
+               checkResult = GameMode.ENCOUNTER == self.gameMode #and (item.name is None or item.name == 
+
+            elif item.type == DialogCheckEnum.IS_NOT_IN_COMBAT:
+               checkResult = GameMode.ENCOUNTER != self.gameMode
+
+            else:
+               print( 'ERROR: Unsupported DialogCheckEnum of', item.type, flush=True )
 
             if not checkResult:
                self.traverseDialog( messageDialog, item.failedCheckDialog, depth+1 )
@@ -317,8 +325,11 @@ class Game:
                      if self.gameState.pc.gp < 0:
                         self.gameState.pc.gp = 0
                   GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
-               elif item.type == DialogActionEnum.GAIN_ITEM and itemName in self.gameState.gameInfo.items:
-                  self.gameState.pc.gainItem( self.gameState.gameInfo.items[itemName], itemCount )
+               elif item.type == DialogActionEnum.GAIN_ITEM:
+                  if itemName in self.gameState.gameInfo.items:
+                     self.gameState.pc.gainItem( self.gameState.gameInfo.items[itemName], itemCount )
+                  else:
+                     self.gameState.pc.gainItem( itemName )
                elif item.type == DialogActionEnum.LOSE_ITEM:
                   self.gameState.pc.loseItem( itemName, itemCount )
                   
@@ -337,7 +348,11 @@ class Game:
                   self.gameState.pc.dir = item.mapDir
                if item.mapName is not None:
                   self.gameState.setMap( item.mapName )
-               self.gameState.drawMap( True )
+               else:
+                  self.gameState.setMap( self.gameState.mapState.mapName )
+               self.gameState.drawMap(flipBuffer=messageDialog.isEmpty())
+               if not messageDialog.isEmpty():
+                  messageDialog.blit( self.gameState.screen, True )
                   
             elif item.type == DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES:
                print( 'ERROR: DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES is not implemented', flush=True )
@@ -366,7 +381,7 @@ class Game:
                self.gameMode = GameMode.ENCOUNTER
                   
             elif item.type == DialogActionEnum.OPEN_DOOR:
-               print( 'ERROR: DialogActionEnum.OPEN_DOOR is not implemented', flush=True )
+               self.gameState.openDoor()
 
             else:
                print( 'ERROR: Unsupported DialogActionEnum of', item.type, flush=True )
@@ -546,9 +561,8 @@ class Game:
                if menuResult == 'TALK':
                   talking = True
                elif menuResult == 'STAIRS':
-                  #SurfaceEffects.pinkTinge( self.gameState.screen )
-                  #SurfaceEffects.rainbowEffect( self.gameState.screen, self.gameState.gameInfo.tiles['water'].image[0] )
                   self.dialogLoop( 'Does thou not like traversing stairs automatically?' )
+                  #SurfaceEffects.pinkTinge( self.gameState.screen )
                elif menuResult == 'STATUS':
                   GameDialog.createFullStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
                   self.waitForAcknowledgement()
@@ -939,7 +953,7 @@ class Game:
          self.gameState.pc.hp = self.gameState.pc.level.hp
          self.gameState.pc.mp = self.gameState.pc.level.mp
          self.gameState.pc.gp = math.floor( self.gameState.pc.gp / 2 )
-         self.gameState.setMap( self.gameState.gameInfo.deathMap )
+         self.gameState.setMap( self.gameState.gameInfo.deathMap,  respawnDecoration=True )
 
    def scrollTile(self): # return (destMap, destPoint) if making transition, else None
 
@@ -1023,9 +1037,9 @@ class Game:
             self.gameState.pc.destPos_datTile = transition.destPoint
             self.gameState.pc.currPosOffset_imgPx = Point(0,0)
             self.gameState.pc.dir = transition.destDir
-            if transition.destMap != self.gameState.mapState.mapName:
-               self.gameState.setMap( transition.destMap )
-            else:
+            mapChanging = transition.destMap != self.gameState.mapState.mapName
+            self.gameState.setMap( transition.destMap, respawnDecorations=transition.respawnDecorations )
+            if not mapChanging:
                self.gameState.drawMap( True )
          else:
             # Check for special monster encounters

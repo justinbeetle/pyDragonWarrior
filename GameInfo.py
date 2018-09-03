@@ -213,6 +213,9 @@ class GameInfo:
          lightRadius = None
          if 'lightRadius' in element.attrib and element.attrib['lightRadius'] != 'unlimited':
             lightRadius = int(element.attrib['lightRadius'])
+         isOutside = True
+         if 'isOutside' in element.attrib:
+            isOutside = element.attrib['isOutside'] == 'yes'
 
          # Parse transitions
          #print( 'Parse transitions', flush=True )
@@ -221,21 +224,29 @@ class GameInfo:
          mapDecorations = []
          transElement = element.find('LeavingTransition')
          if transElement != None:
+            respawnDecorations = False
+            if 'respawnDecorations' in transElement.attrib:
+               respawnDecorations = transElement.attrib['respawnDecorations'] == 'yes'
             leavingTransition = LeavingTransition( transElement.attrib['toMap'],
                                                    Point( int(transElement.attrib['toX']),
                                                           int(transElement.attrib['toY']) ),
-                                                   Direction[transElement.attrib['toDir']] )
+                                                   Direction[transElement.attrib['toDir']],
+                                                   respawnDecorations )
          for transElement in element.findall('PointTransition'):
+            respawnDecorations = False
+            if 'respawnDecorations' in transElement.attrib:
+               respawnDecorations = transElement.attrib['respawnDecorations'] == 'yes'
             fromPoint = Point( int(transElement.attrib['fromX']),
                                int(transElement.attrib['fromY']) )
             pointTransitions.append( PointTransition( fromPoint,
                                                       transElement.attrib['toMap'],
                                                       Point( int(transElement.attrib['toX']),
                                                              int(transElement.attrib['toY']) ),
-                                                      Direction[transElement.attrib['toDir']] ) )
+                                                      Direction[transElement.attrib['toDir']],
+                                                      respawnDecorations ) )
             if 'decoration' in transElement.attrib and transElement.attrib['decoration'] != 'None':
                decorationType = transElement.attrib['decoration']
-               mapDecorations.append( MapDecoration( decorationType, fromPoint, None ) )
+               mapDecorations.append( MapDecoration( decorationType, fromPoint, None, None ) )
 
          # Parse NPCs
          #print( 'Parse NPCs', flush=True )
@@ -254,11 +265,15 @@ class GameInfo:
             decorationType = None
             if 'type' in decorationElement.attrib and decorationElement.attrib['type'] != 'None':
                decorationType = decorationElement.attrib['type']
+            progressMarker = None
+            if 'progressMarker' in decorationElement.attrib:
+               progressMarker = decorationElement.attrib['progressMarker']
             mapDecorations.append( MapDecoration(
                   decorationType,
                   Point( int(decorationElement.attrib['x']),
                          int(decorationElement.attrib['y']) ),
-                  self.parseDialog( decorationElement ) ) )
+                  self.parseDialog( decorationElement ),
+                  progressMarker ) )
 
          # Parse special monsters
          #print( 'Parse special monsters', flush=True )
@@ -325,7 +340,20 @@ class GameInfo:
 
          # Save the map information
          #print( 'Save the map information', flush=True )
-         self.maps[mapName] = Map(mapName, mapDat, mapOverlayDat, mapDatSize, music, lightRadius, leavingTransition, pointTransitions, nonPlayerCharacters, mapDecorations, monsterZones, encounterImage, specialMonsters)
+         self.maps[mapName] = Map(mapName,
+                                  mapDat,
+                                  mapOverlayDat,
+                                  mapDatSize,
+                                  music,
+                                  lightRadius,
+                                  leavingTransition,
+                                  pointTransitions,
+                                  nonPlayerCharacters,
+                                  mapDecorations,
+                                  monsterZones,
+                                  encounterImage,
+                                  specialMonsters,
+                                  isOutside)
 
       # Parse dialog scripts
       for element in xmlRoot.findall("./DialogScripts/DialogScript"):

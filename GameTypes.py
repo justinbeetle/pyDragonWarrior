@@ -35,6 +35,8 @@ class DialogCheckEnum(Enum):
    IS_INSIDE = 4                     # attributes: count (number, range, or unlimited)
    IS_DARK = 5                       # attributes: <none>
    IS_AT_COORDINATES = 6             # attributes: map, x, y
+   IS_IN_COMBAT = 7                  # attributes: name (optional name of monster)
+   IS_NOT_IN_COMBAT = 8              # attributes: <none>
 
 # Actions that can be triggered from dialog
 class DialogActionEnum(Enum):
@@ -52,6 +54,8 @@ class DialogActionEnum(Enum):
    VISUAL_EFFECT = 12                # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect)
    ATTACK_MONSTER = 13               # attributes: name
    OPEN_DOOR = 14                    # attributes: <none>
+   MONSTER_SLEEP = 15                # attributes: bypass (to bypass resistances)
+   MONSTER_STOP_SPELL = 16           # attributes: bypass (to bypass resistances)
 
 # Branch to a labeled dialog state
 class DialogGoTo:
@@ -133,12 +137,14 @@ CharacterType = namedtuple('CharacterType', ['type',
 
 LeavingTransition = namedtuple('LeavingTransition', ['destMap',
                                                      'destPoint',
-                                                     'destDir'], verbose=False)
+                                                     'destDir',
+                                                     'respawnDecorations'], verbose=False)
 
 PointTransition = namedtuple('PointTransition', ['srcPoint',
                                                  'destMap',
                                                  'destPoint',
-                                                 'destDir'], verbose=False)
+                                                 'destDir',
+                                                 'respawnDecorations'], verbose=False)
 
 NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
                                                        'point',
@@ -148,7 +154,8 @@ NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
 
 MapDecoration = namedtuple('MapDecoration', ['type',
                                              'point',
-                                             'dialog'], verbose=False)
+                                             'dialog',
+                                             'progressMarker'], verbose=False)
 
 SpecialMonster = namedtuple('SpecialMonster', ['name',
                                                'point'], verbose=False)
@@ -165,7 +172,8 @@ Map = namedtuple('Map', ['name',
                          'mapDecorations',
                          'monsterZones',
                          'encounterImage',
-                         'specialMonsters'], verbose=False)
+                         'specialMonsters',
+                         'isOutside'], verbose=False)
 
 Monster = namedtuple('Monster', ['name',
                                  'image',

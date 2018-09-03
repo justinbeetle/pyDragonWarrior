@@ -194,7 +194,13 @@ class CharacterState:
 
    def gainItem( self, item, count=1 ):
       # Gained items always go unequippedItems
-      if item in self.unequippedItems:
+      if isinstance(item, str):
+         if item not in self.progressMarkers:
+            self.progressMarkers.append( item )
+            print( 'Added progress marker', item, flush=True )
+         else:
+            print( 'WARN: Did not add previously added progress marker', item, flush=True )
+      elif item in self.unequippedItems:
          self.unequippedItems[item] += count
       else:
          self.unequippedItems[item] = count
@@ -215,20 +221,28 @@ class CharacterState:
          if self.weapon is not None and itemName == self.weapon.name:
             retVal = self.weapon
             self.weapon = None
+            remainingItemsToLose -= 1
          elif self.helm is not None and itemName == self.helm.name:
             retVal = self.helm
             self.helm = None
+            remainingItemsToLose -= 1
          elif self.armor is not None and itemName == self.armor.name:
             retVal = self.armor
             self.armor = None
+            remainingItemsToLose -= 1
          elif self.shield is not None and itemName == self.shield.name:
             retVal = self.shield
             self.shield = None
+            remainingItemsToLose -= 1
+         elif itemName in self.progressMarkers:
+            self.progressMarkers.remove( item )
+            remainingItemsToLose -= 1
          else:
             for item in self.otherEquippedItems:
                if itemName == item.name:
                   retVal = item
                   self.otherEquippedItems.remove( item )
+                  remainingItemsToLose -= 1
                   break
       return retVal
 

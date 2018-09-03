@@ -32,10 +32,9 @@ class GameState:
       self.phase = Phase.A
       self.tickCount = 1
       self.gameInfo = GameInfo( basePath, gameXmlPath, tileSize_pixels, savedGameFile)
+      self.removedDecorationsByMap = {}
 
       # Set character state for new game
-      self.mapState = None
-      self.setMap( self.gameInfo.initialMap, self.gameInfo.initialMapDecorations )
       self.pendingDialog = self.gameInfo.initialStateDialog
       self.pc = CharacterState(
          'hero',
@@ -55,6 +54,9 @@ class GameState:
       self.pc.otherEquippedItems = self.gameInfo.pc_otherEquippedItems
       self.pc.unequippedItems = self.gameInfo.pc_unequippedItems
       self.pc.progressMarkers = self.gameInfo.pc_progressMarkers
+      
+      self.mapState = None
+      self.setMap( self.gameInfo.initialMap, self.gameInfo.initialMapDecorations )
 
    def save(self):
       xmlRoot = xml.etree.ElementTree.Element('SaveState')
@@ -159,10 +161,28 @@ class GameState:
 
    def canMoveToTile(self, tile, enforceNpcHpPenaltyLimit = False, enforceNpcDofLimit = False):
       movementAllowed = False
+
+      # Check if native tile allows movement
       if ( 0 <= tile.x < self.gameInfo.maps[self.mapState.mapName].size.w and
            0 <= tile.y < self.gameInfo.maps[self.mapState.mapName].size.h and
            self.getTileInfo(tile).walkable ):
          movementAllowed = True
+
+      # Check if decoration changes the allowed movement of the native tile
+      if movementAllowed:
+         for decoration in self.mapDecorations:
+            if tile == decoration.point and decoration.type is not None and not self.gameInfo.decorations[decoration.type].walkable:
+               movementAllowed = False
+               #print('Movement not allowed: decoration not walkable', flush=True)
+               break
+      else:
+         for decoration in self.mapDecorations:
+            if tile == decoration.point and decoration.type is not None and self.gameInfo.decorations[decoration.type].walkable:
+               movementAllowed = True
+               #print('Movement allowed: decoration walkable', flush=True)
+               break
+
+      if movementAllowed:
          if movementAllowed and enforceNpcHpPenaltyLimit and self.getTileInfo(tile).hpPenalty != 0:
             movementAllowed = False
             #print('Movement not allowed: NPC HP penalty limited', flush=True)
@@ -178,14 +198,9 @@ class GameState:
                   movementAllowed = False
                   #print('Movement not allowed: NPC in the way', flush=True)
                   break
-         if movementAllowed:
-            for decoration in self.mapDecorations:
-               if tile == decoration.point and decoration.type is not None and not self.gameInfo.decorations[decoration.type].walkable:
-                  movementAllowed = False
-                  #print('Movement not allowed: decoration not walkable', flush=True)
-                  break
       #else:
       #   print('Movement not allowed: tile not walkable', flush=True)
+               
       return movementAllowed
 
    def getTileMonsters(self, tile):
@@ -230,32 +245,68 @@ class GameState:
 
    def isLightRestricted(self):
       return self.lightRadius is not None and self.lightRadius <= self.winSize_tiles.w/2 and self.lightRadius <= self.winSize_tiles.h/2
+   
+   def isOutside(self):
+      return self.gameInfo.maps[self.mapState.mapName].isOutside
 
-   def setMap(self, newMapName, oneTimeDecorations = []):
+   def setMap(self, newMapName, oneTimeDecorations = [], respawnDecorations = False):
       if self.mapState is not None:
+         oldMapName = self.mapState.mapName
+         
          # Update light radius if different between new and old maps
          # Don't always update as this would cancel out light radius changing affects (torchs, etc.)
-         oldMapName = self.mapState.mapName
          if ( self.gameInfo.maps[newMapName].lightRadius != self.gameInfo.maps[oldMapName].lightRadius ):
             self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
       else:
          self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
 
+      # If changing maps and set to respawn decorations, clear the history of removed decorations
+      if respawnDecorations:
+         self.removedDecorationsByMap = {}
+
       self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
+      for decoration in self.mapDecorations:
+         if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
+            self.mapDecorations.remove( decoration )
+      if newMapName in self.removedDecorationsByMap:
+         for decoration in self.removedDecorationsByMap[newMapName]:
+            self.mapDecorations.remove( decoration )
       self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
       self.npcs = []
       for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
          self.npcs.append( CharacterState.createNpcState( npc ) )
+   
+   def isFacingDoor(self):
+      doorOpenDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+      foundDoor = False
+      for decoration in self.gameState.mapDecorations:
+         if ( doorOpenDest_datTile == decoration.point and
+              decoration.type is not None and
+              self.gameState.gameInfo.decorations[decoration.type].removeWithKey ):
+            return True
+      return False
+   
+   def openDoor(self):
+      doorOpenDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+      foundDoor = False
+      for decoration in self.gameState.mapDecorations:
+         if ( doorOpenDest_datTile == decoration.point and
+              decoration.type is not None and
+              self.gameState.gameInfo.decorations[decoration.type].removeWithKey ):
+            removeDecoration( decoration )
 
    def removeDecoration(self, decoration):
-      self.mapDecorations.remove( decoration )
       # TODO: May also need to remove this from the list of one-time decorations for this map
-      
+
+      # Remove the decoration from the map
+      self.mapDecorations.remove( decoration )
+      if self.mapState.mapName not in self.removedDecorationsByMap:
+         self.removedDecorationsByMap[self.mapState.mapName] = []
+      self.removedDecorationsByMap[self.mapState.mapName].append( decoration )
       self.mapState = self.gameInfo.getMapImageInfo( self.mapState.mapName, self.imagePad_tiles, self.mapDecorations )
 
       # Draw the map to the screen
       self.drawMap()
-      
 
    def drawMap(self, flipBuffer=True):
       # Draw the map to the screen

@@ -27,15 +27,15 @@
 27) Improved monster AI (running, spells, different attack types) - Partially implemented
 28) game.xml changes to make it easier to specify chest contents
 29) game.xml changes to make it easier to specify transitions
-30) Add special monsters
-31) Door, chest, hidden item, and special monster respawn control
+30) Add special monsters - Partially implemented
+31) Door, chest, hidden item, and special monster respawn control - Partially implemented
 32) Add armor healing
 33) Add roofs to cities
 34) Add title screen and create/load/delete menu on start
 35) Add more cities
 36) Add more caves
-37) Implement quest items
-38) Move sound selections into game.xml
+37) Implement quest items - Partially implemented
+38) Move sound selections into game.xml - Partially implemented
 39) Make traversing stairs in caves optional
 
 Make custom images
