@@ -108,6 +108,19 @@ class Game:
          self.dialogVariableReplacment = {}
          self.dialogVariableReplacment['[NAME]']=self.gameState.pc.name
          self.dialogVariableReplacment['[NEXT_LEVEL_XP]']=str( self.gameState.pc.calcXpToNextLevel( self.gameState.gameInfo.levels ) )
+         mapOrigin = self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].origin
+         if mapOrigin is not None:
+            mapCoord = self.gameState.pc.currPos_datTile - mapOrigin
+            self.dialogVariableReplacment['[X]'] = abs( mapCoord.x )
+            self.dialogVariableReplacment['[Y]'] = abs( mapCoord.y )
+            if mapCoord.x < 0:
+               self.dialogVariableReplacment['[X_DIR]'] = 'West'
+            else:
+               self.dialogVariableReplacment['[X_DIR]'] = 'East'
+            if mapCoord.y < 0:
+               self.dialogVariableReplacment['[Y_DIR]'] = 'North'
+            else:
+               self.dialogVariableReplacment['[Y_DIR]'] = 'South'
 
       # Convert to dialog list
       if not isinstance( dialog, list ):
@@ -130,8 +143,7 @@ class Game:
                
             # Perform variable replacement
             for variable in self.dialogVariableReplacment:
-               if isinstance( self.dialogVariableReplacment[variable], str ):
-                  item = item.replace(variable, self.dialogVariableReplacment[variable])
+               item = item.replace(variable, str(self.dialogVariableReplacment[variable]))
             
             if not messageDialog.isEmpty():
                messageDialog.addMessage( '' )
@@ -224,7 +236,7 @@ class Game:
 
             checkResult = True
 
-            if item.type == DialogCheckEnum.HAS_ITEM:
+            if item.type == DialogCheckEnum.HAS_ITEM or item.type == DialogCheckEnum.LACKS_ITEM:
                # Perform variable replacement
                itemName = item.name;
                itemCount = item.count;
@@ -243,10 +255,13 @@ class Game:
                   checkValue = self.gameState.pc.level.number
                else:
                   checkValue = self.gameState.pc.getItemCount( itemName )
+                  
                #print( 'checkValue =', checkValue, flush=True )
                #print( 'itemName =', itemName, flush=True )
                #print( 'itemCount =', itemCount, flush=True )
                checkResult = checkValue >= itemCount
+               if item.type == DialogCheckEnum.LACKS_ITEM:
+                  checkResult = not checkResult
 
             elif item.type == DialogCheckEnum.IS_FACING_DOOR:
                checkResult = self.gameState.isFacingDoor()

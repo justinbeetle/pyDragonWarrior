@@ -216,6 +216,10 @@ class GameInfo:
          isOutside = True
          if 'isOutside' in element.attrib:
             isOutside = element.attrib['isOutside'] == 'yes'
+         origin = None
+         if 'originX' in element.attrib and 'originY' in element.attrib:
+            origin = Point( int(element.attrib['originX']),
+                            int(element.attrib['originY']) )
 
          # Parse transitions
          #print( 'Parse transitions', flush=True )
@@ -246,18 +250,26 @@ class GameInfo:
                                                       respawnDecorations ) )
             if 'decoration' in transElement.attrib and transElement.attrib['decoration'] != 'None':
                decorationType = transElement.attrib['decoration']
-               mapDecorations.append( MapDecoration( decorationType, fromPoint, None, None ) )
+               mapDecorations.append( MapDecoration( decorationType, fromPoint, None, None, None ) )
 
          # Parse NPCs
          #print( 'Parse NPCs', flush=True )
          nonPlayerCharacters = []
          for npcElement in element.findall('NonPlayerCharacter'):
+            progressMarker = None
+            if 'progressMarker' in npcElement.attrib:
+               progressMarker = npcElement.attrib['progressMarker']
+            inverseProgressMarker = None
+            if 'inverseProgressMarker' in npcElement.attrib:
+               inverseProgressMarker = npcElement.attrib['inverseProgressMarker']
             nonPlayerCharacters.append( NonPlayerCharacter( npcElement.attrib['type'],
                                                             Point( int(npcElement.attrib['x']),
                                                                    int(npcElement.attrib['y']) ),
                                                             Direction[npcElement.attrib['dir']],
                                                             npcElement.attrib['walking'] == 'yes',
-                                                            self.parseDialog( npcElement ) ) )
+                                                            self.parseDialog( npcElement ),
+                                                            progressMarker,
+                                                            inverseProgressMarker ) )
 
          # Parse standalone decorations
          #print( 'Parse standalone decorations', flush=True )
@@ -268,19 +280,23 @@ class GameInfo:
             progressMarker = None
             if 'progressMarker' in decorationElement.attrib:
                progressMarker = decorationElement.attrib['progressMarker']
+            inverseProgressMarker = None
+            if 'inverseProgressMarker' in decorationElement.attrib:
+               inverseProgressMarker = decorationElement.attrib['inverseProgressMarker']
             mapDecorations.append( MapDecoration(
                   decorationType,
                   Point( int(decorationElement.attrib['x']),
                          int(decorationElement.attrib['y']) ),
                   self.parseDialog( decorationElement ),
-                  progressMarker ) )
+                  progressMarker,
+                  inverseProgressMarker ) )
 
          # Parse special monsters
          #print( 'Parse special monsters', flush=True )
          specialMonsters = []
          for monsterElement in element.findall('Monster'):
-            print( 'monsterElement =', monsterElement, flush=True )
-            print( 'monsterElement.attrib =', monsterElement.attrib, flush=True )
+            #print( 'monsterElement =', monsterElement, flush=True )
+            #print( 'monsterElement.attrib =', monsterElement.attrib, flush=True )
             specialMonsters.append( SpecialMonster(
                   monsterElement.attrib['name'],
                   Point( int(monsterElement.attrib['x']),
@@ -353,7 +369,8 @@ class GameInfo:
                                   monsterZones,
                                   encounterImage,
                                   specialMonsters,
-                                  isOutside)
+                                  isOutside,
+                                  origin)
 
       # Parse dialog scripts
       for element in xmlRoot.findall("./DialogScripts/DialogScript"):
@@ -526,7 +543,7 @@ class GameInfo:
       self.pc_progressMarkers = []
       for progressMarkerElement in initialStateElement.findall("./ProgressMarkers/ProgressMarker"):
          self.pc_progressMarkers.append( progressMarkerElement.attrib['name'] )
-         print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
+         #print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
       
       self.initialMapDecorations = []
       for decorationElement in initialStateElement.findall("./MapDecoration"):
@@ -601,6 +618,8 @@ class GameInfo:
             
          elif element.tag == 'Dialog':
             dialog.append( element.text )
+            if label is not None:
+               self.dialogSequences[label] = element.text
             
          elif element.tag == 'DialogOptions':
             dialogOptions = {}

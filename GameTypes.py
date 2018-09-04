@@ -29,14 +29,15 @@ class Phase(Enum):
 
 # Conditionals supported for dialog checks
 class DialogCheckEnum(Enum):
-   HAS_ITEM = 1                      # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
-   IS_FACING_DOOR = 2                # attributes: <none>
-   IS_OUTSIDE = 3                    # attributes: count (number, range, or unlimited)
-   IS_INSIDE = 4                     # attributes: count (number, range, or unlimited)
-   IS_DARK = 5                       # attributes: <none>
-   IS_AT_COORDINATES = 6             # attributes: map, x, y
-   IS_IN_COMBAT = 7                  # attributes: name (optional name of monster)
-   IS_NOT_IN_COMBAT = 8              # attributes: <none>
+   HAS_ITEM = 1                      # attributes: name (if unknown name, treated as a progress marker), count (defaults to 1)
+   LACKS_ITEM = 2                    # attributes: name (if unknown name, treated as a progress marker), count (defaults to 1)
+   IS_FACING_DOOR = 3                # attributes: <none>
+   IS_OUTSIDE = 4                    # attributes: count (number, range, or unlimited)
+   IS_INSIDE = 5                     # attributes: count (number, range, or unlimited)
+   IS_DARK = 6                       # attributes: <none>
+   IS_AT_COORDINATES = 7             # attributes: map, x, y
+   IS_IN_COMBAT = 8                  # attributes: name (optional name of monster)
+   IS_NOT_IN_COMBAT = 9              # attributes: <none>
 
 # Actions that can be triggered from dialog
 class DialogActionEnum(Enum):
@@ -150,12 +151,15 @@ NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
                                                        'point',
                                                        'dir',
                                                        'walking',
-                                                       'dialog'], verbose=False)
+                                                       'dialog',
+                                                       'progressMarker',
+                                                       'inverseProgressMarker'], verbose=False)
 
 MapDecoration = namedtuple('MapDecoration', ['type',
                                              'point',
                                              'dialog',
-                                             'progressMarker'], verbose=False)
+                                             'progressMarker',
+                                             'inverseProgressMarker'], verbose=False)
 
 SpecialMonster = namedtuple('SpecialMonster', ['name',
                                                'point'], verbose=False)
@@ -173,7 +177,8 @@ Map = namedtuple('Map', ['name',
                          'monsterZones',
                          'encounterImage',
                          'specialMonsters',
-                         'isOutside'], verbose=False)
+                         'isOutside',
+                         'origin'], verbose=False)
 
 Monster = namedtuple('Monster', ['name',
                                  'image',

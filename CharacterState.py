@@ -120,6 +120,8 @@ class CharacterState:
             break
       if self.isItemEquipped( itemName ):
          retVal += 1
+      if itemName in self.progressMarkers:
+         retVal += 1
       return retVal
 
    def getItemOptions( self, itemName ):
@@ -197,7 +199,7 @@ class CharacterState:
       if isinstance(item, str):
          if item not in self.progressMarkers:
             self.progressMarkers.append( item )
-            print( 'Added progress marker', item, flush=True )
+            #print( 'Added progress marker', item, flush=True )
          else:
             print( 'WARN: Did not add previously added progress marker', item, flush=True )
       elif item in self.unequippedItems:
@@ -235,8 +237,9 @@ class CharacterState:
             self.shield = None
             remainingItemsToLose -= 1
          elif itemName in self.progressMarkers:
-            self.progressMarkers.remove( item )
+            self.progressMarkers.remove( itemName )
             remainingItemsToLose -= 1
+            #print( 'Removed progress marker', itemName, flush=True )
          else:
             for item in self.otherEquippedItems:
                if itemName == item.name:

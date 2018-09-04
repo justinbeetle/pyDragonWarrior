@@ -250,6 +250,7 @@ class GameState:
       return self.gameInfo.maps[self.mapState.mapName].isOutside
 
    def setMap(self, newMapName, oneTimeDecorations = [], respawnDecorations = False):
+      #print( 'setMap to', newMapName, flush=True )
       if self.mapState is not None:
          oldMapName = self.mapState.mapName
          
@@ -265,35 +266,45 @@ class GameState:
          self.removedDecorationsByMap = {}
 
       self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
+      # Prune out decorations where the progress marker conditions are not met
       for decoration in self.mapDecorations:
          if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
             self.mapDecorations.remove( decoration )
+         if decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
+            self.mapDecorations.remove( decoration )
+      # Prune out previously removed decorations
       if newMapName in self.removedDecorationsByMap:
          for decoration in self.removedDecorationsByMap[newMapName]:
             self.mapDecorations.remove( decoration )
       self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
+
+      # TODO: If loading up the same map, should retain the NPC positions
       self.npcs = []
       for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+         if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+            continue
+         if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+            continue
          self.npcs.append( CharacterState.createNpcState( npc ) )
    
    def isFacingDoor(self):
-      doorOpenDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+      doorOpenDest_datTile = self.pc.currPos_datTile + getDirectionVector( self.pc.dir )
       foundDoor = False
-      for decoration in self.gameState.mapDecorations:
+      for decoration in self.mapDecorations:
          if ( doorOpenDest_datTile == decoration.point and
               decoration.type is not None and
-              self.gameState.gameInfo.decorations[decoration.type].removeWithKey ):
+              self.gameInfo.decorations[decoration.type].removeWithKey ):
             return True
       return False
    
    def openDoor(self):
-      doorOpenDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+      doorOpenDest_datTile = self.pc.currPos_datTile + getDirectionVector( self.pc.dir )
       foundDoor = False
-      for decoration in self.gameState.mapDecorations:
+      for decoration in self.mapDecorations:
          if ( doorOpenDest_datTile == decoration.point and
               decoration.type is not None and
-              self.gameState.gameInfo.decorations[decoration.type].removeWithKey ):
-            removeDecoration( decoration )
+              self.gameInfo.decorations[decoration.type].removeWithKey ):
+            self.removeDecoration( decoration )
 
    def removeDecoration(self, decoration):
       # TODO: May also need to remove this from the list of one-time decorations for this map
