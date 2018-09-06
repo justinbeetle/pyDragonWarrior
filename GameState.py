@@ -37,7 +37,7 @@ class GameState:
       # Set character state for new game
       self.pendingDialog = self.gameInfo.initialStateDialog
       self.pc = CharacterState(
-         'hero',
+         'hero_sword_and_sheild',
          self.gameInfo.initialHeroPos_datTile,
          self.gameInfo.initialHeroPos_dir,
          self.gameInfo.pc_name,

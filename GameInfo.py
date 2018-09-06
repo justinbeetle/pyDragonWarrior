@@ -554,7 +554,9 @@ class GameInfo:
             decorationType,
             Point( int(decorationElement.attrib['x']),
                    int(decorationElement.attrib['y']) ),
-            self.parseDialog( decorationElement ) ) )
+            self.parseDialog( decorationElement ),
+            None,
+            None ) )
 
       # Parse death state
       deathStateElement = xmlRoot.find('DeathState')

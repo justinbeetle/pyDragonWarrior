@@ -57,15 +57,21 @@
    </Decorations>
 
    <CharacterTypes>
-      <CharacterType type="hero"     image="hero.png"/>
-      <CharacterType type="king"     image="king.png"/>
-      <CharacterType type="princess" image="princess.png"/>
-      <CharacterType type="guard"    image="guard.png"/>
-      <CharacterType type="warrior"  image="warrior.png"/>
-      <CharacterType type="sage"     image="sage.png"/>
-      <CharacterType type="boy"      image="boy.png"/>
-      <CharacterType type="girl"     image="girl.png"/>
-      <CharacterType type="merchant" image="merchant.png"/>
+      <CharacterType type="hero"                   image="hero.png"/>
+      <CharacterType type="hero_sword"             image="hero_sword.png"/>
+      <CharacterType type="hero_sheild"            image="hero_sheild.png"/>
+      <CharacterType type="hero_sword_and_sheild"  image="hero_sword_and_sheild.png"/>
+      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png"/>
+      <CharacterType type="king"                   image="king.png"/>
+      <CharacterType type="princess"               image="princess.png"/>
+      <CharacterType type="guard"                  image="guard.png"/>
+      <CharacterType type="warrior"                image="warrior.png"/>
+      <CharacterType type="sage"                   image="sage.png"/>
+      <CharacterType type="boy"                    image="boy.png"/>
+      <CharacterType type="girl"                   image="girl.png"/>
+      <CharacterType type="merchant"               image="merchant.png"/>
+      <CharacterType type="trumpeter"              image="trumpeter.png"/>
+      <CharacterType type="dragonlord"             image="dragonlord.png"/>
    </CharacterTypes>
 
    <Maps>
@@ -930,8 +936,26 @@
          <MapDecoration type="chest" x="12" y="13"/> <!-- TODO: Populate chest -->
          <MapDecoration type="chest" x="13" y="13"/> <!-- TODO: Populate chest -->
 
-         <NonPlayerCharacter type="boy" x="16" y="24" dir="EAST" walking="no">
-            <Dialog>I'm Nester. Hey, where am I? No, don't tell me!</Dialog></NonPlayerCharacter> <!-- TODO: Turn this into the Dragonlord -->
+         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no">
+            <Dialog>Welcome, [NAME]. I am the Dragonlord--King of Kings.</Dialog>
+            <Dialog>I have been waiting long for one such as thee.</Dialog>
+            <Dialog>I give thee now a chance to share this world and to rule half of it if thou will now stand beside me.</Dialog>
+            <Dialog>What sayest thou? Will the great warrior stand with me?</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>Really?</Dialog>
+                  <DialogOptions>
+                     <DialogOption name="Yes">
+                        <Dialog>Then half of this world is thine, half of the darkness, and...</Dialog>
+                        <Dialog>If thou dies I can bring thee back for another attempt without loss of thy deeds to date.</Dialog>
+                        <Dialog>Thy journey is over.  Take now a long, long rest.  Hahahaha...</Dialog>
+                        <!-- TODO: Add death dialog option and screen effect --></DialogOption>
+                     <DialogOption name="No">
+                        <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
+               <DialogOption name="No" label="fight_dragon_lord">
+                   <Dialog>Thou art a fool!</Dialog>
+                   <DialogAction type="ATTACK_MONSTER" name="Dragonlord"/></DialogOption></DialogOptions></NonPlayerCharacter>
+          <!-- TODO: Turn this into the Dragonlord, including second form and ball of light -->
       </Map>
    </Maps>
 
