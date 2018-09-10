@@ -1022,7 +1022,7 @@ class Game:
             self.gameState.eraseCharacters()
 
             # Scroll the view
-            scroll_view(self.gameState.screen, self.gameState.mapState.mapImage, self.gameState.pc.dir, mapImageRect, 1, imagePxStepSize)
+            scroll_view(self.gameState.screen, self.gameState.getMapImage(), self.gameState.pc.dir, mapImageRect, 1, imagePxStepSize)
             self.gameState.pc.currPosOffset_imgPx = Point(mapImageRect.x - origMapImageRect.x, mapImageRect.y - origMapImageRect.y)
             if self.gameState.isLightRestricted():
                self.gameState.drawMap( False )
@@ -1039,8 +1039,14 @@ class Game:
          self.gameState.advanceTick(movementAllowed)
 
       if movementAllowed:
+         prevPos_datTile = self.gameState.pc.currPos_datTile
          self.gameState.pc.currPos_datTile = self.gameState.pc.destPos_datTile
          self.gameState.pc.currPosOffset_imgPx = Point(0, 0)
+
+         # Redraw the map on a transition between interior and exterior
+         if ( self.gameState.isInterior( prevPos_datTile ) !=
+              self.gameState.isInterior( self.gameState.pc.currPos_datTile ):
+            self.gameState.drawMap( True )
 
          # Apply health penalty and check for player death
          self.gameState.pc.hp -= movementHpPenalty

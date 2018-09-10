@@ -148,18 +148,18 @@ class GameState:
    def getTileInfo(self, tile):
       return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[tile.y][tile.x]]]
 
-   def getTileDegreesOfFreedom(self, tile, enforceNpcHpPenaltyLimit):
+   def getTileDegreesOfFreedom(self, tile, enforceNpcHpPenaltyLimit, prevTile):
       degreesOfFreedom = 0
       for x in [tile.x-1, tile.x+1]:
-         if self.canMoveToTile( Point(x, tile.y), enforceNpcHpPenaltyLimit, False ):
+         if self.canMoveToTile( Point(x, tile.y), enforceNpcHpPenaltyLimit, False, prevTile ):
             degreesOfFreedom += 1
       for y in [tile.y-1, tile.y+1]:
-         if self.canMoveToTile( Point(tile.x, y), enforceNpcHpPenaltyLimit, False ):
+         if self.canMoveToTile( Point(tile.x, y), enforceNpcHpPenaltyLimit, False, prevTile ):
             degreesOfFreedom += 1
       #print('DOF for tile', tile, 'is', degreesOfFreedom, flush=True)
       return degreesOfFreedom
 
-   def canMoveToTile(self, tile, enforceNpcHpPenaltyLimit = False, enforceNpcDofLimit = False):
+   def canMoveToTile(self, tile, enforceNpcHpPenaltyLimit = False, enforceNpcDofLimit = False, prevTile = None):
       movementAllowed = False
 
       # Check if native tile allows movement
@@ -186,7 +186,10 @@ class GameState:
          if movementAllowed and enforceNpcHpPenaltyLimit and self.getTileInfo(tile).hpPenalty != 0:
             movementAllowed = False
             #print('Movement not allowed: NPC HP penalty limited', flush=True)
-         if movementAllowed and enforceNpcDofLimit and self.getTileDegreesOfFreedom(tile, enforceNpcHpPenaltyLimit) < 2:
+         if movementAllowed and enforceNpcHpPenaltyLimit and prevTile is not None and self.isInterior(tile) != self.isInterior(prevTile):
+            movementAllowed = False
+            #print('Movement not allowed: NPC cannot move between interior and exterior tiles', flush=True)
+         if movementAllowed and enforceNpcDofLimit and self.getTileDegreesOfFreedom(tile, enforceNpcHpPenaltyLimit, prevTile) < 2:
             movementAllowed = False
             #print('Movement not allowed: NPC degree-of-freedom limit not met', flush=True)
          if tile == self.pc.currPos_datTile or tile == self.pc.destPos_datTile:
@@ -219,14 +222,15 @@ class GameState:
          self.eraseCharacter( npc )
          
    def eraseCharacter(self, character):
-      self.screen.blit(
-         self.mapState.mapImage.subsurface(
-            self.getTileImageRect(
+      if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
+         self.screen.blit(
+            self.getMapImage().subsurface(
+               self.getTileImageRect(
+                  character.currPos_datTile,
+                  character.currPosOffset_imgPx) ),
+            self.getTileScreenRect(
                character.currPos_datTile,
-               character.currPosOffset_imgPx) ),
-         self.getTileScreenRect(
-            character.currPos_datTile,
-            character.currPosOffset_imgPx ) )
+               character.currPosOffset_imgPx ) )
 
    def drawCharacters(self):
       # Draw PC
@@ -237,11 +241,17 @@ class GameState:
          self.drawCharacter( npc )
          
    def drawCharacter(self, character):
-      self.screen.blit(
-         self.gameInfo.characterTypes[character.type].images[character.dir][self.phase],
-         self.getTileScreenRect(
-            character.currPos_datTile,
-            character.currPosOffset_imgPx) )
+      if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
+         self.screen.blit(
+            self.gameInfo.characterTypes[character.type].images[character.dir][self.phase],
+            self.getTileScreenRect(
+               character.currPos_datTile,
+               character.currPosOffset_imgPx) )
+      if character == self.pc and self.isExterior( self.pc.currPos_datTile ) and self.isInterior( self.pc.destPos_datTile ):
+         # If moving inside should disappear as moving
+         self.screen.blit(
+            self.exteriorMapImage.subsurface( self.getTileImageRect(self.pc.destPos_datTile) ),
+            self.getTileScreenRect(self.pc.destPos_datTile) )
 
    def isLightRestricted(self):
       return self.lightRadius is not None and self.lightRadius <= self.winSize_tiles.w/2 and self.lightRadius <= self.winSize_tiles.h/2
@@ -286,6 +296,22 @@ class GameState:
          if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
             continue
          self.npcs.append( CharacterState.createNpcState( npc ) )
+
+      # Get exterior and interior map images
+      self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
+      self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
+
+   def isInterior( self, pc_pos_datTile ):
+      return ( self.interiorMapImage is not None and
+               self.gameInfo.maps[self.mapState.mapName].overlayDat[pc_pos_datTile.y][pc_pos_datTile.x] in self.gameInfo.tileSymbols )
+      
+   def isExterior( self, pc_pos_datTile ):
+      return not self.isInterior( pc_pos_datTile )
+
+   def getMapImage( self ):
+      if self.isInterior( self.pc.currPos_datTile ):
+         return self.interiorMapImage
+      return self.exteriorMapImage
    
    def isFacingDoor(self):
       doorOpenDest_datTile = self.pc.currPos_datTile + getDirectionVector( self.pc.dir )
@@ -325,22 +351,26 @@ class GameState:
                                          0,
                                          self.winSize_pixels.x,
                                          self.winSize_pixels.y ) )
-      if self.isLightRestricted():
-         self.screen.fill( pygame.Color('black') )
-         self.screen.blit( self.mapState.mapImage.subsurface(
-                              self.getTileRegionImageRect(
-                                 self.pc.currPos_datTile,
-                                 self.lightRadius,
-                                 self.pc.currPosOffset_imgPx ) ),
-                           self.getTileRegionScreenRect(
-                              self.pc.currPos_datTile,
-                              self.lightRadius,
-                              self.pc.currPosOffset_imgPx ) )
-      else:
-         self.screen.blit( self.mapState.mapImage.subsurface( self.getMapImageRect() ), (0,0) )
+
+      # Draw the underlying map
+      self.screen.blit( self.getMapImage().subsurface( self.getMapImageRect() ), (0,0) )
 
       # Draw the hero and NPCs to the screen
       self.drawCharacters()
+            
+      # Limit light radius
+      if self.isLightRestricted():
+         lightSurface = Surface( (self.winSize_pixels.x, self.winSize_pixels.y) )
+         lightSurface.fill( pygame.Color('black') )
+         lightSurface.fill( pygame.Color('white'),
+                            self.getTileRegionImageRect(
+                               self.pc.currPos_datTile,
+                               self.lightRadius,
+                               self.pc.currPosOffset_imgPx ) )
+         pygame.transform.threshold( self.screen,
+                                     lightSurface,
+                                     search_color=pygame.Color('black'),
+                                     set_color=pygame.Color('black') )
 
       # Flip the screen buffer
       if flipBuffer:
@@ -375,7 +405,7 @@ class GameState:
                # TODO: Determine where to move instead of blindly moving forward
                npc.dir = random.choice( list( Direction ) )
                destTile = npc.currPos_datTile + getDirectionVector( npc.dir )
-               if self.canMoveToTile( destTile, True, True ):
+               if self.canMoveToTile( destTile, True, True, npc.currPos_datTile ):
                   npc.destPos_datTile = destTile
 
             # Move the NPC in steps to the destination tile
@@ -397,6 +427,7 @@ class GameState:
 
       if redrawMap:
          pygame.display.flip()
+         #self.drawMap( True )
             
       self.tickCount += 1
       pygame.time.Clock().tick(40)

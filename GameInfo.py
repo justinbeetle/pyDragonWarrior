@@ -197,7 +197,12 @@ class GameInfo:
             directionCharacterTypeImages = {}
             for phase in [Phase.A, Phase.B]:
                image = pygame.Surface( (self.tileSize_pixels, self.tileSize_pixels) )
-               pygame.transform.scale( characterTypeImage.subsurface(x_px, 0, characterTypeImage.get_height(), characterTypeImage.get_height()), (self.tileSize_pixels, self.tileSize_pixels), image )
+               pygame.transform.scale( characterTypeImage.subsurface(x_px,
+                                                                     0,
+                                                                     characterTypeImage.get_height(),
+                                                                     characterTypeImage.get_height()),
+                                       (self.tileSize_pixels, self.tileSize_pixels),
+                                       image )
                image.set_colorkey( GameInfo.TRANSPARENT_COLOR )
                directionCharacterTypeImages[phase] = image
                x_px += characterTypeImage.get_height() + 1
@@ -718,8 +723,36 @@ class GameInfo:
       # The size of the image is padded by imagePad_tiles in all directions
       mapImageSize_tiles = self.maps[mapName].size + 2 * imagePad_tiles
       mapImageSize_pixels = mapImageSize_tiles * self.tileSize_pixels
-      mapImage = pygame.Surface( mapImageSize_pixels, pygame.SRCALPHA )
-      mapImage.fill( pygame.Color('pink') ) # Fill with a color to make is easier to identify any gaps
+
+      if mapDecorations is None:
+         mapDecorations = self.maps[mapName].mapDecorations
+      
+      mapImage = self.getMapImage(
+         mapName,
+         imagePad_tiles,
+         mapDecorations,
+         mapImageSize_pixels,
+         self.maps[mapName].dat,
+         pygame.Color('pink') ) # Fill with a color to make is easier to identify any gaps
+      
+      if self.maps[mapName].overlayDat is not None:
+         mapOverlayImage = self.getMapImage(
+            mapName,
+            imagePad_tiles,
+            [],
+            mapImageSize_pixels,
+            self.maps[mapName].overlayDat,
+            GameInfo.TRANSPARENT_COLOR )
+         mapOverlayImage.set_colorkey( GameInfo.TRANSPARENT_COLOR )
+      else:
+         mapOverlayImage = None
+         
+      # Return the map image info
+      return MapImageInfo(mapName, mapImage, mapImageSize_tiles, mapImageSize_pixels, mapOverlayImage)
+
+   def getMapImage(self, mapName, imagePad_tiles, mapDecorations, mapImageSize_pixels, dat, fillColor ):
+      mapImage = pygame.Surface( mapImageSize_pixels )
+      mapImage.fill( fillColor )
 
       # Blit the padded portions of the image
       lastCol = self.maps[mapName].size[0]-1
@@ -731,60 +764,70 @@ class GameInfo:
             # Blit corners
             yN_px = y * self.tileSize_pixels
             yS_px  = (y + imagePad_tiles.y + self.maps[mapName].size[1]) * self.tileSize_pixels
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[0][0]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][0]]].image[0],             (xW_px, yN_px) ) # NW pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][0]]].image,                (xW_px, yN_px) ) # NW pad
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[0][lastCol]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][lastCol]]].image[0],       (xE_px, yN_px) ) # NE pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][lastCol]]].image,          (xE_px, yN_px) ) # NE pad
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][0]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][0]]].image[0],       (xW_px, yS_px) ) # SW pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][0]]].image,          (xW_px, yS_px) ) # SW pad
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][lastCol]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][lastCol]]].image[0], (xE_px, yS_px) ) # SE pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][lastCol]]].image,    (xE_px, yS_px) ) # SE pad
+            if dat[0][0] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[0][0]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][0]]].image[0],             (xW_px, yN_px) ) # NW pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][0]]].image,                (xW_px, yN_px) ) # NW pad
+            if dat[0][lastCol] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[0][lastCol]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][lastCol]]].image[0],       (xE_px, yN_px) ) # NE pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][lastCol]]].image,          (xE_px, yN_px) ) # NE pad
+            if dat[lastRow][0] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[lastRow][0]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][0]]].image[0],       (xW_px, yS_px) ) # SW pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][0]]].image,          (xW_px, yS_px) ) # SW pad
+            if dat[lastRow][lastCol] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[lastRow][lastCol]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][lastCol]]].image[0], (xE_px, yS_px) ) # SE pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][lastCol]]].image,    (xE_px, yS_px) ) # SE pad
          for y in range(self.maps[mapName].size[1]):
             # Blit sides
             y_px = (y + imagePad_tiles.y) * self.tileSize_pixels
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[y][0]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[y][0]]].image[0],             (xW_px, y_px) )  # W pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[y][0]]].image,                (xW_px, y_px) )  # W pad
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[y][lastCol]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[y][lastCol]]].image[0],       (xE_px, y_px) )  # E pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[y][lastCol]]].image,          (xE_px, y_px) )  # E pad
+            if dat[y][0] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[y][0]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[y][0]]].image[0],             (xW_px, y_px) )  # W pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[y][0]]].image,                (xW_px, y_px) )  # W pad
+            if dat[y][lastCol] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[y][lastCol]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[y][lastCol]]].image[0],       (xE_px, y_px) )  # E pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[y][lastCol]]].image,          (xE_px, y_px) )  # E pad
       for y in range(imagePad_tiles.y):
          yN_px = y * self.tileSize_pixels
          yS_px = (y + imagePad_tiles.y + self.maps[mapName].size[1]) * self.tileSize_pixels
          for x in range(self.maps[mapName].size[0]):
             # Blit the top and bottom
             x_px = (x + imagePad_tiles.x) * self.tileSize_pixels
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[0][x]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][x]]].image[0],             (x_px, yN_px) )  # N pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[0][x]]].image,                (x_px, yN_px) )  # N pad
-            if self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][x]]].specialEdges:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][x]]].image[0],       (x_px, yS_px) )  # S pad
-            else:
-               mapImage.blit( self.tiles[self.tileSymbols[self.maps[mapName].dat[lastRow][x]]].image,          (x_px, yS_px) )  # S pad
+            if dat[0][x] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[0][x]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][x]]].image[0],             (x_px, yN_px) )  # N pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[0][x]]].image,                (x_px, yN_px) )  # N pad
+            if dat[lastRow][x] in self.tileSymbols:
+               if self.tiles[self.tileSymbols[dat[lastRow][x]]].specialEdges:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][x]]].image[0],       (x_px, yS_px) )  # S pad
+               else:
+                  mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][x]]].image,          (x_px, yS_px) )  # S pad
 
       # Blit the map data portion of the image
-      for y, rowData in enumerate(self.maps[mapName].dat):
+      for y, rowData in enumerate(dat):
          y_px = (y + imagePad_tiles.y) * self.tileSize_pixels
          for x, tileSymbol in enumerate(rowData):
+            if tileSymbol not in self.tileSymbols:
+               continue
             x_px = (x + imagePad_tiles.x) * self.tileSize_pixels
             if self.tiles[self.tileSymbols[tileSymbol]].specialEdges:
                # Determine which image to use
                imageIdx = 0
                # TODO: Fix hardcoded exception for the bridge tileSymbol of 'b'
-               if y>0 and self.maps[mapName].dat[y-1][x] != tileSymbol and self.maps[mapName].dat[y-1][x] != 'b':
+               if y>0 and dat[y-1][x] != tileSymbol and dat[y-1][x] != 'b':
                   imageIdx += 8
-               if y<len(self.maps[mapName].dat)-1 and self.maps[mapName].dat[y+1][x] != tileSymbol and self.maps[mapName].dat[y+1][x] != 'b':
+               if y<len(dat)-1 and dat[y+1][x] != tileSymbol and dat[y+1][x] != 'b':
                   imageIdx += 2
                if x>0 and rowData[x-1] != tileSymbol and rowData[x-1] != 'b':
                   imageIdx += 1
@@ -795,8 +838,6 @@ class GameInfo:
                mapImage.blit( self.tiles[self.tileSymbols[tileSymbol]].image,                                  (x_px, y_px) )   # data
 
       # Blit the decoration on the image
-      if mapDecorations is None:
-         mapDecorations = self.maps[mapName].mapDecorations
       for mapDecoration in mapDecorations:
          if mapDecoration.type is None:
             continue
@@ -805,10 +846,25 @@ class GameInfo:
          x_px = tilePosition_px.x + (self.tileSize_pixels - decoration.image.get_width()) / 2
          y_px = tilePosition_px.y + self.tileSize_pixels - decoration.image.get_height()
          mapImage.blit( decoration.image,                                                                      (x_px, y_px) )   # decoration
-         
-      # Return the map image info
-      return MapImageInfo(mapName, mapImage, mapImageSize_tiles, mapImageSize_pixels)
 
+      return mapImage
+
+   def getExteriorImage( mapImageInfo ):
+      mapImage = mapImageInfo.mapImage.copy()
+      if mapImageInfo.mapOverlayImage is not None:
+         mapImage.blit( mapImageInfo.mapOverlayImage, (0,0) )
+      return mapImage
+
+   def getInteriorImage( mapImageInfo ):
+      mapImage = None
+      if mapImageInfo.mapOverlayImage is not None:
+         mapImage = mapImageInfo.mapImage.copy()
+         pygame.transform.threshold(mapImage,
+                                    mapImageInfo.mapOverlayImage,
+                                    search_color=GameInfo.TRANSPARENT_COLOR,
+                                    set_color=pygame.Color('black'),
+                                    inverse_set=True)
+      return mapImage
 
 def main():
    # Initialize pygame
@@ -834,33 +890,44 @@ def main():
       audioPlayer.playMusic( gameInfo.maps[mapName].music )
       mapImageInfo = gameInfo.getMapImageInfo( mapName, imagePad_tiles )
 
-      # Always rendering to the entire window but need to determine the
-      # rectangle from the image which is to be scaled to the screen
-      mapImageRect = pygame.Rect( 0, 0, winSize_pixels.x, winSize_pixels.y )
-      screen.set_clip( pygame.Rect( 0, 0, winSize_pixels.x, winSize_pixels.y ) )
-      screen.blit( mapImageInfo.mapImage.subsurface( mapImageRect ), (0,0) )
-      pygame.display.flip()
+      renderTypes = ['exterior']
+      if mapImageInfo.mapOverlayImage is not None:
+         renderTypes.append('interior')
 
-      pygame.key.set_repeat (10, 10)
-      isRunning = True
-      while isRunning:
-         for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN:
-               if e.key == pygame.K_ESCAPE:
+      for renderType in renderTypes:
+         if renderType == 'exterior':
+            mapImage = GameInfo.getExteriorImage( mapImageInfo )
+         else:
+            mapImage = GameInfo.getInteriorImage( mapImageInfo )
+            
+         # Always rendering to the entire window but need to determine the
+         # rectangle from the image which is to be scaled to the screen
+         mapImageRect = pygame.Rect( 0, 0, winSize_pixels.x, winSize_pixels.y )
+         screen.set_clip( pygame.Rect( 0, 0, winSize_pixels.x, winSize_pixels.y ) )
+         screen.blit( mapImage.subsurface( mapImageRect ), (0,0) )
+         pygame.display.flip()
+
+         pygame.key.set_repeat (10, 10)
+         isRunning = True
+         
+         while isRunning:
+            for e in pygame.event.get():
+               if e.type == pygame.KEYDOWN:
+                  if e.key == pygame.K_ESCAPE:
+                     isRunning = False
+                  elif e.key == pygame.K_DOWN:
+                     scroll_view(screen, mapImage, Direction.SOUTH, mapImageRect, 1, tileSize_pixels, True)
+                  elif e.key == pygame.K_UP:
+                     scroll_view(screen, mapImage, Direction.NORTH, mapImageRect, 1, tileSize_pixels, True)
+                  elif e.key == pygame.K_LEFT:
+                     scroll_view(screen, mapImage, Direction.WEST,  mapImageRect, 1, tileSize_pixels, True)
+                  elif e.key == pygame.K_RIGHT:
+                     scroll_view(screen, mapImage, Direction.EAST,  mapImageRect, 1, tileSize_pixels, True)
+               elif e.type == pygame.QUIT:
                   isRunning = False
-               elif e.key == pygame.K_DOWN:
-                  scroll_view(screen, mapImageInfo.mapImage, Direction.SOUTH, mapImageRect, 1, tileSize_pixels, True)
-               elif e.key == pygame.K_UP:
-                  scroll_view(screen, mapImageInfo.mapImage, Direction.NORTH, mapImageRect, 1, tileSize_pixels, True)
-               elif e.key == pygame.K_LEFT:
-                  scroll_view(screen, mapImageInfo.mapImage, Direction.WEST,  mapImageRect, 1, tileSize_pixels, True)
-               elif e.key == pygame.K_RIGHT:
-                  scroll_view(screen, mapImageInfo.mapImage, Direction.EAST,  mapImageRect, 1, tileSize_pixels, True)
-            elif e.type == pygame.QUIT:
-               isRunning = False
-            else:
-               print( 'e.type =', e.type, flush=True )
-         clock.tick(30)
+               else:
+                  print( 'e.type =', e.type, flush=True )
+            clock.tick(30)
 
    # Terminate pygame
    audioPlayer.terminate()

@@ -261,7 +261,8 @@ class Tool:
 MapImageInfo = namedtuple('MapImageInfo', ['mapName',
                                            'mapImage',
                                            'mapImageSize_tiles',
-                                           'mapImageSize_pixels'], verbose=False)
+                                           'mapImageSize_pixels',
+                                           'mapOverlayImage'], verbose=False)
 
 # TODO: Where to put this???
 import pygame
