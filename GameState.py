@@ -242,8 +242,22 @@ class GameState:
          
    def drawCharacter(self, character):
       if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
+         if character == self.pc:
+            # TODO: Configurable way to handle the PC image mappings
+            if self.pc.hasItem( 'carryingPrincess' ):
+               characterImages = self.gameInfo.characterTypes['hero_carrying_princess'].images
+            elif self.pc.weapon is not None and self.pc.shield is not None:
+               characterImages = self.gameInfo.characterTypes['hero_sword_and_sheild'].images
+            elif self.pc.weapon is not None:
+               characterImages = self.gameInfo.characterTypes['hero_sword'].images
+            elif self.pc.shield is not None:
+               characterImages = self.gameInfo.characterTypes['hero_sheild'].images
+            else:
+               characterImages = self.gameInfo.characterTypes['hero'].images
+         else:
+            characterImages = self.gameInfo.characterTypes[character.type].images
          self.screen.blit(
-            self.gameInfo.characterTypes[character.type].images[character.dir][self.phase],
+            characterImages[character.dir][self.phase],
             self.getTileScreenRect(
                character.currPos_datTile,
                character.currPosOffset_imgPx) )
@@ -342,35 +356,44 @@ class GameState:
       self.removedDecorationsByMap[self.mapState.mapName].append( decoration )
       self.mapState = self.gameInfo.getMapImageInfo( self.mapState.mapName, self.imagePad_tiles, self.mapDecorations )
 
+      # Get exterior and interior map images
+      self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
+      self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
+
       # Draw the map to the screen
       self.drawMap()
 
-   def drawMap(self, flipBuffer=True):
-      # Draw the map to the screen
+   def setClippingForLightRadius(self):
+      if self.isLightRestricted():
+         self.screen.set_clip(
+            self.getTileRegionScreenRect(
+               self.pc.currPos_datTile,
+               self.lightRadius,
+               self.pc.currPosOffset_imgPx ) )
+      else:
+         self.setClippingForWindow()
+
+   def setClippingForWindow(self):
       self.screen.set_clip( pygame.Rect( 0,
                                          0,
                                          self.winSize_pixels.x,
                                          self.winSize_pixels.y ) )
+      
 
-      # Draw the underlying map
+   def drawMap(self, flipBuffer=True):
+      # Implement light radius via clipping
+      if self.isLightRestricted():
+         self.screen.fill( pygame.Color('black') )
+      self.setClippingForLightRadius()
+      
+      # Draw the map to the screen
       self.screen.blit( self.getMapImage().subsurface( self.getMapImageRect() ), (0,0) )
 
       # Draw the hero and NPCs to the screen
       self.drawCharacters()
-            
-      # Limit light radius
-      if self.isLightRestricted():
-         lightSurface = Surface( (self.winSize_pixels.x, self.winSize_pixels.y) )
-         lightSurface.fill( pygame.Color('black') )
-         lightSurface.fill( pygame.Color('white'),
-                            self.getTileRegionImageRect(
-                               self.pc.currPos_datTile,
-                               self.lightRadius,
-                               self.pc.currPosOffset_imgPx ) )
-         pygame.transform.threshold( self.screen,
-                                     lightSurface,
-                                     search_color=pygame.Color('black'),
-                                     set_color=pygame.Color('black') )
+      
+      # Restore clipping for entire window
+      self.setClippingForWindow()
 
       # Flip the screen buffer
       if flipBuffer:
@@ -387,6 +410,9 @@ class GameState:
             self.phase = Phase.B
          else:
             self.phase = Phase.A
+
+      # Implement light radius via clipping
+      self.setClippingForLightRadius()
 
       if phaseChanged and not charactersErased:
          charactersErased = True
@@ -425,9 +451,11 @@ class GameState:
          self.drawCharacters()
          redrawMap = True
 
+      # Restore clipping for entire window
+      self.setClippingForWindow()
+
       if redrawMap:
          pygame.display.flip()
-         #self.drawMap( True )
             
       self.tickCount += 1
       pygame.time.Clock().tick(40)

@@ -162,7 +162,11 @@ MapDecoration = namedtuple('MapDecoration', ['type',
                                              'inverseProgressMarker'], verbose=False)
 
 SpecialMonster = namedtuple('SpecialMonster', ['name',
-                                               'point'], verbose=False)
+                                               'point',
+                                               'victoryDialog',
+                                               'runAwayDialog',
+                                               'progressMarker',
+                                               'inverseProgressMarker'], verbose=False)
 
 Map = namedtuple('Map', ['name',
                          'dat',

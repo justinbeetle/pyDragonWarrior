@@ -1045,7 +1045,7 @@ class Game:
 
          # Redraw the map on a transition between interior and exterior
          if ( self.gameState.isInterior( prevPos_datTile ) !=
-              self.gameState.isInterior( self.gameState.pc.currPos_datTile ):
+              self.gameState.isInterior( self.gameState.pc.currPos_datTile ) ):
             self.gameState.drawMap( True )
 
          # Apply health penalty and check for player death
@@ -1067,8 +1067,13 @@ class Game:
             monster = None
             for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
                if specialMonster.point == self.gameState.pc.currPos_datTile:
+                  if specialMonster.progressMarker is not None and specialMonster.progressMarker not in self.gameState.pc.progressMarkers:
+                     continue
+                  if specialMonster.inverseProgressMarker is not None and specialMonster.inverseProgressMarker in self.gameState.pc.progressMarkers:
+                     continue
                   print ('Found monster at point: ', specialMonster.point, flush=True)
                   self.gameMode = GameMode.ENCOUNTER
+                  break
 
             # Check for random encounters
             if( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and

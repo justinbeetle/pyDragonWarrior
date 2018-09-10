@@ -302,10 +302,28 @@ class GameInfo:
          for monsterElement in element.findall('Monster'):
             #print( 'monsterElement =', monsterElement, flush=True )
             #print( 'monsterElement.attrib =', monsterElement.attrib, flush=True )
+            victoryDialog = None
+            victoryDialogElement = monsterElement.find('VictoryDialog')
+            if victoryDialogElement != None:
+               victoryDialog = self.parseDialog( victoryDialogElement )
+            runAwayDialog = None
+            runAwayDialogElement = monsterElement.find('RunAwayDialog')
+            if runAwayDialogElement != None:
+               runAwayDialog = self.parseDialog( runAwayDialogElement )
+            progressMarker = None
+            if 'progressMarker' in monsterElement.attrib:
+               progressMarker = monsterElement.attrib['progressMarker']
+            inverseProgressMarker = None
+            if 'inverseProgressMarker' in monsterElement.attrib:
+               inverseProgressMarker = monsterElement.attrib['inverseProgressMarker']
             specialMonsters.append( SpecialMonster(
                   monsterElement.attrib['name'],
                   Point( int(monsterElement.attrib['x']),
-                         int(monsterElement.attrib['y']) ) ) )
+                         int(monsterElement.attrib['y']) ),
+                  victoryDialog,
+                  runAwayDialog,
+                  progressMarker,
+                  inverseProgressMarker ) )
          
          # Load map dat file
          #print( 'Load map dat file', flush=True )

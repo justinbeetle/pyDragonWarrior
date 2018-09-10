@@ -180,7 +180,7 @@
 
       <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="44" toY="44" toDir="SOUTH"/>
-         <PointTransition decoration="upstairs" fromX="8" fromY="8"  toMap="tantegel_lvl2" toX="9" toY="8" toDir="WEST"/>
+         <PointTransition decoration="upstairs" fromX="8" fromY="8"  toMap="tantegel_lvl2" toX="9" toY="9" toDir="WEST"/>
          <PointTransition decoration="downstairs" fromX="30" fromY="30" toMap="tantegel_lvl0" toX="1" toY="5" toDir="EAST" />
          <MapDecoration type="door"  x="5"  y="14"/>
          <MapDecoration type="door"  x="19" y="7"/>
@@ -198,54 +198,56 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found 11 gold pieces.</Dialog></MapDecoration>
 
          <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no">
-            <Dialog>King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later.</Dialog></NonPlayerCharacter>
+            <Dialog>"King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="9" y="9" dir="NORTH" walking="no">
-            <Dialog>If thou art planning to take a rest, first see King Lorik.</Dialog></NonPlayerCharacter>
+            <Dialog>"If thou art planning to take a rest, first see King Lorik."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="12" y="12" dir="SOUTH" walking="yes">
-            <Dialog>There was a time when Brecconary was a paradise. Then the Dragonlord's minions came.</Dialog></NonPlayerCharacter>
+            <Dialog>"There was a time when Brecconary was a paradise.  Then the Dragonlord's minions came."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes">
-            <Dialog>Where oh where can I find Princess Gwaelin?</Dialog></NonPlayerCharacter>
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogCheck>
+            <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="3" y="22" dir="EAST" walking="yes">
-            <Dialog>We are merchants who have traveled much in this land. Many of our colleagues have been killed by servants of the Dragonlord.</Dialog></NonPlayerCharacter>
+            <Dialog>"We are merchants who have traveled much in this land.  Many of our colleagues have been killed by servants of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="7" y="24" dir="NORTH" walking="yes">
-            <Dialog>Rumor has it that entire towns have been destroyed by the Dragonlord's servants.</Dialog></NonPlayerCharacter>
+            <Dialog>"Rumor has it that entire towns have been destroyed by the Dragonlord's servants."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="3" y="13" dir="NORTH" walking="yes">
-            <Dialog>Never does a brave person steal.</Dialog></NonPlayerCharacter>
+            <Dialog>"Never does a brave person steal."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="20" y="14" dir="SOUTH" walking="yes">
-            <Dialog>Let us wish the warrior well! May the light be thy strength!</Dialog></NonPlayerCharacter>
+            <Dialog>"Let us wish the warrior well!  May the light be thy strength!"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="27" y="16" dir="NORTH" walking="no">
-            <Dialog>If thy Hit Points are high enough, by all means, enter.</Dialog></NonPlayerCharacter>
+            <Dialog>"If thy hit points are high enough, by all means, enter."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="3" y="9" dir="EAST" walking="yes">
-            <Dialog>To become strong enough to face future trials thou must first battle many foes.</Dialog></NonPlayerCharacter>
+            <Dialog>"To become strong enough to face future trials thou must first battle many foes."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="28" y="6" dir="WEST" walking="no">
-            <Dialog>When the sun and rain meet, a Rainbow Bridge shall appear. It's a legend.</Dialog></NonPlayerCharacter>
+            <Dialog>"When the sun and rain meet, a Rainbow Bridge shall appear.  It's a legend."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="10" y="28" dir="EAST" walking="no">
-            <Dialog>Welcome to Tantegel Castle.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="13" y="28" dir="WEST" walking="no">
-            <Dialog>Welcome to Tantegel Castle.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="16" y="21" dir="EAST" walking="no">
-            <Dialog>Where oh where can I find Princess Gwaelin?</Dialog></NonPlayerCharacter>
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogCheck>
+            <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
-            <Dialog>[NAME]'s coming was foretold by legend. May the light shine upon this brave warrior.</Dialog>
+            <Dialog>"[NAME]'s coming was foretold by legend.  May the light shine upon this brave warrior."</Dialog>
             <DialogAction type="VISUAL_EFFECT" name="flickering"/>
             <DialogAction type="MAGIC_RESTORE" count="unlimited"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="25" y="22" dir="NORTH" walking="yes">
-            <Dialog>In Garinham, look for the grave of Garin. Thou must push on a wall of darkness there.</Dialog></NonPlayerCharacter>
+            <Dialog>"In Garinham, look for the grave of Garin.  Thou must push on a wall of darkness there."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="25" y="2" dir="SOUTH" walking="no">
             <DialogVariable name="[COST]" value="85"/>
@@ -253,31 +255,61 @@
       </Map>
 
       <Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightRadius="unlimited" isOutside="yes">
-         <PointTransition decoration="downstairs" fromX="9" fromY="8"  toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
+         <PointTransition decoration="downstairs" fromX="9" fromY="9" toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
 
          <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no">
+            <DialogCheck type="LACKS_ITEM" name="carryingPrincess">
+               <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
+               <Dialog>"Now, Gwaelin, come to my side."</Dialog>
+               <Dialog>Gwaelin then whispers: "Wait a moment, please. I would give a present to [NAME]."</Dialog>
+               <Dialog>"Please accept my love, [NAME]."</Dialog>
+               <Dialog>"Even when we two are parted by great distances, I shall be with thee."</Dialog>
+               <Dialog>"Farewell, [NAME]."</Dialog>
+               <DialogAction type="GAIN_ITEM" name="Gwaelin's Love"/>
+               <DialogAction type="LOSE_ITEM" name="carryingPrincess"/>
+               <DialogAction type="GAIN_ITEM" name="princessReturnedToCastle"/>
+               <DialogAction type="GOTO_COORDINATES"/></DialogCheck> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
             <Dialog>I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points.</Dialog>
-            <Dialog>Will thou tell me now of thy deeds so they won't be forgotten?</Dialog>
+            <Dialog>"Will thou tell me now of thy deeds so they won't be forgotten?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
                   <DialogAction type="SAVE_GAME"/>
-                  <Dialog>Thy deeds have been recorded on the Imperial Scrolls of Honor.</Dialog></DialogOption>
+                  <Dialog>"Thy deeds have been recorded on the Imperial Scrolls of Honor."</Dialog></DialogOption>
                <DialogOption name="No"/></DialogOptions>
-               <Dialog>Goodbye now, [NAME]. Take care and tempt not the Fates.</Dialog></NonPlayerCharacter>
+               <Dialog>"Goodbye now, [NAME].  Take care and tempt not the Fates."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="guard" x="4" y="6" dir="EAST" walking="no">
-            <Dialog>East of this castle is a town where armor, weapons, and many other items may be purchased. Return to the Inn for a rest if thou art wounded in battle, [NAME]. Sleep heals all.</Dialog></NonPlayerCharacter>
+         <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="princessReturnedToCastle">
+            <DialogCheck type="LACKS_ITEM" name="givenPrincessLove"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
+            <Dialog>Dost thou love me, [NAME]?</Dialog>
+            <DialogOptions label="but_thou_must_love_me">
+               <DialogOption name="Yes">
+                  <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
+                  <Dialog>I'm so happy!</Dialog>
+                  <DialogAction type="GAIN_ITEM" name="givenPrincessLove"/></DialogOption>
+               <DialogOption name="No">
+                   <Dialog>But thou must.</Dialog>
+                   <Dialog>Dost thou love me, [NAME]?</Dialog>
+                   <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="guard" x="6" y="6" dir="WEST" walking="no">
-            <Dialog>If thou hast collected all the Treasure Chests, a key will be found. Once used, the key will disappear, but the door will be open and thou may pass through.</Dialog></NonPlayerCharacter>
+         <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogCheck>
+            <Dialog>"East of this castle is a town where armor, weapons, and many other items may be purchased."</Dialog>
+            <Dialog>"Return to the Inn for a rest if thou art wounded in battle, [NAME].  Sleep heals all."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="guard" x="8" y="5" dir="WEST" walking="yes">
-            <Dialog>Dost thou know about Princess Gwaelin?</Dialog>
+         <NonPlayerCharacter type="guard" x="6" y="7" dir="WEST" walking="no">
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogCheck>
+            <Dialog>"If thou hast collected all the treasure chests, a key will be found."</Dialog>
+            <Dialog>"Once used, the key will disappear, but the door will be open and thou may pass through."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="8" y="6" dir="WEST" walking="yes">
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogCheck>
+            <Dialog>"Dost thou know about Princess Gwaelin?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>[NAME], please save the Princess.</Dialog></DialogOption>
+                  <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption>
                <DialogOption name="No">
-                   <Dialog>Half a year now hath passed since the Princess was kidnapped by the enemy. Never does the King speak of it, but he must be suffering much. Hero, please save the Princess.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
+                   <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <MapDecoration type="None" x="2" y="2">
             <Dialog>Something here smells foul...</Dialog></MapDecoration>
@@ -287,8 +319,8 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5"  toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="7" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Stones_of_Sunlight" count="1"><Dialog>Be gone with you!!!</Dialog></DialogCheck>
-            <Dialog>I have been waiting long for one such as thee.  Take the treasure chest.</Dialog></NonPlayerCharacter>
+            <DialogCheck type="LACKS_ITEM" name="Acquired_Stones_of_Sunlight" count="1"><Dialog>"Be gone with you!!!"</Dialog></DialogCheck>
+            <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="5"  y="6">
             <DialogCheck type="LACKS_ITEM" name="Acquired_Stones_of_Sunlight" count="1"><DialogGoTo label="empty_chest"/></DialogCheck>
@@ -297,7 +329,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="brecconary" tiles="brecconary.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
+      <Map name="brecconary" tiles="brecconary.dat" overlayTiles="brecconary_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="49" toY="42" toDir="SOUTH"/>
          <MapDecoration type="door" x="22" y="7"/>
          <MapDecoration type="door" x="6"  y="24"/>
@@ -377,7 +409,7 @@
             <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
       </Map>
 
-      <Map name="garinham" tiles="garinham.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
+      <Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="3" toY="3" toDir="SOUTH"/>
          <PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="garins_grave_lvl1" toX="7" toY="12" toDir="EAST"/>
          <MapDecoration type="door"  x="18" y="11"/>
@@ -606,7 +638,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Armor.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="cantlin" tiles="cantlin.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
+      <Map name="cantlin" tiles="cantlin.dat" overlayTiles="cantlin_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="74" toY="103" toDir="SOUTH"/>
          <MapDecoration type="door"  x="5"  y="22"/>
          <MapDecoration type="door"  x="9"  y="26"/>
@@ -757,7 +789,24 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
          <MapDecoration type="door"  x="6"  y="21"/>
 
-         <Monster name="Green Dragon" x="5" y="15"/> <!-- TODO: Make one-time -->
+         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="rescuedPrincess"/> <!-- TODO: What happens when you run away?  You can't rescue the princess, can you? -->
+
+         <NonPlayerCharacter type="princess" x="6" y="19" dir="SOUTH" walking="no" inverseProgressMarker="rescuedPrincess">
+            <Dialog>Thou art brave indeed to rescue me, [NAME].</Dialog>
+            <Dialog>I am Gwaelin, daughter of Lorik.</Dialog>
+            <Dialog>Will thou take me to the castle?</Dialog>
+            <DialogOptions label="but_thou_must_rescue_me">
+               <DialogOption name="Yes">
+                  <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
+                  <Dialog>Princess Gwaelin embraces thee.</Dialog>
+                  <Dialog>I'm so happy!</Dialog>
+                  <DialogAction type="GAIN_ITEM" name="rescuedPrincess"/>
+                  <DialogAction type="GAIN_ITEM" name="carryingPrincess"/>
+                  <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess from the map -->
+               <DialogOption name="No">
+                   <Dialog>But thou must.</Dialog>
+                   <Dialog>Will thou take me to the castle?</Dialog>
+                   <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
       <Map name="northern_shrine" tiles="northern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="no">
@@ -1450,18 +1499,19 @@
 
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
             <Dialog>[NAME] held the Gwaelin's Love tightly.</Dialog>
-            <Dialog>Heed my voice, [NAME], for this is Gwaelin.</Dialog>
-            <Dialog>To reach the next level thou must raise thy experience points by [NEXT_LEVEL_XP].  My hope is with thee.</Dialog>
-            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>I love thee, [NAME]</Dialog></DialogCheck>
-            <Dialog>From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR].</Dialog>
-            <Dialog>I love thee, [NAME].</Dialog></Tool>
+            <Dialog>"Heed my voice, [NAME], for this is Gwaelin."</Dialog>
+            <Dialog>"To reach the next level thou must raise thy experience points by [NEXT_LEVEL_XP].  My hope is with thee."</Dialog>
+            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
+            <Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog>
+            <Dialog>"I love thee, [NAME]."</Dialog></Tool>
       </Tools>
    </Items>
 
    <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero" xp="0" gp="0">
-      <Dialog>Descendant of Erdrick, listen now to my words. It is told that in ages past Erdrick fought demons with a Ball of Light. Then came the Dragonlord who stole the precious globe and hid it in the darkness.</Dialog>
-      <Dialog>Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land. The Dragonlord must be defeated.</Dialog>
-      <Dialog>Take now whatever thou may find in these Treasure Chests to aid thee in thy quest. Then speak with the guards, for they have much knowledge that may aid thee. May the light shine upon thee, [NAME].</Dialog> 
+      <Dialog>"Descendant of Erdrick, listen now to my words.  It is told that in ages past Erdrick fought demons with a Ball of Light.  Then came the Dragonlord who stole the precious globe and hid it in the darkness."</Dialog>
+      <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
+      <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>
+      <Dialog>May the light shine upon thee, [NAME].</Dialog> 
       
       <!-- TODO: Change to one time decorations.  Add one-time monsters. -->
       <MapDecoration type="chest" x="6" y="5">
@@ -1473,9 +1523,9 @@
       <MapDecoration type="chest" x="8" y="2">
          <DialogAction type="GAIN_ITEM" name="gp" count="120"/>
          <Dialog>Fortune smiles upon thee!  Thou hast found 120 gold pieces.</Dialog></MapDecoration>
-      <MapDecoration type="door" x="5" y="7"/>
+      <MapDecoration type="door" x="5" y="8"/>
    </InitialState>
 
    <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">
-      <Dialog>Death should not have taken thee [NAME].</Dialog></DeathState>
+      <Dialog>"Death should not have taken thee [NAME]."</Dialog></DeathState>
 </Game>
