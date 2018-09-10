@@ -97,9 +97,11 @@ class GameState:
          progressMarkerElement.attrib['name'] = progressMarker
             
       dialogElement = xml.etree.ElementTree.SubElement( xmlRoot, 'Dialog' )
-      dialogElement.text = 'I am glad thou hast returned. All our hopes are riding on thee. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points. See me again when thy level has increased.'
+      dialogElement.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
       dialogElement = xml.etree.ElementTree.SubElement( xmlRoot, 'Dialog' )
-      dialogElement.text = 'Goodbye now, [NAME]. Take care and tempt not the Fates.'  
+      dialogElement.text = '"Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points.  See me again when thy level has increased."'
+      dialogElement = xml.etree.ElementTree.SubElement( xmlRoot, 'Dialog' )
+      dialogElement.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'  
 
       saveGameFilePath = os.path.join( self.gameInfo.savesPath, self.pc.name + '.xml' )
       saveGameFile = open(saveGameFilePath, 'wb')

@@ -746,6 +746,10 @@ class Game:
          self.gameState.advanceTick()
 
    def encounterLoop(self):
+      # TODO: Rework this to invoke from an existing dialog or None.
+      #       Allow a specific monster to be passed in.
+      #       Allow run away and victory dialog to be passed in and triggered.
+      
       # Save off initial screen and key repeat settings
       (origRepeat1, origRepeat2) = pygame.key.get_repeat()
       pygame.key.set_repeat()

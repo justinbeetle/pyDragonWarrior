@@ -280,15 +280,15 @@
 
          <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="princessReturnedToCastle">
             <DialogCheck type="LACKS_ITEM" name="givenPrincessLove"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
-            <Dialog>Dost thou love me, [NAME]?</Dialog>
+            <Dialog>"Dost thou love me, [NAME]?"</Dialog>
             <DialogOptions label="but_thou_must_love_me">
                <DialogOption name="Yes">
                   <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
-                  <Dialog>I'm so happy!</Dialog>
+                  <Dialog>"I'm so happy!"</Dialog>
                   <DialogAction type="GAIN_ITEM" name="givenPrincessLove"/></DialogOption>
                <DialogOption name="No">
-                   <Dialog>But thou must.</Dialog>
-                   <Dialog>Dost thou love me, [NAME]?</Dialog>
+                   <Dialog>"But thou must."</Dialog>
+                   <Dialog>"Dost thou love me, [NAME]?"</Dialog>
                    <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
@@ -335,52 +335,53 @@
          <MapDecoration type="door" x="6"  y="24"/>
 
          <NonPlayerCharacter type="boy" x="2" y="14" dir="SOUTH" walking="no">
-            <Dialog>Thou art most welcome in Brecconary.</Dialog></NonPlayerCharacter>
+            <Dialog>"Thou art most welcome in Brecconary."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="5" y="8" dir="SOUTH" walking="no">
-            <Dialog>Welcome! Enter the shop and speak to its keeper across the desk.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="11" y="27" dir="NORTH" walking="no">
-            <Dialog>Tell King Lorik that the search for his daughter hath failed. I am almost gone...</Dialog></NonPlayerCharacter>
+            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogCheck>
+            <Dialog>"Tell King Lorik that the search for his daughter hath failed.  I am almost gone..."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="29" y="14" dir="SOUTH" walking="no">
-            <Dialog>See King Lorik when thy experience levels are raised.</Dialog></NonPlayerCharacter>
+            <Dialog>"See King Lorik when thy experience levels are raised."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="21" y="11" dir="SOUTH" walking="no">
-            <Dialog>There is a town where magic keys can be purchased.</Dialog></NonPlayerCharacter>
+            <Dialog>"There is a town where magic keys can be purchased."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="25" y="11" dir="SOUTH" walking="no">
-            <Dialog>If thou art cursed, come again.</Dialog></NonPlayerCharacter>
+            <Dialog>"If thou art cursed, come again."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="29" y="2" dir="SOUTH" walking="no">
-            <Dialog>Beware the bridges! Danger grows when thou crosses.</Dialog></NonPlayerCharacter>
+            <Dialog>"Beware the bridges!  Danger grows when thou crosses."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="21" y="24" dir="NORTH" walking="no">
-            <Dialog>Within sight of Tantegel Castle to the south is Charlock, the fortress of the Dragonlord.</Dialog></NonPlayerCharacter>
+            <Dialog>"Within sight of Tantegel Castle to the south is Charlock, the fortress of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="15" y="26" dir="WEST" walking="yes">
-            <Dialog>No, I am not Princess Gwaelin.</Dialog></NonPlayerCharacter>
+            <Dialog>"No, I am not Princess Gwaelin."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="25" y="22" dir="WEST" walking="yes">
-            <Dialog>Enter where thou can.</Dialog></NonPlayerCharacter>
+            <Dialog>"Enter where thou can."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="10" y="8" dir="SOUTH" walking="yes">
-            <Dialog>Watch thy Hit Points when in the Poisonous Marsh.</Dialog></NonPlayerCharacter>
+            <Dialog>"Watch thy hit points when in the poisonous marsh."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="6" y="18" dir="EAST" walking="yes">
-            <Dialog>Go north to the seashore, then follow the coastline west until thou hath reached Garinham.</Dialog></NonPlayerCharacter>
+            <Dialog>"Go North to the seashore, then follow the coastline West until thou hath reached Garinham."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="20" y="17" dir="SOUTH" walking="yes">
-            <Dialog>Art thou the descendant of Erdrick? Hast thou any proof?</Dialog></NonPlayerCharacter>
+            <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="15" y="7" dir="SOUTH" walking="yes">
-            <Dialog>Many have been the warriors who have perished on this quest. But for thee I wish success, Hero.</Dialog></NonPlayerCharacter>
+            <Dialog>"Many have been the warriors who have perished on this quest.  But for thee I wish success, [NAME]."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="12" y="5" dir="WEST" walking="yes">
-            <Dialog>Please, save us from the minions of the Dragonlord.</Dialog></NonPlayerCharacter>
+            <Dialog>"Please, save us from the minions of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="4" y="23" dir="SOUTH" walking="yes">
-            <Dialog>Some say that Garin's grave is home to a Silver Harp.</Dialog></NonPlayerCharacter>
+            <Dialog>"Some say that Garin's grave is home to a Silver Harp."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="6" y="5" dir="SOUTH" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -419,19 +420,19 @@
          <MapDecoration type="chest" x="9"  y="7"/> <!-- TODO: Populate chest -->
 
          <NonPlayerCharacter type="girl" x="12" y="13" dir="SOUTH" walking="yes">
-            <Dialog>Welcome to Garinham. May thy stay be a peaceful one.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome to Garinham.  May thy stay be a peaceful one."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="3" y="11" dir="SOUTH" walking="no">
-            <Dialog>Garin, a wandering minstrel of legendary fame, is said to have built this town.</Dialog></NonPlayerCharacter>
+            <Dialog>"Garin, a wandering minstrel of legendary fame, is said to have built this town."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="3" y="18" dir="EAST" walking="no">
-            <Dialog>Many believe that Princess Gwaelin is hidden away in a cave.</Dialog></NonPlayerCharacter>
+            <Dialog>"Many believe that Princess Gwaelin is hidden away in a cave."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="7" y="17" dir="NORTH" walking="yes">
-            <Dialog>I have heard of one named Nester. Dost thou know such a one?</Dialog></NonPlayerCharacter>
+            <Dialog>"I have heard of one named Nester.  Dost thou know such a one?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="19" y="12" dir="SOUTH" walking="yes">
-            <Dialog>It is said that the Princess was kidnapped and taken eastward.</Dialog></NonPlayerCharacter>
+            <Dialog>"It is said that the princess was kidnapped and taken eastward."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="11" y="19" dir="NORTH" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -472,19 +473,19 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Fairy Flute.</Dialog></MapDecoration>
 
          <NonPlayerCharacter type="sage" x="21" y="20" dir="SOUTH" walking="no">
-            <Dialog>This is the village of Kol.</Dialog></NonPlayerCharacter>
+            <Dialog>"This is the village of Kol."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="12" y="16" dir="SOUTH" walking="yes">
-            <Dialog>Please, save us from the minions of the Dragonlord</Dialog></NonPlayerCharacter>
+            <Dialog>"Please, save us from the minions of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="15" y="15" dir="SOUTH" walking="yes">
-            <Dialog>Dreadful is the South Island. Great strength and skill and wit only will bring thee back from that place.</Dialog></NonPlayerCharacter>
+            <Dialog>"Dreadful is the South Island.  Great strength and skill and wit only will bring thee back from that place."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="14" y="10" dir="SOUTH" walking="yes">
-            <Dialog>Golem is afraid of the music of the flute, so 'tis said.</Dialog></NonPlayerCharacter>
+            <Dialog>"Golem is afraid of the music of the flute, so 'tis said."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="21" y="14" dir="NORTH" walking="no">
-            <Dialog>East of Hauksness there is a town, 'tis said, where one may purchase weapons of extraordinary quality.</Dialog></NonPlayerCharacter>
+            <Dialog>"East of Hauksness there is a town, 'tis said, where one may purchase weapons of extraordinary quality."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="23" y="13" dir="WEST" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -497,34 +498,35 @@
             <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="20" y="9" dir="SOUTH" walking="no">
-            <Dialog>In legends it is said that fairies know how to put Golem to sleep.</Dialog></NonPlayerCharacter>
+            <Dialog>"In legends it is said that fairies know how to put Golem to sleep."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="20" y="5" dir="NORTH" walking="no">
             <DialogVariable name="[COST]" value="20"/>
             <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="13" y="2" dir="SOUTH" walking="no">
-            <Dialog>This bath cures rheumatism.</Dialog></NonPlayerCharacter>
+            <Dialog>"This bath cures rheumatism."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="7" y="7" dir="SOUTH" walking="yes">
-            <Dialog>Hast thou seen Nester? I think he may need help.</Dialog></NonPlayerCharacter>
+            <Dialog>"Hast thou seen Nester?  I think he may need help."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="2" y="2" dir="SOUTH" walking="no">
-            <Dialog>Though thou art as brave as thy ancestor, Hero, thou cannot defeat the great Dragonlord with such weapons. Thou shouldst come here again.</Dialog></NonPlayerCharacter>
+            <DialogCheck type="LACKS_ITEM" name="Erdrick's Sword"><Dialog>"Finally thou hast obtained it, [NAME]."</Dialog></DialogCheck>
+            <Dialog>"Though thou art as brave as thy ancestor, [NAME], thou cannot defeat the great Dragonlord with such weapons.  Thou shouldst come here again."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="6" y="13" dir="SOUTH" walking="yes">
-            <Dialog>Art thou the descendant of Erdrick? Hast thou any proof?</Dialog></NonPlayerCharacter>
+            <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="2" y="24" dir="SOUTH" walking="no">
-            <Dialog>Rimuldar is the place to buy keys.</Dialog></NonPlayerCharacter>
+            <Dialog>"Rimuldar is the place to buy keys."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="8" y="20" dir="SOUTH" walking="yes">
-            <Dialog>Hast thou been to the southern island?</Dialog>
+            <Dialog>"Hast thou been to the Southern Island?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>I have heard that powerful enemies live there.</Dialog></DialogOption>
+                  <Dialog>"I have heard that powerful enemies live there."</Dialog></DialogOption>
                <DialogOption name="No">
-                   <Dialog>To the south, I believe, there is a town called Rimuldar.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <Dialog>"To the South, I believe, there is a town called Rimuldar."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="15" y="22" dir="WEST" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -536,12 +538,12 @@
             <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="3" y="13" dir="SOUTH" walking="no">
-            <Dialog>Hast thou found the flute?</Dialog>
+            <Dialog>"Hast thou found the flute?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>Go to the town of Cantlin.</Dialog></DialogOption>
+                  <Dialog>"Go to the town of Cantlin."</Dialog></DialogOption>
                <DialogOption name="No">
-                   <Dialog>Howard had it, but he went to Rimuldar and never returned.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <Dialog>"Howard had it, but he went to Rimuldar and never returned."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
       <Map name="rimuldar" tiles="rimuldar.dat" overlayTiles="rimuldar_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
@@ -551,17 +553,17 @@
          <MapDecoration type="chest" x="25" y="24"/> <!-- TODO: Populate chest -->
 
          <NonPlayerCharacter type="girl" x="23" y="15" dir="SOUTH" walking="yes">
-            <Dialog>No, I have no tomatoes. I have no tomatoes today.</Dialog></NonPlayerCharacter>
+            <Dialog>"No, I have no tomatoes.  I have no tomatoes today."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="17" y="19" dir="EAST" walking="no">
             <DialogVariable name="[COST]" value="55"/>
             <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="25" y="20" dir="SOUTH" walking="yes">
-            <Dialog>You are [NAME]? It has been long since last we met.</Dialog></NonPlayerCharacter>
+            <Dialog>"You are [NAME]?  It has been long since last we met."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="14" y="13" dir="SOUTH" walking="yes">
-            <Dialog>Welcome to the town of Rimuldar.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome to the town of Rimuldar."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="24" y="8" dir="SOUTH" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -575,62 +577,63 @@
             <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="24" y="12" dir="SOUTH" walking="yes">
-            <Dialog>The scales of the Dragonlord are as hard as steel.</Dialog></NonPlayerCharacter>
+            <Dialog>"The scales of the Dragonlord are as hard as steel."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="12" y="9" dir="NORTH" walking="yes">
-            <Dialog>Art thou the descendant of Erdrick? Hast thou any proof? </Dialog></NonPlayerCharacter>
+            <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="16" y="9" dir="NORTH" walking="no">
-            <Dialog>Who art thou? Leave at once or I will call my friends.</Dialog></NonPlayerCharacter>
+            <Dialog>"Who art thou?  Leave at once or I will call my friends."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="7" y="14" dir="WEST" walking="no">
-            <Dialog>Over the western part of this island Erdrick created a rainbow. 'Tis also said that he entered the darkness from a hidden entrance in the room of the Dragonlord.</Dialog></NonPlayerCharacter>
+            <Dialog>"Over the Western part of this island Erdrick created a rainbow. 'Tis also said that he entered the darkness from a hidden entrance in the room of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="9" y="16" dir="SOUTH" walking="yes">
-            <Dialog>Thou shalt find the Stones of Sunlight in Tantegel Castle, if thou has not found them yet.</Dialog></NonPlayerCharacter>
+            <Dialog>"Thou shalt find the Stones of Sunlight in Tantegel Castle, if thou has not found them yet."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="16" y="27" dir="SOUTH" walking="yes">
-            <DialogCheck type="HAS_ITEM" name="Fighter's Ring" count="1"><Dialog>All true warriors wear a ring.</Dialog></DialogCheck>
-            <Dialog>Is that a wedding ring? Thou seems too young to be married.</Dialog></NonPlayerCharacter>
+            <DialogCheck type="HAS_ITEM" name="Fighter's Ring" count="1"><Dialog>"All true warriors wear a ring."</Dialog></DialogCheck>
+            <Dialog>"Is that a wedding ring?  Thou seems too young to be married."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="5" y="22" dir="SOUTH" walking="yes">
-            <Dialog>Before long the enemy will arrive.</Dialog></NonPlayerCharacter>
+            <Dialog>"Before long the enemy will arrive."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="7" y="22" dir="EAST" walking="yes">
-            <Dialog>Heed my warning! Travel not to the south for there the monsters are fierce and terrible.</Dialog></NonPlayerCharacter>
+            <Dialog>"Heed my warning!  Travel not to the south for there the monsters are fierce and terrible."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="4" y="27" dir="SOUTH" walking="yes">
-            <Dialog>In this world is there any sword that can pierce the scales of the Dragonlord?</Dialog></NonPlayerCharacter>
+            <Dialog>"In this world is there any sword that can pierce the scales of the Dragonlord?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="4" y="24" dir="EAST" walking="no">
-            <Dialog>This is a magic place. Hast thou found a magic temple?</Dialog>
+            <Dialog>"This is a magic place.  Hast thou found a magic temple?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>In this temple do the sun and rain meet.</Dialog></DialogOption>
+                  <Dialog>"In this temple do the sun and rain meet."</Dialog></DialogOption>
                <DialogOption name="No">
-                   <Dialog>Go to the south.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <Dialog>"Go to the South."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="1" y="27" dir="SOUTH" walking="no">
-            <Dialog>Orwick is late again. I'm starving.</Dialog></NonPlayerCharacter>
+            <Dialog>"Orwick is late again.  I'm starving."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="28" y="1" dir="SOUTH" walking="no">
-            <Dialog>I am Orwick, and I am waiting for my girl friend.</Dialog></NonPlayerCharacter>
+            <Dialog>"I am Orwick, and I am waiting for my girlfriend."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="3" y="5" dir="NORTH" walking="no">
-            <Dialog>Welcome!</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome!"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="5" y="8" dir="NORTH" walking="no">
             <DialogVariable name="[COST]" value="53"/>
             <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="21" y="24" dir="SOUTH" walking="no">
-            <Dialog>Good day, I am Howard. Four steps south of the bath in Kol thou shalt find a magic item.</Dialog></NonPlayerCharacter>
+            <Dialog>"Good day, I am Howard.  Four steps South of the bath in Kol thou shalt find a magic item."</Dialog></NonPlayerCharacter>
       </Map>
 
       <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="battle_background.png" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="26" toY="90" toDir="SOUTH"/>
 
-         <Monster name="Axe Knight" x="19" y="13"/>
+         <Monster name="Axe Knight" x="19" y="13">
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="18" y="13"/></RunAwayDialog></Monster>
 
          <MapDecoration type="None" x="19" y="13">
             <DialogCheck type="LACKS_ITEM" name="Erdrick's Armor" count="1"><DialogGoTo label="found_nothing"/></DialogCheck>
@@ -665,7 +668,7 @@
             <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="16" y="7" dir="SOUTH" walking="yes">
-            <Dialog>Welcome to Cantlin, the castle town.</Dialog></NonPlayerCharacter>
+            <Dialog>"Welcome to Cantlin, the castle town."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="28" y="7" dir="SOUTH" walking="no">
             <DialogVariable name="[COST]" value="98"/>
@@ -679,18 +682,18 @@
             <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="6" y="8" dir="SOUTH" walking="yes">
-            <Dialog>'Tis said that the Dragonlord hath claws that can cleave iron and fiery breath that can melt stone. Dost thou still wish to go on?</Dialog>
+            <Dialog>"'Tis said that the Dragonlord hath claws that can cleave iron and fiery breath that can melt stone.  Dost thou still wish to go on?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>Thou art truly brave.</Dialog></DialogOption>
+                  <Dialog>"Thou art truly brave."</Dialog></DialogOption>
                <DialogOption name="No">
-                   <Dialog>That is good. No one will say thou art afraid.</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <Dialog>"That is good.  No one will say thou art afraid."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="23" y="10" dir="SOUTH" walking="yes">
-            <Dialog>It is said that many have held Erdrick's armor. The last to have it was a fellow named Wynn.</Dialog></NonPlayerCharacter>
+            <Dialog>"It is said that many have held Erdrick's armor.  The last to have it was a fellow named Wynn."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="3" y="13" dir="EAST" walking="no">
-            <Dialog>Come buy my radishes! They are fresh and cheap. Buy thy radishes today!</Dialog></NonPlayerCharacter>
+            <Dialog>"Come buy my radishes!  They are fresh and cheap.  Buy thy radishes today!"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="8" y="13" dir="WEST" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -711,22 +714,22 @@
             <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="5" y="15" dir="WEST" walking="yes">
-            <Dialog>What shall I get for thy dinner?</Dialog></NonPlayerCharacter>
+            <Dialog>"What shall I get for thy dinner?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="11" y="15" dir="EAST" walking="yes">
-            <Dialog>I know nothing.</Dialog></NonPlayerCharacter>
+            <Dialog>"I know nothing."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="16" y="17" dir="SOUTH" walking="no">
-            <Dialog>To learn how proof may be obtained that thy ancestor was the great Erdrick, see a man in this very town.</Dialog></NonPlayerCharacter>
+            <Dialog>"To learn how proof may be obtained that thy ancestor was the great Erdrick, see a man in this very town."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="26" y="18" dir="SOUTH" walking="yes">
-            <Dialog>Grandfather used to say that his friend, Wynn, had buried something of great value at the foot of a tree behind his shop.</Dialog></NonPlayerCharacter>
+            <Dialog>"Grandfather used to say that his friend, Wynn, had buried something of great value at the foot of a tree behind his shop."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="21" y="19" dir="SOUTH" walking="yes">
-            <Dialog>I'm Nester. Hey, where am I? No, don't tell me!</Dialog></NonPlayerCharacter>
+            <Dialog>"I'm Nester.  Hey, where am I?  No, don't tell me!"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="23" y="23" dir="SOUTH" walking="no">
-            <Dialog>'Tis said that Erdrick's sword could cleave steel.</Dialog></NonPlayerCharacter>
+            <Dialog>"'Tis said that Erdrick's sword could cleave steel."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="28" y="27" dir="WEST" walking="no">
             <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
@@ -738,10 +741,11 @@
             <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="4" y="28" dir="SOUTH" walking="yes">
-            <Dialog>My Grandfather Wynn once had a shop on the east side of Hauksness.</Dialog></NonPlayerCharacter>
+            <Dialog>"My Grandfather Wynn once had a shop on the east side of Hauksness."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="15" y="29" dir="SOUTH" walking="no">
-            <Dialog>Let us wish the warrior well! May the light be thy strength! Thou may go and search. From Tantegel Castle travel 70 leagues to the south and 40 to the east.</Dialog></NonPlayerCharacter>
+            <Dialog>"Let us wish the warrior well!  May the light be thy strength!"</Dialog>
+            <Dialog>"Thou may go and search.  From Tantegel Castle travel 70 leagues to the South and 40 to the East."</Dialog></NonPlayerCharacter>
       </Map>
 
       <Map name="erdricks_tomb_lvl1" tiles="erdricks_tomb_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightRadius="0" isOutside="no">
@@ -789,23 +793,24 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
          <MapDecoration type="door"  x="6"  y="21"/>
 
-         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="rescuedPrincess"/> <!-- TODO: What happens when you run away?  You can't rescue the princess, can you? -->
+         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="rescuedPrincess">
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="5" y="14"/></RunAwayDialog></Monster>
 
          <NonPlayerCharacter type="princess" x="6" y="19" dir="SOUTH" walking="no" inverseProgressMarker="rescuedPrincess">
-            <Dialog>Thou art brave indeed to rescue me, [NAME].</Dialog>
-            <Dialog>I am Gwaelin, daughter of Lorik.</Dialog>
-            <Dialog>Will thou take me to the castle?</Dialog>
+            <Dialog>"Thou art brave indeed to rescue me, [NAME]."</Dialog>
+            <Dialog>"I am Gwaelin, daughter of Lorik."</Dialog>
+            <Dialog>"Will thou take me to the castle?"</Dialog>
             <DialogOptions label="but_thou_must_rescue_me">
                <DialogOption name="Yes">
                   <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
                   <Dialog>Princess Gwaelin embraces thee.</Dialog>
-                  <Dialog>I'm so happy!</Dialog>
+                  <Dialog>"I'm so happy!"</Dialog>
                   <DialogAction type="GAIN_ITEM" name="rescuedPrincess"/>
                   <DialogAction type="GAIN_ITEM" name="carryingPrincess"/>
                   <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess from the map -->
                <DialogOption name="No">
-                   <Dialog>But thou must.</Dialog>
-                   <Dialog>Will thou take me to the castle?</Dialog>
+                   <Dialog>"But thou must."</Dialog>
+                   <Dialog>"Will thou take me to the castle?"</Dialog>
                    <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
@@ -813,12 +818,12 @@
          <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="Northern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Staff_of_Rain"><Dialog>Thou hast no business here.  Go away.</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
             <DialogCheck type="HAS_ITEM" name="Acquired_Silver_Harp">
-               <Dialog>Thy bravery must be proven.  Thus, I propose a test.</Dialog>
-               <Dialog>There is a Silver Harp that beckons to the creatures of the Dragonlord.</Dialog>
-               <Dialog>Bring this to me and I will reward thee with the Staff of Rain.</Dialog></DialogCheck>
-            <Dialog>Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest.</Dialog>
+               <Dialog>"Thy bravery must be proven.  Thus, I propose a test."</Dialog>
+               <Dialog>"There is a Silver Harp that beckons to the creatures of the Dragonlord."</Dialog>
+               <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogCheck>
+            <Dialog>"Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Silver Harp"/>
             <DialogAction type="GAIN_ITEM" name="Northern_Shrine_Sage_Vanished"/>
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
@@ -835,17 +840,17 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="Southern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Rainbow_Drop"><Dialog>Thou hast no business here.  Go away.</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
             <DialogCheck type="HAS_ITEM" name="Acquired_Stones_of_Sunlight">
-               <Dialog>In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!</Dialog>
+               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
                <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
             <DialogCheck type="HAS_ITEM" name="Acquired_Staff_of_Rain">
-               <Dialog>In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!</Dialog>
+               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
                <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
             <DialogCheck type="HAS_ITEM" name="Erdrick's Token">
-               <Dialog>In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!</Dialog>
+               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
                <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
-            <Dialog>Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping.</Dialog>
+            <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Stones of Sunlight"/>
             <DialogAction type="LOSE_ITEM" name="Staff of Rain"/>
             <DialogAction type="GAIN_ITEM" name="Southern_Shrine_Sage_Vanished"/>
@@ -986,23 +991,23 @@
          <MapDecoration type="chest" x="13" y="13"/> <!-- TODO: Populate chest -->
 
          <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no">
-            <Dialog>Welcome, [NAME]. I am the Dragonlord--King of Kings.</Dialog>
-            <Dialog>I have been waiting long for one such as thee.</Dialog>
-            <Dialog>I give thee now a chance to share this world and to rule half of it if thou will now stand beside me.</Dialog>
-            <Dialog>What sayest thou? Will the great warrior stand with me?</Dialog>
+            <Dialog>"Welcome, [NAME]. I am the Dragonlord--King of Kings."</Dialog>
+            <Dialog>"I have been waiting long for one such as thee."</Dialog>
+            <Dialog>"I give thee now a chance to share this world and to rule half of it if thou will now stand beside me."</Dialog>
+            <Dialog>"What sayest thou?  Will the great warrior stand with me?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
-                  <Dialog>Really?</Dialog>
+                  <Dialog>"Really?"</Dialog>
                   <DialogOptions>
                      <DialogOption name="Yes">
-                        <Dialog>Then half of this world is thine, half of the darkness, and...</Dialog>
-                        <Dialog>If thou dies I can bring thee back for another attempt without loss of thy deeds to date.</Dialog>
-                        <Dialog>Thy journey is over.  Take now a long, long rest.  Hahahaha...</Dialog>
+                        <Dialog>"Then half of this world is thine, half of the darkness, and..."</Dialog>
+                        <Dialog>"If thou dies I can bring thee back for another attempt without loss of thy deeds to date."</Dialog>
+                        <Dialog>"Thy journey is over.  Take now a long, long rest.  Hahahaha..."</Dialog>
                         <!-- TODO: Add death dialog option and screen effect --></DialogOption>
                      <DialogOption name="No">
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
                <DialogOption name="No" label="fight_dragon_lord">
-                   <Dialog>Thou art a fool!</Dialog>
+                   <Dialog>"Thou art a fool!"</Dialog>
                    <DialogAction type="ATTACK_MONSTER" name="Dragonlord"/></DialogOption></DialogOptions></NonPlayerCharacter>
           <!-- TODO: Turn this into the Dragonlord, including second form and ball of light -->
       </Map>
@@ -1015,49 +1020,49 @@
             <InventoryItemType type="Armor"/>
             <InventoryItemType type="Shield"/>
          </DialogVariable>
-         <Dialog>We deal in weapons and armor. Dost thou wish to buy or sell anything today?</Dialog>
+         <Dialog>"We deal in weapons and armor.  Dost thou wish to buy or sell anything today?"</Dialog>
          <DialogOptions label="buy_or_sell_weapon_and_armor_option">
             <DialogOption name="Buy">
-               <Dialog>What dost thou wish to buy?</Dialog>
+               <Dialog>"What dost thou wish to buy?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
-                  <Dialog>Sorry. Thou hast not enough gold.</Dialog>
-                  <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+                  <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                   <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogCheck>
-               <Dialog>The [ITEM]?  Is that okay?</Dialog>
+               <Dialog>"The [ITEM]?  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
                      <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                      <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
-               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
             <DialogOption name="Sell">
-               <Dialog>What dost thou wish to sell?</Dialog>
+               <Dialog>"What dost thou wish to sell?"</Dialog>
                <DialogVendorSellOptions values="[SELL_ITEMS]"/>
-               <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
+               <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
                      <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
                      <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
-               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
             <DialogOption name="No Thank Thee">
-               <Dialog>Very well then.  If you change your mind you know where to find me.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"Very well then.  If you change your mind you know where to find me."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="tool_vendor">
          <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
             <InventoryItemType type="Tool"/>
          </DialogVariable>
-         <Dialog>Welcome. We deal in tools. What can I do for thee?</Dialog>
+         <Dialog>"Welcome.  We deal in tools.  What can I do for thee?"</Dialog>
          <DialogOptions label="buy_or_sell_tool_option">
             <DialogOption name="Buy">
-               <Dialog>What dost thou want?</Dialog>
+               <Dialog>"What dost thou want?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
-                  <Dialog>Sorry. Thou hast not enough gold.</Dialog>
-                  <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+                  <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                   <DialogGoTo label="buy_or_sell_tool_option"/></DialogCheck>
                <Dialog>The [ITEM]?  Is that okay?</Dialog>
                <DialogOptions>
@@ -1065,70 +1070,70 @@
                      <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                      <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
-               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
             <DialogOption name="Sell">
-               <Dialog>What dost thou want to sell?</Dialog>
+               <Dialog>"What dost thou want to sell?"</Dialog>
                <DialogVendorSellOptions values="[SELL_ITEMS]"/>
-               <Dialog>The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?</Dialog>
+               <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
                      <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
                      <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
                   <DialogOption name="No"/></DialogOptions>
-               <Dialog>Dost thou wish to buy or sell anything more?</Dialog>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
             <DialogOption name="No Thank Thee">
-               <Dialog>I will be waiting for thy next visit.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"I will be waiting for thy next visit."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="key_vendor">
          <DialogVariable name="[ITEM]" value="Key"/>
-         <Dialog>Magic keys! They will unlock any door. Dost thou wish to purchase one for [COST] gold peices?</Dialog>
+         <Dialog>"Magic keys!  They will unlock any door.  Dost thou wish to purchase one for [COST] gold peices?"</Dialog>
          <DialogOptions label="key_buy_option">
             <DialogOption name="Yes">
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
-                  <Dialog>Thou dost not have enough gold.</Dialog>
-                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"I will see thee later."</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
-               <Dialog>Here, take this key. Dost thou wish to purchase more?</Dialog>
+               <Dialog>"Here, take this key.  Dost thou wish to purchase more?"</Dialog>
                <DialogGoTo label="key_buy_option"/></DialogOption>
             <DialogOption name="No">
-               <Dialog>I will see thee later.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"I will see thee later."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="fairy_water_vendor">
          <DialogVariable name="[ITEM]" value="Fairy Water"/>
-         <Dialog>Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?</Dialog>
+         <Dialog>"Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?"</Dialog>
          <DialogOptions label="fairy_water_buy_option">
             <DialogOption name="Yes">
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
-                  <Dialog>Thou dost not have enough gold.</Dialog>
-                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"All the best to thee."</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
-               <Dialog>I thank thee. Won't thou buy one more bottle?</Dialog>
+               <Dialog>"I thank thee.  Won't thou buy one more bottle?"</Dialog>
                <DialogGoTo label="fairy_water_buy_option"/></DialogOption>
             <DialogOption name="No">
-               <Dialog>All the best to thee.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"All the best to thee."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="single_item_vendor_buy_option">
          <DialogOptions>
             <DialogOption name="Yes">
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
-                  <Dialog>Thou dost not have enough gold.</Dialog>
-                  <Dialog>Please come again when you have more gold!</Dialog></DialogCheck>
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"Please come again when you have more gold!"</Dialog></DialogCheck>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
-               <Dialog>Would you like to buy another?</Dialog>
+               <Dialog>"Would you like to buy another?"</Dialog>
                <DialogGoTo label="single_item_vendor_buy_option"/></DialogOption>
             <DialogOption name="No">
-               <Dialog>All the best to thee.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"All the best to thee."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="innkeeper">
-         <Dialog>Welcome to the Traveler's Inn. Room and board is [COST] gold pieces per night. Dost thou want a room?</Dialog>
+         <Dialog>"Welcome to the Traveler's Inn.  Room and board is [COST] gold pieces per night.  Dost thou want a room?"</Dialog>
          <DialogOptions>
             <DialogOption name="Yes">
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
@@ -1138,9 +1143,9 @@
                <DialogAction type="MAGIC_RESTORE" count="unlimited"/>
                <DialogAction type="HEALTH_RESTORE" count="unlimited"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
-               <Dialog>Good morning!  Thou seems to have spent a good night.  I shall see thee again.</Dialog></DialogOption>
+               <Dialog>"Good morning!  Thou seems to have spent a good night.  I shall see thee again."</Dialog></DialogOption>
             <DialogOption name="No">
-               <Dialog>Okay. Good-bye, traveler.</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"Okay.  Good-bye, traveler."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="found_nothing">
          <Dialog>[NAME] searched the ground and found nothing.</Dialog></DialogScript>
