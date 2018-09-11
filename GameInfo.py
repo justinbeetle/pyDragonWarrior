@@ -617,6 +617,7 @@ class GameInfo:
          name = None
          if 'name' in element.attrib:
             name = element.attrib['name']
+            
          count = 1
          if 'count' in element.attrib:
             if 'unlimited' == element.attrib['count'] or ( '[' == element.attrib['count'][0] and ']' == element.attrib['count'][-1] ):
@@ -627,13 +628,16 @@ class GameInfo:
                except:
                   GameInfo.parseIntRange(element.attrib['count'])
                   count = element.attrib['count']
+                  
          mapName = None
          if 'map' in element.attrib:
             mapName = element.attrib['map']
+            
          mapPos = None
          if 'x' in element.attrib and 'y' in element.attrib:
             mapPos = Point( int(element.attrib['x']),
                             int(element.attrib['y']) )
+         
          mapDir = None
          if 'dir' in element.attrib:
             mapDir = Direction[element.attrib['dir']]
@@ -649,7 +653,10 @@ class GameInfo:
          elif element.tag == 'DialogOptions':
             dialogOptions = {}
             for optionElement in element.findall("./DialogOption"):
-               dialogOptions[ optionElement.attrib['name'] ] = self.parseDialog( optionElement )
+               dialogOption = self.parseDialog( optionElement )
+               dialogOptions[ optionElement.attrib['name'] ] = dialogOption
+               if 'label' in optionElement.attrib:
+                  self.dialogSequences[ optionElement.attrib['label'] ] = dialogOption
             dialog.append( dialogOptions )
             if label is not None:
                self.dialogSequences[label] = dialogOptions
@@ -685,12 +692,22 @@ class GameInfo:
                                         mapPos = mapPos ) )
             
          elif element.tag == 'DialogAction':
+            victoryDialog = None
+            if 'victoryDialogScript' in element.attrib:
+               victoryDialog = [ DialogGoTo( element.attrib['victoryDialogScript'] ) ]
+               
+            runAwayDialog = None
+            if 'runAwayDialogScript' in element.attrib:
+               runAwayDialog = [ DialogGoTo( element.attrib['runAwayDialogScript'] ) ]
+            
             dialog.append( DialogAction( DialogActionEnum[ element.attrib['type'] ],
                                          name = name,
                                          count = count,
                                          mapName = mapName,
                                          mapPos = mapPos,
-                                         mapDir = mapDir ) )
+                                         mapDir = mapDir,
+                                         victoryDialog = victoryDialog,
+                                         runAwayDialog = runAwayDialog) )
             
          elif element.tag == 'DialogVariable':
             name = element.attrib['name']

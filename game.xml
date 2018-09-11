@@ -269,7 +269,7 @@
                <DialogAction type="LOSE_ITEM" name="carryingPrincess"/>
                <DialogAction type="GAIN_ITEM" name="princessReturnedToCastle"/>
                <DialogAction type="GOTO_COORDINATES"/></DialogCheck> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
-            <Dialog>I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points.</Dialog>
+            <Dialog>"I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points."</Dialog>
             <Dialog>"Will thou tell me now of thy deeds so they won't be forgotten?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
@@ -990,7 +990,7 @@
          <MapDecoration type="chest" x="12" y="13"/> <!-- TODO: Populate chest -->
          <MapDecoration type="chest" x="13" y="13"/> <!-- TODO: Populate chest -->
 
-         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no">
+         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no" inverseProgressMarker="defeatedDragonlord">
             <Dialog>"Welcome, [NAME]. I am the Dragonlord--King of Kings."</Dialog>
             <Dialog>"I have been waiting long for one such as thee."</Dialog>
             <Dialog>"I give thee now a chance to share this world and to rule half of it if thou will now stand beside me."</Dialog>
@@ -1008,12 +1008,23 @@
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
                <DialogOption name="No" label="fight_dragon_lord">
                    <Dialog>"Thou art a fool!"</Dialog>
-                   <DialogAction type="ATTACK_MONSTER" name="Dragonlord"/></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <DialogAction type="ATTACK_MONSTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
           <!-- TODO: Turn this into the Dragonlord, including second form and ball of light -->
       </Map>
    </Maps>
 
    <DialogScripts>
+      <DialogScript label="defeated_dragonlord_first_form">
+         <Dialog>The Dragonlord revealed his true self!</Dialog>
+         <DialogAction type="ATTACK_MONSTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form"/></DialogScript>
+
+      <DialogScript label="defeated_dragonlord_second_form">
+         <DialogAction type="GAIN_ITEM" name="defeatedDragonlord"/>
+         <Dialog>Thou hast found the Ball of Light.</Dialog>
+         <Dialog>Radiance streams forth as they hands touch the object and hold id aloft.</Dialog>
+         <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
+         <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></DialogScript>
+
       <DialogScript label="weapon_and_armor_vendor">
          <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
             <InventoryItemType type="Weapon"/>

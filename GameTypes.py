@@ -53,7 +53,7 @@ class DialogActionEnum(Enum):
    PLAY_SOUND = 10                   # attributes: name
    PLAY_MUSIC = 11                   # attributes: name (currently play it once and return to looping on the prior music)
    VISUAL_EFFECT = 12                # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect)
-   ATTACK_MONSTER = 13               # attributes: name
+   ATTACK_MONSTER = 13               # attributes: name, victoryDialog, runAwayDialog
    OPEN_DOOR = 14                    # attributes: <none>
    MONSTER_SLEEP = 15                # attributes: bypass (to bypass resistances)
    MONSTER_STOP_SPELL = 16           # attributes: bypass (to bypass resistances)
@@ -95,7 +95,7 @@ class DialogCheck:
 
 # Conditionally branch dialog if the check condition is not met
 class DialogAction:
-   def __init__(self, type, name = None, count = 1, decaySteps = None, mapName = None, mapPos = None, mapDir = None):
+   def __init__(self, type, name = None, count = 1, decaySteps = None, mapName = None, mapPos = None, mapDir = None, victoryDialog = None, runAwayDialog = None):
       self.type = type
       self.name = name
       self.count = count
@@ -103,9 +103,20 @@ class DialogAction:
       self.mapName = mapName
       self.mapPos = mapPos
       self.mapDir = mapDir
+      self.victoryDialog = victoryDialog
+      self.runAwayDialog = runAwayDialog
       
    def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.type, self.name, self.count, self.decaySteps, self.mapName, self.mapPos, self.mapDir)
+      return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
+                                                         self.type,
+                                                         self.name,
+                                                         self.count,
+                                                         self.decaySteps,
+                                                         self.mapName,
+                                                         self.mapPos,
+                                                         self.mapDir,
+                                                         self.victoryDialog,
+                                                         self.runAwayDialog)
 
 # Set a variaable to be used in substitution for the remainder of the dialog session
 class DialogVariable:

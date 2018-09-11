@@ -2,6 +2,7 @@
 
 import os
 import xml.etree.ElementTree
+import xml.dom.minidom
 import random
 
 import pygame
@@ -103,9 +104,12 @@ class GameState:
       dialogElement = xml.etree.ElementTree.SubElement( xmlRoot, 'Dialog' )
       dialogElement.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'  
 
+      xmlString = xml.dom.minidom.parseString( xml.etree.ElementTree.tostring( xmlRoot ) ).toprettyxml(indent="   ")
+      #print( xmlString, flush=True )
+      
       saveGameFilePath = os.path.join( self.gameInfo.savesPath, self.pc.name + '.xml' )
-      saveGameFile = open(saveGameFilePath, 'wb')
-      saveGameFile.write( xml.etree.ElementTree.tostring( xmlRoot ) )
+      saveGameFile = open(saveGameFilePath, 'w')
+      saveGameFile.write( xmlString )
       saveGameFile.close()
 
    def getCastableCombatSpellNames(self):

@@ -62,9 +62,11 @@ class CharacterState:
          self.addItemToItemRowData( self.armor, 'E', limitToDropable, filterTypes, itemRowData )
       if self.shield is not None:
          self.addItemToItemRowData( self.shield, 'E', limitToDropable, filterTypes, itemRowData )
-      for item in self.otherEquippedItems:
+      #for item in self.otherEquippedItems:
+      for item in sorted(self.otherEquippedItems, key=lambda item: item.name):
          self.addItemToItemRowData( item, 'E', limitToDropable, filterTypes, itemRowData )
-      for item in self.unequippedItems:
+      #for item in self.unequippedItems:
+      for item in sorted(self.unequippedItems, key=lambda item: item.name):
          self.addItemToItemRowData( item, str( self.unequippedItems[item] ), limitToDropable, filterTypes, itemRowData )
       return itemRowData
 
@@ -252,7 +254,7 @@ class CharacterState:
    def getAttackStrength( self ):
       retVal = 0;
       if self.level is not None:
-         retVal += self.level.strength // 2
+         retVal += self.level.strength # TODO: Should this be // 2?
       if self.weapon is not None:
          retVal += self.weapon.attackBonus
       for item in self.otherEquippedItems:

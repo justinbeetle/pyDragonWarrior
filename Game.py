@@ -20,7 +20,7 @@ from SurfaceEffects import SurfaceEffects
 class GameMode(Enum):
    TITLE_SCREEN = 1
    EXPLORING = 2
-   ENCOUNTER = 3
+   ENCOUNTER = 3 # TODO: Remove
 
 class Game:
    def __init__(self, basePath, gameXmlPath, desiredWinSize_pixels, tileSize_pixels, savedGameFile = None):
@@ -392,9 +392,11 @@ class Game:
                   print( 'ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name, flush=True )
                   
             elif item.type == DialogActionEnum.ATTACK_MONSTER:
-               print( 'ERROR: Monster selection for DialogActionEnum.ATTACK_MONSTER is not implemented', flush=True )
-               self.gameMode = GameMode.ENCOUNTER
-                  
+               monster=None
+               if item.name in self.gameState.gameInfo.monsters:
+                  monster = self.gameState.gameInfo.monsters[item.name]
+               self.encounterLoop( monster=monster, victoryDialog=item.victoryDialog, runAwayDialog=item.runAwayDialog, encouterMusic=None, messageDialog=messageDialog )
+            
             elif item.type == DialogActionEnum.OPEN_DOOR:
                self.gameState.openDoor()
 
@@ -745,7 +747,7 @@ class Game:
 
          self.gameState.advanceTick()
 
-   def encounterLoop(self):
+   def encounterLoop( self, monster=None, victoryDialog=None, runAwayDialog=None, encouterMusic=None, messageDialog=None ):
       # TODO: Rework this to invoke from an existing dialog or None.
       #       Allow a specific monster to be passed in.
       #       Allow run away and victory dialog to be passed in and triggered.
@@ -756,28 +758,34 @@ class Game:
       #print( 'Disabled key repeat', flush=True )
       pygame.event.get() # Clear event queue
       origScreen = self.gameState.screen.copy()
-      
-      # Check for special monsters
-      monster = None
-      for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
-         if specialMonster.point == self.gameState.pc.currPos_datTile:
-            monster = self.gameState.gameInfo.monsters[ specialMonster.name ]
-            
-      # Pick the monster
+
       if monster is None:
-         monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
+         # Check for special monsters
+         monster = None
+         for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
+            if specialMonster.point == self.gameState.pc.currPos_datTile:
+               monster = self.gameState.gameInfo.monsters[ specialMonster.name ]
+               
+         # Pick the monster
+         if monster is None:
+            monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
 
       # Pick monster HP and GP
       monster_hp = random.randint( monster.minHp, monster.maxHp )
       monster_gp = random.randint( monster.minGp, monster.maxGp )
 
       # Start enounter music
+      if encouterMusic is None:
+         encouterMusic = '06_-_Dragon_Warrior_-_NES_-_Fight.ogg'
       audioPlayer = AudioPlayer();
-      audioPlayer.playMusic( '06_-_Dragon_Warrior_-_NES_-_Fight.ogg' )
+      audioPlayer.playMusic( encouterMusic )
       #audioPlayer.playMusic( '14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3', '24_Dragon_Quest_1_-_Monster_Battle.mp3' )
 
       # Render the encounter background
-      messageDialog = GameDialog.createMessageDialog( 'A ' + monster.name + ' draws near!' )
+      hasPreExistingDialog = messageDialog is not None
+      if not hasPreExistingDialog:
+         messageDialog = GameDialog.createMessageDialog()
+      messageDialog.addMessage( 'A ' + monster.name + ' draws near!' )
       encounterImage = self.gameState.gameInfo.maps[self.gameState.mapState.mapName].encounterImage
       encounterImageSize_pixels = Point( encounterImage.get_size() )
       encounterImageDest_pixels = Point(
@@ -866,6 +874,9 @@ class Game:
                else:
                   audioPlayer.playSound( 'runAway.wav' )
                   messageDialog.addMessage( self.gameState.pc.name + ' started to run away.' )
+
+                  if runAwayDialog is not None:
+                     self.traverseDialog( messageDialog, runAwayDialog, depth=1 )
                   break
             elif menuResult == 'SPELL':
                print( 'Magic is not implemented', flush=True )
@@ -940,7 +951,12 @@ class Game:
             GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
             
          messageDialog.blit( self.gameState.screen, True )
-         self.waitForAcknowledgement( messageDialog )
+
+         if victoryDialog is not None:
+            self.traverseDialog( messageDialog, victoryDialog, depth=1 )
+         
+         if not hasPreExistingDialog:
+            self.waitForAcknowledgement( messageDialog )
 
       # Restore initial screen and key repeat settings
       pygame.key.set_repeat( origRepeat1, origRepeat2 )
@@ -971,8 +987,8 @@ class Game:
          self.gameState.pendingDialog = self.gameState.gameInfo.deathDialog
          self.gameState.pc.hp = self.gameState.pc.level.hp
          self.gameState.pc.mp = self.gameState.pc.level.mp
-         self.gameState.pc.gp = math.floor( self.gameState.pc.gp / 2 )
-         self.gameState.setMap( self.gameState.gameInfo.deathMap,  respawnDecoration=True )
+         self.gameState.pc.gp = self.gameState.pc.gp // 2
+         self.gameState.setMap( self.gameState.gameInfo.deathMap, respawnDecorations=True )
 
    def scrollTile(self): # return (destMap, destPoint) if making transition, else None
 
