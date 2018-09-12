@@ -89,6 +89,7 @@ class GameDialog:
 
       self.displayedMessageLines = []
       self.remainingMessageLines = []
+      self.acknowledged = True
 
       self.menuOptions = None
       self.menuPrompt = None
@@ -213,6 +214,7 @@ class GameDialog:
 
    def addMessage( self, newMessage, append = True ):
 
+      self.acknowledged = False
       self.menuOptions = None
 
       # Turn message into lines of text
@@ -259,13 +261,10 @@ class GameDialog:
          self.displayedMessageLines = newMessageLines[ 0 : numRows ]
          self.remainingMessageLines = newMessageLines[ numRows : ]
 
-      # Blit lines to dialog
-      self.intitializeImage()
-      colPosX = GameDialog.outsideSpacing_pixels
-      for row in range( len(self.displayedMessageLines) ):
-         rowPosY = self.getRowPosY( row )
-         self.image.blit( GameDialog.font.render(self.displayedMessageLines[row], False, self.fontColor, pygame.Color('black') ), (colPosX, rowPosY) )
-
+      # Refresh image
+      self.refreshImage()
+      self.acknowledged = False
+      
    def addEncounterPrompt( self ):
       self.addMenuPrompt( ['FIGHT', 'RUN', 'SPELL', 'ITEM'], 4, GameDialogSpacing.SPACERS, 'Command?' )
 
@@ -287,6 +286,9 @@ class GameDialog:
       return len(self.remainingMessageLines) != 0
 
    def advanceContent( self ):
+      if not self.hasMoreContent():
+         return
+
       # Determine the number of lines of text which can be displayed in the dialog
       numRows = self.getNumRows()
 
@@ -296,6 +298,7 @@ class GameDialog:
 
       # Refresh image
       self.refreshImage()
+      self.acknowledged = False
 
    def refreshImage( self ):
       # Clear the image
@@ -496,6 +499,12 @@ class GameDialog:
             # Draw new indicator
             self.drawMenuIndicator()
             self.blit( screen, True )
+
+   def acknowledge( self ):
+      self.acknowledged = True
+
+   def isAcknowledged( self ):
+      return self.acknowledged
 
 def main():
    # Initialize pygame

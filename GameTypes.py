@@ -156,7 +156,9 @@ PointTransition = namedtuple('PointTransition', ['srcPoint',
                                                  'destMap',
                                                  'destPoint',
                                                  'destDir',
-                                                 'respawnDecorations'], verbose=False)
+                                                 'respawnDecorations',
+                                                 'progressMarker',
+                                                 'inverseProgressMarker'], verbose=False)
 
 NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
                                                        'point',

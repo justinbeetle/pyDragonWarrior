@@ -92,13 +92,15 @@
          <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
 
          <MapDecoration type="None" x="84" y="114">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Token" count="1"><DialogGoTo label="found_nothing"/></DialogCheck>
-            <DialogAction type="GAIN_ITEM" name="Erdrick's Token" count="1"/>
+            <DialogCheck type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogCheck>
+            <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
-         <MapDecoration type="bridge" x="65" y="50" progressMarker="Created_Rainbow_Bridge"/>
+         <MapDecoration type="bridge" x="65" y="50" progressMarker="PM_Created_Rainbow_Bridge"/>
 
-         <Monster name="Golem" x="74" y="101"/> <!-- TODO: Make one-time -->
+         <Monster name="Golem" x="74" y="101" inverseProgressMarker="PM_Defeated_Golem">
+            <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="74" y="100"/></RunAwayDialog></Monster>
 
          <MonsterZones>
             <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
@@ -185,17 +187,17 @@
          <MapDecoration type="door"  x="5"  y="14"/>
          <MapDecoration type="door"  x="19" y="7"/>
          <MapDecoration type="chest" x="2"  y="14">
-            <DialogAction type="GAIN_ITEM" name="gp" count="8"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found 8 gold pieces.</Dialog></MapDecoration>
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
          <MapDecoration type="chest" x="2"  y="16">
-            <DialogAction type="GAIN_ITEM" name="gp" count="9"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found 9 gold pieces.</Dialog></MapDecoration>
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
          <MapDecoration type="chest" x="3"  y="15">
-            <DialogAction type="GAIN_ITEM" name="gp" count="13"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found 13 gold pieces.</Dialog></MapDecoration>
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
          <MapDecoration type="chest" x="4"  y="16">
-            <DialogAction type="GAIN_ITEM" name="gp" count="11"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found 11 gold pieces.</Dialog></MapDecoration>
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
 
          <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no">
             <Dialog>"King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later."</Dialog></NonPlayerCharacter>
@@ -207,7 +209,7 @@
             <Dialog>"There was a time when Brecconary was a paradise.  Then the Dragonlord's minions came."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogCheck>
             <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="3" y="22" dir="EAST" walking="yes">
@@ -238,7 +240,7 @@
             <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="16" y="21" dir="EAST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogCheck>
             <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
@@ -258,7 +260,7 @@
          <PointTransition decoration="downstairs" fromX="9" fromY="9" toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
 
          <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="carryingPrincess">
+            <DialogCheck type="LACKS_ITEM" name="PM_Carrying_Princess">
                <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
                <Dialog>"Now, Gwaelin, come to my side."</Dialog>
                <Dialog>Gwaelin then whispers: "Wait a moment, please. I would give a present to [NAME]."</Dialog>
@@ -266,8 +268,8 @@
                <Dialog>"Even when we two are parted by great distances, I shall be with thee."</Dialog>
                <Dialog>"Farewell, [NAME]."</Dialog>
                <DialogAction type="GAIN_ITEM" name="Gwaelin's Love"/>
-               <DialogAction type="LOSE_ITEM" name="carryingPrincess"/>
-               <DialogAction type="GAIN_ITEM" name="princessReturnedToCastle"/>
+               <DialogAction type="LOSE_ITEM" name="PM_Carrying_Princess"/>
+               <DialogAction type="GAIN_ITEM" name="PM_Princess_Returned_To_Castle"/>
                <DialogAction type="GOTO_COORDINATES"/></DialogCheck> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
             <Dialog>"I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points."</Dialog>
             <Dialog>"Will thou tell me now of thy deeds so they won't be forgotten?"</Dialog>
@@ -278,31 +280,31 @@
                <DialogOption name="No"/></DialogOptions>
                <Dialog>"Goodbye now, [NAME].  Take care and tempt not the Fates."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="princessReturnedToCastle">
-            <DialogCheck type="LACKS_ITEM" name="givenPrincessLove"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
+         <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="PM_Princess_Returned_To_Castle">
+            <DialogCheck type="LACKS_ITEM" name="PM_Given_Princess_Love"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
             <Dialog>"Dost thou love me, [NAME]?"</Dialog>
             <DialogOptions label="but_thou_must_love_me">
                <DialogOption name="Yes">
                   <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
                   <Dialog>"I'm so happy!"</Dialog>
-                  <DialogAction type="GAIN_ITEM" name="givenPrincessLove"/></DialogOption>
+                  <DialogAction type="GAIN_ITEM" name="PM_Given_Princess_Love"/></DialogOption>
                <DialogOption name="No">
                    <Dialog>"But thou must."</Dialog>
                    <Dialog>"Dost thou love me, [NAME]?"</Dialog>
                    <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogCheck>
             <Dialog>"East of this castle is a town where armor, weapons, and many other items may be purchased."</Dialog>
             <Dialog>"Return to the Inn for a rest if thou art wounded in battle, [NAME].  Sleep heals all."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="6" y="7" dir="WEST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogCheck>
             <Dialog>"If thou hast collected all the treasure chests, a key will be found."</Dialog>
             <Dialog>"Once used, the key will disappear, but the door will be open and thou may pass through."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="8" y="6" dir="WEST" walking="yes">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogCheck>
             <Dialog>"Dost thou know about Princess Gwaelin?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
@@ -310,6 +312,17 @@
                <DialogOption name="No">
                    <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
                    <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+         <MapDecoration type="chest" x="6" y="2" inverseProgressMarker="PM_Taken_Initial_Chest_1">
+            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_1"/>
+            <DialogGoTo label="key_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="8" y="2" inverseProgressMarker="PM_Taken_Initial_Chest_2">
+            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_2"/>
+            <DialogVariable name="[CHEST_GOLD]" value="120"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="6" y="5" inverseProgressMarker="PM_Taken_Initial_Chest_3">
+            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_3"/>
+            <DialogGoTo label="torch_chest"/></MapDecoration>
 
          <MapDecoration type="None" x="2" y="2">
             <Dialog>Something here smells foul...</Dialog></MapDecoration>
@@ -319,13 +332,13 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5"  toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="7" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Stones_of_Sunlight" count="1"><Dialog>"Be gone with you!!!"</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><Dialog>"Be gone with you!!!"</Dialog></DialogCheck>
             <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="5"  y="6">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Stones_of_Sunlight" count="1"><DialogGoTo label="empty_chest"/></DialogCheck>
-            <DialogAction type="GAIN_ITEM" name="Acquired_Stones_of_Sunlight" count="1"/>
-            <DialogAction type="GAIN_ITEM" name="Stones of Sunlight" count="1"/>
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Stones_of_Sunlight"/>
+            <DialogAction type="GAIN_ITEM" name="Stones of Sunlight"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
       </Map>
 
@@ -341,7 +354,7 @@
             <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="11" y="27" dir="NORTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="rescuedPrincess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogCheck>
             <Dialog>"Tell King Lorik that the search for his daughter hath failed.  I am almost gone..."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="29" y="14" dir="SOUTH" walking="no">
@@ -413,11 +426,15 @@
       <Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="3" toY="3" toDir="SOUTH"/>
          <PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="garins_grave_lvl1" toX="7" toY="12" toDir="EAST"/>
+
          <MapDecoration type="door"  x="18" y="11"/>
          <MapDecoration type="door"  x="5"  y="7"/>
-         <MapDecoration type="chest" x="9"  y="6"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="10" y="6"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="9"  y="7"/> <!-- TODO: Populate chest -->
+
+         <MapDecoration type="chest" x="9"  y="6">
+            <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="10" y="6"><DialogGoTo label="torch_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="9"  y="7"><DialogGoTo label="herb_chest"/></MapDecoration>
 
          <NonPlayerCharacter type="girl" x="12" y="13" dir="SOUTH" walking="yes">
             <Dialog>"Welcome to Garinham.  May thy stay be a peaceful one."</Dialog></NonPlayerCharacter>
@@ -463,9 +480,9 @@
          <LeavingTransition toMap="overworld" toX="105" toY="11" toDir="SOUTH"/>
          <MapDecoration type="door"  x="8"  y="13"/>
          <MapDecoration type="door"  x="2"  y="15"/>
-         <MapDecoration type="chest" x="16" y="21"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="16" y="22"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="16" y="23"/> <!-- TODO: Populate chest -->
+         <MapDecoration type="chest" x="16" y="21"/>
+         <MapDecoration type="chest" x="16" y="22"/>
+         <MapDecoration type="chest" x="16" y="23"/>
 
          <MapDecoration type="None" x="10" y="7">
             <DialogCheck type="LACKS_ITEM" name="Fairy Flute" count="1"><DialogGoTo label="found_nothing"/></DialogCheck>
@@ -548,9 +565,11 @@
 
       <Map name="rimuldar" tiles="rimuldar.dat" overlayTiles="rimuldar_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="103" toY="73" toDir="SOUTH"/>
+
          <MapDecoration type="door"  x="22" y="22"/>
          <MapDecoration type="door"  x="23" y="24"/>
-         <MapDecoration type="chest" x="25" y="24"/> <!-- TODO: Populate chest -->
+
+         <MapDecoration type="chest" x="25" y="24"><DialogGoTo label="wings_chest"/></MapDecoration>
 
          <NonPlayerCharacter type="girl" x="23" y="15" dir="SOUTH" walking="yes">
             <Dialog>"No, I have no tomatoes.  I have no tomatoes today."</Dialog></NonPlayerCharacter>
@@ -636,8 +655,9 @@
             <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="18" y="13"/></RunAwayDialog></Monster>
 
          <MapDecoration type="None" x="19" y="13">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Armor" count="1"><DialogGoTo label="found_nothing"/></DialogCheck>
+            <DialogCheck type="LACKS_ITEM" name="Erdrick's Armor"><DialogGoTo label="found_nothing"/></DialogCheck>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Armor"/>
+            <Dialog>[NAME] searched the ground all about.</Dialog>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Armor.</Dialog></MapDecoration>
       </Map>
 
@@ -648,9 +668,9 @@
          <MapDecoration type="door"  x="15" y="26"/>
          <MapDecoration type="door"  x="16" y="26"/>
          <MapDecoration type="door"  x="27" y="10"/>
-         <MapDecoration type="chest" x="28" y="26"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="28" y="28"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="3"  y="28"/> <!-- TODO: Populate chest -->
+         <MapDecoration type="chest" x="28" y="26"/>
+         <MapDecoration type="chest" x="28" y="28"/>
+         <MapDecoration type="chest" x="3"  y="28"/>
 
          <NonPlayerCharacter type="merchant" x="9" y="4" dir="SOUTH" walking="no">
             <DialogVariable name="[COST]" value="100"/>
@@ -765,6 +785,7 @@
          <PointTransition decoration="downstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl2" toX="1"  toY="1"  toDir="SOUTH"/>
          <PointTransition decoration="downstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl2" toX="7"  toY="6"  toDir="SOUTH"/>
          <PointTransition decoration="downstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl2" toX="13" toY="13" toDir="SOUTH"/>
+
          <MapDecoration type="chest" x="14" y="6">
             <DialogAction type="GAIN_ITEM" name="Herb"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
@@ -774,18 +795,17 @@
          <PointTransition decoration="upstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl1" toX="1"  toY="1"  toDir="SOUTH"/>
          <PointTransition decoration="upstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl1" toX="7"  toY="6"  toDir="SOUTH"/>
          <PointTransition decoration="upstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl1" toX="13" toY="13" toDir="SOUTH"/>
-         <MapDecoration type="chest" x="3" y="3">
-            <DialogAction type="GAIN_ITEM" name="Torch"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
+
+         <MapDecoration type="chest" x="3" y="3"><DialogGoTo label="torch_chest"/></MapDecoration>
          <MapDecoration type="chest" x="4" y="3">
             <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
          <MapDecoration type="chest" x="2" y="7">
-            <DialogAction type="GAIN_ITEM" name="Gold" count="14"/> <!-- TODO: Change to 10-17 -->
-            <Dialog>Fortune smiles upon thee!  Thou hast found 14 gold pieces.</Dialog></MapDecoration>
-         <MapDecoration type="chest" x="11" y="10">
-            <DialogAction type="GAIN_ITEM" name="Gold" count="115"/> <!-- TODO: Change to 100-128 -->
-            <Dialog>Fortune smiles upon thee!  Thou hast found 115 gold pieces.</Dialog></MapDecoration>
+            <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="10"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
+            <DialogVariable name="[CHEST_GOLD]" value="100-131"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
 
       <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightRadius="0" isOutside="no">
@@ -793,10 +813,10 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
          <MapDecoration type="door"  x="6"  y="21"/>
 
-         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="rescuedPrincess">
+         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="PM_Rescued_Princess">
             <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="5" y="14"/></RunAwayDialog></Monster>
 
-         <NonPlayerCharacter type="princess" x="6" y="19" dir="SOUTH" walking="no" inverseProgressMarker="rescuedPrincess">
+         <NonPlayerCharacter type="princess" x="6" y="19" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
             <Dialog>"Thou art brave indeed to rescue me, [NAME]."</Dialog>
             <Dialog>"I am Gwaelin, daughter of Lorik."</Dialog>
             <Dialog>"Will thou take me to the castle?"</Dialog>
@@ -805,8 +825,8 @@
                   <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
                   <Dialog>Princess Gwaelin embraces thee.</Dialog>
                   <Dialog>"I'm so happy!"</Dialog>
-                  <DialogAction type="GAIN_ITEM" name="rescuedPrincess"/>
-                  <DialogAction type="GAIN_ITEM" name="carryingPrincess"/>
+                  <DialogAction type="GAIN_ITEM" name="PM_Rescued_Princess"/>
+                  <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
                   <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess from the map -->
                <DialogOption name="No">
                    <Dialog>"But thou must."</Dialog>
@@ -817,21 +837,21 @@
       <Map name="northern_shrine" tiles="northern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="no">
          <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
 
-         <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="Northern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="Acquired_Silver_Harp">
+         <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
+            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Silver_Harp">
                <Dialog>"Thy bravery must be proven.  Thus, I propose a test."</Dialog>
                <Dialog>"There is a Silver Harp that beckons to the creatures of the Dragonlord."</Dialog>
                <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogCheck>
             <Dialog>"Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Silver Harp"/>
-            <DialogAction type="GAIN_ITEM" name="Northern_Shrine_Sage_Vanished"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/>
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
-            <DialogAction type="LOSE_ITEM" name="Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
+            <DialogAction type="LOSE_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="4" y="5">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogCheck>
-            <DialogAction type="GAIN_ITEM" name="Acquired_Staff_of_Rain"/>
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Staff_of_Rain"/>
             <DialogAction type="GAIN_ITEM" name="Staff of Rain"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
       </Map>
@@ -839,12 +859,12 @@
       <Map name="southern_shrine" tiles="southern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightRadius="unlimited" isOutside="no">
          <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
 
-         <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="Southern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="Acquired_Stones_of_Sunlight">
+         <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
+            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
                <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="Acquired_Staff_of_Rain">
+            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
                <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
             <DialogCheck type="HAS_ITEM" name="Erdrick's Token">
@@ -853,13 +873,13 @@
             <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Stones of Sunlight"/>
             <DialogAction type="LOSE_ITEM" name="Staff of Rain"/>
-            <DialogAction type="GAIN_ITEM" name="Southern_Shrine_Sage_Vanished"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/>
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
-            <DialogAction type="LOSE_ITEM" name="Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
+            <DialogAction type="LOSE_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="6" y="6">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogCheck>
-            <DialogAction type="GAIN_ITEM" name="Acquired_Rainbow_Drop"/>
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Rainbow_Drop"/>
             <DialogAction type="GAIN_ITEM" name="Rainbow Drop"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
       </Map>
@@ -868,9 +888,13 @@
          <PointTransition decoration="upstairs"   fromX="7"  fromY="12" toMap="garinham"          toX="20" toY="1"  toDir="WEST"/>
          <PointTransition decoration="downstairs" fromX="2"  fromY="19" toMap="garins_grave_lvl2" toX="12" toY="3"  toDir="EAST"/><!--A-->
          <MapDecoration type="door"  x="18" y="18"/>
-         <MapDecoration type="chest" x="12" y="1"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="13" y="1"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="14" y="1"/> <!-- TODO: Populate chest -->
+         <MapDecoration type="chest" x="12" y="1">
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="13" y="1">
+            <DialogVariable name="[CHEST_GOLD]" value="5-20"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="14" y="1"><DialogGoTo label="herb_chest"/></MapDecoration>
       </Map>
 
       <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" encounterBackground="cave_battle_background.png" lightRadius="0" isOutside="no">
@@ -891,10 +915,10 @@
          <PointTransition decoration="downstairs" fromX="10" fromY="6"  toMap="garins_grave_lvl4" toX="1"  toY="5"  toDir="EAST"/><!--G-->
          <PointTransition decoration="downstairs" fromX="11" fromY="10" toMap="garins_grave_lvl4" toX="6"  toY="5"  toDir="EAST"/><!--H-->
 
-         <MapDecoration type="chest" x="2"  y="2"/> <!-- TODO: Populate chest -->
+         <MapDecoration type="chest" x="2"  y="2"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
          <MapDecoration type="chest" x="14" y="7">
-            <DialogCheck type="LACKS_ITEM" name="Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogCheck>
-            <DialogAction type="GAIN_ITEM" name="Acquired_Silver_Harp"/>
+            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Silver_Harp"/>
             <DialogAction type="GAIN_ITEM" name="Silver Harp"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
       </Map>
@@ -906,13 +930,21 @@
 
       <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightRadius="unlimited" isOutside="no">
          <LeavingTransition toMap="overworld" toX="49" toY="49" toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="11" fromY="2"  toMap="charlock_lvl2"  toX="10" toY="1"  toDir="EAST"/><!--A--> <!--TODO: Should initially be hidden-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="2"  toMap="charlock_lvl2"  toX="10" toY="1"  toDir="EAST" progressMarker="PM_Found_Secret_Passage"/><!--A-->
          <PointTransition decoration="downstairs" fromX="5"  fromY="15" toMap="charlock_lvl2"  toX="9"  toY="14" toDir="EAST"/><!--B-->
          <PointTransition decoration="downstairs" fromX="16" fromY="15" toMap="charlock_lvl2"  toX="18" toY="16" toDir="EAST"/><!--C-->
+
          <MapDecoration type="door"  x="5"  y="9"/>
          <MapDecoration type="door"  x="16" y="9"/>
+
          <MapDecoration type="None" x="11" y="4">
+            <Dialog>[NAME] searched the ground all about.</Dialog>
             <Dialog>Feel the wind blowing from behind the throne.</Dialog></MapDecoration>
+         <MapDecoration type="None" x="11" y="2" inprogressMarker="PM_Found_Secret_Passage">
+            <Dialog>[NAME] searched the ground all about.</Dialog>
+            <Dialog>[NAME] discovers the secret passage.</Dialog>
+            <DialogAction type="GAIN_ITEM" name="PM_Found_Secret_Passage"/>
+            <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
       </Map>
 
       <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightRadius="0" isOutside="no">
@@ -982,15 +1014,19 @@
 
       <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightRadius="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"   fromX="10" fromY="29" toMap="charlock_lvl7a" toX="10" toY="3"  toDir="WEST"/><!--U-->
-         <MapDecoration type="door"  x="17" y="12"/>
-         <MapDecoration type="chest" x="11" y="11"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="11" y="12"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="12" y="12"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="11" y="13"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="12" y="13"/> <!-- TODO: Populate chest -->
-         <MapDecoration type="chest" x="13" y="13"/> <!-- TODO: Populate chest -->
 
-         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no" inverseProgressMarker="defeatedDragonlord">
+         <MapDecoration type="door"  x="17" y="12"/>
+
+         <MapDecoration type="chest" x="11" y="11"><DialogGoTo label="herb_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="12"><DialogGoTo label="herb_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="12">
+            <DialogVariable name="[CHEST_GOLD]" value="500-755"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="13"><DialogGoTo label="key_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="13"><DialogGoTo label="wing_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="13" y="13"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
+
+         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
             <Dialog>"Welcome, [NAME]. I am the Dragonlord--King of Kings."</Dialog>
             <Dialog>"I have been waiting long for one such as thee."</Dialog>
             <Dialog>"I give thee now a chance to share this world and to rule half of it if thou will now stand beside me."</Dialog>
@@ -1009,19 +1045,20 @@
                <DialogOption name="No" label="fight_dragon_lord">
                    <Dialog>"Thou art a fool!"</Dialog>
                    <DialogAction type="ATTACK_MONSTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
-          <!-- TODO: Turn this into the Dragonlord, including second form and ball of light -->
       </Map>
    </Maps>
 
    <DialogScripts>
       <DialogScript label="defeated_dragonlord_first_form">
+         <!-- TODO: Whole screen should go black, different combat music should play -->
          <Dialog>The Dragonlord revealed his true self!</Dialog>
          <DialogAction type="ATTACK_MONSTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form"/></DialogScript>
 
       <DialogScript label="defeated_dragonlord_second_form">
-         <DialogAction type="GAIN_ITEM" name="defeatedDragonlord"/>
+         <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
+         <DialogAction type="GAIN_ITEM" name="Ball of Light"/>
          <Dialog>Thou hast found the Ball of Light.</Dialog>
-         <Dialog>Radiance streams forth as they hands touch the object and hold id aloft.</Dialog>
+         <Dialog>Radiance streams forth as thy hands touch the object and hold id aloft.</Dialog>
          <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
          <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></DialogScript>
 
@@ -1163,6 +1200,30 @@
 
       <DialogScript label="empty_chest">
          <Dialog>The chest was empty.</Dialog></DialogScript>
+
+      <DialogScript label="key_chest">
+         <DialogAction type="GAIN_ITEM" name="Key"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a key.</Dialog></DialogScript>
+
+      <DialogScript label="gold_chest">
+         <DialogAction type="GAIN_ITEM" name="gp" count="[CHEST_GOLD]"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found [CHEST_GOLD] gold pieces.</Dialog></DialogScript>
+
+      <DialogScript label="torch_chest">
+         <DialogAction type="GAIN_ITEM" name="Torch"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></DialogScript>
+
+      <DialogScript label="herb_chest">
+         <DialogAction type="GAIN_ITEM" name="Herb"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></DialogScript>
+
+      <DialogScript label="wings_chest">
+         <DialogAction type="GAIN_ITEM" name="Wings"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found the Wings of the Wyvern.</Dialog></DialogScript>
+
+      <DialogScript label="cursed_belt_chest">
+         <DialogAction type="GAIN_ITEM" name="Cursed Belt"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found the Cursed Belt.</Dialog></DialogScript>
 
       <DialogScript label="end_of_dialog"/>
    </DialogScripts>
@@ -1393,6 +1454,7 @@
    </Levels>
 
    <Spells>
+      <!-- TODO: Reimplement with dialog scripting like the tools, with the possible exception of combat spells -->
       <Spell name="Heal"      level="3"  mp="4"  availableInCombat="yes" availableOutsideCombat="yes" hpRecover="10-17"/>
       <Spell name="Hurt"      level="4"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="5-12" damageByMonster="3-10"/>
       <Spell name="Sleep"     level="7"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
@@ -1476,7 +1538,8 @@
             <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
             <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Tool>
 
-         <Tool name="Ball of Light"                                  droppable="no"  equippable="no"/>
+         <Tool name="Ball of Light"                                  droppable="no"  equippable="no">
+            <Dialog>Radiance streams forth as thy hands touch the object and hold id aloft.</Dialog></Tool>
 
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
@@ -1502,7 +1565,7 @@
             <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogCheck>
             <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>
-            <DialogAction type="GAIN_ITEM" name="Created_Rainbow_Bridge"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Created_Rainbow_Bridge"/>
             <DialogAction type="LOSE_ITEM" name="Rainbow Drop"/>
             <Dialog>A rainbow appeared forming a bridge to Charlock Island.</Dialog>
             <DialogAction type="GOTO_COORDINATES"/></Tool> <!-- The GOTO_COORDINATES forces a setMap call to add the rainbow bridge to the map -->
@@ -1520,6 +1583,9 @@
             <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
             <Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog>
             <Dialog>"I love thee, [NAME]."</Dialog></Tool>
+
+         <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
+         <Tool name="Death Necklace"                       gp="1200" droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
       </Tools>
    </Items>
 
@@ -1527,18 +1593,8 @@
       <Dialog>"Descendant of Erdrick, listen now to my words.  It is told that in ages past Erdrick fought demons with a Ball of Light.  Then came the Dragonlord who stole the precious globe and hid it in the darkness."</Dialog>
       <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
       <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>
-      <Dialog>May the light shine upon thee, [NAME].</Dialog> 
-      
-      <!-- TODO: Change to one time decorations.  Add one-time monsters. -->
-      <MapDecoration type="chest" x="6" y="5">
-         <DialogAction type="GAIN_ITEM" name="Torch"/>
-         <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></MapDecoration>
-      <MapDecoration type="chest" x="6" y="2">
-         <DialogAction type="GAIN_ITEM" name="Key"/>
-         <Dialog>Fortune smiles upon thee!  Thou hast found a key.</Dialog></MapDecoration>
-      <MapDecoration type="chest" x="8" y="2">
-         <DialogAction type="GAIN_ITEM" name="gp" count="120"/>
-         <Dialog>Fortune smiles upon thee!  Thou hast found 120 gold pieces.</Dialog></MapDecoration>
+      <Dialog>"May the light shine upon thee, [NAME]."</Dialog>
+
       <MapDecoration type="door" x="5" y="8"/>
    </InitialState>
 

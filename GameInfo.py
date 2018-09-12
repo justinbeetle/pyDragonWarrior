@@ -247,15 +247,23 @@ class GameInfo:
                respawnDecorations = transElement.attrib['respawnDecorations'] == 'yes'
             fromPoint = Point( int(transElement.attrib['fromX']),
                                int(transElement.attrib['fromY']) )
+            progressMarker = None
+            if 'progressMarker' in transElement.attrib:
+               progressMarker = transElement.attrib['progressMarker']
+            inverseProgressMarker = None
+            if 'inverseProgressMarker' in transElement.attrib:
+               inverseProgressMarker = transElement.attrib['inverseProgressMarker']
             pointTransitions.append( PointTransition( fromPoint,
                                                       transElement.attrib['toMap'],
                                                       Point( int(transElement.attrib['toX']),
                                                              int(transElement.attrib['toY']) ),
                                                       Direction[transElement.attrib['toDir']],
-                                                      respawnDecorations ) )
+                                                      respawnDecorations,
+                                                      progressMarker,
+                                                      inverseProgressMarker ) )
             if 'decoration' in transElement.attrib and transElement.attrib['decoration'] != 'None':
                decorationType = transElement.attrib['decoration']
-               mapDecorations.append( MapDecoration( decorationType, fromPoint, None, None, None ) )
+               mapDecorations.append( MapDecoration( decorationType, fromPoint, None, progressMarker, inverseProgressMarker ) )
 
          # Parse NPCs
          #print( 'Parse NPCs', flush=True )

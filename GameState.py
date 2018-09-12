@@ -154,6 +154,46 @@ class GameState:
    def getTileInfo(self, tile):
       return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[tile.y][tile.x]]]
 
+   def getPointTransition(self, tile = None):
+      if tile is None:
+         tile = self.pc.currPos_datTile
+      for pointTransition in self.gameInfo.maps[self.mapState.mapName].pointTransitions:
+         if pointTransition.srcPoint == tile:
+            if pointTransition.progressMarker is not None and pointTransition.progressMarker not in self.pc.progressMarkers:
+               continue
+            if pointTransition.inverseProgressMarker is not None and pointTransition.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            #print ('Found transition at point: ', tile, flush=True)
+            return pointTransition
+      return None
+
+   def getDecorations(self, tile = None):
+      decorations = []
+      if tile is None:
+         tile = self.pc.currPos_datTile
+      for decoration in self.mapDecorations:
+         if decoration.point == tile:
+            if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
+               continue
+            if decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            #print ('Found decoration at point: ', tile, flush=True)
+            decorations.append( decoration )
+      return decorations
+
+   def getSpecialMonster(self, tile = None):
+      if tile is None:
+         tile = self.pc.currPos_datTile
+      for specialMonster in self.gameInfo.maps[self.mapState.mapName].specialMonsters:
+         if specialMonster.point == tile:
+            if specialMonster.progressMarker is not None and specialMonster.progressMarker not in self.pc.progressMarkers:
+               continue
+            if specialMonster.inverseProgressMarker is not None and specialMonster.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            #print ('Found monster at point: ', tile, flush=True)
+            return specialMonster
+      return None
+
    def getTileDegreesOfFreedom(self, tile, enforceNpcHpPenaltyLimit, prevTile):
       degreesOfFreedom = 0
       for x in [tile.x-1, tile.x+1]:
@@ -179,13 +219,13 @@ class GameState:
          for decoration in self.mapDecorations:
             if tile == decoration.point and decoration.type is not None and not self.gameInfo.decorations[decoration.type].walkable:
                movementAllowed = False
-               #print('Movement not allowed: decoration not walkable', flush=True)
+               #print('Movement not allowed: decoration not walkable', decoration, flush=True)
                break
       else:
          for decoration in self.mapDecorations:
             if tile == decoration.point and decoration.type is not None and self.gameInfo.decorations[decoration.type].walkable:
                movementAllowed = True
-               #print('Movement allowed: decoration walkable', flush=True)
+               #print('Movement allowed: decoration walkable', decoration, flush=True)
                break
 
       if movementAllowed:
@@ -250,7 +290,7 @@ class GameState:
       if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
          if character == self.pc:
             # TODO: Configurable way to handle the PC image mappings
-            if self.pc.hasItem( 'carryingPrincess' ):
+            if self.pc.hasItem( 'PM_Carrying_Princess' ):
                characterImages = self.gameInfo.characterTypes['hero_carrying_princess'].images
             elif self.pc.weapon is not None and self.pc.shield is not None:
                characterImages = self.gameInfo.characterTypes['hero_sword_and_sheild'].images
@@ -279,8 +319,34 @@ class GameState:
    def isOutside(self):
       return self.gameInfo.maps[self.mapState.mapName].isOutside
 
+   def makeMapTransition(self, transition):
+      if transition is not None:
+         self.pc.currPos_datTile = self.pc.destPos_datTile = transition.destPoint
+         self.pc.currPosOffset_imgPx = Point(0,0)
+         self.pc.dir = transition.destDir
+         mapChanging = transition.destMap != self.mapState.mapName
+         self.setMap( transition.destMap, respawnDecorations=transition.respawnDecorations )
+         if not mapChanging:
+            self.gameState.drawMap( True )
+      return transition is not None
+
+   def boundsCheckPcPosition(self):
+      # Bounds checking to ensure a valid hero/center position
+      if ( self.pc.currPos_datTile is None or
+           self.pc.currPos_datTile[0] < 1 or
+           self.pc.currPos_datTile[0] < 1 or
+           self.pc.currPos_datTile[0] > self.gameInfo.maps[self.mapState.mapName].size[0]-1 or
+           self.pc.currPos_datTile[1] > self.gameInfo.maps[self.mapState.mapName].size[1]-1 ):
+         print('ERROR: Invalid hero position, defaulting to middle tile', flush=True)
+         self.pc.currPos_datTile = self.pc.destPos_datTile = Point(
+            self.gameInfo.maps[self.mapState.mapName].size[0] // 2,
+            self.gameInfo.maps[self.mapState.mapName].size[1] // 2 )
+         self.pc.currPosOffset_imgPx = Point(0,0)
+         self.pc.dir = Direction.SOUTH
+
    def setMap(self, newMapName, oneTimeDecorations = [], respawnDecorations = False):
       #print( 'setMap to', newMapName, flush=True )
+      oldMapName = None
       if self.mapState is not None:
          oldMapName = self.mapState.mapName
          
@@ -305,17 +371,40 @@ class GameState:
       # Prune out previously removed decorations
       if newMapName in self.removedDecorationsByMap:
          for decoration in self.removedDecorationsByMap[newMapName]:
-            self.mapDecorations.remove( decoration )
+            if decoration in self.mapDecorations:
+               self.mapDecorations.remove( decoration )
       self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
 
-      # TODO: If loading up the same map, should retain the NPC positions
-      self.npcs = []
-      for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
-         if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
-            continue
-         if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
-            continue
-         self.npcs.append( CharacterState.createNpcState( npc ) )
+      if oldMapName == newMapName:
+         # If loading up the same map, should retain the NPC positions
+         
+         # Remove any NPCs which should be missing
+         for npc in self.npcs:
+            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+               self.npcs.remove( npc )
+            elif npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+               self.npcs.remove( npc )
+         
+         # Add missing NPCs
+         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+               continue
+            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            if npc not in self.npcs:
+               self.npcs.append( CharacterState.createNpcState( npc ) )
+      else:
+         # On a map change load NPCs from scratch
+         self.npcs = []
+         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+               continue
+            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            self.npcs.append( CharacterState.createNpcState( npc ) )
+
+      # Bounds checking to ensure a valid hero/center position
+      self.boundsCheckPcPosition()
 
       # Get exterior and interior map images
       self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
@@ -353,21 +442,20 @@ class GameState:
             self.removeDecoration( decoration )
 
    def removeDecoration(self, decoration):
-      # TODO: May also need to remove this from the list of one-time decorations for this map
+      # Remove the decoration from the map (if present)
+      if decoration in self.mapDecorations:
+         self.mapDecorations.remove( decoration )
+         if self.mapState.mapName not in self.removedDecorationsByMap:
+            self.removedDecorationsByMap[self.mapState.mapName] = []
+         self.removedDecorationsByMap[self.mapState.mapName].append( decoration )
+         self.mapState = self.gameInfo.getMapImageInfo( self.mapState.mapName, self.imagePad_tiles, self.mapDecorations )
 
-      # Remove the decoration from the map
-      self.mapDecorations.remove( decoration )
-      if self.mapState.mapName not in self.removedDecorationsByMap:
-         self.removedDecorationsByMap[self.mapState.mapName] = []
-      self.removedDecorationsByMap[self.mapState.mapName].append( decoration )
-      self.mapState = self.gameInfo.getMapImageInfo( self.mapState.mapName, self.imagePad_tiles, self.mapDecorations )
+         # Get exterior and interior map images
+         self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
+         self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
 
-      # Get exterior and interior map images
-      self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
-      self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
-
-      # Draw the map to the screen
-      self.drawMap()
+         # Draw the map to the screen
+         self.drawMap()
 
    def setClippingForLightRadius(self):
       if self.isLightRestricted():
@@ -385,7 +473,6 @@ class GameState:
                                          self.winSize_pixels.x,
                                          self.winSize_pixels.y ) )
       
-
    def drawMap(self, flipBuffer=True):
       # Implement light radius via clipping
       if self.isLightRestricted():

@@ -171,6 +171,12 @@ class Game:
             
          elif isinstance( item, DialogVariable ):
             #print( 'Dialog Variable =', item, flush=True )
+            try:
+               (minVal, maxVal) = GameInfo.parseIntRange(item.value)
+               item.value = str( random.randint( minVal, maxVal ) )
+               #print( 'Dialog Variable (after value int conversion) =', item, flush=True )
+            except:
+               pass
             self.dialogVariableReplacment[item.name] = item.value
             
          elif isinstance( item, dict ):
@@ -330,7 +336,8 @@ class Game:
                try:
                   itemCount = int(itemCount)
                except:
-                  print( 'ERROR: Failed to convert itemCount to int:', itemCount, flush=True )
+                  print( 'ERROR: Failed to convert itemCount to int so defaulting to 1:', itemCount, flush=True )
+                  itemCount = 1
                   
                if itemName == 'gp':
                   if item.type == DialogActionEnum.GAIN_ITEM:
@@ -358,7 +365,7 @@ class Game:
             elif item.type == DialogActionEnum.GOTO_COORDINATES:
                self.gameState.pc.currPosOffset_imgPx = Point(0,0)
                if item.mapPos is not None:
-                  self.gameState.pc.currPos_datTile = item.mapPos
+                  self.gameState.pc.currPos_datTile = self.gameState.pc.destPos_datTile = item.mapPos
                if item.mapDir is not None:
                   self.gameState.pc.dir = item.mapDir
                if item.mapName is not None:
@@ -433,6 +440,11 @@ class Game:
    def waitForAcknowledgement( self, messageDialog = None ):
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
 
+      # Skip waiting for acknowledgement of message dialog if the content
+      # was already acknowledged.
+      if messageDialog is not None and messageDialog.isAcknowledged():
+         return
+
       isAwaitingAcknowledgement = True
       isWaitingIndicatorDrawn = False
       while self.gameState.isRunning and isAwaitingAcknowledgement:
@@ -455,9 +467,13 @@ class Game:
                   isAwaitingAcknowledgement = False
             elif e.type == pygame.QUIT:
                self.gameState.isRunning = False
-      if self.gameState.isRunning and isWaitingIndicatorDrawn:
-         messageDialog.eraseWaitingIndicator()
-         messageDialog.blit( self.gameState.screen, True )
+               
+      if self.gameState.isRunning:
+         if messageDialog is not None:
+            messageDialog.acknowledge()
+            if isWaitingIndicatorDrawn:
+               messageDialog.eraseWaitingIndicator()
+               messageDialog.blit( self.gameState.screen, True )
 
    def getMenuResult( self, menuDialog ):
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
@@ -504,17 +520,7 @@ class Game:
             audioPlayer.playMusic( self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].music )
 
             # Bounds checking to ensure a valid hero/center position
-            if ( self.gameState.pc.currPos_datTile is None or
-                 self.gameState.pc.currPos_datTile[0] < 1 or
-                 self.gameState.pc.currPos_datTile[0] < 1 or
-                 self.gameState.pc.currPos_datTile[0] > self.gameState.gameInfo.maps[mapName].size[0]-1 or
-                 self.gameState.pc.currPos_datTile[1] > self.gameState.gameInfo.maps[mapName].size[1]-1 ):
-               print('ERROR: Invalid hero position, defaulting to middle tile', flush=True)
-               self.gameState.pc.currPos_datTile = ( self.gameState.gameInfo.maps[mapName].size[0] // 2,
-                                                     self.gameState.gameInfo.maps[mapName].size[1] // 2 )
-               self.gameState.pc.destPos_datTile = self.gameState.pc.currPos_datTile
-               self.gameState.pc.currPosOffset_imgPx = Point(0,0)
-               self.gameState.pc.dir = Direction.SOUTH
+            self.gameState.boundsCheckPcPosition()
 
             # Draw the map to the screen
             self.gameState.drawMap()
@@ -530,7 +536,6 @@ class Game:
             moving = False
             menu = False
             talking = False
-            doorOpening = False
             searching = False
             pc_dir_old = self.gameState.pc.dir
                            
@@ -578,8 +583,8 @@ class Game:
                if menuResult == 'TALK':
                   talking = True
                elif menuResult == 'STAIRS':
-                  self.dialogLoop( 'Does thou not like traversing stairs automatically?' )
-                  #SurfaceEffects.pinkTinge( self.gameState.screen )
+                  if not self.gameState.makeMapTransition( self.gameState.getPointTransition() ):
+                     self.dialogLoop( 'There are no stairs here.' )
                elif menuResult == 'STATUS':
                   GameDialog.createFullStatusDialog( self.gameState.pc ).blit( self.gameState.screen, True )
                   self.waitForAcknowledgement()
@@ -672,22 +677,6 @@ class Game:
                               self.gameState.pc.unequipItem( itemResult )
                            elif actionResult == 'USE':
                               self.dialogLoop( self.gameState.gameInfo.items[itemResult].useDialog )
-                              ''' TODO: Dead code follows
-                              # TODO: Actually apply item effects here
-                              usedItem = False
-                              if itemResult == 'Key':
-                                 doorOpening = True
-                              elif itemResult == 'Torch':
-                                 if self.gameState.lightRadius is not None and self.gameState.lightRadius < 1:
-                                    usedItem = True
-                                    self.gameState.lightRadius = 1
-                                    self.gameState.drawMap()
-                              else:      
-                                 self.dialogLoop( '[NAME] attempted to use ' + itemResult + ' but nothing happened' )
-
-                              if usedItem:
-                                 self.gameState.pc.useItem( itemResult )
-                              '''
                   
                   # TODO: Implement door opening from the item list
                elif menuResult != None:
@@ -710,35 +699,15 @@ class Game:
                      break
                self.dialogLoop( dialog )
 
-            if doorOpening:
-               doorOpenDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
-               foundDoor = False
-               for decoration in self.gameState.mapDecorations:
-                  if doorOpenDest_datTile == decoration.point and decoration.type is not None and self.gameState.gameInfo.decorations[decoration.type].removeWithKey:
-                     foundDoor = True
-                     if self.gameState.pc.hasItem( 'Key' ):
-                        self.gameState.pc.loseItem( 'Key' )
-                        self.gameState.mapDecorations.remove( decoration )
-                        self.gameState.mapState = self.gameState.gameInfo.getMapImageInfo( mapName, self.gameState.imagePad_tiles, self.gameState.mapDecorations )
-
-                        # Draw the map to the screen
-                        self.gameState.drawMap()
-                     else:
-                        self.dialogLoop( 'Thou dost not have a key.' )
-                     break
-               if not foundDoor:
-                  self.dialogLoop( 'There is no door to open.' )
-
             if searching:
-               dialog = self.gameState.pc.name + ' searched the ground and found nothing.'
-               for decoration in self.gameState.mapDecorations:
-                  if self.gameState.pc.currPos_datTile == decoration.point:
-                     if decoration.type is not None and self.gameState.gameInfo.decorations[decoration.type].removeWithSearch:
-                        self.gameState.removeDecoration( decoration )
+               dialog = '[NAME] searched the ground and found nothing.'
+               for decoration in self.gameState.getDecorations():
+                  if decoration.type is not None and self.gameState.gameInfo.decorations[decoration.type].removeWithSearch:
+                     self.gameState.removeDecoration( decoration )
                         
-                     if decoration.dialog is not None:
-                        dialog = decoration.dialog
-                        break
+                  if decoration.dialog is not None:
+                     dialog = decoration.dialog
+                     break
 
                self.dialogLoop( dialog )
 
@@ -761,10 +730,11 @@ class Game:
 
       if monster is None:
          # Check for special monsters
-         monster = None
-         for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
-            if specialMonster.point == self.gameState.pc.currPos_datTile:
-               monster = self.gameState.gameInfo.monsters[ specialMonster.name ]
+         specialMonster = self.gameState.getSpecialMonster()
+         if specialMonster is not None:
+            monster = self.gameState.gameInfo.monsters[ specialMonster.name ]
+            victoryDialog = specialMonster.victoryDialog
+            runAwayDialog = specialMonster.runAwayDialog
                
          # Pick the monster
          if monster is None:
@@ -953,10 +923,9 @@ class Game:
          messageDialog.blit( self.gameState.screen, True )
 
          if victoryDialog is not None:
-            self.traverseDialog( messageDialog, victoryDialog, depth=1 )
+            self.traverseDialog( messageDialog, victoryDialog )
          
-         if not hasPreExistingDialog:
-            self.waitForAcknowledgement( messageDialog )
+         self.waitForAcknowledgement( messageDialog )
 
       # Restore initial screen and key repeat settings
       pygame.key.set_repeat( origRepeat1, origRepeat2 )
@@ -1023,10 +992,7 @@ class Game:
          else:
             # See if this tile has any associated transitions
             print('Check for transitions at', heroDest_datTile, flush=True) # TODO: Uncomment for coordinate logging
-            for pointTransition in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].pointTransitions:
-               if pointTransition.srcPoint == heroDest_datTile:
-                  #print ('Found transition at point: ', pointTransition.srcPoint, flush=True)
-                  transition = pointTransition
+            transition = self.gameState.getPointTransition( heroDest_datTile )
 
          # Check for tile penalty effects
          if destTileType.hpPenalty > 0 and not self.gameState.pc.isIgnoringTilePenalties():
@@ -1073,30 +1039,12 @@ class Game:
          self.checkForPlayerDeath()
 
          # At destination - now determine if an encounter should start
-         if transition is not None:
-            self.gameState.pc.currPos_datTile = transition.destPoint
-            self.gameState.pc.destPos_datTile = transition.destPoint
-            self.gameState.pc.currPosOffset_imgPx = Point(0,0)
-            self.gameState.pc.dir = transition.destDir
-            mapChanging = transition.destMap != self.gameState.mapState.mapName
-            self.gameState.setMap( transition.destMap, respawnDecorations=transition.respawnDecorations )
-            if not mapChanging:
-               self.gameState.drawMap( True )
-         else:
+         if not self.gameState.makeMapTransition( transition ):
             # Check for special monster encounters
-            monster = None
-            for specialMonster in self.gameState.gameInfo.maps[self.gameState.mapState.mapName].specialMonsters:
-               if specialMonster.point == self.gameState.pc.currPos_datTile:
-                  if specialMonster.progressMarker is not None and specialMonster.progressMarker not in self.gameState.pc.progressMarkers:
-                     continue
-                  if specialMonster.inverseProgressMarker is not None and specialMonster.inverseProgressMarker in self.gameState.pc.progressMarkers:
-                     continue
-                  print ('Found monster at point: ', specialMonster.point, flush=True)
-                  self.gameMode = GameMode.ENCOUNTER
-                  break
-
+            if self.gameState.getSpecialMonster() is not None:
+               self.gameMode = GameMode.ENCOUNTER
             # Check for random encounters
-            if( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and
+            elif( len( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) > 0 and
                 random.uniform(0, 1) < destTileType.spawnRate ):
                self.gameMode = GameMode.ENCOUNTER
 
