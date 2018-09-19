@@ -131,25 +131,25 @@ class GameState:
          self.winSize_pixels[1] )
 
    def getTileImageRect(self, tile, offset=Point(0,0)):
-      return self.getTileRegionImageRect(tile, 0, offset)
+      return self.getTileRegionImageRect(tile, 0.5, offset)
 
    def getTileRegionImageRect(self, centerTile, tileRadius, offset=Point(0,0)):
       return pygame.Rect(
-         (self.imagePad_tiles[0] + centerTile[0] - tileRadius) * self.gameInfo.tileSize_pixels + offset.x,
-         (self.imagePad_tiles[1] + centerTile[1] - tileRadius) * self.gameInfo.tileSize_pixels + offset.y,
-         (2*tileRadius + 1) * self.gameInfo.tileSize_pixels,
-         (2*tileRadius + 1) * self.gameInfo.tileSize_pixels )
+         (self.imagePad_tiles[0] + centerTile[0] + 0.5 - tileRadius) * self.gameInfo.tileSize_pixels + offset.x,
+         (self.imagePad_tiles[1] + centerTile[1] + 0.5 - tileRadius) * self.gameInfo.tileSize_pixels + offset.y,
+         (2*tileRadius) * self.gameInfo.tileSize_pixels,
+         (2*tileRadius) * self.gameInfo.tileSize_pixels )
 
    def getTileScreenRect(self, tile, offset=Point(0,0)):
-      return self.getTileRegionScreenRect(tile, 0, offset)
+      return self.getTileRegionScreenRect(tile, 0.5, offset)
    
    def getTileRegionScreenRect(self, centerTile, tileRadius, offset=Point(0,0)):
       # Hero is always in the center of the screen
       return pygame.Rect(
-         (self.winSize_tiles[0] / 2 - 0.5 + centerTile[0] - self.pc.currPos_datTile[0] - tileRadius) * self.gameInfo.tileSize_pixels + offset.x - self.pc.currPosOffset_imgPx.x,
-         (self.winSize_tiles[1] / 2 - 0.5 + centerTile[1] - self.pc.currPos_datTile[1] - tileRadius) * self.gameInfo.tileSize_pixels + offset.y - self.pc.currPosOffset_imgPx.y,
-         (2*tileRadius + 1) * self.gameInfo.tileSize_pixels,
-         (2*tileRadius + 1) * self.gameInfo.tileSize_pixels )
+         (self.winSize_tiles[0] / 2 + centerTile[0] - self.pc.currPos_datTile[0] - tileRadius) * self.gameInfo.tileSize_pixels + offset.x - self.pc.currPosOffset_imgPx.x,
+         (self.winSize_tiles[1] / 2 + centerTile[1] - self.pc.currPos_datTile[1] - tileRadius) * self.gameInfo.tileSize_pixels + offset.y - self.pc.currPosOffset_imgPx.y,
+         (2*tileRadius) * self.gameInfo.tileSize_pixels,
+         (2*tileRadius) * self.gameInfo.tileSize_pixels )
 
    def getTileInfo(self, tile):
       return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[tile.y][tile.x]]]
@@ -314,7 +314,7 @@ class GameState:
             self.getTileScreenRect(self.pc.destPos_datTile) )
 
    def isLightRestricted(self):
-      return self.lightRadius is not None and self.lightRadius <= self.winSize_tiles.w/2 and self.lightRadius <= self.winSize_tiles.h/2
+      return self.lightDiameter is not None and self.lightDiameter <= self.winSize_tiles.w and self.lightDiameter <= self.winSize_tiles.h
    
    def isOutside(self):
       return self.gameInfo.maps[self.mapState.mapName].isOutside
@@ -350,12 +350,15 @@ class GameState:
       if self.mapState is not None:
          oldMapName = self.mapState.mapName
          
-         # Update light radius if different between new and old maps
-         # Don't always update as this would cancel out light radius changing affects (torchs, etc.)
-         if ( self.gameInfo.maps[newMapName].lightRadius != self.gameInfo.maps[oldMapName].lightRadius ):
-            self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
+         # Update light diameter if different between new and old maps
+         # Don't always update as this would cancel out light diameter changing affects (torchs, etc.)
+         if ( self.gameInfo.maps[newMapName].lightDiameter != self.gameInfo.maps[oldMapName].lightDiameter or
+              ( self.gameInfo.maps[newMapName].lightDiameter is None and self.lightDiameter is not None ) or
+              ( self.gameInfo.maps[newMapName].lightDiameter is not None and self.lightDiameter is not None and
+                self.lightDiameter < self.gameInfo.maps[newMapName].lightDiameter ) ):
+            self.lightDiameter = self.gameInfo.maps[newMapName].lightDiameter
       else:
-         self.lightRadius = self.gameInfo.maps[newMapName].lightRadius
+         self.lightDiameter = self.gameInfo.maps[newMapName].lightDiameter
 
       # If changing maps and set to respawn decorations, clear the history of removed decorations
       if respawnDecorations:
@@ -457,12 +460,12 @@ class GameState:
          # Draw the map to the screen
          self.drawMap()
 
-   def setClippingForLightRadius(self):
+   def setClippingForLightDiameter(self):
       if self.isLightRestricted():
          self.screen.set_clip(
             self.getTileRegionScreenRect(
                self.pc.currPos_datTile,
-               self.lightRadius,
+               self.lightDiameter / 2,
                self.pc.currPosOffset_imgPx ) )
       else:
          self.setClippingForWindow()
@@ -474,10 +477,10 @@ class GameState:
                                          self.winSize_pixels.y ) )
       
    def drawMap(self, flipBuffer=True):
-      # Implement light radius via clipping
+      # Implement light diameter via clipping
       if self.isLightRestricted():
          self.screen.fill( pygame.Color('black') )
-      self.setClippingForLightRadius()
+      self.setClippingForLightDiameter()
       
       # Draw the map to the screen
       self.screen.blit( self.getMapImage().subsurface( self.getMapImageRect() ), (0,0) )
@@ -504,8 +507,8 @@ class GameState:
          else:
             self.phase = Phase.A
 
-      # Implement light radius via clipping
-      self.setClippingForLightRadius()
+      # Implement light diameter via clipping
+      self.setClippingForLightDiameter()
 
       if phaseChanged and not charactersErased:
          charactersErased = True

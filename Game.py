@@ -355,8 +355,11 @@ class Game:
                elif item.type == DialogActionEnum.LOSE_ITEM:
                   self.gameState.pc.loseItem( itemName, itemCount )
                   
-            elif item.type == DialogActionEnum.SET_LIGHT_RADIUS:
-               self.gameState.lightRadius = item.count
+            elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
+               if item.count == 'unlimited':
+                  self.gameState.lightDiameter = None
+               else:
+                  self.gameState.lightDiameter = item.count
                self.gameState.drawMap()
                   
             elif item.type == DialogActionEnum.REPEL_MONSTERS:
@@ -402,7 +405,7 @@ class Game:
                monster=None
                if item.name in self.gameState.gameInfo.monsters:
                   monster = self.gameState.gameInfo.monsters[item.name]
-               self.encounterLoop( monster=monster, victoryDialog=item.victoryDialog, runAwayDialog=item.runAwayDialog, encouterMusic=None, messageDialog=messageDialog )
+               self.encounterLoop( monster=monster, victoryDialog=item.victoryDialog, runAwayDialog=item.runAwayDialog, encouterMusic=item.encounterMusic, messageDialog=messageDialog )
             
             elif item.type == DialogActionEnum.OPEN_DOOR:
                self.gameState.openDoor()
@@ -616,9 +619,9 @@ class Game:
                               hpRecover = random.randint( spell.minHpRecover, spell.maxHpRecover )
                               self.gameState.pc.hp = min( self.gameState.pc.level.hp, self.gameState.pc.hp + hpRecover )
                            elif spell.name == 'Radiant':
-                              if self.gameState.lightRadius is not None and self.gameState.lightRadius < 6:
-                                 # TODO: Add diminishing light radius
-                                 self.gameState.lightRadius = 6
+                              if self.gameState.lightDiameter is not None and self.gameState.lightDiameter < 7:
+                                 # TODO: Add diminishing light diameter
+                                 self.gameState.lightDiameter = 7
                                  self.gameState.drawMap()
                            elif spell.name == 'Outside':
                               # TODO: If not on the overworld map, go to the last coordinates from the overworld map
@@ -720,6 +723,9 @@ class Game:
       # TODO: Rework this to invoke from an existing dialog or None.
       #       Allow a specific monster to be passed in.
       #       Allow run away and victory dialog to be passed in and triggered.
+
+      # Clear any menus
+      self.gameState.drawMap( False )
       
       # Save off initial screen and key repeat settings
       (origRepeat1, origRepeat2) = pygame.key.get_repeat()
@@ -728,6 +734,7 @@ class Game:
       pygame.event.get() # Clear event queue
       origScreen = self.gameState.screen.copy()
 
+      isRandomMonster = False
       if monster is None:
          # Check for special monsters
          specialMonster = self.gameState.getSpecialMonster()
@@ -739,10 +746,17 @@ class Game:
          # Pick the monster
          if monster is None:
             monster = self.gameState.gameInfo.monsters[ random.choice( self.gameState.getTileMonsters( self.gameState.pc.currPos_datTile ) ) ]
+            isRandomMonster = True
 
       # Pick monster HP and GP
-      monster_hp = random.randint( monster.minHp, monster.maxHp )
+      monster_max_hp = monster_hp = random.randint( monster.minHp, monster.maxHp )
       monster_gp = random.randint( monster.minGp, monster.maxGp )
+
+      # Initialize monster/player spell states
+      monster_asleep = False
+      monster_stopspelled = False
+      player_asleep = False
+      player_stopspelled = False
 
       # Start enounter music
       if encouterMusic is None:
@@ -755,6 +769,8 @@ class Game:
       hasPreExistingDialog = messageDialog is not None
       if not hasPreExistingDialog:
          messageDialog = GameDialog.createMessageDialog()
+      else:
+         messageDialog.addMessage( '' )
       messageDialog.addMessage( 'A ' + monster.name + ' draws near!' )
       encounterImage = self.gameState.gameInfo.maps[self.gameState.mapState.mapName].encounterImage
       encounterImageSize_pixels = Point( encounterImage.get_size() )
@@ -780,8 +796,9 @@ class Game:
          if isStart:
             isStart = False
             
-            # Check if the monster is going to run away
-            if self.gameState.pc.monsterRunCheck( monster ):
+            # Check if the monster is going to run away.  Only random monsters should ever run away.
+            if isRandomMonster and self.gameState.pc.monsterRunCheck( monster ):
+               # TODO: Play sound?
                messageDialog.addMessage( 'The ' + monster.name + ' is running away.' )
                break
             
@@ -849,10 +866,46 @@ class Game:
                      self.traverseDialog( messageDialog, runAwayDialog, depth=1 )
                   break
             elif menuResult == 'SPELL':
-               print( 'Magic is not implemented', flush=True )
-               self.dialogLoop( 'Thou has yet to learn magic' )
-               print( 'spells =', self.gameState.getAvailableSpellNames(), flush=True )
-               continue
+               availableSpellNames = self.gameState.getAvailableSpellNames()
+               if len(availableSpellNames) == 0:
+                  messageDialog.addMessage( 'Thou hast not yet learned any spells.' )
+                  continue
+               else:
+                  menuDialog = GameDialog.createMenuDialog(
+                     Point(-1, 1),
+                     None,
+                     'SPELLS',
+                     availableSpellNames,
+                     1 )
+                  menuDialog.blit( self.gameState.screen, True )
+                  menuResult = self.getMenuResult( menuDialog )
+                  #print( 'menuResult =', menuResult, flush=True )
+                  if menuResult is not None:
+                     spell = self.gameState.gameInfo.spells[menuResult]
+                     if self.gameState.pc.mp >= spell.mp:
+                        self.gameState.pc.mp -= spell.mp
+                        
+                        AudioPlayer().playSound( 'castSpell.wav' )
+                        SurfaceEffects.flickering( self.gameState.screen )
+                        
+                        if spell.maxHpRecover > 0:
+                           hpRecover = random.randint( spell.minHpRecover, spell.maxHpRecover )
+                           self.gameState.pc.hp = min( self.gameState.pc.level.hp, self.gameState.pc.hp + hpRecover )
+                        elif spell.maxDamageByHero > 0:
+                           monster_hp -= random.randint( spell.minDamageByHero, spell.maxDamageByHero )
+                        elif spell.name == 'Sleep':
+                           # TODO: Implement this
+                           print( 'Sleep not implemented', flush=True )
+                        elif spell.name == 'Stopspell':
+                           # TODO: Implement this
+                           print( 'Stopspell not implemented', flush=True )
+
+                        GameDialog.createEncounterStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
+                        messageDialog.addMessage( self.gameState.pc.name + ' cast the spell of ' + spell.name + '.' )
+
+                     else:
+                        messageDialog.addMessage( 'Thou dost not have enough magic to cast the spell.' )
+                        continue
             elif menuResult == 'ITEM':
                print( 'Items are not implemented', flush=True )
                continue
@@ -868,20 +921,97 @@ class Game:
 
          # Perform monster turn
          messageDialog.addMessage( '' )
-         # Check if the monster is going to run away
-         if self.gameState.pc.monsterRunCheck( monster ):
+         
+         # Check if the monster is going to run away.  Only random monsters should ever run away.
+         if isRandomMonster and self.gameState.pc.monsterRunCheck( monster ):
             # TODO: Play sound?
             messageDialog.addMessage( 'The ' + monster.name + ' is running away.' )
             break
-                  
-         # Check for a player dodge
-         damage = self.gameState.pc.calcHitDamageFromMonster( monster )
-         if 0 == damage:
-            # TODO: Play sound?
-            messageDialog.addMessage( 'The ' + monster.name + ' attacks! ' + self.gameState.pc.name + ' dodges the strike.' )
-         else:
-            audioPlayer.playSound( 'Dragon Warrior [Dragon Quest] SFX (5).wav' )
-            messageDialog.addMessage( 'The ' + monster.name + ' attacks! Thy hit points reduced by ' + str(damage) + '.' )
+
+         # Determine the monster action
+         chosenMonsterAction = MonsterActionEnum.ATTACK
+         for monsterAction in monster.monsterActions:
+            monsterHealthRatio = monster_hp / monster_max_hp
+            if monsterHealthRatio > monsterAction.healthRatioThreshold:
+               continue
+            if monsterAction.type == MonsterActionEnum.SLEEP and player_asleep:
+               continue
+            if monsterAction.type == MonsterActionEnum.STOPSPELL and player_stopspelled:
+               continue
+            if random.uniform(0, 1) < monsterAction.probability:
+               chosenMonsterAction = monsterAction.type
+               break
+
+         # Perform the monster action
+         damage = 0
+         if chosenMonsterAction == MonsterActionEnum.HEAL or chosenMonsterAction == MonsterActionEnum.HEALMORE:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            if chosenMonsterAction == MonsterActionEnum.HEAL:
+               messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of heal.' )
+            else:
+               messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of healmore.' )
+            if monster_stopspelled:
+               messageDialog.addMessage( 'But that spell hath been blocked.' )
+            else:
+               messageDialog.addMessage( 'The ' + monster.name + ' hath recovered.' )
+               monster_hp = monster_max_hp
+         elif chosenMonsterAction == MonsterActionEnum.HURT or chosenMonsterAction == MonsterActionEnum.HURTMORE:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            if chosenMonsterAction == MonsterActionEnum.HEAL:
+               messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of hurt.' )
+               damage = random.randint( self.gameState.gameInfo.spells['Hurt'].minDamageByMonster, self.gameState.gameInfo.spells['Hurt'].maxDamageByMonster )
+            else:
+               messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of hurtmore.' )
+               damage = random.randint( self.gameState.gameInfo.spells['Hurtmore'].minDamageByMonster, self.gameState.gameInfo.spells['Hurtmore'].maxDamageByMonster )
+            if self.gameState.pc.armor is not None:
+               damage = round(damage * self.gameState.pc.armor.hurtDmgModifier)
+            if monster_stopspelled:
+               messageDialog.addMessage( 'But that spell hath been blocked.' )
+            else:
+               messageDialog.addMessage( 'Thy hit points reduced by ' + str(damage) + '.' )
+         elif chosenMonsterAction == MonsterActionEnum.SLEEP:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of sleep.' )
+            if monster_stopspelled:
+               messageDialog.addMessage( 'But that spell hath been blocked.' )
+            else:
+               messageDialog.addMessage( 'Thou art asleep.' )
+               player_asleep = True
+         elif chosenMonsterAction == MonsterActionEnum.STOPSPELL:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of stopspell.' )
+            if monster_stopspelled:
+               messageDialog.addMessage( 'But that spell hath been blocked.' )
+            # TODO: Should always be blocked by certain items - Erdrick's Armor
+            elif random.uniform(0, 1) < 0.5:
+               messageDialog.addMessage( self.gameState.pc.name + ' spells hath been blocked.' )
+               player_stopspelled = True
+            else:
+               messageDialog.addMessage( 'But that spell did not work.' )
+         elif chosenMonsterAction == MonsterActionEnum.BREATH_FIRE or chosenMonsterAction == MonsterActionEnum.BREATH_STRONG_FIRE:
+            AudioPlayer().playSound( 'fireBreathingAttack.wav' )
+            messageDialog.addMessage( 'The ' + monster.name + ' is breathing fire.' )
+            if chosenMonsterAction == MonsterActionEnum.BREATH_FIRE:
+               damage = random.randint(16, 23)
+            else:
+               damage = random.randint(65, 72)
+            # TODO: Apply armor damage reduction
+            messageDialog.addMessage( 'Thy hit points reduced by ' + str(damage) + '.' )
+         else: # chosenMonsterAction == MonsterActionEnum.ATTACK
+            damage = self.gameState.pc.calcHitDamageFromMonster( monster )
+            if 0 == damage:
+               # TODO: Play sound?
+               messageDialog.addMessage( 'The ' + monster.name + ' attacks! ' + self.gameState.pc.name + ' dodges the strike.' )
+            else:
+               audioPlayer.playSound( 'Dragon Warrior [Dragon Quest] SFX (5).wav' )
+               messageDialog.addMessage( 'The ' + monster.name + ' attacks!' )
+               messageDialog.addMessage( 'Thy hit points reduced by ' + str(damage) + '.' )
+            
+         if damage != 0:
             self.gameState.pc.hp -= damage
             if self.gameState.pc.hp < 0:
                self.gameState.pc.hp = 0
@@ -899,16 +1029,17 @@ class Game:
                GameDialog.createEncounterStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
                messageDialog.blit( self.gameState.screen, True )
                pygame.time.Clock().tick(30)
-         
-          # Check for player death
-         if self.gameState.pc.hp <= 0:
-            break
+
+            # Check for player death
+            if self.gameState.pc.hp <= 0:
+               break
 
       audioPlayer.stopMusic()
       if self.gameState.pc.hp <= 0:
          self.checkForPlayerDeath( messageDialog )
       elif monster_hp <= 0:
          audioPlayer.playSound( '17_-_Dragon_Warrior_-_NES_-_Enemy_Defeated.ogg' )
+         self.gameState.drawMap( False )
          self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
          messageDialog.addMessage( 'Thou has done well in defeating the ' + monster.name + '. Thy experience increases by ' + str(monster.xp) + '. Thy gold increases by ' + str(monster_gp) + '.' )
          self.gameState.pc.gp += monster_gp
@@ -927,11 +1058,12 @@ class Game:
          
          self.waitForAcknowledgement( messageDialog )
 
-      # Restore initial screen and key repeat settings
+      # Restore initial key repeat settings
       pygame.key.set_repeat( origRepeat1, origRepeat2 )
+
+      # Draw the map
       if self.gameState.pc.hp > 0:
-         self.gameState.screen.blit( origScreen, (0, 0) )
-         pygame.display.flip()
+         self.gameState.drawMap( True )
          
       # Return to exploring after completion of encounter
       self.lastGameMode = GameMode.ENCOUNTER
@@ -948,6 +1080,7 @@ class Game:
          if messageDialog is None:
             self.dialogLoop( 'Thou art dead.' )
          else:
+            messageDialog.addMessage( '' )
             messageDialog.addMessage( 'Thou art dead.' )
             self.waitForAcknowledgement( messageDialog )
          self.gameState.pc.currPos_datTile = self.gameState.gameInfo.deathHeroPos_datTile

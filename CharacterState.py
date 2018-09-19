@@ -254,7 +254,7 @@ class CharacterState:
    def getAttackStrength( self ):
       retVal = 0;
       if self.level is not None:
-         retVal += self.level.strength # TODO: Should this be // 2?
+         retVal += self.level.strength
       if self.weapon is not None:
          retVal += self.weapon.attackBonus
       for item in self.otherEquippedItems:
@@ -273,11 +273,11 @@ class CharacterState:
          retVal += self.shield.defenseBonus
       for item in self.otherEquippedItems:
          retVal += item.defenseBonus
-      return math.floor(retVal)
+      return retVal
 
    def monsterRunCheck( self, monster ):
       if self.getAttackStrength() > monster.strength * 2:
-         return random.uniform(0, 1) < 0.25
+         return random.uniform(0, 1) < 0.25 # TODO: Correct this calculation
       return False
 
    def monsterInitiativeCheck( self, monster ):

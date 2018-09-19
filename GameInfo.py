@@ -215,9 +215,9 @@ class GameInfo:
          mapName = element.attrib['name']
          #print( 'mapName =', mapName, flush=True )
          music = element.attrib['music']
-         lightRadius = None
-         if 'lightRadius' in element.attrib and element.attrib['lightRadius'] != 'unlimited':
-            lightRadius = int(element.attrib['lightRadius'])
+         lightDiameter = None
+         if 'lightDiameter' in element.attrib and element.attrib['lightDiameter'] != 'unlimited':
+            lightDiameter = int(element.attrib['lightDiameter'])
          isOutside = True
          if 'isOutside' in element.attrib:
             isOutside = element.attrib['isOutside'] == 'yes'
@@ -392,7 +392,7 @@ class GameInfo:
                                   mapOverlayDat,
                                   mapDatSize,
                                   music,
-                                  lightRadius,
+                                  lightDiameter,
                                   leavingTransition,
                                   pointTransitions,
                                   nonPlayerCharacters,
@@ -425,6 +425,15 @@ class GameInfo:
 
          (minHp, maxHp) = GameInfo.parseIntRange(element.attrib['hp'])
          (minGp, maxGp) = GameInfo.parseIntRange(element.attrib['gp'])
+
+         monsterActions = []
+         for monsterActionElement in element.findall("./MonsterAction"):
+            healthRatioThreshold = 1.0
+            if 'healthRatioThreshold' in monsterActionElement.attrib:
+               healthRatioThreshold = float( monsterActionElement.attrib['healthRatioThreshold'] )
+            monsterActions.append( MonsterAction( MonsterActionEnum[ monsterActionElement.attrib['type'] ],
+                                                  float(monsterActionElement.attrib['probability']),
+                                                  healthRatioThreshold ) )
          
          self.monsters[monsterName] = Monster(
             monsterName,
@@ -441,7 +450,8 @@ class GameInfo:
             GameInfo.parseFloat(element.attrib['blockFactor']),
             int(element.attrib['xp']),
             minGp,
-            maxGp )
+            maxGp,
+            monsterActions )
          
       # Parse monster sets
       self.monsterSets = {}
@@ -707,6 +717,10 @@ class GameInfo:
             runAwayDialog = None
             if 'runAwayDialogScript' in element.attrib:
                runAwayDialog = [ DialogGoTo( element.attrib['runAwayDialogScript'] ) ]
+
+            encounterMusic = None
+            if 'encounterMusic' in element.attrib:
+               encounterMusic = element.attrib['encounterMusic']
             
             dialog.append( DialogAction( DialogActionEnum[ element.attrib['type'] ],
                                          name = name,
@@ -715,7 +729,8 @@ class GameInfo:
                                          mapPos = mapPos,
                                          mapDir = mapDir,
                                          victoryDialog = victoryDialog,
-                                         runAwayDialog = runAwayDialog) )
+                                         runAwayDialog = runAwayDialog,
+                                         encounterMusic = encounterMusic ) )
             
          elif element.tag == 'DialogVariable':
             name = element.attrib['name']

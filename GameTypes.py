@@ -46,17 +46,29 @@ class DialogActionEnum(Enum):
    HEALTH_RESTORE = 3                # attributes: count (number, range, or unlimited)
    LOSE_ITEM = 4                     # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
    GAIN_ITEM = 5                     # attributes: item (if unknown name, treated as a progress marker), count (defaults to 1)
-   SET_LIGHT_RADIUS = 6              # attributes: count, decay (number or unlimited)
+   SET_LIGHT_DIAMETER = 6            # attributes: count, decay (number or unlimited)
    REPEL_MONSTERS = 7                # attributes: decay
    GOTO_COORDINATES = 8              # attributes: map, x, y, dir
    GOTO_LAST_OUTSIDE_COORDINATES = 9 # attributes: <none>
    PLAY_SOUND = 10                   # attributes: name
    PLAY_MUSIC = 11                   # attributes: name (currently play it once and return to looping on the prior music)
-   VISUAL_EFFECT = 12                # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect)
-   ATTACK_MONSTER = 13               # attributes: name, victoryDialog, runAwayDialog
+   VISUAL_EFFECT = 12                # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
+   ATTACK_MONSTER = 13               # attributes: name, victoryDialog (victoryDialogScript in XML), runAwayDialog (runAwayDialogScript in XML), encounterMusic
    OPEN_DOOR = 14                    # attributes: <none>
    MONSTER_SLEEP = 15                # attributes: bypass (to bypass resistances)
    MONSTER_STOP_SPELL = 16           # attributes: bypass (to bypass resistances)
+
+# Alternate options to attacking (or attempting to run away) which may be attempted by a monster
+class MonsterActionEnum(Enum):
+   HEAL = 1
+   HURT = 2
+   SLEEP = 3
+   STOPSPELL = 4
+   HEALMORE = 5
+   HURTMORE = 6
+   BREATH_FIRE = 7
+   BREATH_STRONG_FIRE = 8
+   ATTACK = 9
 
 # Branch to a labeled dialog state
 class DialogGoTo:
@@ -82,7 +94,13 @@ class DialogVendorSellOptions:
 
 # Conditionally branch dialog if the check condition is not met
 class DialogCheck:
-   def __init__(self, type, failedCheckDialog, name = None, count = 1, mapName = None, mapPos = None ):
+   def __init__(self,
+                type,
+                failedCheckDialog,
+                name = None,
+                count = 1,
+                mapName = None,
+                mapPos = None ):
       self.type = type
       self.failedCheckDialog = failedCheckDialog
       self.name = name
@@ -91,11 +109,27 @@ class DialogCheck:
       self.mapPos = mapPos
       
    def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.type, self.failedCheckDialog, self.name, self.count, self.mapName, self.mapPos)
+      return "%s(%s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
+                                             self.type,
+                                             self.failedCheckDialog,
+                                             self.name,
+                                             self.count,
+                                             self.mapName,
+                                             self.mapPos)
 
 # Conditionally branch dialog if the check condition is not met
 class DialogAction:
-   def __init__(self, type, name = None, count = 1, decaySteps = None, mapName = None, mapPos = None, mapDir = None, victoryDialog = None, runAwayDialog = None):
+   def __init__(self,
+                type,
+                name = None,
+                count = 1,
+                decaySteps = None,
+                mapName = None,
+                mapPos = None,
+                mapDir = None,
+                victoryDialog = None,
+                runAwayDialog = None,
+                encounterMusic = None):
       self.type = type
       self.name = name
       self.count = count
@@ -105,18 +139,20 @@ class DialogAction:
       self.mapDir = mapDir
       self.victoryDialog = victoryDialog
       self.runAwayDialog = runAwayDialog
+      self.encounterMusic = encounterMusic
       
    def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
-                                                         self.type,
-                                                         self.name,
-                                                         self.count,
-                                                         self.decaySteps,
-                                                         self.mapName,
-                                                         self.mapPos,
-                                                         self.mapDir,
-                                                         self.victoryDialog,
-                                                         self.runAwayDialog)
+      return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
+                                                             self.type,
+                                                             self.name,
+                                                             self.count,
+                                                             self.decaySteps,
+                                                             self.mapName,
+                                                             self.mapPos,
+                                                             self.mapDir,
+                                                             self.victoryDialog,
+                                                             self.runAwayDialog,
+                                                             self.encounterMusic)
 
 # Set a variaable to be used in substitution for the remainder of the dialog session
 class DialogVariable:
@@ -186,7 +222,7 @@ Map = namedtuple('Map', ['name',
                          'overlayDat',
                          'size',
                          'music',
-                         'lightRadius',
+                         'lightDiameter',
                          'leavingTransition',
                          'pointTransitions',
                          'nonPlayerCharacters',
@@ -196,6 +232,10 @@ Map = namedtuple('Map', ['name',
                          'specialMonsters',
                          'isOutside',
                          'origin'], verbose=False)
+
+MonsterAction = namedtuple('MonsterAction', ['type',
+                                             'probability',
+                                             'healthRatioThreshold'], verbose=False)
 
 Monster = namedtuple('Monster', ['name',
                                  'image',
@@ -211,7 +251,8 @@ Monster = namedtuple('Monster', ['name',
                                  'blockFactor',
                                  'xp',
                                  'minGp',
-                                 'maxGp'], verbose=False)
+                                 'maxGp',
+                                 'monsterActions'], verbose=False)
 
 MonsterZone = namedtuple('MonsterZone', ['x',
                                          'y',
@@ -254,7 +295,7 @@ Armor = namedtuple('Armor', ['name',
                              'gp',
                              'ignoresTilePenalties',
                              'hurtDmgModifier',
-                             'hpRegenTiles'], verbose=False)
+                             'hpRegenTiles'], verbose=False) # TODO: Add fireDmbModified, stopspellBlock
 
 Shield = namedtuple('Shield', ['name',
                                'defenseBonus',
