@@ -366,10 +366,10 @@ class GameState:
 
       self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
       # Prune out decorations where the progress marker conditions are not met
-      for decoration in self.mapDecorations:
+      for decoration in self.mapDecorations[:]:
          if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
             self.mapDecorations.remove( decoration )
-         if decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
+         elif decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
             self.mapDecorations.remove( decoration )
       # Prune out previously removed decorations
       if newMapName in self.removedDecorationsByMap:
@@ -382,7 +382,7 @@ class GameState:
          # If loading up the same map, should retain the NPC positions
          
          # Remove any NPCs which should be missing
-         for npc in self.npcs:
+         for npc in self.npcs[:]:
             if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
                self.npcs.remove( npc )
             elif npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
