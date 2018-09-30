@@ -1,60 +1,87 @@
 #!/usr/bin/env python
 
+# Imports to support type annotations
+from __future__ import annotations
+from typing import Tuple, Union
+
 import math
-import operator
 
 class Point(tuple):
-   def __new__(self, x=0, y=0):
+   PointTypeElemType = Union[float, int]
+   PointTupleType = Union['Point', Tuple[PointTypeElemType, PointTypeElemType]]
+   ScalarOrPointTupleType = Union[PointTypeElemType, PointTupleType]
+   
+   def __new__(self, x: ScalarOrPointTupleType = 0, y: PointTypeElemType = 0) -> Point:
       if isinstance( x, tuple ):
          return tuple.__new__(Point, (x[0], x[1]))
       return tuple.__new__(Point, (x, y))
    
-   def __add__( self, p ):
+   def __init__(self, x: ScalarOrPointTupleType = 0, y: PointTypeElemType = 0) -> None:
+      pass
+
+   @property
+   def x(self) -> PointTypeElemType:
+      return self[0]
+
+   @property
+   def w(self) -> PointTypeElemType:
+      return self[0]
+
+   @property
+   def y(self) -> PointTypeElemType:
+      return self[1]
+
+   @property
+   def h(self) -> PointTypeElemType:
+      return self[1]
+
+   # Point addition has a signature which is intentionally incompatible with the supertype 'tuple'
+   def __add__( self, p: PointTupleType ) -> Point: # type: ignore
       return Point( self.x + p[0], self.y + p[1] )
 
-   def __radd__( self, p ):
+   def __radd__( self, p: PointTupleType ) -> Point:
       return self + p;
 
-   def __sub__( self, p ):
+   def __sub__( self, p: PointTupleType ) -> Point:
       return Point( self.x - p[0], self.y - p[1] )
 
-   def __rsub__( self, p ):
+   def __rsub__( self, p: PointTupleType ) -> Point:
       if isinstance( p, tuple ):
-         return Point(p) / self;
+         return Point(p) - self;
       return NotImplemented;
 
-   def __mul__( self, p ):
+   def __mul__( self, p: ScalarOrPointTupleType ) -> Point:
       if isinstance( p, tuple ):
          return Point( self.x * p[0], self.y * p[1])
       return Point( self.x * p, self.y * p )
 
-   def __rmul__( self, p ):
+   def __rmul__( self, p: ScalarOrPointTupleType ) -> Point:
       return self * p;
 
-   def __truediv__( self, p ):
+   def __truediv__( self, p: ScalarOrPointTupleType ) -> Point:
       if isinstance( p, tuple ):
          return Point( self.x / p[0], self.y / p[1])
       return Point( self.x / p, self.y / p )
 
-   def __rtruediv__( self, p ):
+   def __rtruediv__( self, p: PointTupleType ) -> Point:
       if isinstance( p, tuple ):
          return Point(p) / self;
       return NotImplemented
 
-   def __floordiv__( self, p ):
+   def __floordiv__( self, p: ScalarOrPointTupleType ) -> Point:
       if isinstance( p, tuple ):
          return Point( self.x // p[0], self.y // p[1])
       return Point( self.x // p, self.y // p )
 
-   def __rfloordiv__( self, p ):
+   def __rfloordiv__( self, p: PointTupleType ) -> Point:
       if isinstance( p, tuple ):
          return Point(p) / self;
       return NotImplemented
 
-   def floor( self ):
+   def floor( self ) -> Point:
       return Point( math.floor( self.x ), math.floor( self.y ) )
 
-   def ceil( self ):
+   def ceil( self ) -> Point:
       return Point( math.ceil( self.x ), math.ceil( self.y ) )
 
    def __str__( self ):
@@ -62,11 +89,6 @@ class Point(tuple):
 
    def __repr__( self ):
       return "%s(%r, %r)" % (self.__class__.__name__, self.x, self.y)
-   
-Point.x = property(operator.itemgetter(0))
-Point.w = property(operator.itemgetter(0))
-Point.y = property(operator.itemgetter(1))
-Point.h = property(operator.itemgetter(1))
 
 def main():
    p1 = Point()
