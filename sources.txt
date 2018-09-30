@@ -26,11 +26,14 @@ Gameplay:     https://www.youtube.com/watch?v=jmzHrNVelL0&t=551s
 
 
 
+Python 3.6.3 (v3.6.3:2c5fed8, Oct  3 2017, 17:26:49) [MSC v.1900 32 bit (Intel)] on win32
 
 
 C:\Users\Justin\AppData\Roaming\Python\Python36\site-packages\pygame\examples
 http://www.py2exe.org/
 http://www.pyinstaller.org/
+
+
 
 
 
@@ -42,6 +45,15 @@ python -m ensurepip --upgrade
 cd C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts
 pip install pygame
 pip install pyinstaller
+python -m pip install mypy
+python -m pip install --upgrade pip
+python -m pip install --upgrade pygame
+python -m pip install --upgrade pyinstaller
+python -m pip install --upgrade mypy
+
+python -m mypy Point.py --strict
+
+
 cd C:\Users\Justin\Desktop\Adventure\Adventure
 C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts\pyinstaller Game.py
 copy game.xml, data, and saves from C:\Users\Justin\Desktop\Adventure\Adventure to C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game

@@ -690,10 +690,10 @@ class Game:
                pygame.display.flip()
 
             if talking:
-               talkDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+               talkDest_datTile = self.gameState.pc.currPos_datTile + self.gameState.pc.dir.getDirectionVector()
                talkDestTileType = self.gameState.getTileInfo(talkDest_datTile)
                if talkDestTileType.canTalkOver:
-                  talkDest_datTile = talkDest_datTile + getDirectionVector( self.gameState.pc.dir )
+                  talkDest_datTile = talkDest_datTile + self.gameState.pc.dir.getDirectionVector()
                dialog = 'There is no one there.'
                for npc in self.gameState.npcs:
                   if talkDest_datTile == npc.currPos_datTile or talkDest_datTile == npc.destPos_datTile:
@@ -1125,7 +1125,7 @@ class Game:
       tileMoveSteps = self.gameState.gameInfo.tileSize_pixels // imagePxStepSize
 
       # Determine the destination tile and pixel count for the scroll
-      heroDest_datTile = self.gameState.pc.currPos_datTile + getDirectionVector( self.gameState.pc.dir )
+      heroDest_datTile = self.gameState.pc.currPos_datTile + self.gameState.pc.dir.getDirectionVector()
       
       # Validate if the destination tile is navagable
       movementAllowed = self.gameState.canMoveToTile( heroDest_datTile )

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# Imports to support type annotations
+from typing import Any, List, Union
+
+from typing import NamedTuple
+from dataclasses import dataclass
 from collections import namedtuple
 from enum import Enum
 from Point import Point
@@ -9,19 +14,19 @@ class Direction(Enum):
    SOUTH = 2
    WEST = 3
    EAST = 4
-   
-def getDirectionVector( dir ):
-   if Direction.NORTH == dir:
-      vector = Point( 0, -1 )
-   elif Direction.SOUTH == dir:
-      vector = Point( 0, 1 )
-   elif Direction.EAST == dir:
-      vector = Point( 1, 0 )
-   elif Direction.WEST == dir:
-      vector = Point( -1, 0 )
-   else:
-      vector = Point( 0, 0 )
-   return vector
+
+   def getDirectionVector( self ) -> Point:
+      if Direction.NORTH == self:
+         vector = Point( 0, -1 )
+      elif Direction.SOUTH == self:
+         vector = Point( 0, 1 )
+      elif Direction.EAST == self:
+         vector = Point( 1, 0 )
+      elif Direction.WEST == self:
+         vector = Point( -1, 0 )
+      else:
+         vector = Point( 0, 0 )
+      return vector
 
 class Phase(Enum):
    A = 1
@@ -70,98 +75,50 @@ class MonsterActionEnum(Enum):
    BREATH_STRONG_FIRE = 8
    ATTACK = 9
 
-# Branch to a labeled dialog state
+# Dialog to branch to a labeled dialog state
+@dataclass
 class DialogGoTo:
-   def __init__(self, label):
-      self.label = label
-      
-   def __str__(self):
-      return "%s(%s)" % (self.__class__.__name__, self.label)
+   label: str
 
+# Dialog for a list of vendor buy options
+@dataclass
 class DialogVendorBuyOptions:
-   def __init__(self, nameAndGpRowData):
-      self.nameAndGpRowData = nameAndGpRowData
-      
-   def __str__(self):
-      return "%s(%s)" % (self.__class__.__name__, self.nameAndGpRowData)
+   nameAndGpRowData: List[List[str]] # List of items that can be bought from the vendor where each item is a 2 element list: item name and gold cost (as str)
 
+# Dialog for a list of vendor sell options
+@dataclass
 class DialogVendorSellOptions:
-   def __init__(self, itemTypes):
-      self.itemTypes = itemTypes
-      
-   def __str__(self):
-      return "%s(%s)" % (self.__class__.__name__, self.itemTypes)
+   itemTypes: List[str] # List of the classes of items that can be sold to the vendor
 
 # Conditionally branch dialog if the check condition is not met
+@dataclass
 class DialogCheck:
-   def __init__(self,
-                type,
-                failedCheckDialog,
-                name = None,
-                count = 1,
-                mapName = None,
-                mapPos = None ):
-      self.type = type
-      self.failedCheckDialog = failedCheckDialog
-      self.name = name
-      self.count = count
-      self.mapName = mapName
-      self.mapPos = mapPos
-      
-   def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
-                                             self.type,
-                                             self.failedCheckDialog,
-                                             self.name,
-                                             self.count,
-                                             self.mapName,
-                                             self.mapPos)
+   type: DialogCheckEnum
+   failedCheckDialog: Any # TODO: Better document this type
+   name: Union[None, str] = None
+   count: int = 1
+   mapName: Union[None, str] = None
+   mapPos: Union[None, Point] = None
 
 # Conditionally branch dialog if the check condition is not met
+@dataclass
 class DialogAction:
-   def __init__(self,
-                type,
-                name = None,
-                count = 1,
-                decaySteps = None,
-                mapName = None,
-                mapPos = None,
-                mapDir = None,
-                victoryDialog = None,
-                runAwayDialog = None,
-                encounterMusic = None):
-      self.type = type
-      self.name = name
-      self.count = count
-      self.decaySteps = decaySteps
-      self.mapName = mapName
-      self.mapPos = mapPos
-      self.mapDir = mapDir
-      self.victoryDialog = victoryDialog
-      self.runAwayDialog = runAwayDialog
-      self.encounterMusic = encounterMusic
-      
-   def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__,
-                                                             self.type,
-                                                             self.name,
-                                                             self.count,
-                                                             self.decaySteps,
-                                                             self.mapName,
-                                                             self.mapPos,
-                                                             self.mapDir,
-                                                             self.victoryDialog,
-                                                             self.runAwayDialog,
-                                                             self.encounterMusic)
+   type: DialogActionEnum
+   name: Union[None, str] = None
+   count: int = 1
+   decaySteps: Union[None, int] = None
+   mapName: Union[None, str] = None
+   mapPos: Union[None, Point] = None
+   mapDir: Union[None, Direction] = None
+   victoryDialog: Any = None # TODO: Better document this type
+   runAwayDialog: Any = None # TODO: Better document this type
+   encounterMusic: Union[None, str] = None
 
 # Set a variaable to be used in substitution for the remainder of the dialog session
+@dataclass
 class DialogVariable:
-   def __init__(self, name, value):
-      self.name = name
-      self.value = value
-      
-   def __str__(self):
-      return "%s(%s, %s)" % (self.__class__.__name__, self.name, self.value)
+   name: str
+   value: str
 
 Tile = namedtuple('Tile', ['name',
                            'symbol',
@@ -372,3 +329,16 @@ def scroll_view(screen, image, direction, view_rect, zoom_factor, imagePxStepSiz
             screen.subsurface(dst_rect))
       if update:
          pygame.display.update(zoom_view_rect)
+
+def main():
+   dv1 = DialogVariable( '1', '2' )
+   print( dv1, type(dv1.value), flush=True )
+   dv2 = DialogVariable( '1', 2 )
+   print( dv2, type(dv2.value), flush=True )
+
+if __name__ == '__main__':
+   try:
+      main()
+   except Exception:
+      import traceback
+      traceback.print_exc()

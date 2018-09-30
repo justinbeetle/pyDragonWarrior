@@ -426,7 +426,7 @@ class GameState:
       return self.exteriorMapImage
    
    def isFacingDoor(self):
-      doorOpenDest_datTile = self.pc.currPos_datTile + getDirectionVector( self.pc.dir )
+      doorOpenDest_datTile = self.pc.currPos_datTile + self.pc.dir.getDirectionVector()
       foundDoor = False
       for decoration in self.mapDecorations:
          if ( doorOpenDest_datTile == decoration.point and
@@ -436,7 +436,7 @@ class GameState:
       return False
    
    def openDoor(self):
-      doorOpenDest_datTile = self.pc.currPos_datTile + getDirectionVector( self.pc.dir )
+      doorOpenDest_datTile = self.pc.currPos_datTile + self.pc.dir.getDirectionVector()
       foundDoor = False
       for decoration in self.mapDecorations:
          if ( doorOpenDest_datTile == decoration.point and
@@ -526,7 +526,7 @@ class GameState:
             if self.tickCount % NPC_MOVE_STEPS == 0:
                # TODO: Determine where to move instead of blindly moving forward
                npc.dir = random.choice( list( Direction ) )
-               destTile = npc.currPos_datTile + getDirectionVector( npc.dir )
+               destTile = npc.currPos_datTile + npc.dir.getDirectionVector()
                if self.canMoveToTile( destTile, True, True, npc.currPos_datTile ):
                   npc.destPos_datTile = destTile
 
@@ -534,7 +534,7 @@ class GameState:
             if npc.currPos_datTile != npc.destPos_datTile:
                if not charactersErased:
                   self.eraseCharacter(npc)
-               directionVector = getDirectionVector( npc.dir )
+               directionVector = npc.dir.getDirectionVector()
                npc.currPosOffset_imgPx += directionVector * imagePxStepSize
                if npc.currPosOffset_imgPx / self.gameInfo.tileSize_pixels == directionVector:
                   npc.currPos_datTile = npc.destPos_datTile

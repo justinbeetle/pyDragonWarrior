@@ -21,19 +21,31 @@ class Point(tuple):
 
    @property
    def x(self) -> PointTypeElemType:
-      return self[0]
+      if isinstance( self[0], float ) or isinstance( self[0], int ):
+         return self[0]
+      else:
+         return float(self[0])
 
    @property
    def w(self) -> PointTypeElemType:
-      return self[0]
+      if isinstance( self[0], float ) or isinstance( self[0], int ):
+         return self[0]
+      else:
+         return float(self[0])
 
    @property
    def y(self) -> PointTypeElemType:
-      return self[1]
+      if isinstance( self[1], float ) or isinstance( self[1], int ):
+         return self[1]
+      else:
+         return float(self[1])
 
    @property
    def h(self) -> PointTypeElemType:
-      return self[1]
+      if isinstance( self[1], float ) or isinstance( self[1], int ):
+         return self[1]
+      else:
+         return float(self[1])
 
    # Point addition has a signature which is intentionally incompatible with the supertype 'tuple'
    def __add__( self, p: PointTupleType ) -> Point: # type: ignore
@@ -84,13 +96,13 @@ class Point(tuple):
    def ceil( self ) -> Point:
       return Point( math.ceil( self.x ), math.ceil( self.y ) )
 
-   def __str__( self ):
+   def __str__( self ) -> str:
       return "(%s, %s)" % (self.x, self.y)
 
-   def __repr__( self ):
+   def __repr__( self ) -> str:
       return "%s(%r, %r)" % (self.__class__.__name__, self.x, self.y)
 
-def main():
+def main() -> None:
    p1 = Point()
    p2 = Point( 1, 4 )
    p3 = Point( 2, 7 )
