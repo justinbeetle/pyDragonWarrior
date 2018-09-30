@@ -172,21 +172,21 @@ Tile = namedtuple('Tile', ['name',
                            'mpPenalty',
                            'speed',
                            'spawnRate',
-                           'specialEdges'], verbose=False)
+                           'specialEdges'])
 
 Decoration = namedtuple('Decoration', ['name',
                                        'image',
                                        'walkable',
                                        'removeWithSearch',
-                                       'removeWithKey'], verbose=False)
+                                       'removeWithKey'])
 
 CharacterType = namedtuple('CharacterType', ['type',
-                                             'images'], verbose=False)
+                                             'images'])
 
 LeavingTransition = namedtuple('LeavingTransition', ['destMap',
                                                      'destPoint',
                                                      'destDir',
-                                                     'respawnDecorations'], verbose=False)
+                                                     'respawnDecorations'])
 
 PointTransition = namedtuple('PointTransition', ['srcPoint',
                                                  'destMap',
@@ -194,7 +194,7 @@ PointTransition = namedtuple('PointTransition', ['srcPoint',
                                                  'destDir',
                                                  'respawnDecorations',
                                                  'progressMarker',
-                                                 'inverseProgressMarker'], verbose=False)
+                                                 'inverseProgressMarker'])
 
 NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
                                                        'point',
@@ -202,20 +202,20 @@ NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
                                                        'walking',
                                                        'dialog',
                                                        'progressMarker',
-                                                       'inverseProgressMarker'], verbose=False)
+                                                       'inverseProgressMarker'])
 
 MapDecoration = namedtuple('MapDecoration', ['type',
                                              'point',
                                              'dialog',
                                              'progressMarker',
-                                             'inverseProgressMarker'], verbose=False)
+                                             'inverseProgressMarker'])
 
 SpecialMonster = namedtuple('SpecialMonster', ['name',
                                                'point',
                                                'victoryDialog',
                                                'runAwayDialog',
                                                'progressMarker',
-                                               'inverseProgressMarker'], verbose=False)
+                                               'inverseProgressMarker'])
 
 Map = namedtuple('Map', ['name',
                          'dat',
@@ -231,11 +231,11 @@ Map = namedtuple('Map', ['name',
                          'encounterImage',
                          'specialMonsters',
                          'isOutside',
-                         'origin'], verbose=False)
+                         'origin'])
 
 MonsterAction = namedtuple('MonsterAction', ['type',
                                              'probability',
-                                             'healthRatioThreshold'], verbose=False)
+                                             'healthRatioThreshold'])
 
 Monster = namedtuple('Monster', ['name',
                                  'image',
@@ -252,13 +252,13 @@ Monster = namedtuple('Monster', ['name',
                                  'xp',
                                  'minGp',
                                  'maxGp',
-                                 'monsterActions'], verbose=False)
+                                 'monsterActions'])
 
 MonsterZone = namedtuple('MonsterZone', ['x',
                                          'y',
                                          'w',
                                          'h',
-                                         'setName'], verbose=False)
+                                         'setName'])
 
 Level = namedtuple('Level', ['number',
                              'name',
@@ -266,7 +266,7 @@ Level = namedtuple('Level', ['number',
                              'strength',
                              'agility',
                              'hp',
-                             'mp'], verbose=False)
+                             'mp'])
 
 Spell = namedtuple('Spell', ['name',
                              'level',
@@ -280,26 +280,26 @@ Spell = namedtuple('Spell', ['name',
                              'minDamageByMonster',
                              'maxDamageByMonster',
                              'excludedMap',
-                             'includedMap'], verbose=False)
+                             'includedMap'])
 
 Weapon = namedtuple('Weapon', ['name',
                                'attackBonus',
-                               'gp'], verbose=False)
+                               'gp'])
 
 Helm = namedtuple('Helm', ['name',
                            'defenseBonus',
-                           'gp'], verbose=False)
+                           'gp'])
 
 Armor = namedtuple('Armor', ['name',
                              'defenseBonus',
                              'gp',
                              'ignoresTilePenalties',
                              'hurtDmgModifier',
-                             'hpRegenTiles'], verbose=False) # TODO: Add fireDmbModified, stopspellBlock
+                             'hpRegenTiles']) # TODO: Add fireDmbModified, stopspellBlock
 
 Shield = namedtuple('Shield', ['name',
                                'defenseBonus',
-                               'gp'], verbose=False)
+                               'gp'])
 
 # Tool as class as the namedtuple variant wasn't hashable for use in a dict
 class Tool:
@@ -320,7 +320,7 @@ MapImageInfo = namedtuple('MapImageInfo', ['mapName',
                                            'mapImage',
                                            'mapImageSize_tiles',
                                            'mapImageSize_pixels',
-                                           'mapOverlayImage'], verbose=False)
+                                           'mapOverlayImage'])
 
 # TODO: Where to put this???
 import pygame
