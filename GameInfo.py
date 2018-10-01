@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# Imports to support type annotations
+from __future__ import annotations
+from typing import Dict, Optional, Tuple, Union
+
 import os
 import math
 import random
@@ -16,10 +20,10 @@ from Point import Point
 class GameInfo:
    TRANSPARENT_COLOR = pygame.Color(0, 128, 128)
    
-   def __init__(self, basePath, gameXmlPath, tileSize_pixels, savedGameFile = None):
+   def __init__(self, basePath: str, gameXmlPath: str, tileSize_pixels: int, savedGameFile: Optional[str] = None) -> None:
 
       self.tileSize_pixels = tileSize_pixels
-      self.dialogSequences = {}
+      self.dialogSequences = {} # TODO: Document this type
 
       # TODO: Need to determine a method for determining how much to scale the monster images
       monsterScaleFactor = 4
@@ -44,10 +48,10 @@ class GameInfo:
       audioPlayer.setSoundPath( soundPath )
 
       # Parse items
-      self.items = {}
+      self.items: Dict[str, Union[Weapon, Armor, Shield, Tool]] = {}
 
       # Parse weapons
-      self.weapons = {}
+      self.weapons: Dict[str, Weapon] = {}
       for element in xmlRoot.findall("./Items/Weapons/Weapon"):
          itemName = element.attrib['name']
          self.weapons[itemName] = Weapon(
@@ -57,7 +61,7 @@ class GameInfo:
          self.items[itemName] = self.weapons[itemName]
          
       # Parse armors
-      self.armors = {}
+      self.armors: Dict[str, Armor] = {}
       for element in xmlRoot.findall("./Items/Armors/Armor"):
          itemName = element.attrib['name']
          self.armors[itemName] = Armor(
@@ -70,7 +74,7 @@ class GameInfo:
          self.items[itemName] = self.armors[itemName]
          
       # Parse shields
-      self.shields = {}
+      self.shields: Dict[str, Shield] = {}
       for element in xmlRoot.findall("./Items/Shields/Shield"):
          itemName = element.attrib['name']
          self.shields[itemName] = Shield(
@@ -80,7 +84,7 @@ class GameInfo:
          self.items[itemName] = self.shields[itemName]
          
       # Parse tools
-      self.tools = {}
+      self.tools: Dict[str, Tool] = {}
       for element in xmlRoot.findall("./Items/Tools/Tool"):
          itemName = element.attrib['name']
          attackBonus = 0
@@ -104,8 +108,8 @@ class GameInfo:
          self.items[itemName] = self.tools[itemName]
 
       # Parse tiles
-      self.tileSymbols = {}
-      self.tiles = {}
+      self.tileSymbols: Dict[str, str] = {} # tile symbol to tile name map
+      self.tiles: Dict[str, Tile] = {}
       for element in xmlRoot.findall("./Tiles/Tile"):
          tileName = element.attrib['name']
          tileSymbol = element.attrib['symbol']
@@ -152,7 +156,7 @@ class GameInfo:
          self.tiles[tileName] = Tile(tileName, tileSymbol, tileImageScaled, tileWalkable, canTalkOver, hpPenalty, mpPenalty, speed, spawnRate, specialEdges)
 
       # Parse decorations
-      self.decorations = {}
+      self.decorations: Dict[str, Decoration] = {}
       for element in xmlRoot.findall("./Decorations/Decoration"):
          decorationName = element.attrib['name']
          widthTiles = 1
@@ -185,7 +189,7 @@ class GameInfo:
          self.decorations[decorationName] = Decoration(decorationName, decorationImageScaled, walkable, removeWithSearch, removeWithKey )
 
       # Parse characters
-      self.characterTypes = {}
+      self.characterTypes: Dict[str, CharacterType] = {}
       for element in xmlRoot.findall("./CharacterTypes/CharacterType"):
          characterType = element.attrib['type']
          characterTypeFileName = os.path.join( characterPath, element.attrib['image'] )
@@ -210,7 +214,7 @@ class GameInfo:
          self.characterTypes[characterType]=CharacterType(characterType, characterTypeImages)
 
       # Parse maps
-      self.maps = {}
+      self.maps: Dict[str, Map] = {}
       for element in xmlRoot.findall("./Maps/Map"):
          mapName = element.attrib['name']
          #print( 'mapName =', mapName, flush=True )
@@ -454,17 +458,17 @@ class GameInfo:
             monsterActions )
          
       # Parse monster sets
-      self.monsterSets = {}
+      self.monsterSets: Dict[str, List[str]] = {}
       for element in xmlRoot.findall("./MonsterSets/MonsterSet"):
-         monsters = []
+         monsters: List[str] = []
          for monsterElement in element.findall("./Monster"):
             monsters.append( monsterElement.attrib['name'] )
          self.monsterSets[ element.attrib['name'] ] = monsters
 
       # Parse levels
-      self.levels = []
-      self.levelsByName = {}
-      self.levelsByNumber = {}
+      self.levels: List[Level] = []
+      self.levelsByName: Dict[str, Level] = {}
+      self.levelsByNumber: Dict[int, Level] = {}
       for element in xmlRoot.findall("./Levels/Level"):
          levelName = element.attrib['name']
          levelNumber = len(self.levels)
@@ -481,7 +485,7 @@ class GameInfo:
          self.levelsByNumber[ levelNumber ] = level
 
       # Parse spells
-      self.spells = {}
+      self.spells: Dict[str, Spell] = {}
       for element in xmlRoot.findall("./Spells/Spell"):
          spellName = element.attrib['name']
          availableInCombat = True
@@ -525,7 +529,7 @@ class GameInfo:
             includedMap )
          
       # Parse initial game state
-      self.pc_name = None
+      self.pc_name: Optional[str] = None
       
       initialStateElement = xmlRoot.find('InitialState')
       if savedGameFile is not None:
@@ -608,14 +612,16 @@ class GameInfo:
       self.deathHeroPos_dir = Direction[deathStateElement.attrib['dir']]
       self.deathDialog = self.parseDialog( deathStateElement )
 
-   def parseFloat(value):
+   @staticmethod
+   def parseFloat(value: Union[str, float, int]) -> float:
       if isinstance(value, str) and '/' in value:
          retVal = int(value.split('/')[0]) / int(value.split('/')[1])
       else:
          retVal = float(value)
       return retVal
 
-   def parseIntRange(value):
+   @staticmethod
+   def parseIntRange(value: Union[str, int]) -> Tuple[int, int]:
       if isinstance(value, str) and '-' in value:
          minVal = int(value.split('-')[0])
          maxVal = int(value.split('-')[1])

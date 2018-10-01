@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import Any, List, Union
+from typing import Any, List, Optional
 
 from typing import NamedTuple
 from dataclasses import dataclass
@@ -95,24 +95,24 @@ class DialogVendorSellOptions:
 class DialogCheck:
    type: DialogCheckEnum
    failedCheckDialog: Any # TODO: Better document this type
-   name: Union[None, str] = None
+   name: Optional[str] = None
    count: int = 1
-   mapName: Union[None, str] = None
-   mapPos: Union[None, Point] = None
+   mapName: Optional[str] = None
+   mapPos: Optional[Point] = None
 
 # Conditionally branch dialog if the check condition is not met
 @dataclass
 class DialogAction:
    type: DialogActionEnum
-   name: Union[None, str] = None
+   name: Optional[str] = None
    count: int = 1
-   decaySteps: Union[None, int] = None
-   mapName: Union[None, str] = None
-   mapPos: Union[None, Point] = None
-   mapDir: Union[None, Direction] = None
+   decaySteps: Optional[int] = None
+   mapName: Optional[str] = None
+   mapPos: Optional[Point] = None
+   mapDir: Optional[Direction] = None
    victoryDialog: Any = None # TODO: Better document this type
    runAwayDialog: Any = None # TODO: Better document this type
-   encounterMusic: Union[None, str] = None
+   encounterMusic: Optional[str] = None
 
 # Set a variaable to be used in substitution for the remainder of the dialog session
 @dataclass
@@ -258,20 +258,19 @@ Shield = namedtuple('Shield', ['name',
                                'defenseBonus',
                                'gp'])
 
-# Tool as class as the namedtuple variant wasn't hashable for use in a dict
+@dataclass
 class Tool:
-   def __init__(self, name, attackBonus, defenseBonus, gp, droppable, equippable, useDialog):
-      self.name = name
-      self.attackBonus = attackBonus
-      self.defenseBonus = defenseBonus
-      self.gp = gp
-      self.droppable = droppable
-      self.equippable = equippable
-      self.useDialog = useDialog
+   name: str
+   attackBonus: int
+   defenseBonus: int
+   gp: int
+   droppable: bool
+   equippable: bool
+   useDialog: Any # TODO: Better document this type
+
+   def __hash__(self):
+      return hash('Tool:' + self.name)
       
-   def __str__(self):
-      return "%s(%s, %s, %s, %s, %s, %s, %s)" % (self.__class__.__name__, self.name, self.attackBonus, self.defenseBonus, self.gp, self.droppable, self.equippable, self.useDialog)
-   
 
 MapImageInfo = namedtuple('MapImageInfo', ['mapName',
                                            'mapImage',
@@ -281,7 +280,7 @@ MapImageInfo = namedtuple('MapImageInfo', ['mapName',
 
 # TODO: Where to put this???
 import pygame
-def scroll_view(screen, image, direction, view_rect, zoom_factor, imagePxStepSize, update = False):
+def scroll_view(screen, image, direction: Direction, view_rect, zoom_factor: int, imagePxStepSize: int, update: bool = False) -> None:
    dx = dy = 0
    src_rect = None
    zoom_view_rect = screen.get_clip()
@@ -330,11 +329,8 @@ def scroll_view(screen, image, direction, view_rect, zoom_factor, imagePxStepSiz
       if update:
          pygame.display.update(zoom_view_rect)
 
-def main():
-   dv1 = DialogVariable( '1', '2' )
-   print( dv1, type(dv1.value), flush=True )
-   dv2 = DialogVariable( '1', 2 )
-   print( dv2, type(dv2.value), flush=True )
+def main() -> None:
+   pass
 
 if __name__ == '__main__':
    try:
