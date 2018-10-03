@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import Any, List, Optional
+from __future__ import annotations
+from typing import Any, Dict, List, Optional, Union
 
 from typing import NamedTuple
 from dataclasses import dataclass
@@ -75,6 +76,16 @@ class MonsterActionEnum(Enum):
    BREATH_STRONG_FIRE = 8
    ATTACK = 9
 
+# Dialog type
+DialogType = List[Union[str,
+                        Dict[str, 'DialogType'],
+                        'DialogGoTo',
+                        'DialogVendorBuyOptions',
+                        'DialogVendorSellOptions',
+                        'DialogCheck',
+                        'DialogAction',
+                        'DialogVariable']]
+
 # Dialog to branch to a labeled dialog state
 @dataclass
 class DialogGoTo:
@@ -83,20 +94,28 @@ class DialogGoTo:
 # Dialog for a list of vendor buy options
 @dataclass
 class DialogVendorBuyOptions:
-   nameAndGpRowData: List[List[str]] # List of items that can be bought from the vendor where each item is a 2 element list: item name and gold cost (as str)
-
+   # List of items that can be bought from the vendor where each item is a 2 element list: item name and gold cost (as str)
+   # Optionally could also be a string for replacement by a DialogVariable
+   DialogVendorBuyOptionsParamWithoutReplacementType = List[List[str]]
+   DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
+   nameAndGpRowData: DialogVendorBuyOptionsParamType
+   
 # Dialog for a list of vendor sell options
 @dataclass
 class DialogVendorSellOptions:
-   itemTypes: List[str] # List of the classes of items that can be sold to the vendor
+   # List of the classes of items that can be sold to the vendor
+   # Optionally could also be a string for replacement by a DialogVariable
+   DialogVendorSellOptionsParamWithoutReplacemenType = List[str]
+   DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacemenType, str]
+   itemTypes: DialogVendorSellOptionsParamType
 
 # Conditionally branch dialog if the check condition is not met
 @dataclass
 class DialogCheck:
    type: DialogCheckEnum
-   failedCheckDialog: Any # TODO: Better document this type
+   failedCheckDialog: Optional[DialogType]
    name: Optional[str] = None
-   count: int = 1
+   count: Union[int, str] = 1
    mapName: Optional[str] = None
    mapPos: Optional[Point] = None
 
@@ -105,20 +124,23 @@ class DialogCheck:
 class DialogAction:
    type: DialogActionEnum
    name: Optional[str] = None
-   count: int = 1
+   count: Union[int, str] = 1
    decaySteps: Optional[int] = None
    mapName: Optional[str] = None
    mapPos: Optional[Point] = None
    mapDir: Optional[Direction] = None
-   victoryDialog: Any = None # TODO: Better document this type
-   runAwayDialog: Any = None # TODO: Better document this type
+   victoryDialog: Optional[DialogType] = None
+   runAwayDialog: Optional[DialogType] = None
    encounterMusic: Optional[str] = None
 
 # Set a variaable to be used in substitution for the remainder of the dialog session
 @dataclass
 class DialogVariable:
    name: str
-   value: str
+   DialogVariableValueType = Union[str,
+                                   DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType,
+                                   DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType]
+   value: DialogVariableValueType
 
 Tile = namedtuple('Tile', ['name',
                            'symbol',
@@ -261,15 +283,17 @@ Shield = namedtuple('Shield', ['name',
 @dataclass
 class Tool:
    name: str
-   attackBonus: int
-   defenseBonus: int
-   gp: int
-   droppable: bool
-   equippable: bool
-   useDialog: Any # TODO: Better document this type
+   attackBonus: int = 0
+   defenseBonus: int = 0
+   gp: int = 0
+   droppable: bool = True
+   equippable: bool = False
+   useDialog: Optional[DialogType] = None
 
-   def __hash__(self):
+   def __hash__(self) -> int:
       return hash('Tool:' + self.name)
+
+ItemType = Union[Weapon, Helm, Armor, Shield, Tool]
       
 
 MapImageInfo = namedtuple('MapImageInfo', ['mapName',
@@ -280,7 +304,13 @@ MapImageInfo = namedtuple('MapImageInfo', ['mapName',
 
 # TODO: Where to put this???
 import pygame
-def scroll_view(screen, image, direction: Direction, view_rect, zoom_factor: int, imagePxStepSize: int, update: bool = False) -> None:
+def scroll_view(screen: pygame.Surface,
+                image: pygame.Surface,
+                direction: Direction,
+                view_rect: pygame.Rect,
+                zoom_factor: int,
+                imagePxStepSize: int,
+                update: bool = False) -> None:
    dx = dy = 0
    src_rect = None
    zoom_view_rect = screen.get_clip()

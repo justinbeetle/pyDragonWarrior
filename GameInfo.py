@@ -23,7 +23,7 @@ class GameInfo:
    def __init__(self, basePath: str, gameXmlPath: str, tileSize_pixels: int, savedGameFile: Optional[str] = None) -> None:
 
       self.tileSize_pixels = tileSize_pixels
-      self.dialogSequences = {} # TODO: Document this type
+      self.dialogSequences: Dict[str, DialogType] = {}
 
       # TODO: Need to determine a method for determining how much to scale the monster images
       monsterScaleFactor = 4
@@ -48,7 +48,7 @@ class GameInfo:
       audioPlayer.setSoundPath( soundPath )
 
       # Parse items
-      self.items: Dict[str, Union[Weapon, Armor, Shield, Tool]] = {}
+      self.items: Dict[str, ItemType] = {}
 
       # Parse weapons
       self.weapons: Dict[str, Weapon] = {}
@@ -233,10 +233,10 @@ class GameInfo:
          # Parse transitions
          #print( 'Parse transitions', flush=True )
          leavingTransition = None
-         pointTransitions = []
-         mapDecorations = []
+         pointTransitions: List[PointTransition] = []
+         mapDecorations: List[MapDecoration] = []
          transElement = element.find('LeavingTransition')
-         if transElement != None:
+         if transElement is not None:
             respawnDecorations = False
             if 'respawnDecorations' in transElement.attrib:
                respawnDecorations = transElement.attrib['respawnDecorations'] == 'yes'
@@ -266,12 +266,12 @@ class GameInfo:
                                                       progressMarker,
                                                       inverseProgressMarker ) )
             if 'decoration' in transElement.attrib and transElement.attrib['decoration'] != 'None':
-               decorationType = transElement.attrib['decoration']
+               decorationType: Optional[str] = transElement.attrib['decoration']
                mapDecorations.append( MapDecoration( decorationType, fromPoint, None, progressMarker, inverseProgressMarker ) )
 
          # Parse NPCs
          #print( 'Parse NPCs', flush=True )
-         nonPlayerCharacters = []
+         nonPlayerCharacters: List[NonPlayerCharacter] = []
          for npcElement in element.findall('NonPlayerCharacter'):
             progressMarker = None
             if 'progressMarker' in npcElement.attrib:
@@ -310,7 +310,7 @@ class GameInfo:
 
          # Parse special monsters
          #print( 'Parse special monsters', flush=True )
-         specialMonsters = []
+         specialMonsters: List[SpecialMonster] = []
          for monsterElement in element.findall('Monster'):
             #print( 'monsterElement =', monsterElement, flush=True )
             #print( 'monsterElement.attrib =', monsterElement.attrib, flush=True )
@@ -409,10 +409,12 @@ class GameInfo:
 
       # Parse dialog scripts
       for element in xmlRoot.findall("./DialogScripts/DialogScript"):
-         self.dialogSequences[ element.attrib['label'] ] = self.parseDialog( element )
+         dialogScript = self.parseDialog( element )
+         if dialogScript is not None:
+            self.dialogSequences[ element.attrib['label'] ] = dialogScript
 
       # Parse monsters
-      self.monsters = {}
+      self.monsters: Dict[str, Monster] = {}
       for element in xmlRoot.findall("./Monsters/Monster"):
          monsterName = element.attrib['name']
 
@@ -530,7 +532,6 @@ class GameInfo:
          
       # Parse initial game state
       self.pc_name: Optional[str] = None
-      
       initialStateElement = xmlRoot.find('InitialState')
       if savedGameFile is not None:
          saveGameFilePath = os.path.join( self.savesPath, savedGameFile + '.xml' )
@@ -539,6 +540,9 @@ class GameInfo:
             initialStateElement = xml.etree.ElementTree.parse(saveGameFilePath).getroot()
          else:
             self.pc_name = savedGameFile
+      if initialStateElement is None:
+         print('ERROR: InitialState element is missing', flush=True)
+         raise Exception('Missing required InitialState element')
          
       self.initialMap = initialStateElement.attrib['map']
       self.initialHeroPos_datTile = Point(
@@ -557,10 +561,10 @@ class GameInfo:
          self.pc_hp = int(initialStateElement.attrib['hp'])
       if 'mp' in initialStateElement.attrib:
          self.pc_mp = int(initialStateElement.attrib['mp'])
-      self.pc_weapon = None
-      self.pc_armor = None
-      self.pc_shield = None
-      self.pc_otherEquippedItems = []
+      self.pc_weapon: Optional[Weapon] = None
+      self.pc_armor: Optional[Armor] = None
+      self.pc_shield: Optional[Shield] = None
+      self.pc_otherEquippedItems: List[ItemType] = []
       for itemElement in initialStateElement.findall("./EquippedItems/Item"):
          itemName = itemElement.attrib['name']
          if itemName in self.weapons:
@@ -574,7 +578,7 @@ class GameInfo:
          else:
             print( 'ERROR: Unsupported item', itemName, flush=True )
             
-      self.pc_unequippedItems = {}
+      self.pc_unequippedItems: Dict[ItemType, int] = {}
       for itemElement in initialStateElement.findall("./UnequippedItems/Item"):
          itemName = itemElement.attrib['name']
          itemCount = 1
@@ -585,12 +589,12 @@ class GameInfo:
          else:
             print( 'ERROR: Unsupported item', itemName, flush=True )
 
-      self.pc_progressMarkers = []
+      self.pc_progressMarkers: List[str] = []
       for progressMarkerElement in initialStateElement.findall("./ProgressMarkers/ProgressMarker"):
          self.pc_progressMarkers.append( progressMarkerElement.attrib['name'] )
          #print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
       
-      self.initialMapDecorations = []
+      self.initialMapDecorations: List[MapDecoration] = []
       for decorationElement in initialStateElement.findall("./MapDecoration"):
          decorationType = None
          if 'type' in decorationElement.attrib and decorationElement.attrib['type'] != 'None':
@@ -605,6 +609,9 @@ class GameInfo:
 
       # Parse death state
       deathStateElement = xmlRoot.find('DeathState')
+      if deathStateElement is None:
+         print('ERROR: DeathState element is missing', flush=True)
+         raise Exception('Missing required DeathState element')
       self.deathMap = deathStateElement.attrib['map']
       self.deathHeroPos_datTile = Point(
          int(deathStateElement.attrib['x']),
@@ -629,8 +636,10 @@ class GameInfo:
          minVal = maxVal = int(value)
       return (minVal, maxVal)
 
-   def parseDialog( self, dialogRootElement ):
-      dialog = []
+   def parseDialog( self, dialogRootElement: Optional[xml.etree.ElementTree.Element] ) -> Optional[DialogType]:
+      if dialogRootElement is None:
+         return None
+      dialog: DialogType = []
       for element in dialogRootElement:
          #print( 'in parseDialog: element =', element, flush=True )
          
@@ -642,7 +651,7 @@ class GameInfo:
          if 'name' in element.attrib:
             name = element.attrib['name']
             
-         count = 1
+         count: Union[int, str] = 1
          if 'count' in element.attrib:
             if 'unlimited' == element.attrib['count'] or ( '[' == element.attrib['count'][0] and ']' == element.attrib['count'][-1] ):
                count = element.attrib['count']
@@ -667,27 +676,34 @@ class GameInfo:
             mapDir = Direction[element.attrib['dir']]
                
          if element.tag == 'DialogGoTo':
-            dialog.append( DialogGoTo( label ) )
+            if label is not None:
+               dialog.append( DialogGoTo( label ) )
             
          elif element.tag == 'Dialog':
-            dialog.append( element.text )
-            if label is not None:
-               self.dialogSequences[label] = element.text
+            if element.text is not None:
+               dialog.append( element.text )
+               if label is not None:
+                  self.dialogSequences[label] = [element.text]
             
          elif element.tag == 'DialogOptions':
             dialogOptions = {}
             for optionElement in element.findall("./DialogOption"):
                dialogOption = self.parseDialog( optionElement )
-               dialogOptions[ optionElement.attrib['name'] ] = dialogOption
-               if 'label' in optionElement.attrib:
-                  self.dialogSequences[ optionElement.attrib['label'] ] = dialogOption
-            dialog.append( dialogOptions )
-            if label is not None:
-               self.dialogSequences[label] = dialogOptions
+               if dialogOption is not None:
+                  dialogOptions[ optionElement.attrib['name'] ] = dialogOption
+                  dialogOptionLabel = None
+                  if 'label' in optionElement.attrib:
+                     dialogOptionLabel = optionElement.attrib['label']
+                     if dialogOptionLabel is not None:
+                        self.dialogSequences[ optionElement.attrib['label'] ] = dialogOption
+            if len(dialogOptions) > 0:
+               dialog.append( dialogOptions )
+               if label is not None:
+                  self.dialogSequences[label] = [dialogOptions]
             
          elif element.tag == 'DialogVendorBuyOptions':
             if 'values' in element.attrib:
-               dialogVendorBuyOptions = element.attrib['values']
+               dialogVendorBuyOptions: DialogVendorBuyOptions.DialogVendorBuyOptionsParamType = element.attrib['values']
             else:
                dialogVendorBuyOptions = []
                for optionElement in element.findall("./DialogVendorBuyOption"):
@@ -700,7 +716,7 @@ class GameInfo:
             
          elif element.tag == 'DialogVendorSellOptions':
             if 'values' in element.attrib:
-               dialogVendorSellOptions = element.attrib['values']
+               dialogVendorSellOptions: DialogVendorSellOptions.DialogVendorSellOptionsParamType = element.attrib['values']
             else:
                dialogVendorSellOptions = []
                for optionElement in element.findall("./DialogVendorSellOption"):
@@ -716,11 +732,11 @@ class GameInfo:
                                         mapPos = mapPos ) )
             
          elif element.tag == 'DialogAction':
-            victoryDialog = None
+            victoryDialog: Optional[DialogType] = None
             if 'victoryDialogScript' in element.attrib:
                victoryDialog = [ DialogGoTo( element.attrib['victoryDialogScript'] ) ]
                
-            runAwayDialog = None
+            runAwayDialog: Optional[DialogType] = None
             if 'runAwayDialogScript' in element.attrib:
                runAwayDialog = [ DialogGoTo( element.attrib['runAwayDialogScript'] ) ]
 
@@ -742,25 +758,28 @@ class GameInfo:
             name = element.attrib['name']
             value = element.attrib['value']
             if value == 'ITEM_LIST':
-               value = []
+               valueForDialogVendorBuyOptions: DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType = []
                for itemElement in element.findall("./Item"):
                   itemName = itemElement.attrib['name']
                   itemGp = self.items[itemName].gp
                   if 'gp' in itemElement.attrib:
                      itemGp = itemElement.attrib['gp']
-                  value.append( [itemName, str(itemGp)] )
+                  valueForDialogVendorBuyOptions.append( [itemName, str(itemGp)] )
+               dialog.append( DialogVariable( name, valueForDialogVendorBuyOptions ) )
             elif value == 'INVENTORY_ITEM_TYPE_LIST':
-               value = []
+               valueForDialogVendorSellOptions: DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType = []
                for itemTypeElement in element.findall("./InventoryItemType"):
-                  value.append( itemTypeElement.attrib['type'] )
-            dialog.append( DialogVariable( name, value ) )
+                  valueForDialogVendorSellOptions.append( itemTypeElement.attrib['type'] )
+               dialog.append( DialogVariable( name, valueForDialogVendorSellOptions ) )
+            else:
+               dialog.append( DialogVariable( name, value ) )
 
-      if 0 == len(dialog):
-         dialog = None
+      if len(dialog) > 0:
+         return dialog
       
-      return dialog
+      return None
 
-   def getCastableSpellNames(self, isInCombat, level, availableMp, mapName):
+   def getCastableSpellNames(self, isInCombat: bool, level: Level, availableMp: int, mapName: str) -> List[str]:
       availableSpells = []
       for spellName in self.spells:
          spell = self.spells[ spellName ]
@@ -773,7 +792,7 @@ class GameInfo:
             availableSpells.append( spell.name )
       return availableSpells
 
-   def getAvailableSpellNames(self, level):
+   def getAvailableSpellNames(self, level: Level) -> List[str]:
       availableSpells = []
       for spellName in self.spells:
          spell = self.spells[ spellName ]
@@ -781,7 +800,7 @@ class GameInfo:
             availableSpells.append( spell.name )
       return availableSpells
 
-   def getMapImageInfo(self, mapName, imagePad_tiles = Point(0,0), mapDecorations = None ):
+   def getMapImageInfo(self, mapName: str, imagePad_tiles: Point = Point(0,0), mapDecorations: Optional[List[MapDecoration]] = None ) -> MapImageInfo:
       
       # Determine the size of the map image then initialize
       # The size of the image is padded by imagePad_tiles in all directions
@@ -814,17 +833,17 @@ class GameInfo:
       # Return the map image info
       return MapImageInfo(mapName, mapImage, mapImageSize_tiles, mapImageSize_pixels, mapOverlayImage)
 
-   def getMapImage(self, mapName, imagePad_tiles, mapDecorations, mapImageSize_pixels, dat, fillColor ):
+   def getMapImage(self, mapName: str, imagePad_tiles: Point, mapDecorations: Optional[List[MapDecoration]], mapImageSize_pixels: Point, dat: List[str], fillColor: pygame.Color ) -> pygame.Surface:
       mapImage = pygame.Surface( mapImageSize_pixels )
       mapImage.fill( fillColor )
 
       # Blit the padded portions of the image
       lastCol = self.maps[mapName].size[0]-1
       lastRow = self.maps[mapName].size[1]-1
-      for x in range(imagePad_tiles.x):
-         xW_px = x * self.tileSize_pixels
-         xE_px  = (x + imagePad_tiles.x + self.maps[mapName].size[0]) * self.tileSize_pixels
-         for y in range(imagePad_tiles.y):
+      for x in range(int(imagePad_tiles.x)):
+         xW_px = int(x * self.tileSize_pixels)
+         xE_px  = int((x + imagePad_tiles.x + self.maps[mapName].size[0]) * self.tileSize_pixels)
+         for y in range(int(imagePad_tiles.y)):
             # Blit corners
             yN_px = y * self.tileSize_pixels
             yS_px  = (y + imagePad_tiles.y + self.maps[mapName].size[1]) * self.tileSize_pixels
@@ -850,7 +869,7 @@ class GameInfo:
                   mapImage.blit( self.tiles[self.tileSymbols[dat[lastRow][lastCol]]].image,    (xE_px, yS_px) ) # SE pad
          for y in range(self.maps[mapName].size[1]):
             # Blit sides
-            y_px = (y + imagePad_tiles.y) * self.tileSize_pixels
+            y_px = int((y + imagePad_tiles.y) * self.tileSize_pixels)
             if dat[y][0] in self.tileSymbols:
                if self.tiles[self.tileSymbols[dat[y][0]]].specialEdges:
                   mapImage.blit( self.tiles[self.tileSymbols[dat[y][0]]].image[0],             (xW_px, y_px) )  # W pad
@@ -861,12 +880,12 @@ class GameInfo:
                   mapImage.blit( self.tiles[self.tileSymbols[dat[y][lastCol]]].image[0],       (xE_px, y_px) )  # E pad
                else:
                   mapImage.blit( self.tiles[self.tileSymbols[dat[y][lastCol]]].image,          (xE_px, y_px) )  # E pad
-      for y in range(imagePad_tiles.y):
-         yN_px = y * self.tileSize_pixels
-         yS_px = (y + imagePad_tiles.y + self.maps[mapName].size[1]) * self.tileSize_pixels
+      for y in range(int(imagePad_tiles.y)):
+         yN_px = int(y * self.tileSize_pixels)
+         yS_px = int((y + imagePad_tiles.y + self.maps[mapName].size[1]) * self.tileSize_pixels)
          for x in range(self.maps[mapName].size[0]):
             # Blit the top and bottom
-            x_px = (x + imagePad_tiles.x) * self.tileSize_pixels
+            x_px = int((x + imagePad_tiles.x) * self.tileSize_pixels)
             if dat[0][x] in self.tileSymbols:
                if self.tiles[self.tileSymbols[dat[0][x]]].specialEdges:
                   mapImage.blit( self.tiles[self.tileSymbols[dat[0][x]]].image[0],             (x_px, yN_px) )  # N pad
@@ -880,11 +899,11 @@ class GameInfo:
 
       # Blit the map data portion of the image
       for y, rowData in enumerate(dat):
-         y_px = (y + imagePad_tiles.y) * self.tileSize_pixels
+         y_px = int((y + imagePad_tiles.y) * self.tileSize_pixels)
          for x, tileSymbol in enumerate(rowData):
             if tileSymbol not in self.tileSymbols:
                continue
-            x_px = (x + imagePad_tiles.x) * self.tileSize_pixels
+            x_px = int((x + imagePad_tiles.x) * self.tileSize_pixels)
             if self.tiles[self.tileSymbols[tileSymbol]].specialEdges:
                # Determine which image to use
                imageIdx = 0
@@ -897,29 +916,32 @@ class GameInfo:
                   imageIdx += 1
                if x<len(rowData)-1 and rowData[x+1] != tileSymbol and rowData[x+1] != 'b':
                   imageIdx += 4
-               mapImage.blit( self.tiles[self.tileSymbols[tileSymbol]].image[imageIdx],                        (x_px, y_px) )   # data
+               mapImage.blit( self.tiles[self.tileSymbols[tileSymbol]].image[imageIdx],        (x_px, y_px) )   # data
             else:
-               mapImage.blit( self.tiles[self.tileSymbols[tileSymbol]].image,                                  (x_px, y_px) )   # data
+               mapImage.blit( self.tiles[self.tileSymbols[tileSymbol]].image,                  (x_px, y_px) )   # data
 
       # Blit the decoration on the image
-      for mapDecoration in mapDecorations:
-         if mapDecoration.type is None:
-            continue
-         decoration = self.decorations[mapDecoration.type]
-         tilePosition_px = (mapDecoration.point + imagePad_tiles) * self.tileSize_pixels
-         x_px = tilePosition_px.x + (self.tileSize_pixels - decoration.image.get_width()) / 2
-         y_px = tilePosition_px.y + self.tileSize_pixels - decoration.image.get_height()
-         mapImage.blit( decoration.image,                                                                      (x_px, y_px) )   # decoration
+      if mapDecorations is not None:
+         for mapDecoration in mapDecorations:
+            if mapDecoration.type is None:
+               continue
+            decoration = self.decorations[mapDecoration.type]
+            tilePosition_px = (mapDecoration.point + imagePad_tiles) * self.tileSize_pixels
+            x_px = int(tilePosition_px.x + (self.tileSize_pixels - decoration.image.get_width()) / 2)
+            y_px = int(tilePosition_px.y + self.tileSize_pixels - decoration.image.get_height())
+            mapImage.blit( decoration.image,                                                   (x_px, y_px) )   # decoration
 
       return mapImage
 
-   def getExteriorImage( mapImageInfo ):
+   @staticmethod
+   def getExteriorImage( mapImageInfo: MapImageInfo ) -> pygame.Surface:
       mapImage = mapImageInfo.mapImage.copy()
       if mapImageInfo.mapOverlayImage is not None:
          mapImage.blit( mapImageInfo.mapOverlayImage, (0,0) )
       return mapImage
 
-   def getInteriorImage( mapImageInfo ):
+   @staticmethod
+   def getInteriorImage( mapImageInfo: MapImageInfo ) -> pygame.Surface:
       mapImage = None
       if mapImageInfo.mapOverlayImage is not None:
          mapImage = mapImageInfo.mapImage.copy()
@@ -930,7 +952,7 @@ class GameInfo:
                                     inverse_set=True)
       return mapImage
 
-def main():
+def main() -> None:
    # Initialize pygame
    pygame.init()
    audioPlayer = AudioPlayer()
