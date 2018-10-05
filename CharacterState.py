@@ -17,7 +17,13 @@ import pygame
 from AudioPlayer import AudioPlayer
 
 class CharacterState:
-   def __init__(self, type: str, pos_datTile: Point, dir: Direction, name: Optional[str], level: Optional[Level], npcInfo: Optional[NonPlayerCharacter] = None ) -> None:
+   def __init__( self,
+                 type: str,
+                 pos_datTile: Point,
+                 dir: Direction,
+                 name: Optional[str],
+                 level: Optional[Level],
+                 npcInfo: Optional[NonPlayerCharacter] = None ) -> None:
       self.type = type
       self.currPos_datTile = Point( pos_datTile )
       self.destPos_datTile = Point( pos_datTile )
@@ -29,18 +35,16 @@ class CharacterState:
          self.name = name
       else:
          self.name = 'Unnamed'
-         
-      self.level = level
+
       if level is not None:
-         self.hp = level.hp
-         self.mp = level.mp
-         self.gp = 0
-         self.xp = level.xp
+         self.level = level
       else:
-         self.hp = 1
-         self.mp = 0
-         self.gp = 0
-         self.xp = 0
+         level = Level( 0, '0', 0, 0, 0, 1, 0 )
+         
+      self.hp = level.hp
+      self.mp = level.mp
+      self.gp = 0
+      self.xp = level.xp
          
       self.weapon: Optional[Weapon] = None
 

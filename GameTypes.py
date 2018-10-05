@@ -2,9 +2,8 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Union
 
-from typing import NamedTuple
 from dataclasses import dataclass
 from collections import namedtuple
 from enum import Enum
@@ -142,143 +141,162 @@ class DialogVariable:
                                    DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType]
    value: DialogVariableValueType
 
-Tile = namedtuple('Tile', ['name',
-                           'symbol',
-                           'image',
-                           'walkable',
-                           'canTalkOver',
-                           'hpPenalty',
-                           'mpPenalty',
-                           'speed',
-                           'spawnRate',
-                           'specialEdges'])
+class Tile(NamedTuple):
+   name: str
+   symbol: str
+   image: Union[pygame.Surface, List[pygame.Surface]]
+   walkable: bool
+   canTalkOver: bool
+   hpPenalty: int
+   mpPenalty: int
+   speed: float
+   spawnRate: float
+   specialEdges: bool
 
-Decoration = namedtuple('Decoration', ['name',
-                                       'image',
-                                       'walkable',
-                                       'removeWithSearch',
-                                       'removeWithKey'])
+class Decoration(NamedTuple):
+   name: str
+   image: pygame.Surface
+   walkable: bool
+   removeWithSearch: bool
+   removeWithKey: bool
 
-CharacterType = namedtuple('CharacterType', ['type',
-                                             'images'])
+class CharacterType(NamedTuple):
+   type: str
+   images: Dict[Direction, pygame.Surface]
 
-LeavingTransition = namedtuple('LeavingTransition', ['destMap',
-                                                     'destPoint',
-                                                     'destDir',
-                                                     'respawnDecorations'])
+class LeavingTransition(NamedTuple):
+   destMap: str
+   destPoint: Point
+   destDir: Direction
+   respawnDecorations: bool
 
-PointTransition = namedtuple('PointTransition', ['srcPoint',
-                                                 'destMap',
-                                                 'destPoint',
-                                                 'destDir',
-                                                 'respawnDecorations',
-                                                 'progressMarker',
-                                                 'inverseProgressMarker'])
+class PointTransition(NamedTuple):
+   srcPoint: Point
+   destMap: src
+   destPoint: Point
+   destDir: Direction
+   respawnDecorations: bool
+   progressMarker: Optional[str]
+   inverseProgressMarker: Optional[str]
 
-NonPlayerCharacter = namedtuple('NonPlayerCharacter', ['type',
-                                                       'point',
-                                                       'dir',
-                                                       'walking',
-                                                       'dialog',
-                                                       'progressMarker',
-                                                       'inverseProgressMarker'])
+class NonPlayerCharacter(NamedTuple):
+   type: str
+   point: Point
+   dir: Direction
+   walking: bool
+   dialog: Optional[DialogType]
+   progressMarker: Optional[str]
+   inverseProgressMarker: Optional[str]
 
-MapDecoration = namedtuple('MapDecoration', ['type',
-                                             'point',
-                                             'dialog',
-                                             'progressMarker',
-                                             'inverseProgressMarker'])
+class MapDecoration(NamedTuple):
+   type: Optional[str]
+   point: Point
+   dialog: Optional[DialogType]
+   progressMarker: Optional[str]
+   inverseProgressMarker: Optional[str]
 
-SpecialMonster = namedtuple('SpecialMonster', ['name',
-                                               'point',
-                                               'victoryDialog',
-                                               'runAwayDialog',
-                                               'progressMarker',
-                                               'inverseProgressMarker'])
+class SpecialMonster(NamedTuple):
+   name: str
+   point: Point
+   victoryDialog: Optional[DialogType]
+   runAwayDialog: Optional[DialogType]
+   progressMarker: Optional[str]
+   inverseProgressMarker: Optional[str]
 
-Map = namedtuple('Map', ['name',
-                         'dat',
-                         'overlayDat',
-                         'size',
-                         'music',
-                         'lightDiameter',
-                         'leavingTransition',
-                         'pointTransitions',
-                         'nonPlayerCharacters',
-                         'mapDecorations',
-                         'monsterZones',
-                         'encounterImage',
-                         'specialMonsters',
-                         'isOutside',
-                         'origin'])
+class Map(NamedTuple):
+   name: str
+   dat: List[str]
+   overlayDat: Optional[List[str]]
+   size: Point
+   music: str
+   lightDiameter: Optional[int]
+   leavingTransition: Optional[LeavingTransition]
+   pointTransitions: List[PointTransition]
+   nonPlayerCharacters: List[NonPlayerCharacter]
+   mapDecorations: List[MapDecoration]
+   monsterZones: List[MonsterZone]
+   encounterImage: Optional[pygame.Surface]
+   specialMonsters: List[SpecialMonster]
+   isOutside: bool
+   origin: Optional[Point]
 
-MonsterAction = namedtuple('MonsterAction', ['type',
-                                             'probability',
-                                             'healthRatioThreshold'])
+class MonsterAction(NamedTuple):
+   type: MonsterActionEnum
+   probability: float
+   healthRatioThreshold: Optional[float]
 
-Monster = namedtuple('Monster', ['name',
-                                 'image',
-                                 'dmgImage',
-                                 'strength',
-                                 'agility',
-                                 'minHp',
-                                 'maxHp',
-                                 'sleepResist',
-                                 'stopspellResist',
-                                 'hurtResist',
-                                 'dodge',
-                                 'blockFactor',
-                                 'xp',
-                                 'minGp',
-                                 'maxGp',
-                                 'monsterActions'])
+class Monster(NamedTuple):
+   name: str
+   image: pygame.Surface
+   dmgImage: pygame.Surface
+   strength: int
+   agility: int
+   minHp: int
+   maxHp: int
+   sleepResist: float
+   stopspellResist: float
+   hurtResist: float
+   dodge: float
+   blockFactor: float
+   xp: int
+   minGp: int
+   maxGp: int
+   monsterActions: List[MonsterAction]
 
-MonsterZone = namedtuple('MonsterZone', ['x',
-                                         'y',
-                                         'w',
-                                         'h',
-                                         'setName'])
+class MonsterZone(NamedTuple):
+   x: int
+   y: int
+   w: int
+   h: int
+   setName: str
 
-Level = namedtuple('Level', ['number',
-                             'name',
-                             'xp',
-                             'strength',
-                             'agility',
-                             'hp',
-                             'mp'])
+class Level(NamedTuple):
+   number: int
+   name: str
+   xp: int
+   strength: int
+   agility: int
+   hp: int
+   mp: int
 
-Spell = namedtuple('Spell', ['name',
-                             'level',
-                             'mp',
-                             'availableInCombat',
-                             'availableOutsideCombat',
-                             'minHpRecover',
-                             'maxHpRecover',
-                             'minDamageByHero',
-                             'maxDamageByHero',
-                             'minDamageByMonster',
-                             'maxDamageByMonster',
-                             'excludedMap',
-                             'includedMap'])
+class Spell(NamedTuple):
+   name: str
+   level: Level
+   mp: int
+   availableInCombat: bool
+   availableOutsideCombat: bool
+   minHpRecover: int
+   maxHpRecover: int
+   minDamageByHero: int
+   maxDamageByHero: int
+   minDamageByMonster: int
+   maxDamageByMonster: int
+   excludedMap: Optional[str]
+   includedMap: Optional[str]
 
-Weapon = namedtuple('Weapon', ['name',
-                               'attackBonus',
-                               'gp'])
+class Weapon(NamedTuple):
+   name: str
+   attackBonus: int
+   gp: int
 
-Helm = namedtuple('Helm', ['name',
-                           'defenseBonus',
-                           'gp'])
+class Helm(NamedTuple):
+   name: str
+   defenseBonus: int
+   gp: int
 
-Armor = namedtuple('Armor', ['name',
-                             'defenseBonus',
-                             'gp',
-                             'ignoresTilePenalties',
-                             'hurtDmgModifier',
-                             'hpRegenTiles']) # TODO: Add fireDmbModified, stopspellBlock
+class Armor(NamedTuple):
+   name: str
+   defenseBonus: int
+   gp: int
+   ignoresTilePenalties: bool
+   hurtDmgModifier: float
+   hpRegenTiles: int
+   # TODO: Add fireDmbModified, stopspellBlock
 
-Shield = namedtuple('Shield', ['name',
-                               'defenseBonus',
-                               'gp'])
+class Shield(NamedTuple):
+   name: str
+   defenseBonus: int
+   gp: int
 
 @dataclass
 class Tool:
@@ -295,12 +313,12 @@ class Tool:
 
 ItemType = Union[Weapon, Helm, Armor, Shield, Tool]
       
-
-MapImageInfo = namedtuple('MapImageInfo', ['mapName',
-                                           'mapImage',
-                                           'mapImageSize_tiles',
-                                           'mapImageSize_pixels',
-                                           'mapOverlayImage'])
+class MapImageInfo(NamedTuple):
+   mapName: str
+   mapImage: pygame.Surface
+   mapImageSize_tiles: Point
+   mapImageSize_pixels: Point
+   mapOverlayImage: Optional[pygame.Surface]
 
 # TODO: Where to put this???
 import pygame

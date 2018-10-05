@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# Imports to support type annotations
+from __future__ import annotations
+from typing import Dict, Optional, Tuple, Union
+
 import os
 import math
 
@@ -19,12 +23,14 @@ class GameDialog:
    tileSize_pixels = 48
    fontSize = 32
    fontColor = pygame.Color('white')
-   font = None
+   font: Optional[pygame.Font] = None
    outsideSpacing_pixels = 24
    internalSpacing_pixels = 10
    selectionIndicator_pixels = 16
-   
-   def init( winSize_tiles, tileSize_pixels ):
+
+   @staticmethod
+   def init( winSize_tiles: Point,
+             tileSize_pixels: int ) -> None:
       GameDialog.winSize_tiles = winSize_tiles
       GameDialog.tileSize_pixels = tileSize_pixels
       #GameDialog.fontSize = 1
@@ -40,7 +46,10 @@ class GameDialog:
       GameDialog.font = pygame.font.SysFont( 'arial', GameDialog.fontSize )
       #GameDialog.font = pygame.font.Font( None, GameDialog.tileSize_pixels )
 
-   def getSizeForContent(longestString, numRows, title):
+   @staticmethod
+   def getSizeForContent( longestString: str,
+                          numRows: int,
+                          title: Optional[str] ) -> Point:
       width_pixels = 2*GameDialog.outsideSpacing_pixels + GameDialog.font.size(longestString)[0]
       if title is not None:
          height_pixels = GameDialog.outsideSpacing_pixels + (numRows+1) * GameDialog.font.get_height() + numRows * GameDialog.internalSpacing_pixels
@@ -48,7 +57,11 @@ class GameDialog:
          height_pixels = 2*GameDialog.outsideSpacing_pixels + numRows * GameDialog.font.get_height() + (numRows-1) * GameDialog.internalSpacing_pixels
       return Point( math.ceil(width_pixels / GameDialog.tileSize_pixels), height_pixels / GameDialog.tileSize_pixels )
 
-   def getSizeForMenu(options, numCols, title, spacingType = GameDialogSpacing.EQUAL_COLUMNS):
+   @staticmethod
+   def getSizeForMenu( options: List[str],
+                       numCols: int,
+                       title: Optional[str],
+                       spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS) -> Point:
       rowData = GameDialog.convertOptionsToRowData( options, numCols )
       numRows = len(rowData)
 
@@ -75,7 +88,10 @@ class GameDialog:
          height_pixels = 2*GameDialog.outsideSpacing_pixels + numRows * GameDialog.font.get_height() + (numRows-1) * GameDialog.internalSpacing_pixels
       return Point( math.ceil(width_pixels / GameDialog.tileSize_pixels), height_pixels / GameDialog.tileSize_pixels )
    
-   def __init__( self, pos_tile, size_tiles, title = None ):
+   def __init__( self,
+                 pos_tile: Point,
+                 size_tiles: Point,
+                 title: Optional[str] = None ) -> None:
       if pos_tile.x < 0:
          self.pos_tile = Point( GameDialog.winSize_tiles.x - size_tiles.x + pos_tile.x, pos_tile.y )
       else:
@@ -87,17 +103,17 @@ class GameDialog:
       # Initialize the image
       self.intitializeImage()
 
-      self.displayedMessageLines = []
-      self.remainingMessageLines = []
+      self.displayedMessageLines: List[str] = []
+      self.remainingMessageLines: List[str] = []
       self.acknowledged = True
 
-      self.menuOptions = None
-      self.menuPrompt = None
-      self.menuSpacing = None
+      self.menuOptions: Optional[List[List[Optional[str]]]] = None
+      self.menuPrompt: Optional[str] = None
+      self.menuSpacing: Optional[GameDialogSpacing] = None
       self.menuRow = 0
       self.menuCol = 0
 
-   def intitializeImage( self ):
+   def intitializeImage( self ) -> None:
       self.image = pygame.Surface( self.size_tiles * GameDialog.tileSize_pixels )
       self.image.fill( pygame.Color('black') )
       pygame.draw.rect( self.image, self.fontColor, pygame.Rect(8, 8, self.image.get_width()-16, self.image.get_height()-16), 7 )
@@ -113,7 +129,8 @@ class GameDialog:
                titleImage.get_height() ) )
          self.image.blit( titleImage, (titleImagePosX, 0) )
 
-   def createMessageDialog( messageContent = None ):
+   @staticmethod
+   def createMessageDialog( messageContent: Optional[str] = None ) -> GameDialog:
       dialog = GameDialog(
          Point( 2, GameDialog.winSize_tiles.y/2 + 1.5 ),
          Point( GameDialog.winSize_tiles.x-4, (GameDialog.winSize_tiles.y-1) / 2 - 2 ) )
@@ -121,14 +138,21 @@ class GameDialog:
          dialog.addMessage( messageContent )
       return dialog
 
-   def createMenuDialog( pos_tile, size_tiles, title, options, numCols = 2, spacingType = GameDialogSpacing.EQUAL_COLUMNS ):
+   @staticmethod
+   def createMenuDialog( pos_tile: Point,
+                         size_tiles: Optional[Point],
+                         title: Optional[str],
+                         options: List[str],
+                         numCols: int = 2,
+                         spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS ) -> GameDialog:
       if size_tiles is None:
          size_tiles = GameDialog.getSizeForMenu( options, numCols, title, spacingType )
       dialog = GameDialog( pos_tile, size_tiles, title )
       dialog.addMenuPrompt( options, numCols, spacingType )
       return dialog
 
-   def createExploringMenu():
+   @staticmethod
+   def createExploringMenu() -> GameDialog:
       return GameDialog.createMenuDialog(
          Point(-1, 1),
          None,
@@ -136,10 +160,11 @@ class GameDialog:
          ['TALK', 'STATUS', 'STAIRS', 'SEARCH', 'SPELL', 'ITEM'],
          3 )
 
-   def createEncounterMenu():
-      title = 'COMMANDS'
-      options = ['FIGHT', 'SPELL', 'RUN', 'ITEM']
-      numCols = len(options)
+   @staticmethod
+   def createEncounterMenu() -> GameDialog:
+      title: Optional[str] = 'COMMANDS'
+      options: List[str] = ['FIGHT', 'SPELL', 'RUN', 'ITEM']
+      numCols: int = len(options)
       return GameDialog.createMenuDialog(
          Point(-1, 1),
          Point(
@@ -149,34 +174,41 @@ class GameDialog:
          options,
          numCols )
 
-   def createStatusDialog( pos_tile, size_tiles, title, rowData ):
+   @staticmethod
+   def createStatusDialog( pos_tile: Point,
+                           size_tiles: Optional[Point],
+                           title: Optional[str],
+                           rowData: List[List[Optional[str]]] ) -> GameDialog:
       if size_tiles is None:
          size_tiles = GameDialog.getSizeForContent( 'XP 1000000000', len(rowData), title )
       dialog = GameDialog( pos_tile, size_tiles, title )
       dialog.addRowData( rowData )
       return dialog
 
-   def createExploringStatusDialog( pc ):
+   @staticmethod
+   def createExploringStatusDialog( pc: CharacterState ) -> GameDialog:
       return GameDialog.createStatusDialog(
          Point(1, 1),
          None,
          pc.name,
-         [ [ 'LV', pc.level.name  ],
-           [ 'HP', str( pc.hp )   ],
-           [ 'MP', str( pc.mp )   ],
-           [ 'GP', str( pc.gp )   ],
-           [ 'XP', str( pc.xp )   ] ] )
+         [ [ 'LV', pc.level.name ],
+           [ 'HP', str( pc.hp )  ],
+           [ 'MP', str( pc.mp )  ],
+           [ 'GP', str( pc.gp )  ],
+           [ 'XP', str( pc.xp )  ] ] )
 
-   def createEncounterStatusDialog( pc ):
+   @staticmethod
+   def createEncounterStatusDialog( pc: CharacterState ) -> GameDialog:
       return GameDialog.createStatusDialog(
          Point(1, 1),
          None,
          pc.name,
-         [ [ 'LV', pc.level.name  ],
-           [ 'HP', str( pc.hp )   ],
-           [ 'MP', str( pc.mp )   ] ] )
+         [ [ 'LV', pc.level.name ],
+           [ 'HP', str( pc.hp )  ],
+           [ 'MP', str( pc.mp )  ] ] )
 
-   def createFullStatusDialog( pc ):
+   @staticmethod
+   def createFullStatusDialog( pc: CharacterState ) -> GameDialog:
       title = pc.name
       weaponName = 'None'
       helmName = 'None'
@@ -190,7 +222,7 @@ class GameDialog:
          armorName = pc.armor.name
       if pc.shield is not None:
          shieldName = pc.shield.name
-      rowData = [
+      rowData: List[List[Optional[str]]] = [
          [ 'Level:',             pc.level.name                  ],
          [ 'Max Hit Points:',    str( pc.level.hp )             ],
          [ 'Hit Points:',        str( pc.hp )                   ],
@@ -212,18 +244,20 @@ class GameDialog:
          title,
          rowData )
 
-   def addMessage( self, newMessage, append = True ):
+   def addMessage( self,
+                   newMessage: str,
+                   append: bool = True ) -> None:
 
       self.acknowledged = False
       self.menuOptions = None
 
       # Turn message into lines of text
-      newMessageLines = []
+      newMessageLines: List[str] = []
       for line in newMessage.split('\n'):
-         lineToDisplay = None
+         lineToDisplay = ''
          for word in line.split(' '):
             #print('word =', word, flush=True)
-            if lineToDisplay == None:
+            if lineToDisplay == '':
                lineToEvaluate = word
             else:
                lineToEvaluate = lineToDisplay + ' ' + word
@@ -265,27 +299,30 @@ class GameDialog:
       self.refreshImage()
       self.acknowledged = False
       
-   def addEncounterPrompt( self ):
+   def addEncounterPrompt( self ) -> None:
       self.addMenuPrompt( ['FIGHT', 'RUN', 'SPELL', 'ITEM'], 4, GameDialogSpacing.SPACERS, 'Command?' )
 
-   def addYesNoPrompt( self, prompt = None ):
+   def addYesNoPrompt( self,
+                       prompt: Optional[str] = None ) -> None:
       self.addMenuPrompt( ['YES', 'NO'], 2, GameDialogSpacing.SPACERS, prompt )
 
-   def setFontColor( fontColor ):
+   @staticmethod
+   def setDefaultFontColor( fontColor: pygame.Color ) -> None:
       GameDialog.fontColor = fontColor
 
-   def setFontColor( self, fontColor ):
+   def setFontColor( self,
+                     fontColor: pygame.Color ) -> None:
       if fontColor != self.fontColor:
          self.fontColor = fontColor
          self.refreshImage()
 
-   def isEmpty( self ):
+   def isEmpty( self ) -> bool:
       return len(self.displayedMessageLines) == 0
 
-   def hasMoreContent( self ):
+   def hasMoreContent( self ) -> bool:
       return len(self.remainingMessageLines) != 0
 
-   def advanceContent( self ):
+   def advanceContent( self ) -> None:
       if not self.hasMoreContent():
          return
 
@@ -300,7 +337,7 @@ class GameDialog:
       self.refreshImage()
       self.acknowledged = False
 
-   def refreshImage( self ):
+   def refreshImage( self ) -> None:
       # Clear the image
       self.intitializeImage()
 
@@ -311,34 +348,40 @@ class GameDialog:
          self.image.blit( GameDialog.font.render(lines, False, self.fontColor, pygame.Color('black') ), (colPosX, rowPosY) )
          rowPosY += GameDialog.font.get_height() + GameDialog.internalSpacing_pixels
 
-   def getStartingRowPosY( self ):
+   def getStartingRowPosY( self ) -> int:
       return self.getRowPosY( 0 )
 
-   def getRowPosY( self, row ):
+   def getRowPosY( self, row: int ) -> int:
       if self.title is None:
          startingRowPosY = GameDialog.outsideSpacing_pixels
       else:
          startingRowPosY = GameDialog.font.get_height() + GameDialog.internalSpacing_pixels
-      return startingRowPosY + row * (GameDialog.font.get_height() + GameDialog.internalSpacing_pixels)
+      return int(startingRowPosY + row * (GameDialog.font.get_height() + GameDialog.internalSpacing_pixels))
 
-   def getNumRows( self ):
+   def getNumRows( self ) -> int:
       # Determine the number of lines of text which can be displayed in the dialog
       numRows = 0
       while self.getRowPosY( numRows ) + GameDialog.font.get_height() + GameDialog.internalSpacing_pixels < self.image.get_height():
          numRows += 1
       return numRows - 1
 
-   def addMenuPrompt( self, options, numCols, spacingType = GameDialogSpacing.EQUAL_COLUMNS, prompt = None ):
+   def addMenuPrompt( self,
+                      options: List[str],
+                      numCols: int,
+                      spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
+                      prompt: Optional[str] = None ) -> None:
       self.addRowData( GameDialog.convertOptionsToRowData( options, numCols ), spacingType, True, prompt )
 
-   def convertOptionsToRowData( options, numCols ):
+   @staticmethod
+   def convertOptionsToRowData( options: List[str],
+                                numCols: int ) -> List[List[Optional[str]]]:
       numRows = math.ceil( len(options) / numCols)
       rowData = []
       colsPerOption = 1
       if len(options) > 0 and isinstance( options[0], list ):
          colsPerOption = len(options[0])
       for row in range(numRows):
-         temp = []
+         temp: List[Optional[str]] = []
          for col in range(numCols):
             indexInOptions = row + col * numRows
             if indexInOptions < len(options):
@@ -353,7 +396,11 @@ class GameDialog:
          rowData.append( temp )
       return rowData
 
-   def addRowData( self, rowData, spacingType = GameDialogSpacing.OUTSIDE_JUSTIFIED, isMenu = False, prompt = None ):
+   def addRowData( self,
+                   rowData: List[List[Optional[str]]],
+                   spacingType: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
+                   isMenu: bool = False,
+                   prompt: Optional[str] = None ) -> None:
       # NOTE:  isOutsideJustified assumes 2 columns in rowData
       # NOTE:  If isMenu and isOutsideJustified, each row constitutes a single menu item
 
@@ -414,20 +461,26 @@ class GameDialog:
       else:
          self.menuOptions = None
 
-   def blit(self, surface, display = False, offset_pixels = Point(0, 0) ):
+   def blit( self,
+             surface: pygame.Surface,
+             display: bool = False,
+             offset_pixels: Point = Point(0, 0) ) -> None:
       surface.blit( self.image, self.pos_tile * GameDialog.tileSize_pixels + offset_pixels )
       if display:
          pygame.display.flip()
 
-   def getSelectedMenuOption( self ):
+   def getSelectedMenuOption( self ) -> Optional[str]:
       if self.menuOptions is not None:
          return self.menuOptions[self.menuRow][self.menuCol]
       return None
 
-   def eraseMenuIndicator( self ):
+   def eraseMenuIndicator( self ) -> None:
       self.drawMenuIndicator( pygame.Color('black') )
 
-   def drawMenuIndicator( self, color = None ):
+   def drawMenuIndicator( self, color: pygame.Color = None ) -> None:
+      if self.menuOptions is None:
+         return
+      
       if color is None:
          color = self.fontColor
       firstColPosX = GameDialog.outsideSpacing_pixels
@@ -453,10 +506,10 @@ class GameDialog:
          (colPosX + 3/4 * GameDialog.selectionIndicator_pixels, rowPosY + GameDialog.selectionIndicator_pixels/2) )
       pygame.draw.polygon( self.image, color, pointlist)
 
-   def eraseWaitingIndicator( self ):
+   def eraseWaitingIndicator( self ) -> None:
       self.drawWaitingIndicator( pygame.Color('black') )
 
-   def drawWaitingIndicator( self, color = None ):
+   def drawWaitingIndicator( self, color: Optional[pygame.Color] = None ) -> None:
       if color is None:
          color = self.fontColor
       colPosX = (self.image.get_width() - GameDialog.selectionIndicator_pixels) / 2
@@ -467,7 +520,10 @@ class GameDialog:
          (colPosX + GameDialog.selectionIndicator_pixels/2, rowPosY + 3/4 * GameDialog.selectionIndicator_pixels) )
       pygame.draw.polygon( self.image, color, pointlist)
       
-   def processEvent( self, e, screen ):
+   def processEvent( self, e: pygame.Event, screen: pygame.Surface ) -> None:
+      if self.menuOptions is None:
+         return
+      
       if e.type == pygame.KEYDOWN:
          numCols = len( self.menuOptions[0] )
          newCol = self.menuCol
@@ -500,13 +556,13 @@ class GameDialog:
             self.drawMenuIndicator()
             self.blit( screen, True )
 
-   def acknowledge( self ):
+   def acknowledge( self ) -> None:
       self.acknowledged = True
 
-   def isAcknowledged( self ):
+   def isAcknowledged( self ) -> bool:
       return self.acknowledged
 
-def main():
+def main() -> None:
    # Initialize pygame
    pygame.init()
    pygame.font.init()

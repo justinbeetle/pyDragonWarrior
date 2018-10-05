@@ -15,7 +15,12 @@ from CharacterState import CharacterState
 
 class GameState:
 
-   def __init__(self, basePath, gameXmlPath, desiredWinSize_pixels, tileSize_pixels, savedGameFile = None):
+   def __init__( self,
+                 basePath: str,
+                 gameXmlPath: str,
+                 desiredWinSize_pixels: Optional[Point],
+                 tileSize_pixels: int,
+                 savedGameFile: Optional[str] = None) -> None:
       
       if desiredWinSize_pixels is None:
          self.screen = pygame.display.set_mode( (0, 0) , pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE )
@@ -33,7 +38,7 @@ class GameState:
       self.phase = Phase.A
       self.tickCount = 1
       self.gameInfo = GameInfo( basePath, gameXmlPath, tileSize_pixels, savedGameFile)
-      self.removedDecorationsByMap = {}
+      self.removedDecorationsByMap: Dict[str, Decoration] = {}
 
       # Set character state for new game
       self.pendingDialog = self.gameInfo.initialStateDialog
@@ -55,11 +60,11 @@ class GameState:
       self.pc.otherEquippedItems = self.gameInfo.pc_otherEquippedItems
       self.pc.unequippedItems = self.gameInfo.pc_unequippedItems
       self.pc.progressMarkers = self.gameInfo.pc_progressMarkers
-      
-      self.mapState = None
+
+      self.mapState: Optional[MapImageInfo] = None
       self.setMap( self.gameInfo.initialMap, self.gameInfo.initialMapDecorations )
 
-   def save(self):
+   def save(self) -> None:
       xmlRoot = xml.etree.ElementTree.Element('SaveState')
       xmlRoot.attrib['name'] = self.pc.name
       xmlRoot.attrib['map'] = self.mapState.mapName
@@ -81,9 +86,9 @@ class GameState:
       if self.pc.shield is not None:
          itemElement = xml.etree.ElementTree.SubElement( itemsElement, 'Item' )
          itemElement.attrib['name'] = self.pc.shield.name
-      for item in self.pc.otherEquippedItems:
+      for tool in self.pc.otherEquippedItems:
          itemElement = xml.etree.ElementTree.SubElement( itemsElement, 'Item' )
-         itemElement.attrib['name'] = item.name
+         itemElement.attrib['name'] = tool.name
 
       itemsElement = xml.etree.ElementTree.SubElement( xmlRoot, 'UnequippedItems' )
       for item in self.pc.unequippedItems:
@@ -112,16 +117,16 @@ class GameState:
       saveGameFile.write( xmlString )
       saveGameFile.close()
 
-   def getCastableCombatSpellNames(self):
+   def getCastableCombatSpellNames(self) -> List[str]:
       return self.gameInfo.getCastableSpellNames( True, self.pc.level, self.pc.mp, self.mapState.mapName )
 
-   def getCastableNonCombatSpellNames(self):
+   def getCastableNonCombatSpellNames(self) -> List[str]:
       return self.gameInfo.getCastableSpellNames( False, self.pc.level, self.pc.mp, self.mapState.mapName )
 
-   def getAvailableSpellNames(self):
+   def getAvailableSpellNames(self) -> List[str]:
       return self.gameInfo.getAvailableSpellNames( self.pc.level )
    
-   def getMapImageRect(self):
+   def getMapImageRect(self) -> pygame.Rect:
       # Always rendering to the entire screen but need to determine the
       # rectangle from the image which is to be scaled to the screen
       return pygame.Rect(
@@ -130,20 +135,30 @@ class GameState:
          self.winSize_pixels[0],
          self.winSize_pixels[1] )
 
-   def getTileImageRect(self, tile, offset=Point(0,0)):
+   def getTileImageRect( self,
+                         tile: Point,
+                         offset: Point = Point(0,0) ) -> pygame.Rect:
       return self.getTileRegionImageRect(tile, 0.5, offset)
 
-   def getTileRegionImageRect(self, centerTile, tileRadius, offset=Point(0,0)):
+   def getTileRegionImageRect( self,
+                               centerTile: Point,
+                               tileRadius: float,
+                               offset: Point = Point(0,0) ) -> pygame.Rect:
       return pygame.Rect(
          (self.imagePad_tiles[0] + centerTile[0] + 0.5 - tileRadius) * self.gameInfo.tileSize_pixels + offset.x,
          (self.imagePad_tiles[1] + centerTile[1] + 0.5 - tileRadius) * self.gameInfo.tileSize_pixels + offset.y,
          (2*tileRadius) * self.gameInfo.tileSize_pixels,
          (2*tileRadius) * self.gameInfo.tileSize_pixels )
 
-   def getTileScreenRect(self, tile, offset=Point(0,0)):
+   def getTileScreenRect( self,
+                          tile: Point,
+                          offset: Point = Point(0,0) ) -> pygame.Rect:
       return self.getTileRegionScreenRect(tile, 0.5, offset)
    
-   def getTileRegionScreenRect(self, centerTile, tileRadius, offset=Point(0,0)):
+   def getTileRegionScreenRect( self,
+                                centerTile: Point,
+                                tileRadius: float,
+                                offset: Point = Point(0,0) ) -> pygame.Rect:
       # Hero is always in the center of the screen
       return pygame.Rect(
          (self.winSize_tiles[0] / 2 + centerTile[0] - self.pc.currPos_datTile[0] - tileRadius) * self.gameInfo.tileSize_pixels + offset.x - self.pc.currPosOffset_imgPx.x,
@@ -151,10 +166,12 @@ class GameState:
          (2*tileRadius) * self.gameInfo.tileSize_pixels,
          (2*tileRadius) * self.gameInfo.tileSize_pixels )
 
-   def getTileInfo(self, tile):
+   def getTileInfo( self, tile: Optional[Point] ) -> Tile:
+      if tile is None:
+         tile = self.pc.currPos_datTile
       return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[tile.y][tile.x]]]
 
-   def getPointTransition(self, tile = None):
+   def getPointTransition(self, tile: Optional[Point] = None) -> Optional[PointTransition]:
       if tile is None:
          tile = self.pc.currPos_datTile
       for pointTransition in self.gameInfo.maps[self.mapState.mapName].pointTransitions:
@@ -167,7 +184,7 @@ class GameState:
             return pointTransition
       return None
 
-   def getDecorations(self, tile = None):
+   def getDecorations(self, tile: Optional[Point] = None) -> List[Decoration]:
       decorations = []
       if tile is None:
          tile = self.pc.currPos_datTile
@@ -181,7 +198,7 @@ class GameState:
             decorations.append( decoration )
       return decorations
 
-   def getSpecialMonster(self, tile = None):
+   def getSpecialMonster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
       if tile is None:
          tile = self.pc.currPos_datTile
       for specialMonster in self.gameInfo.maps[self.mapState.mapName].specialMonsters:
@@ -194,7 +211,10 @@ class GameState:
             return specialMonster
       return None
 
-   def getTileDegreesOfFreedom(self, tile, enforceNpcHpPenaltyLimit, prevTile):
+   def getTileDegreesOfFreedom( self,
+                                tile: Point,
+                                enforceNpcHpPenaltyLimit: bool,
+                                prevTile: Point ) -> int:
       degreesOfFreedom = 0
       for x in [tile.x-1, tile.x+1]:
          if self.canMoveToTile( Point(x, tile.y), enforceNpcHpPenaltyLimit, False, prevTile ):
@@ -205,7 +225,11 @@ class GameState:
       #print('DOF for tile', tile, 'is', degreesOfFreedom, flush=True)
       return degreesOfFreedom
 
-   def canMoveToTile(self, tile, enforceNpcHpPenaltyLimit = False, enforceNpcDofLimit = False, prevTile = None):
+   def canMoveToTile( self,
+                      tile: Point,
+                      enforceNpcHpPenaltyLimit: bool = False,
+                      enforceNpcDofLimit: bool = False,
+                      prevTile: bool = None) -> bool:
       movementAllowed = False
 
       # Check if native tile allows movement
@@ -252,14 +276,16 @@ class GameState:
                
       return movementAllowed
 
-   def getTileMonsters(self, tile):
+   def getTileMonsters(self, tile: Optional[Point]) -> List[Monster]:
+      if tile is None:
+         tile = self.pc.currPos_datTile
       for mz in self.gameInfo.maps[self.mapState.mapName].monsterZones:
          if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
             #print( 'in monsterZone of monster set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True )
             return self.gameInfo.monsterSets[mz.setName]
       return []
 
-   def eraseCharacters(self):
+   def eraseCharacters(self) -> None:
       # Erase PC
       self.eraseCharacter( self.pc )
 
@@ -267,7 +293,7 @@ class GameState:
       for npc in self.npcs:
          self.eraseCharacter( npc )
          
-   def eraseCharacter(self, character):
+   def eraseCharacter(self, character: CharacterState) -> None:
       if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
          self.screen.blit(
             self.getMapImage().subsurface(
@@ -278,7 +304,7 @@ class GameState:
                character.currPos_datTile,
                character.currPosOffset_imgPx ) )
 
-   def drawCharacters(self):
+   def drawCharacters(self) -> None:
       # Draw PC
       self.drawCharacter( self.pc )
 
@@ -286,7 +312,7 @@ class GameState:
       for npc in self.npcs:
          self.drawCharacter( npc )
          
-   def drawCharacter(self, character):
+   def drawCharacter(self, character: CharacterState) -> None:
       if character == self.pc or self.isInterior( self.pc.currPos_datTile ) == self.isInterior( character.currPos_datTile ):
          if character == self.pc:
             # TODO: Configurable way to handle the PC image mappings
@@ -313,13 +339,14 @@ class GameState:
             self.exteriorMapImage.subsurface( self.getTileImageRect(self.pc.destPos_datTile) ),
             self.getTileScreenRect(self.pc.destPos_datTile) )
 
-   def isLightRestricted(self):
+   def isLightRestricted(self) -> bool:
       return self.lightDiameter is not None and self.lightDiameter <= self.winSize_tiles.w and self.lightDiameter <= self.winSize_tiles.h
    
-   def isOutside(self):
+   def isOutside(self) -> bool:
       return self.gameInfo.maps[self.mapState.mapName].isOutside
 
-   def makeMapTransition(self, transition):
+   def makeMapTransition( self,
+                          transition: Union[LeavingTransition, PointTransition] ) -> bool:
       if transition is not None:
          self.pc.currPos_datTile = self.pc.destPos_datTile = transition.destPoint
          self.pc.currPosOffset_imgPx = Point(0,0)
@@ -330,7 +357,7 @@ class GameState:
             self.gameState.drawMap( True )
       return transition is not None
 
-   def boundsCheckPcPosition(self):
+   def boundsCheckPcPosition(self) -> None:
       # Bounds checking to ensure a valid hero/center position
       if ( self.pc.currPos_datTile is None or
            self.pc.currPos_datTile[0] < 1 or
@@ -344,7 +371,10 @@ class GameState:
          self.pc.currPosOffset_imgPx = Point(0,0)
          self.pc.dir = Direction.SOUTH
 
-   def setMap(self, newMapName, oneTimeDecorations = [], respawnDecorations = False):
+   def setMap( self,
+               newMapName: str,
+               oneTimeDecorations: List[MapDecoration] = [],
+               respawnDecorations: bool = False ) -> None:
       #print( 'setMap to', newMapName, flush=True )
       oldMapName = None
       if self.mapState is not None:
@@ -413,19 +443,19 @@ class GameState:
       self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
       self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
 
-   def isInterior( self, pc_pos_datTile ):
+   def isInterior( self, pc_pos_datTile: Point ) -> bool:
       return ( self.interiorMapImage is not None and
                self.gameInfo.maps[self.mapState.mapName].overlayDat[pc_pos_datTile.y][pc_pos_datTile.x] in self.gameInfo.tileSymbols )
       
-   def isExterior( self, pc_pos_datTile ):
+   def isExterior( self, pc_pos_datTile: Point ) -> bool:
       return not self.isInterior( pc_pos_datTile )
 
-   def getMapImage( self ):
+   def getMapImage( self ) -> pygame.Surface:
       if self.isInterior( self.pc.currPos_datTile ):
          return self.interiorMapImage
       return self.exteriorMapImage
    
-   def isFacingDoor(self):
+   def isFacingDoor(self) -> bool:
       doorOpenDest_datTile = self.pc.currPos_datTile + self.pc.dir.getDirectionVector()
       foundDoor = False
       for decoration in self.mapDecorations:
@@ -435,7 +465,7 @@ class GameState:
             return True
       return False
    
-   def openDoor(self):
+   def openDoor(self) -> None:
       doorOpenDest_datTile = self.pc.currPos_datTile + self.pc.dir.getDirectionVector()
       foundDoor = False
       for decoration in self.mapDecorations:
@@ -444,7 +474,7 @@ class GameState:
               self.gameInfo.decorations[decoration.type].removeWithKey ):
             self.removeDecoration( decoration )
 
-   def removeDecoration(self, decoration):
+   def removeDecoration( self, decoration: MapDecoration ) -> None:
       # Remove the decoration from the map (if present)
       if decoration in self.mapDecorations:
          self.mapDecorations.remove( decoration )
@@ -460,7 +490,7 @@ class GameState:
          # Draw the map to the screen
          self.drawMap()
 
-   def setClippingForLightDiameter(self):
+   def setClippingForLightDiameter(self) -> None:
       if self.isLightRestricted():
          self.screen.set_clip(
             self.getTileRegionScreenRect(
@@ -470,13 +500,13 @@ class GameState:
       else:
          self.setClippingForWindow()
 
-   def setClippingForWindow(self):
+   def setClippingForWindow(self) -> None:
       self.screen.set_clip( pygame.Rect( 0,
                                          0,
                                          self.winSize_pixels.x,
                                          self.winSize_pixels.y ) )
       
-   def drawMap(self, flipBuffer=True):
+   def drawMap( self, flipBuffer: bool = True ) -> None:
       # Implement light diameter via clipping
       if self.isLightRestricted():
          self.screen.fill( pygame.Color('black') )
@@ -495,7 +525,7 @@ class GameState:
       if flipBuffer:
          pygame.display.flip()
 
-   def advanceTick(self, charactersErased=False):
+   def advanceTick( self, charactersErased: bool = False ) -> None:
       PHASE_TICKS = 20
       NPC_MOVE_STEPS = 60
 
@@ -556,7 +586,7 @@ class GameState:
       self.tickCount += 1
       pygame.time.Clock().tick(40)
 
-def main():
+def main() -> None:
    print( 'Not implemented', flush=True )
 
 if __name__ == '__main__':

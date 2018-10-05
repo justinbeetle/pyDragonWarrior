@@ -211,7 +211,7 @@ class GameInfo:
                directionCharacterTypeImages[phase] = image
                x_px += characterTypeImage.get_height() + 1
             characterTypeImages[direction] = directionCharacterTypeImages
-         self.characterTypes[characterType]=CharacterType(characterType, characterTypeImages)
+         self.characterTypes[characterType] = CharacterType(characterType, characterTypeImages)
 
       # Parse maps
       self.maps: Dict[str, Map] = {}
@@ -371,7 +371,7 @@ class GameInfo:
          #print( 'Parse map monster info', flush=True )
          monsterZones = []
          if 'monsterSet' in element.attrib:
-            monsterZones.append( MonsterZone( 0, 0, mapDatSize.w, mapDatSize.h, element.attrib['monsterSet'] ) )
+            monsterZones.append( MonsterZone( 0, 0, int(mapDatSize.w), int(mapDatSize.h), element.attrib['monsterSet'] ) )
          else:
             for monsterZoneElement in element.findall('MonsterZones/MonsterZone'):
                monsterZones.append( MonsterZone(
@@ -564,7 +564,7 @@ class GameInfo:
       self.pc_weapon: Optional[Weapon] = None
       self.pc_armor: Optional[Armor] = None
       self.pc_shield: Optional[Shield] = None
-      self.pc_otherEquippedItems: List[ItemType] = []
+      self.pc_otherEquippedItems: List[Tool] = []
       for itemElement in initialStateElement.findall("./EquippedItems/Item"):
          itemName = itemElement.attrib['name']
          if itemName in self.weapons:
@@ -574,7 +574,7 @@ class GameInfo:
          elif itemName in self.shields:
             self.pc_shield = self.shields[itemName]
          elif itemName in self.items:
-            self.pc_otherEquippedItems.append( self.items[itemName] )
+            self.pc_otherEquippedItems.append( self.tools[itemName] )
          else:
             print( 'ERROR: Unsupported item', itemName, flush=True )
             
@@ -708,10 +708,10 @@ class GameInfo:
                dialogVendorBuyOptions = []
                for optionElement in element.findall("./DialogVendorBuyOption"):
                   itemName = optionElement.attrib['name']
-                  itemGp = self.items[itemName].gp
+                  itemGp = str(self.items[itemName].gp)
                   if 'gp' in optionElement.attrib:
                      itemGp = optionElement.attrib['gp']
-                  dialogVendorBuyOptions.append( [itemName, str(itemGp)] )
+                  dialogVendorBuyOptions.append( [itemName, itemGp] )
             dialog.append( DialogVendorBuyOptions( dialogVendorBuyOptions ) )
             
          elif element.tag == 'DialogVendorSellOptions':
@@ -761,10 +761,10 @@ class GameInfo:
                valueForDialogVendorBuyOptions: DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType = []
                for itemElement in element.findall("./Item"):
                   itemName = itemElement.attrib['name']
-                  itemGp = self.items[itemName].gp
+                  itemGp = str(self.items[itemName].gp)
                   if 'gp' in itemElement.attrib:
                      itemGp = itemElement.attrib['gp']
-                  valueForDialogVendorBuyOptions.append( [itemName, str(itemGp)] )
+                  valueForDialogVendorBuyOptions.append( [itemName, itemGp] )
                dialog.append( DialogVariable( name, valueForDialogVendorBuyOptions ) )
             elif value == 'INVENTORY_ITEM_TYPE_LIST':
                valueForDialogVendorSellOptions: DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType = []
@@ -817,7 +817,7 @@ class GameInfo:
          mapImageSize_pixels,
          self.maps[mapName].dat,
          pygame.Color('pink') ) # Fill with a color to make is easier to identify any gaps
-      
+
       if self.maps[mapName].overlayDat is not None:
          mapOverlayImage = self.getMapImage(
             mapName,
@@ -833,7 +833,13 @@ class GameInfo:
       # Return the map image info
       return MapImageInfo(mapName, mapImage, mapImageSize_tiles, mapImageSize_pixels, mapOverlayImage)
 
-   def getMapImage(self, mapName: str, imagePad_tiles: Point, mapDecorations: Optional[List[MapDecoration]], mapImageSize_pixels: Point, dat: List[str], fillColor: pygame.Color ) -> pygame.Surface:
+   def getMapImage( self,
+                    mapName: str,
+                    imagePad_tiles: Point,
+                    mapDecorations: Optional[List[MapDecoration]],
+                    mapImageSize_pixels: Point,
+                    dat: List[str],
+                    fillColor: pygame.Color ) -> pygame.Surface:
       mapImage = pygame.Surface( mapImageSize_pixels )
       mapImage.fill( fillColor )
 
