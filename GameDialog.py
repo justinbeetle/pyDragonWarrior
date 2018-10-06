@@ -23,7 +23,7 @@ class GameDialog:
    tileSize_pixels = 48
    fontSize = 32
    fontColor = pygame.Color('white')
-   font: Optional[pygame.Font] = None
+   font: pygame.Font
    outsideSpacing_pixels = 24
    internalSpacing_pixels = 10
    selectionIndicator_pixels = 16
@@ -58,7 +58,7 @@ class GameDialog:
       return Point( math.ceil(width_pixels / GameDialog.tileSize_pixels), height_pixels / GameDialog.tileSize_pixels )
 
    @staticmethod
-   def getSizeForMenu( options: List[str],
+   def getSizeForMenu( options: Union[List[str], List[List[str]]],
                        numCols: int,
                        title: Optional[str],
                        spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS) -> Point:
@@ -142,7 +142,7 @@ class GameDialog:
    def createMenuDialog( pos_tile: Point,
                          size_tiles: Optional[Point],
                          title: Optional[str],
-                         options: List[str],
+                         options: Union[List[str], List[List[str]]],
                          numCols: int = 2,
                          spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS ) -> GameDialog:
       if size_tiles is None:
@@ -366,14 +366,14 @@ class GameDialog:
       return numRows - 1
 
    def addMenuPrompt( self,
-                      options: List[str],
+                      options: Union[List[str], List[List[str]]],
                       numCols: int,
                       spacingType: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
                       prompt: Optional[str] = None ) -> None:
       self.addRowData( GameDialog.convertOptionsToRowData( options, numCols ), spacingType, True, prompt )
 
    @staticmethod
-   def convertOptionsToRowData( options: List[str],
+   def convertOptionsToRowData( options: Union[List[str], List[List[str]]],
                                 numCols: int ) -> List[List[Optional[str]]]:
       numRows = math.ceil( len(options) / numCols)
       rowData = []
@@ -385,11 +385,12 @@ class GameDialog:
          for col in range(numCols):
             indexInOptions = row + col * numRows
             if indexInOptions < len(options):
-               if isinstance( options[indexInOptions], list ):
-                  for item in options[indexInOptions]:
+               currentOption = options[indexInOptions]
+               if isinstance( currentOption, list ):
+                  for item in currentOption:
                      temp.append( item )
-               else:
-                  temp.append( options[indexInOptions] )
+               elif isinstance( currentOption, str ):
+                  temp.append( currentOption )
             else:
                for colInner in range(colsPerOption):
                   temp.append( None )

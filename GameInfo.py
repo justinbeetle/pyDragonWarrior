@@ -689,6 +689,8 @@ class GameInfo:
             dialogOptions = {}
             for optionElement in element.findall("./DialogOption"):
                dialogOption = self.parseDialog( optionElement )
+               if dialogOption is None:
+                  dialogOption = []
                if dialogOption is not None:
                   dialogOptions[ optionElement.attrib['name'] ] = dialogOption
                   dialogOptionLabel = None
@@ -765,12 +767,12 @@ class GameInfo:
                   if 'gp' in itemElement.attrib:
                      itemGp = itemElement.attrib['gp']
                   valueForDialogVendorBuyOptions.append( [itemName, itemGp] )
-               dialog.append( DialogVariable( name, valueForDialogVendorBuyOptions ) )
+               dialog.append( DialogVendorBuyOptionsVariable( name, valueForDialogVendorBuyOptions ) )
             elif value == 'INVENTORY_ITEM_TYPE_LIST':
                valueForDialogVendorSellOptions: DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType = []
                for itemTypeElement in element.findall("./InventoryItemType"):
                   valueForDialogVendorSellOptions.append( itemTypeElement.attrib['type'] )
-               dialog.append( DialogVariable( name, valueForDialogVendorSellOptions ) )
+               dialog.append( DialogVendorSellOptionsVariable( name, valueForDialogVendorSellOptions ) )
             else:
                dialog.append( DialogVariable( name, value ) )
 
@@ -800,7 +802,10 @@ class GameInfo:
             availableSpells.append( spell.name )
       return availableSpells
 
-   def getMapImageInfo(self, mapName: str, imagePad_tiles: Point = Point(0,0), mapDecorations: Optional[List[MapDecoration]] = None ) -> MapImageInfo:
+   def getMapImageInfo( self,
+                        mapName: str,
+                        imagePad_tiles: Point = Point(0,0),
+                        mapDecorations: Optional[List[MapDecoration]] = None ) -> MapImageInfo:
       
       # Determine the size of the map image then initialize
       # The size of the image is padded by imagePad_tiles in all directions
@@ -818,13 +823,14 @@ class GameInfo:
          self.maps[mapName].dat,
          pygame.Color('pink') ) # Fill with a color to make is easier to identify any gaps
 
-      if self.maps[mapName].overlayDat is not None:
+      overlayDat = self.maps[mapName].overlayDat
+      if overlayDat is not None:
          mapOverlayImage = self.getMapImage(
             mapName,
             imagePad_tiles,
             [],
             mapImageSize_pixels,
-            self.maps[mapName].overlayDat,
+            overlayDat,
             GameInfo.TRANSPARENT_COLOR )
          mapOverlayImage.set_colorkey( GameInfo.TRANSPARENT_COLOR )
       else:

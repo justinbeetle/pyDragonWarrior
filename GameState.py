@@ -38,7 +38,7 @@ class GameState:
       self.phase = Phase.A
       self.tickCount = 1
       self.gameInfo = GameInfo( basePath, gameXmlPath, tileSize_pixels, savedGameFile)
-      self.removedDecorationsByMap: Dict[str, Decoration] = {}
+      self.removedDecorationsByMap: Dict[str, List[MapDecoration]] = {}
 
       # Set character state for new game
       self.pendingDialog = self.gameInfo.initialStateDialog
@@ -61,8 +61,93 @@ class GameState:
       self.pc.unequippedItems = self.gameInfo.pc_unequippedItems
       self.pc.progressMarkers = self.gameInfo.pc_progressMarkers
 
-      self.mapState: Optional[MapImageInfo] = None
+      self.mapDecorations: List[MapDecoration] = []
+      self.npcs: List[CharacterState] = []
+      self.lightDiameter: Optional[float] = None # None indicates the light diameter is unlimited
+      self.mapState: MapImageInfo # Initialized in setMap
       self.setMap( self.gameInfo.initialMap, self.gameInfo.initialMapDecorations )
+
+   def setMap( self,
+               newMapName: str,
+               oneTimeDecorations: List[MapDecoration] = [],
+               respawnDecorations: bool = False ) -> None:
+      #print( 'setMap to', newMapName, flush=True )
+      oldMapName = None
+      try:
+         oldMapName = self.mapState.mapName
+      except:
+         pass
+
+      # Set light diameter for the new map if there was not an old map or if the new default map
+      # diameter is unlimited.  Also update the light diameter for the new map if the default light
+      # diameters between the old and new maps are different and either the old map default light
+      # diamters was unlimited or the current diameter is less than the default light diameter of the
+      # new map.
+      newMapLightDiameter = self.gameInfo.maps[newMapName].lightDiameter
+      if ( oldMapName is None or newMapLightDiameter is None or
+           ( newMapLightDiameter != self.gameInfo.maps[oldMapName].lightDiameter and
+             ( self.gameInfo.maps[oldMapName].lightDiameter is None or
+               ( self.lightDiameter is not None and
+                 self.lightDiameter < newMapLightDiameter ) ) ) ):
+         self.lightDiameter = newMapLightDiameter
+
+      # If changing maps and set to respawn decorations, clear the history of removed decorations
+      if respawnDecorations:
+         self.removedDecorationsByMap = {}
+
+      self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
+      # Prune out decorations where the progress marker conditions are not met
+      for decoration in self.mapDecorations[:]:
+         if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
+            self.mapDecorations.remove( decoration )
+         elif decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
+            self.mapDecorations.remove( decoration )
+      # Prune out previously removed decorations
+      if newMapName in self.removedDecorationsByMap:
+         for decoration in self.removedDecorationsByMap[newMapName]:
+            if decoration in self.mapDecorations:
+               self.mapDecorations.remove( decoration )
+      self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
+
+      if oldMapName == newMapName:
+         # If loading up the same map, should retain the NPC positions
+         
+         # Remove any current NPCs which should be missing
+         for npcChar in self.npcs[:]:
+            if npcChar.npcInfo is not None and npcChar.npcInfo.progressMarker is not None and npcChar.npcInfo.progressMarker not in self.pc.progressMarkers:
+               self.npcs.remove( npcChar )
+            elif npcChar.npcInfo is not None and npcChar.npcInfo.inverseProgressMarker is not None and npcChar.npcInfo.inverseProgressMarker in self.pc.progressMarkers:
+               self.npcs.remove( npcChar )
+         
+         # Add missing NPCs
+         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+               continue
+            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            isMissing = True
+            for npcChar in self.npcs:
+               if npcChar.npcInfo is not None and npc == npcChar.npcInfo:
+                  isMissing = False
+                  break
+            if isMissing:
+               self.npcs.append( CharacterState.createNpcState( npc ) )
+      else:
+         # On a map change load NPCs from scratch
+         self.npcs = []
+         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
+               continue
+            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
+               continue
+            self.npcs.append( CharacterState.createNpcState( npc ) )
+
+      # Bounds checking to ensure a valid hero/center position
+      self.boundsCheckPcPosition()
+
+      # Get exterior and interior map images
+      self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
+      self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
 
    def save(self) -> None:
       xmlRoot = xml.etree.ElementTree.Element('SaveState')
@@ -169,7 +254,7 @@ class GameState:
    def getTileInfo( self, tile: Optional[Point] ) -> Tile:
       if tile is None:
          tile = self.pc.currPos_datTile
-      return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[tile.y][tile.x]]]
+      return self.gameInfo.tiles[self.gameInfo.tileSymbols[self.gameInfo.maps[self.mapState.mapName].dat[int(tile.y)][int(tile.x)]]]
 
    def getPointTransition(self, tile: Optional[Point] = None) -> Optional[PointTransition]:
       if tile is None:
@@ -184,7 +269,7 @@ class GameState:
             return pointTransition
       return None
 
-   def getDecorations(self, tile: Optional[Point] = None) -> List[Decoration]:
+   def getDecorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
       decorations = []
       if tile is None:
          tile = self.pc.currPos_datTile
@@ -214,7 +299,7 @@ class GameState:
    def getTileDegreesOfFreedom( self,
                                 tile: Point,
                                 enforceNpcHpPenaltyLimit: bool,
-                                prevTile: Point ) -> int:
+                                prevTile: Optional[Point] ) -> int:
       degreesOfFreedom = 0
       for x in [tile.x-1, tile.x+1]:
          if self.canMoveToTile( Point(x, tile.y), enforceNpcHpPenaltyLimit, False, prevTile ):
@@ -229,7 +314,7 @@ class GameState:
                       tile: Point,
                       enforceNpcHpPenaltyLimit: bool = False,
                       enforceNpcDofLimit: bool = False,
-                      prevTile: bool = None) -> bool:
+                      prevTile: Optional[Point] = None) -> bool:
       movementAllowed = False
 
       # Check if native tile allows movement
@@ -276,7 +361,7 @@ class GameState:
                
       return movementAllowed
 
-   def getTileMonsters(self, tile: Optional[Point]) -> List[Monster]:
+   def getTileMonsters(self, tile: Optional[Point]) -> List[str]:
       if tile is None:
          tile = self.pc.currPos_datTile
       for mz in self.gameInfo.maps[self.mapState.mapName].monsterZones:
@@ -346,7 +431,7 @@ class GameState:
       return self.gameInfo.maps[self.mapState.mapName].isOutside
 
    def makeMapTransition( self,
-                          transition: Union[LeavingTransition, PointTransition] ) -> bool:
+                          transition: Optional[Union[LeavingTransition, PointTransition]] ) -> bool:
       if transition is not None:
          self.pc.currPos_datTile = self.pc.destPos_datTile = transition.destPoint
          self.pc.currPosOffset_imgPx = Point(0,0)
@@ -354,7 +439,7 @@ class GameState:
          mapChanging = transition.destMap != self.mapState.mapName
          self.setMap( transition.destMap, respawnDecorations=transition.respawnDecorations )
          if not mapChanging:
-            self.gameState.drawMap( True )
+            self.drawMap( True )
       return transition is not None
 
    def boundsCheckPcPosition(self) -> None:
@@ -371,81 +456,10 @@ class GameState:
          self.pc.currPosOffset_imgPx = Point(0,0)
          self.pc.dir = Direction.SOUTH
 
-   def setMap( self,
-               newMapName: str,
-               oneTimeDecorations: List[MapDecoration] = [],
-               respawnDecorations: bool = False ) -> None:
-      #print( 'setMap to', newMapName, flush=True )
-      oldMapName = None
-      if self.mapState is not None:
-         oldMapName = self.mapState.mapName
-         
-         # Update light diameter if different between new and old maps
-         # Don't always update as this would cancel out light diameter changing affects (torchs, etc.)
-         if ( self.gameInfo.maps[newMapName].lightDiameter != self.gameInfo.maps[oldMapName].lightDiameter or
-              ( self.gameInfo.maps[newMapName].lightDiameter is None and self.lightDiameter is not None ) or
-              ( self.gameInfo.maps[newMapName].lightDiameter is not None and self.lightDiameter is not None and
-                self.lightDiameter < self.gameInfo.maps[newMapName].lightDiameter ) ):
-            self.lightDiameter = self.gameInfo.maps[newMapName].lightDiameter
-      else:
-         self.lightDiameter = self.gameInfo.maps[newMapName].lightDiameter
-
-      # If changing maps and set to respawn decorations, clear the history of removed decorations
-      if respawnDecorations:
-         self.removedDecorationsByMap = {}
-
-      self.mapDecorations = self.gameInfo.maps[newMapName].mapDecorations + oneTimeDecorations
-      # Prune out decorations where the progress marker conditions are not met
-      for decoration in self.mapDecorations[:]:
-         if decoration.progressMarker is not None and decoration.progressMarker not in self.pc.progressMarkers:
-            self.mapDecorations.remove( decoration )
-         elif decoration.inverseProgressMarker is not None and decoration.inverseProgressMarker in self.pc.progressMarkers:
-            self.mapDecorations.remove( decoration )
-      # Prune out previously removed decorations
-      if newMapName in self.removedDecorationsByMap:
-         for decoration in self.removedDecorationsByMap[newMapName]:
-            if decoration in self.mapDecorations:
-               self.mapDecorations.remove( decoration )
-      self.mapState = self.gameInfo.getMapImageInfo( newMapName, self.imagePad_tiles, self.mapDecorations )
-
-      if oldMapName == newMapName:
-         # If loading up the same map, should retain the NPC positions
-         
-         # Remove any NPCs which should be missing
-         for npc in self.npcs[:]:
-            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
-               self.npcs.remove( npc )
-            elif npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
-               self.npcs.remove( npc )
-         
-         # Add missing NPCs
-         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
-            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
-               continue
-            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
-               continue
-            if npc not in self.npcs:
-               self.npcs.append( CharacterState.createNpcState( npc ) )
-      else:
-         # On a map change load NPCs from scratch
-         self.npcs = []
-         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
-            if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
-               continue
-            if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
-               continue
-            self.npcs.append( CharacterState.createNpcState( npc ) )
-
-      # Bounds checking to ensure a valid hero/center position
-      self.boundsCheckPcPosition()
-
-      # Get exterior and interior map images
-      self.exteriorMapImage = GameInfo.getExteriorImage( self.mapState )
-      self.interiorMapImage = GameInfo.getInteriorImage( self.mapState )
-
    def isInterior( self, pc_pos_datTile: Point ) -> bool:
-      return ( self.interiorMapImage is not None and
-               self.gameInfo.maps[self.mapState.mapName].overlayDat[pc_pos_datTile.y][pc_pos_datTile.x] in self.gameInfo.tileSymbols )
+      overlayDat = self.gameInfo.maps[self.mapState.mapName].overlayDat
+      return ( overlayDat is not None and
+               overlayDat[int(pc_pos_datTile.y)][int(pc_pos_datTile.x)] in self.gameInfo.tileSymbols )
       
    def isExterior( self, pc_pos_datTile: Point ) -> bool:
       return not self.isInterior( pc_pos_datTile )
@@ -491,7 +505,7 @@ class GameState:
          self.drawMap()
 
    def setClippingForLightDiameter(self) -> None:
-      if self.isLightRestricted():
+      if self.isLightRestricted() and self.lightDiameter is not None:
          self.screen.set_clip(
             self.getTileRegionScreenRect(
                self.pc.currPos_datTile,
@@ -550,6 +564,9 @@ class GameState:
       # Move NPCs
       imagePxStepSize = self.gameInfo.tileSize_pixels // 8 # NOTE: tileSize_pixels must be divisible by imagePxStepSize
       for npc in self.npcs:
+         if npc.npcInfo is None:
+            continue
+
          if npc.npcInfo.walking:
             
             # Start moving NPC by setting a destination tile
@@ -572,6 +589,13 @@ class GameState:
                if not drawAllCharacters:
                   self.drawCharacter(npc)
                   redrawMap = True
+                  
+         elif npc.dir != npc.npcInfo.dir:
+            # Stationary characters should resume looking in the default
+            # direction after talking to the player
+            self.eraseCharacter(npc)
+            npc.dir = npc.npcInfo.dir
+            self.drawCharacter(npc)
 
       if drawAllCharacters:
          self.drawCharacters()

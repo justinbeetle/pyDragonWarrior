@@ -23,14 +23,18 @@ class GameMode(Enum):
    ENCOUNTER = 3 # TODO: Remove
 
 class Game:
-   def __init__(self, basePath, gameXmlPath, desiredWinSize_pixels, tileSize_pixels, savedGameFile = None):
-
+   def __init__( self,
+                 basePath: str,
+                 gameXmlPath: str,
+                 desiredWinSize_pixels: Optional[Point],
+                 tileSize_pixels: int,
+                 savedGameFile: Optional[str] = None ) -> None:
       self.gameState = GameState( basePath, gameXmlPath, desiredWinSize_pixels, tileSize_pixels, savedGameFile )
       GameDialog.init( self.gameState.winSize_tiles, tileSize_pixels )
 
-   def getEvents(self):
+   def getEvents(self) -> List[pygame.event.Event]:
       # Translate joystick events to keyboard events
-      events = pygame.event.get()
+      events: List[pygame.event.Event] = pygame.event.get()
 
       # Process joystick taking into account keyboard repeat settings
       isKeyboardRepeatEnabled = pygame.key.get_repeat() != (0, 0)
@@ -64,7 +68,7 @@ class Game:
                
       return events
 
-   def getEventForJoystickHatPosition(self, hatPosition):
+   def getEventForJoystickHatPosition( self, hatPosition: Tuple[int, int] ) -> Optional[pygame.event.Event]:
       event = None
       eventDict = {}
       if hatPosition == (0, -1):
@@ -81,9 +85,9 @@ class Game:
          event = pygame.event.Event( pygame.KEYDOWN, eventDict )
       return event
 
-   def runGameLoop(self):
+   def runGameLoop(self) -> None:
 
-      self.lastGameMode = None
+      self.lastGameMode: Optional[GameMode] = None
       self.gameMode = GameMode.TITLE_SCREEN
 
       self.gameState.isRunning = True
@@ -95,24 +99,29 @@ class Game:
          elif GameMode.ENCOUNTER == self.gameMode:
             self.encounterLoop()
 
-   def titleScreenLoop(self):
+   def titleScreenLoop(self) -> None:
       # TODO: Implement
       # for now transition straight to exploring
       self.gameMode = GameMode.EXPLORING
 
-   def traverseDialog(self, messageDialog, dialog, depth=0):
+   def traverseDialog( self,
+                       messageDialog: GameDialog,
+                       dialog: Union[DialogType, str],
+                       depth: int = 0 ) -> None:
 
       if depth == 0:
          self.traverseDialogWaitBeforeNewText = False
          #print( 'Intialized self.traverseDialogWaitBeforeNewText to False', flush=True )
-         self.dialogVariableReplacment = {}
+         self.dialogVariableReplacment: Dict[str, str] = {}
+         self.dialogVendorBuyOptionsVariableReplacment: Dict[str, DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType] = {}
+         self.dialogVendorSellOptionsVariableReplacment: Dict[str, DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType] = {}
          self.dialogVariableReplacment['[NAME]']=self.gameState.pc.name
          self.dialogVariableReplacment['[NEXT_LEVEL_XP]']=str( self.gameState.pc.calcXpToNextLevel( self.gameState.gameInfo.levels ) )
          mapOrigin = self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].origin
          if mapOrigin is not None:
             mapCoord = self.gameState.pc.currPos_datTile - mapOrigin
-            self.dialogVariableReplacment['[X]'] = abs( mapCoord.x )
-            self.dialogVariableReplacment['[Y]'] = abs( mapCoord.y )
+            self.dialogVariableReplacment['[X]'] = str( abs( mapCoord.x ) )
+            self.dialogVariableReplacment['[Y]'] = str( abs( mapCoord.y ) )
             if mapCoord.x < 0:
                self.dialogVariableReplacment['[X_DIR]'] = 'West'
             else:
@@ -122,8 +131,8 @@ class Game:
             else:
                self.dialogVariableReplacment['[Y_DIR]'] = 'South'
 
-      # Convert to dialog list
-      if not isinstance( dialog, list ):
+      # Ensure dialog is a list and not a str to allow iteration
+      if isinstance( dialog, str ):
          temp = dialog
          dialog = []
          dialog.append( temp )
@@ -131,6 +140,7 @@ class Game:
       for item in dialog:
          #print( 'item =', item, flush=True )
          if isinstance( item, str ):
+            #print( 'Dialog Text =', item, flush=True )
             # Wait for user to acknowledge that the message is read
             # before iterating to display the next part of the message
             # or exiting out of the loop when the full message has been
@@ -158,6 +168,7 @@ class Game:
             #print( 'Set self.traverseDialogWaitBeforeNewText to True', flush=True )
             
          elif isinstance( item, list ):
+            #print( 'Dialog Sub Tree =', item, flush=True )
             if self.gameState.isRunning:
                self.traverseDialog( messageDialog, item, depth+1 )
             
@@ -179,6 +190,14 @@ class Game:
                pass
             self.dialogVariableReplacment[item.name] = item.value
             
+         elif isinstance( item, DialogVendorBuyOptionsVariable ):
+            #print( 'Dialog Vendor Buy Options Variable =', item, flush=True )
+            self.dialogVendorBuyOptionsVariableReplacment[item.name] = item.value
+            
+         elif isinstance( item, DialogVendorSellOptionsVariable ):
+            #print( 'Dialog Vendor Sell Options Variable =', item, flush=True )
+            self.dialogVendorSellOptionsVariableReplacment[item.name] = item.value
+            
          elif isinstance( item, dict ):
             #print( 'Dialog Option =', item, flush=True )
             self.traverseDialogWaitBeforeNewText = False
@@ -187,17 +206,20 @@ class Game:
             messageDialog.addMenuPrompt( options, len(options), GameDialogSpacing.SPACERS )
             messageDialog.blit( self.gameState.screen, True )
             menuResult = None
-            while self.gameState.isRunning and menuResult == None:
+            while self.gameState.isRunning and menuResult is None:
                menuResult = self.getMenuResult( messageDialog )
-            if self.gameState.isRunning:
+            if self.gameState.isRunning and menuResult is not None:
                #print( 'menuResult =', menuResult, flush=True )
                self.traverseDialog( messageDialog, item[menuResult], depth+1 )
             
          elif isinstance( item, DialogVendorBuyOptions ):
             #print( 'Dialog Vendor Buy Options =', item, flush=True )
-            nameAndGpRowData = item.nameAndGpRowData
-            if nameAndGpRowData in self.dialogVariableReplacment:
-               nameAndGpRowData = self.dialogVariableReplacment[nameAndGpRowData]
+            if isinstance(item.nameAndGpRowData, str) and item.nameAndGpRowData in self.dialogVendorBuyOptionsVariableReplacment:
+               nameAndGpRowData = self.dialogVendorBuyOptionsVariableReplacment[item.nameAndGpRowData]
+            elif not isinstance(item.nameAndGpRowData, str):
+               nameAndGpRowData = item.nameAndGpRowData
+            else:
+               nameAndGpRowData = []
             if len(nameAndGpRowData) == 0:
                print('ERROR: No options from vendor', flush=True)
                self.traverseDialog( messageDialog, 'Nature calls and I need to run.  Sorry!', depth+1 )
@@ -211,16 +233,19 @@ class Game:
                menuResult = self.getMenuResult( messageDialog )
             if menuResult is not None:
                #print( 'menuResult =', menuResult, flush=True )
-               self.dialogVariableReplacment['[ITEM]']=menuResult
+               self.dialogVariableReplacment['[ITEM]'] = menuResult
                for itemNameAndGp in nameAndGpRowData:
                   if itemNameAndGp[0] == menuResult:
-                     self.dialogVariableReplacment['[COST]']=itemNameAndGp[1]
+                     self.dialogVariableReplacment['[COST]'] = itemNameAndGp[1]
                      
          elif isinstance( item, DialogVendorSellOptions ):
             #print( 'Dialog Vendor Sell Options =', item, flush=True )
-            itemTypes = item.itemTypes
-            if itemTypes in self.dialogVariableReplacment:
-               itemTypes = self.dialogVariableReplacment[itemTypes]
+            if isinstance(item.itemTypes, str) and item.itemTypes in self.dialogVendorSellOptionsVariableReplacment:
+               itemTypes = self.dialogVendorSellOptionsVariableReplacment[item.itemTypes]
+            elif not isinstance(item.itemTypes, str):
+               itemTypes = item.itemTypes
+            else:
+               itemTypes = []
             itemRowData = self.gameState.pc.getItemRowData( True, itemTypes )
             if len(itemRowData) == 0:
                self.traverseDialog( messageDialog, 'Thou dost not have any items to sell.', depth+1 )
@@ -244,17 +269,17 @@ class Game:
 
             if item.type == DialogCheckEnum.HAS_ITEM or item.type == DialogCheckEnum.LACKS_ITEM:
                # Perform variable replacement
-               itemName = item.name;
-               itemCount = item.count;
+               itemName = str(item.name)
+               itemCount = 1
                for variable in self.dialogVariableReplacment:
-                  if isinstance( self.dialogVariableReplacment[variable], str ):
+                  if isinstance(itemName, str):
                      itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
-                     if isinstance(itemCount, str):
-                        itemCount = itemCount.replace(variable, self.dialogVariableReplacment[variable])
-               try:
-                  itemCount = int(itemCount)
-               except:
-                  print( 'ERROR: Failed to convert itemCount to int:', itemCount, flush=True )
+                  if isinstance(item.count, str):
+                     try:
+                        itemCount = int(item.count.replace(variable, self.dialogVariableReplacment[variable]))
+                     except:
+                        print( 'ERROR: Failed to convert itemCount to int:', item.count, flush=True )
+
                if itemName == 'gp':
                   checkValue = self.gameState.pc.gp
                elif itemName == 'lv':
@@ -295,7 +320,8 @@ class Game:
                print( 'ERROR: Unsupported DialogCheckEnum of', item.type, flush=True )
 
             if not checkResult:
-               self.traverseDialog( messageDialog, item.failedCheckDialog, depth+1 )
+               if item.failedCheckDialog is not None:
+                  self.traverseDialog( messageDialog, item.failedCheckDialog, depth+1 )
                break
                
          elif isinstance( item, DialogAction ):
@@ -326,18 +352,15 @@ class Game:
 
             elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
                # Perform variable replacement
-               itemName = item.name;
-               itemCount = item.count;
+               itemName = str(item.name)
+               itemCount = 1
                for variable in self.dialogVariableReplacment:
-                  if isinstance( self.dialogVariableReplacment[variable], str ):
-                     itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
-                     if isinstance(itemCount, str):
-                        itemCount = itemCount.replace(variable, self.dialogVariableReplacment[variable])
-               try:
-                  itemCount = int(itemCount)
-               except:
-                  print( 'ERROR: Failed to convert itemCount to int so defaulting to 1:', itemCount, flush=True )
-                  itemCount = 1
+                  itemName = itemName.replace(variable, self.dialogVariableReplacment[variable])
+                  if isinstance(item.count, str):
+                     try:
+                        itemCount = int(item.count.replace(variable, self.dialogVariableReplacment[variable]))
+                     except:
+                        print( 'ERROR: Failed to convert itemCount to int so defaulting to 1:', itemCount, flush=True )
                   
                if itemName == 'gp':
                   if item.type == DialogActionEnum.GAIN_ITEM:
@@ -356,10 +379,10 @@ class Game:
                   self.gameState.pc.loseItem( itemName, itemCount )
                   
             elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
-               if item.count == 'unlimited':
-                  self.gameState.lightDiameter = None
-               else:
+               if isinstance(item.count, int):
                   self.gameState.lightDiameter = item.count
+               else:
+                  self.gameState.lightDiameter = None
                self.gameState.drawMap()
                   
             elif item.type == DialogActionEnum.REPEL_MONSTERS:
@@ -384,12 +407,14 @@ class Game:
                   
             elif item.type == DialogActionEnum.PLAY_SOUND:
                #print( 'Play sound', item.name, flush=True )
-               AudioPlayer().playSound( item.name )
+               if isinstance( item.name, str ):
+                  AudioPlayer().playSound( item.name )
                   
             elif item.type == DialogActionEnum.PLAY_MUSIC:
                #print( 'Play music', item.name, flush=True )
-               AudioPlayer().playMusic( item.name,
-                  self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].music )
+               if isinstance( item.name, str ):
+                  AudioPlayer().playMusic( item.name,
+                     self.gameState.gameInfo.maps[ self.gameState.mapState.mapName ].music )
                   
             elif item.type == DialogActionEnum.VISUAL_EFFECT:
                if item.name == 'fadeToBlackAndBack':
@@ -419,7 +444,8 @@ class Game:
       if depth==0 and not messageDialog.isEmpty():
          self.waitForAcknowledgement( messageDialog )
 
-   def dialogLoop(self, dialog):
+   def dialogLoop( self,
+                   dialog: Union[DialogType, str] ) -> None:
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
       
       # Save off initial key repeat settings
@@ -440,7 +466,7 @@ class Game:
       # Redraw the map
       self.gameState.drawMap( True )
 
-   def waitForAcknowledgement( self, messageDialog = None ):
+   def waitForAcknowledgement( self, messageDialog: Optional[GameDialog] = None ) -> None:
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
 
       # Skip waiting for acknowledgement of message dialog if the content
@@ -478,7 +504,7 @@ class Game:
                messageDialog.eraseWaitingIndicator()
                messageDialog.blit( self.gameState.screen, True )
 
-   def getMenuResult( self, menuDialog ):
+   def getMenuResult( self, menuDialog: GameDialog ) -> Optional[str]:
       # TODO: move screen and isRunning to GameState then move this functionality to GameDialog using GameState
       
       menuResult = None
@@ -504,7 +530,7 @@ class Game:
          
       return menuResult
 
-   def exploringLoop(self):
+   def exploringLoop(self) -> None:
       
       pygame.key.set_repeat (10, 10)
       mapName = self.gameState.mapState.mapName
@@ -679,7 +705,9 @@ class Game:
                            elif actionResult == 'UNEQUIP':
                               self.gameState.pc.unequipItem( itemResult )
                            elif actionResult == 'USE':
-                              self.dialogLoop( self.gameState.gameInfo.items[itemResult].useDialog )
+                              item = self.gameState.gameInfo.items[itemResult]
+                              if isinstance(item, Tool) and item.useDialog is not None:
+                                 self.dialogLoop( item.useDialog )
                   
                elif menuResult != None:
                   print( 'ERROR:  Unsupoorted menuResult =', menuResult, flush=True )
@@ -694,15 +722,27 @@ class Game:
                talkDestTileType = self.gameState.getTileInfo(talkDest_datTile)
                if talkDestTileType.canTalkOver:
                   talkDest_datTile = talkDest_datTile + self.gameState.pc.dir.getDirectionVector()
-               dialog = 'There is no one there.'
+               dialog: DialogType = ['There is no one there.']
                for npc in self.gameState.npcs:
-                  if talkDest_datTile == npc.currPos_datTile or talkDest_datTile == npc.destPos_datTile:
-                     dialog = npc.npcInfo.dialog
+                  if ( npc.npcInfo is not None and
+                       ( talkDest_datTile == npc.currPos_datTile or
+                         talkDest_datTile == npc.destPos_datTile ) ):
+                     if npc.npcInfo.dialog is not None:
+                        dialog = npc.npcInfo.dialog
+                        
+                        # NPC should turn to face you
+                        if npc.dir != self.gameState.pc.dir.getOppositeDirection():
+                           self.gameState.eraseCharacter(npc)
+                           npc.dir = self.gameState.pc.dir.getOppositeDirection()
+                           self.gameState.drawCharacter(npc)
+                           pygame.display.flip()
+                     else:
+                        dialog = ['They pay you no mind.']
                      break
                self.dialogLoop( dialog )
 
             if searching:
-               dialog = '[NAME] searched the ground and found nothing.'
+               dialog = ['[NAME] searched the ground and found nothing.']
                for decoration in self.gameState.getDecorations():
                   if decoration.type is not None and self.gameState.gameInfo.decorations[decoration.type].removeWithSearch:
                      self.gameState.removeDecoration( decoration )
@@ -718,13 +758,23 @@ class Game:
 
          self.gameState.advanceTick()
 
-   def encounterLoop( self, monster=None, victoryDialog=None, runAwayDialog=None, encouterMusic=None, messageDialog=None ):
+   def encounterLoop( self,
+                      monster: Optional[Monster] = None,
+                      victoryDialog: Optional[DialogType] = None,
+                      runAwayDialog: Optional[DialogType] = None,
+                      encouterMusic: Optional[str] = None,
+                      messageDialog: Optional[GameDialog] = None ) -> None:
       # TODO: Rework this to invoke from an existing dialog or None.
       #       Allow a specific monster to be passed in.
       #       Allow run away and victory dialog to be passed in and triggered.
 
       # Clear any menus
       self.gameState.drawMap( False )
+
+      encounterImage = self.gameState.gameInfo.maps[self.gameState.mapState.mapName].encounterImage
+      if encounterImage is None:
+         print( 'ERROR: Cannot host an encounter on a map without an encounter image', flush=True )
+         return
       
       # Save off initial screen and key repeat settings
       (origRepeat1, origRepeat2) = pygame.key.get_repeat()
@@ -766,18 +816,19 @@ class Game:
       audioPlayer.playMusic( encouterMusic )
       #audioPlayer.playMusic( '14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3', '24_Dragon_Quest_1_-_Monster_Battle.mp3' )
 
-      # Render the encounter background
-      hasPreExistingDialog = messageDialog is not None
-      if not hasPreExistingDialog:
+      # Start the encounter dialog (used to position the encount background
+      if messageDialog is None:
          messageDialog = GameDialog.createMessageDialog()
       else:
          messageDialog.addMessage( '' )
       messageDialog.addMessage( 'A ' + monster.name + ' draws near!' )
-      encounterImage = self.gameState.gameInfo.maps[self.gameState.mapState.mapName].encounterImage
+         
+      # Render the encounter background
+      damageFlickerPixels = 4
       encounterImageSize_pixels = Point( encounterImage.get_size() )
       encounterImageDest_pixels = Point(
          ( self.gameState.winSize_pixels.w - encounterImageSize_pixels.w ) / 2,
-         messageDialog.pos_tile.y * self.gameState.gameInfo.tileSize_pixels - encounterImageSize_pixels.h )
+         messageDialog.pos_tile.y * self.gameState.gameInfo.tileSize_pixels - encounterImageSize_pixels.h + damageFlickerPixels )
       self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
 
       # Render the monster
@@ -1039,7 +1090,7 @@ class Game:
             if self.gameState.pc.hp < 0:
                self.gameState.pc.hp = 0
             for flickerTimes in range( 10 ):
-               offset_pixels = Point( 4, 4 )
+               offset_pixels = Point( damageFlickerPixels, damageFlickerPixels )
                self.gameState.screen.blit( origScreen, (0, 0) )
                self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
                self.gameState.screen.blit( monster.image, monsterImageDest_pixels )
@@ -1092,7 +1143,7 @@ class Game:
       self.lastGameMode = GameMode.ENCOUNTER
       self.gameMode = GameMode.EXPLORING
 
-   def checkForPlayerDeath( self, messageDialog = None ):
+   def checkForPlayerDeath( self, messageDialog: Optional[GameDialog] = None ) -> None:
       if self.gameState.pc.hp <= 0:
          # Player death
          self.gameState.pc.hp = 0
@@ -1101,11 +1152,11 @@ class Game:
          AudioPlayer().playSound( '20_-_Dragon_Warrior_-_NES_-_Dead.ogg' )
          GameDialog.createExploringStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
          if messageDialog is None:
-            self.dialogLoop( 'Thou art dead.' )
+            messageDialog = GameDialog.createMessageDialog()
          else:
             messageDialog.addMessage( '' )
-            messageDialog.addMessage( 'Thou art dead.' )
-            self.waitForAcknowledgement( messageDialog )
+         messageDialog.addMessage( 'Thou art dead.' )
+         self.waitForAcknowledgement( messageDialog )
          self.gameState.pc.currPos_datTile = self.gameState.gameInfo.deathHeroPos_datTile
          self.gameState.pc.currPosOffset_imgPx = Point(0,0)
          self.gameState.pc.dir = self.gameState.gameInfo.deathHeroPos_dir
@@ -1115,9 +1166,9 @@ class Game:
          self.gameState.pc.gp = self.gameState.pc.gp // 2
          self.gameState.setMap( self.gameState.gameInfo.deathMap, respawnDecorations=True )
 
-   def scrollTile(self): # return (destMap, destPoint) if making transition, else None
+   def scrollTile(self) -> None:
 
-      transition = None;
+      transition: Optional[Union[LeavingTransition, PointTransition]] = None;
       
       mapImageRect = self.gameState.getMapImageRect()
       origMapImageRect = self.gameState.getMapImageRect()
@@ -1204,7 +1255,7 @@ class Game:
                 random.uniform(0, 1) < destTileType.spawnRate ):
                self.gameMode = GameMode.ENCOUNTER
 
-def main():
+def main() -> None:
    pygame.init()
    pygame.mouse.set_visible( False )
 

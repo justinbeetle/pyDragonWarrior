@@ -204,7 +204,7 @@ class CharacterState:
                self.otherEquippedItems.remove( item )
                break
 
-   def gainItem( self, item: ItemType, count: int = 1 ) -> None:
+   def gainItem( self, item: Union[ItemType, str], count: int = 1 ) -> None:
       # Gained items always go unequippedItems
       if isinstance(item, str):
          if item not in self.progressMarkers:
@@ -290,7 +290,7 @@ class CharacterState:
 
    def monsterInitiativeCheck( self, monster: Monster ) -> bool:
       if self.level is not None:
-         return self.level.agility * random.uniform(0, 1) < monster.agility * random.uniform(0, 1) * 0.25
+         return self.level.agility * random.uniform(0, 1) < monster.agility * random.uniform(0, 1) * monster.blockFactor
       return True
 
    def monsterDodgeCheck( self, monster: Monster ) -> bool:

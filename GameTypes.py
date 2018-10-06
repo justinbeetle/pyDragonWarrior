@@ -22,11 +22,20 @@ class Direction(Enum):
          vector = Point( 0, 1 )
       elif Direction.EAST == self:
          vector = Point( 1, 0 )
-      elif Direction.WEST == self:
-         vector = Point( -1, 0 )
       else:
-         vector = Point( 0, 0 )
+         vector = Point( -1, 0 )
       return vector
+
+   def getOppositeDirection( self ) -> Direction:
+      if Direction.NORTH == self:
+         opposite = Direction.SOUTH
+      elif Direction.SOUTH == self:
+         opposite = Direction.NORTH
+      elif Direction.EAST == self:
+         opposite = Direction.WEST
+      else:
+         opposite = Direction.EAST
+      return opposite
 
 class Phase(Enum):
    A = 1
@@ -78,13 +87,21 @@ class MonsterActionEnum(Enum):
 # Dialog type
 DialogType = List[Union[str,
                         Dict[str, 'DialogType'],
+                        'DialogVariable',
                         'DialogGoTo',
                         'DialogVendorBuyOptions',
+                        'DialogVendorBuyOptionsVariable',
                         'DialogVendorSellOptions',
+                        'DialogVendorSellOptionsVariable',
                         'DialogCheck',
-                        'DialogAction',
-                        'DialogVariable']]
+                        'DialogAction']]
 
+# Set a variaable to be used in substitution for the remainder of the dialog session
+@dataclass
+class DialogVariable:
+   name: str
+   value: str
+   
 # Dialog to branch to a labeled dialog state
 @dataclass
 class DialogGoTo:
@@ -99,6 +116,11 @@ class DialogVendorBuyOptions:
    DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
    nameAndGpRowData: DialogVendorBuyOptionsParamType
    
+@dataclass
+class DialogVendorBuyOptionsVariable:
+   name: str
+   value: DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType
+   
 # Dialog for a list of vendor sell options
 @dataclass
 class DialogVendorSellOptions:
@@ -107,6 +129,11 @@ class DialogVendorSellOptions:
    DialogVendorSellOptionsParamWithoutReplacemenType = List[str]
    DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacemenType, str]
    itemTypes: DialogVendorSellOptionsParamType
+
+@dataclass
+class DialogVendorSellOptionsVariable:
+   name: str
+   value: DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType
 
 # Conditionally branch dialog if the check condition is not met
 @dataclass
@@ -131,15 +158,6 @@ class DialogAction:
    victoryDialog: Optional[DialogType] = None
    runAwayDialog: Optional[DialogType] = None
    encounterMusic: Optional[str] = None
-
-# Set a variaable to be used in substitution for the remainder of the dialog session
-@dataclass
-class DialogVariable:
-   name: str
-   DialogVariableValueType = Union[str,
-                                   DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType,
-                                   DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType]
-   value: DialogVariableValueType
 
 class Tile(NamedTuple):
    name: str
@@ -172,7 +190,7 @@ class LeavingTransition(NamedTuple):
 
 class PointTransition(NamedTuple):
    srcPoint: Point
-   destMap: src
+   destMap: str
    destPoint: Point
    destDir: Direction
    respawnDecorations: bool
@@ -223,7 +241,7 @@ class Map(NamedTuple):
 class MonsterAction(NamedTuple):
    type: MonsterActionEnum
    probability: float
-   healthRatioThreshold: Optional[float]
+   healthRatioThreshold: float
 
 class Monster(NamedTuple):
    name: str

@@ -6,20 +6,22 @@ import pygame
 
 class SurfaceEffects:
 
-   def fadeToBlackAndBack(screen):
+   def fadeToBlackAndBack( screen: pygame.Surface ) -> None:
       backgroundSurface = screen.copy()
       fadeSurface = pygame.Surface( screen.get_size() )
       fadeSurface.fill( pygame.Color('black') )
       SurfaceEffects.fadeOut( screen, backgroundSurface, fadeSurface )
       SurfaceEffects.fadeIn( screen, backgroundSurface, fadeSurface )
 
-   def fadeToBlack(screen):
-      startingSurface = screen.blit( origScreen, (0, 0) )
+   def fadeToBlack( screen: pygame.Surface ) -> None:
+      backgroundSurface = screen.copy()
       fadeSurface = pygame.Surface( screen.get_size() )
       fadeSurface.fill( pygame.Color('black') )
       SurfaceEffects.fadeOut( screen, backgroundSurface, fadeSurface )
 
-   def fadeOut(screen, backgroundSurface, fadeSurface):
+   def fadeOut( screen: pygame.Surface,
+                backgroundSurface: pygame.Surface,
+                fadeSurface: pygame.Surface ) -> None:
       for i in range(15, 256, 16):
          fadeSurface.set_alpha(i)
          screen.blit( backgroundSurface, (0, 0) )
@@ -27,7 +29,9 @@ class SurfaceEffects:
          pygame.display.flip()
          pygame.time.Clock().tick(30)
 
-   def fadeIn(screen, backgroundSurface, fadeSurface):
+   def fadeIn( screen: pygame.Surface,
+               backgroundSurface: pygame.Surface,
+               fadeSurface: pygame.Surface ) -> None:
       for i in range(240, -1, -16):
          fadeSurface.set_alpha(i)
          screen.blit( backgroundSurface, (0, 0) )
@@ -35,7 +39,7 @@ class SurfaceEffects:
          pygame.display.flip()
          pygame.time.Clock().tick(30)
 
-   def flickering(screen):
+   def flickering( screen: pygame.Surface ) -> None:
       backgroundSurface = screen.copy()
       flickerSurface = pygame.Surface( screen.get_size() )
       flickerSurface.fill( pygame.Color('white') )
@@ -51,12 +55,13 @@ class SurfaceEffects:
          pygame.display.flip()
          pygame.time.Clock().tick(30)
 
-   def pinkTinge(screen):
+   def pinkTinge( screen: pygame.Surface ) -> None:
       PINK = pygame.Color(252, 116, 96)
       pygame.transform.threshold(screen, screen, search_color=pygame.Color('white'), threshold=pygame.Color(3, 3, 3), set_color=PINK, inverse_set=True)
       pygame.display.flip()
 
-   def rainbowEffect(screen, waterTile):
+   def rainbowEffect( screen: pygame.Surface,
+                      waterTile: pygame.Surface ) -> None:
       origScreen = screen.copy()
       waterColor = pygame.transform.average_color(waterTile)
       rainbowColors = [pygame.Color('red'),
@@ -76,13 +81,13 @@ class SurfaceEffects:
                pygame.display.flip()
                pygame.time.Clock().tick(15)
             except:
-               print( 'Color not found: ', color, flush=True )
+               print( 'Color not found: ', rainbowColor, flush=True )
 
       # Restore original screen
       screen.blit( origScreen, (0, 0) )
       pygame.display.flip()
 
-def main():
+def main() -> None:
    # Initialize pygame
    pygame.init()
 
