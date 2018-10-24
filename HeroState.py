@@ -2,46 +2,30 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional, Union
 
 import math
 import random
 
+from MapCharacterState import MapCharacterState
+from CombatCharacterState import CombatCharacterState
 from Point import Point
-from GameTypes import *
-from GameInfo import GameInfo
+from GameTypes import Armor, Direction, Helm, ItemType, Level, Shield, Tool, Weapon
 
-# For main only
-import os
-import pygame
-from AudioPlayer import AudioPlayer
-
-class CharacterState:
+class HeroState(MapCharacterState, CombatCharacterState):
    def __init__( self,
                  type: str,
                  pos_datTile: Point,
                  dir: Direction,
-                 name: Optional[str],
-                 level: Optional[Level],
-                 npcInfo: Optional[NpcInfo] = None ) -> None:
-      self.type = type
-      self.currPos_datTile = Point( pos_datTile )
-      self.destPos_datTile = Point( pos_datTile )
-      self.currPosOffset_imgPx = Point( 0, 0 )
-      self.dir = dir
-      self.npcInfo = npcInfo
+                 name: str,
+                 level: Level ) -> None:
 
-      if name is not None:
-         self.name = name
-      else:
-         self.name = 'Unnamed'
+      MapCharacterState.__init__( self, type, pos_datTile, dir )
+      CombatCharacterState.__init__( self, hp=level.hp )
 
-      if level is not None:
-         self.level = level
-      else:
-         level = Level( 0, '0', 0, 0, 0, 1, 0 )
-         
-      self.hp = level.hp
+      self.name = name
+      self.level = level
+
       self.mp = level.mp
       self.gp = 0
       self.xp = level.xp
@@ -55,10 +39,6 @@ class CharacterState:
       self.otherEquippedItems: List[Tool] = []
       self.unequippedItems: Dict[ItemType, int] = {} # Dictionary where keys are items and values are the item counts
       self.progressMarkers: List[str] = []
-
-   @staticmethod
-   def createNpcState( npc: NpcInfo ) -> CharacterState:
-      return CharacterState( npc.type, npc.point, npc.dir, None, None, npc )
 
    def getItemRowData( self, limitToDropable: bool = False, filterTypes: Optional[List[str]] = None ) -> List[List[str]]:
       itemRowData: List[List[str]] = []
@@ -259,20 +239,31 @@ class CharacterState:
                   break
       return retVal
 
+   def isStillAsleep(self) -> bool:
+      retVal = self.isAsleep and (self.turnsAsleep == 0 or random.uniform(0, 1) > 0.5)
+      if retVal:
+         self.turnsAsleep += 1
+      else:
+         self.isAsleep = False
+         self.turnsAsleep = 0
+      return retVal
+
+   def getStrength( self ) -> int:
+      return self.level.strength
+
+   def getAgility( self ) -> int:
+      return self.level.agility
+
    def getAttackStrength( self ) -> int:
-      retVal = 0;
-      if self.level is not None:
-         retVal += self.level.strength
+      retVal = self.getStrength()
       if self.weapon is not None:
          retVal += self.weapon.attackBonus
       for item in self.otherEquippedItems:
          retVal += item.attackBonus
-      return retVal
+      return math.floor(retVal)
 
    def getDefenseStrength( self ) -> int:
-      retVal = 0;
-      if self.level is not None:
-         retVal += self.level.agility // 2
+      retVal = self.getAgility() // 2
       if self.helm is not None:
          retVal += self.helm.defenseBonus
       if self.armor is not None:
@@ -283,46 +274,31 @@ class CharacterState:
          retVal += item.defenseBonus
       return retVal
 
-   def monsterRunCheck( self, monster: Monster ) -> bool:
-      if self.getAttackStrength() > monster.strength * 2:
-         return random.uniform(0, 1) < 0.25 # TODO: Correct this calculation
+   def allowsCriticalHits( self ) -> bool:
       return False
 
-   def monsterInitiativeCheck( self, monster: Monster ) -> bool:
-      if self.level is not None:
-         return self.level.agility * random.uniform(0, 1) < monster.agility * random.uniform(0, 1) * monster.blockFactor
-      return True
-
-   def monsterDodgeCheck( self, monster: Monster ) -> bool:
-      return random.uniform(0, 1) < monster.dodge
-
-   def monsterBlockCheck( self, monster: Monster ) -> bool:
-      if self.level is not None:
-         return self.level.agility * random.uniform(0, 1) < monster.agility * random.uniform(0, 1) * monster.blockFactor
-      return True
-
-   def criticalHitCheck( self, monster: Monster ) -> bool:
+   def criticalHitCheck( self, monster: MonsterState ) -> bool:
       return random.uniform(0, 1) < 1/32
 
-   def calcRegularHitDamageToMonster( self, monster: Monster ) -> int:
-      return CharacterState.calcDamage(
-         ( self.getAttackStrength() - monster.agility // 2 ) // 4,
-         ( self.getAttackStrength() - monster.agility // 2 ) // 2 )
+   def calcRegularHitDamageToMonster( self, monster: MonsterState ) -> int:
+      return HeroState.calcDamage(
+         ( self.getAttackStrength() - monster.getAgility() // 2 ) // 4,
+         ( self.getAttackStrength() - monster.getAgility() // 2 ) // 2 )
 
-   def calcCriticalHitDamageToMonster( self, monster: Monster ) -> int:
-      return CharacterState.calcDamage(
+   def calcCriticalHitDamageToMonster( self, monster: MonsterState ) -> int:
+      return HeroState.calcDamage(
          self.getAttackStrength() // 2,
          self.getAttackStrength() )
 
-   def calcHitDamageFromMonster( self, monster: Monster ) -> int:
-      if self.getDefenseStrength() < monster.strength:
-         return CharacterState.calcDamage(
-            ( monster.strength - self.getDefenseStrength() // 2 ) // 4,
-            ( monster.strength - self.getDefenseStrength() // 2 ) // 2 )
+   def calcHitDamageFromMonster( self, monster: MonsterState ) -> int:
+      if self.getDefenseStrength() < monster.getStrength():
+         return HeroState.calcDamage(
+            ( monster.getStrength() - self.getDefenseStrength() // 2 ) // 4,
+            ( monster.getStrength() - self.getDefenseStrength() // 2 ) // 2 )
       else:
-         return CharacterState.calcDamage(
+         return HeroState.calcDamage(
             0,
-            ( monster.strength + 4 ) // 6 )
+            ( monster.getStrength() + 4 ) // 6 )
 
    # TODO: Add spell checks and damage calc methods
 
@@ -348,7 +324,7 @@ class CharacterState:
    def levelUpCheck( self, levels: List[Level] ) -> bool:
       leveledUp = False
       if self.level is not None:
-         newLevel = CharacterState.calcLevel(levels, self.xp)
+         newLevel = HeroState.calcLevel(levels, self.xp)
          leveledUp = self.level != newLevel
          self.level = newLevel
       return leveledUp
@@ -377,7 +353,7 @@ class CharacterState:
          self.mp,
          self.gp,
          self.xp,
-         self.type,
+         self.typeName,
          self.currPos_datTile,
          self.destPos_datTile,
          self.currPosOffset_imgPx,
@@ -392,36 +368,20 @@ class CharacterState:
          self.mp,
          self.gp,
          self.xp,
-         self.type,
+         self.typeName,
          self.currPos_datTile,
          self.destPos_datTile,
          self.currPosOffset_imgPx,
          self.dir)
 
 def main() -> None:
-   # Initialize pygame
-   pygame.init()
-   audioPlayer = AudioPlayer()
-   screen = pygame.display.set_mode( (1, 1) )
-   
-   # Initialize GameInfo
-   basePath = os.path.split(os.path.abspath(__file__))[0]
-   gameXmlPath = os.path.join(basePath, 'game.xml')
-   gameInfo = GameInfo( basePath, gameXmlPath, 16 )
-   
    # Test out character states
-   pcState = CharacterState( 'hero', Point(5,6), Direction.SOUTH, 'CAMDEN', gameInfo.levelsByNumber[7] )
-   print( pcState, flush=True )
-   pcState.hp += 2
-   print( pcState, flush=True )
-   for mapName in gameInfo.maps:
-      for npc in gameInfo.maps[mapName].npcs:
-         npcState = CharacterState.createNpcState( npc )
-         print( npcState, flush=True )
-
-   # Terminate pygame
-   audioPlayer.terminate()
-   pygame.quit()
+   level = Level( 0, '1', 2, 3, 4, 25, 6 )
+   heroState = HeroState( 'hero', Point(7,3), Direction.WEST, 'Sir Me', level )
+   print( heroState, flush=True )
+   while heroState.isAlive():
+      heroState.hp -= 10
+      print( heroState, flush=True )
 
 if __name__ == '__main__':
    try:

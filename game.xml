@@ -59,8 +59,8 @@
    <CharacterTypes>
       <CharacterType type="hero"                   image="hero.png"/>
       <CharacterType type="hero_sword"             image="hero_sword.png"/>
-      <CharacterType type="hero_sheild"            image="hero_sheild.png"/>
-      <CharacterType type="hero_sword_and_sheild"  image="hero_sword_and_sheild.png"/>
+      <CharacterType type="hero_shield"            image="hero_shield.png"/>
+      <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
       <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png"/>
       <CharacterType type="king"                   image="king.png"/>
       <CharacterType type="princess"               image="princess.png"/>

@@ -809,7 +809,7 @@ class Game:
       player_turns_asleep = 0
       player_stopspelled = False
 
-      # Start enounter music
+      # Start encounter music
       if encouterMusic is None:
          encouterMusic = '06_-_Dragon_Warrior_-_NES_-_Fight.ogg'
       audioPlayer = AudioPlayer();

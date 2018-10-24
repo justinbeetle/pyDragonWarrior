@@ -43,7 +43,7 @@ class GameState:
       # Set character state for new game
       self.pendingDialog = self.gameInfo.initialStateDialog
       self.pc = CharacterState(
-         'hero_sword_and_sheild',
+         'hero_sword_and_shield',
          self.gameInfo.initialHeroPos_datTile,
          self.gameInfo.initialHeroPos_dir,
          self.gameInfo.pc_name,
@@ -120,7 +120,7 @@ class GameState:
                self.npcs.remove( npcChar )
          
          # Add missing NPCs
-         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+         for npc in self.gameInfo.maps[newMapName].npcs:
             if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
                continue
             if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
@@ -135,7 +135,7 @@ class GameState:
       else:
          # On a map change load NPCs from scratch
          self.npcs = []
-         for npc in self.gameInfo.maps[newMapName].nonPlayerCharacters:
+         for npc in self.gameInfo.maps[newMapName].npcs:
             if npc.progressMarker is not None and npc.progressMarker not in self.pc.progressMarkers:
                continue
             if npc.inverseProgressMarker is not None and npc.inverseProgressMarker in self.pc.progressMarkers:
@@ -404,11 +404,11 @@ class GameState:
             if self.pc.hasItem( 'PM_Carrying_Princess' ):
                characterImages = self.gameInfo.characterTypes['hero_carrying_princess'].images
             elif self.pc.weapon is not None and self.pc.shield is not None:
-               characterImages = self.gameInfo.characterTypes['hero_sword_and_sheild'].images
+               characterImages = self.gameInfo.characterTypes['hero_sword_and_shield'].images
             elif self.pc.weapon is not None:
                characterImages = self.gameInfo.characterTypes['hero_sword'].images
             elif self.pc.shield is not None:
-               characterImages = self.gameInfo.characterTypes['hero_sheild'].images
+               characterImages = self.gameInfo.characterTypes['hero_shield'].images
             else:
                characterImages = self.gameInfo.characterTypes['hero'].images
          else:

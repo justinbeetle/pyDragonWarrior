@@ -271,7 +271,7 @@ class GameInfo:
 
          # Parse NPCs
          #print( 'Parse NPCs', flush=True )
-         nonPlayerCharacters: List[NonPlayerCharacter] = []
+         npcs: List[NpcInfo] = []
          for npcElement in element.findall('NonPlayerCharacter'):
             progressMarker = None
             if 'progressMarker' in npcElement.attrib:
@@ -279,14 +279,14 @@ class GameInfo:
             inverseProgressMarker = None
             if 'inverseProgressMarker' in npcElement.attrib:
                inverseProgressMarker = npcElement.attrib['inverseProgressMarker']
-            nonPlayerCharacters.append( NonPlayerCharacter( npcElement.attrib['type'],
-                                                            Point( int(npcElement.attrib['x']),
-                                                                   int(npcElement.attrib['y']) ),
-                                                            Direction[npcElement.attrib['dir']],
-                                                            npcElement.attrib['walking'] == 'yes',
-                                                            self.parseDialog( npcElement ),
-                                                            progressMarker,
-                                                            inverseProgressMarker ) )
+            npcs.append( NpcInfo( npcElement.attrib['type'],
+                                  Point( int(npcElement.attrib['x']),
+                                         int(npcElement.attrib['y']) ),
+                                  Direction[npcElement.attrib['dir']],
+                                  npcElement.attrib['walking'] == 'yes',
+                                  self.parseDialog( npcElement ),
+                                  progressMarker,
+                                  inverseProgressMarker ) )
 
          # Parse standalone decorations
          #print( 'Parse standalone decorations', flush=True )
@@ -399,7 +399,7 @@ class GameInfo:
                                   lightDiameter,
                                   leavingTransition,
                                   pointTransitions,
-                                  nonPlayerCharacters,
+                                  npcs,
                                   mapDecorations,
                                   monsterZones,
                                   encounterImage,

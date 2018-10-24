@@ -194,32 +194,33 @@ class PointTransition(NamedTuple):
    destPoint: Point
    destDir: Direction
    respawnDecorations: bool
-   progressMarker: Optional[str]
-   inverseProgressMarker: Optional[str]
+   progressMarker: Optional[str] = None
+   inverseProgressMarker: Optional[str] = None
 
-class NonPlayerCharacter(NamedTuple):
+class NpcInfo(NamedTuple):
    type: str
    point: Point
    dir: Direction
    walking: bool
-   dialog: Optional[DialogType]
-   progressMarker: Optional[str]
-   inverseProgressMarker: Optional[str]
+   dialog: Optional[DialogType] = None
+   progressMarker: Optional[str] = None
+   inverseProgressMarker: Optional[str] = None
 
 class MapDecoration(NamedTuple):
    type: Optional[str]
    point: Point
-   dialog: Optional[DialogType]
-   progressMarker: Optional[str]
-   inverseProgressMarker: Optional[str]
+   dialog: Optional[DialogType] = None
+   progressMarker: Optional[str] = None
+   inverseProgressMarker: Optional[str] = None
 
 class SpecialMonster(NamedTuple):
-   name: str
+   name: str # TODO: Change to Monster reference instead of storing the monster name
    point: Point
-   victoryDialog: Optional[DialogType]
-   runAwayDialog: Optional[DialogType]
-   progressMarker: Optional[str]
-   inverseProgressMarker: Optional[str]
+   # TODO: Add approachDialog
+   victoryDialog: Optional[DialogType] = None
+   runAwayDialog: Optional[DialogType] = None
+   progressMarker: Optional[str] = None
+   inverseProgressMarker: Optional[str] = None
 
 class Map(NamedTuple):
    name: str
@@ -230,20 +231,20 @@ class Map(NamedTuple):
    lightDiameter: Optional[int]
    leavingTransition: Optional[LeavingTransition]
    pointTransitions: List[PointTransition]
-   nonPlayerCharacters: List[NonPlayerCharacter]
+   npcs: List[NpcInfo]
    mapDecorations: List[MapDecoration]
    monsterZones: List[MonsterZone]
    encounterImage: Optional[pygame.Surface]
    specialMonsters: List[SpecialMonster]
    isOutside: bool
-   origin: Optional[Point]
+   origin: Optional[Point] = None
 
 class MonsterAction(NamedTuple):
    type: MonsterActionEnum
    probability: float
    healthRatioThreshold: float
 
-class Monster(NamedTuple):
+class Monster(NamedTuple): # TODO: Change to MonsterInfo
    name: str
    image: pygame.Surface
    dmgImage: pygame.Surface
@@ -260,6 +261,7 @@ class Monster(NamedTuple):
    minGp: int
    maxGp: int
    monsterActions: List[MonsterAction]
+   # TODO: Add allowsCriticals
 
 class MonsterZone(NamedTuple):
    x: int
@@ -336,7 +338,7 @@ class MapImageInfo(NamedTuple):
    mapImage: pygame.Surface
    mapImageSize_tiles: Point
    mapImageSize_pixels: Point
-   mapOverlayImage: Optional[pygame.Surface]
+   mapOverlayImage: Optional[pygame.Surface] = None
 
 # TODO: Where to put this???
 import pygame
