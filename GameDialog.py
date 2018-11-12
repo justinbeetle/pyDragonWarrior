@@ -11,7 +11,7 @@ import pygame
 
 from Point import Point
 from GameTypes import *
-from CharacterState import CharacterState
+from HeroState import HeroState
 
 class GameDialogSpacing(Enum):
    EQUAL_COLUMNS = 1
@@ -186,7 +186,7 @@ class GameDialog:
       return dialog
 
    @staticmethod
-   def createExploringStatusDialog( pc: CharacterState ) -> GameDialog:
+   def createExploringStatusDialog( pc: HeroState ) -> GameDialog:
       return GameDialog.createStatusDialog(
          Point(1, 1),
          None,
@@ -198,7 +198,7 @@ class GameDialog:
            [ 'XP', str( pc.xp )  ] ] )
 
    @staticmethod
-   def createEncounterStatusDialog( pc: CharacterState ) -> GameDialog:
+   def createEncounterStatusDialog( pc: HeroState ) -> GameDialog:
       return GameDialog.createStatusDialog(
          Point(1, 1),
          None,
@@ -208,7 +208,7 @@ class GameDialog:
            [ 'MP', str( pc.mp )  ] ] )
 
    @staticmethod
-   def createFullStatusDialog( pc: CharacterState ) -> GameDialog:
+   def createFullStatusDialog( pc: HeroState ) -> GameDialog:
       title = pc.name
       weaponName = 'None'
       helmName = 'None'
@@ -580,7 +580,7 @@ def main() -> None:
    # Test out game dialog
    GameDialog.init( winSize_tiles, tileSize_pixels )
    level = Level( 1, '1', 0, 20, 20, 15, 0)
-   pcState = CharacterState( 'hero', Point(5,6), Direction.SOUTH, 'CAMDEN', level )
+   pcState = HeroState( 'hero', Point(5,6), Direction.SOUTH, 'CAMDEN', level )
 
    screen.fill( pygame.Color('pink') )
    GameDialog.createExploringStatusDialog( pcState ).blit( screen, False )

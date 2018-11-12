@@ -4,221 +4,248 @@ from typing import Optional
 import random
 
 from CombatCharacterState import CombatCharacterState
-from GameTypes import Monster, SpecialMonster
-from GameDialog import GameDialog
+from GameTypes import MonsterInfo, SpecialMonster, Spell
+
 
 class MonsterState(CombatCharacterState):
-   def __init__( self, monsterInfo: Monster, specialMonsterInfo: Optional[SpecialMonster] = None ) -> None:
-      super(MonsterState, self).__init__( hp=random.randint(monsterInfo.minHp, monsterInfo.maxHp) )
-      self.monsterInfo = monsterInfo
-      self.specialMonsterInfo = specialMonsterInfo
-      self.gp = random.randint(monsterInfo.minGp, monsterInfo.maxGp)
-      self.xp = monsterInfo.xp # TODO: Should this also come from a range?
+    def __init__(self, monster_info: MonsterInfo, special_monster_info: Optional[SpecialMonster] = None) -> None:
+        super(MonsterState, self).__init__(hp=random.randint(monster_info.min_hp, monster_info.max_hp))
+        self.monster_info = monster_info
+        self.special_monster_info = special_monster_info
+        self.gp = random.randint(monster_info.min_gp, monster_info.max_gp)
+        self.xp = monster_info.xp  # TODO: Should this also come from a range?
 
-   def isStillAsleep(self) -> bool:
-      retVal = self.isAsleep and (self.turnsAsleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
-      if retVal:
-         self.turnsAsleep += 1
-      else:
-         self.isAsleep = False
-         self.turnsAsleep = 0
-      return retVal
+    def get_name(self) -> str:
+        return self.monster_info.name
 
-   def getStrength( self ) -> int:
-      return self.monsterInfo.strength
+    def is_still_asleep(self) -> bool:
+        ret_val = self.is_asleep and (self._turns_asleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
+        if ret_val:
+            self._turns_asleep += 1
+        else:
+            self.is_asleep = False
+            self._turns_asleep = 0
+        return ret_val
 
-   def getAgility( self ) -> int:
-      return self.monsterInfo.agility
+    def get_strength(self) -> int:
+        return self.monster_info.strength
 
-   def getAttackStrength( self ) -> int:
-      return self.getStrength()
+    def get_agility(self) -> int:
+        return self.monster_info.agility
 
-   def getDefenseStrength( self ) -> int:
-      return self.getAgility()
+    def get_attack_strength(self) -> int:
+        return self.get_strength()
 
-   def allowsCriticalHits( self ) -> bool:
-      # TODO: Remove this hack
-      return not self.monsterInfo.name.startswith('Dragonlord')
+    def get_defense_strength(self) -> int:
+        return self.get_agility()
 
-   # Determine if the monster has the initiative and attacks first in an encounter
-   def hasInitiative( self, heroState: CombatCharacterState ) -> bool:
-      return heroState.getAgility() * random.uniform(0, 1) <  self.getAgility() * random.uniform(0, 1) * 0.25
+    def allows_critical_hits(self) -> bool:
+        # TODO: Remove this hack
+        return not self.get_name().startswith('Dragonlord')
 
-   # Determine if the monster will attempt to run away
-   def shouldRunAway( self, heroState: CombatCharacterState ) -> bool:
-      return heroState.getStrength() > self.getStrength() * 2 and random.uniform(0, 1) < 0.25
+    def get_spell_resistance(self, spell: Spell) -> float:
+        if 'HURT' == spell.name.upper() or 'HURTMORE' == spell.name.upper():
+            return self.monster_info.hurt_resist
+        if 'SLEEP' == spell.name.upper():
+            return self.monster_info.sleep_resist
+        if 'STOPSPELL' == spell.name.upper():
+            return self.monster_info.stopspell_resist
+        return 0
 
-   # Determine if the monster dodges an attack
-   def isDodgingAttack( self ) -> bool:
-       return not self.isAsleep and random.uniform(0, 1) < self.monsterInfo.dodge
+    # Determine if the monster has the initiative and attacks first in an encounter
+    def has_initiative(self, hero_state: CombatCharacterState) -> bool:
+        # TODO: Verify that special monsters never take the initiative
+        return (self.special_monster_info is None
+                and hero_state.get_agility() * random.uniform(0, 1) < self.get_agility() * random.uniform(0, 1) * 0.25)
 
-   # Determine if the monster blocks an attempt by the hero to run away
-   def isBlockingEscape( self, heroState: CombatCharacterState ) -> bool:
-      return not self.isAsleep and heroState.getAgility() * random.uniform(0, 1) <  self.getAgility() * random.uniform(0, 1) * self.monsterInfo.blockFactor
+    # Determine if the monster will attempt to run away
+    def should_run_away(self, hero_state: CombatCharacterState) -> bool:
+        return (self.special_monster_info is None
+                and hero_state.get_strength() > self.get_strength() * 2 and random.uniform(0, 1) < 0.25)
 
-   def shouldWakeUp( self ) -> bool:
-      return self.turnsAsleep > 0 and random.uniform(0, 1) < 1.0 / 3.0
+    # Determine if the monster dodges an attack
+    def is_dodging_attack(self) -> bool:
+        return (not self.is_asleep
+                and random.uniform(0, 1) < self.monster_info.dodge)
 
-   # Perform a turn for the monster in the encounter with the hero
-   def performTurn( self, heroState: CombatCharacterState, messageDialog: GameDialog ) -> None:
-      # If monster is asleep, determine whether it stays asleep or wakes up
-      if self.isAsleep:
-         if self.isStillAslepp():
-            messageDialog.addMessage( 'The ' + monster.name + ' is still asleep.' )
+    # Determine if the monster blocks an attempt by the hero to run away
+    def is_blocking_escape(self, hero_state: CombatCharacterState) -> bool:
+        return (not self.is_asleep
+                and hero_state.get_agility() * random.uniform(0, 1) <
+                self.get_agility() * random.uniform(0, 1) * self.monster_info.block_factor)
+
+    '''
+    # Perform a turn for the monster in the encounter with the hero
+    def perform_turn( self, hero_state: CombatCharacterState, message_dialog: GameDialog ) -> None:
+        # If monster is asleep, determine whether it stays asleep or wakes up
+        if self.is_asleep:
+            if self.is_still_asleep():
+                message_dialog.addMessage( 'The ' + self.get_name() + ' is still asleep.' )
+                return
+            else:
+                message_dialog.addMessage('The ' + self.get_name() + ' awakes.')
+
+        # Determine is monster will run away
+        if self.should_run_away( hero_state ):
+            self.has_run_away = True
+            message_dialog.addMessage('The ' + self.get_name() + ' is running away.')
             return
-         else:
-            messageDialog.addMessage('The ' + monster.name + ' awakes.')
 
-      # Determine is monster will run away
-      if self.shouldRunAway( heroState ):
-          self.hasRunAway = True
-          messageDialog.addMessage('The ' + monster.name + ' is running away.')
-          return
+        # Determine monster action
+        chosen_monster_action = MonsterActionEnum.ATTACK
+        for monster_action in self.monster_info.monsterActions:
+            if self.hp / self.max_hp > monster_action.healthRatioThreshold:
+                continue
+            if MonsterActionEnum.SLEEP == monster_action.type and hero_state.is_asleep:
+                continue
+            if MonsterActionEnum.STOPSPELL == monster_action.type and hero_state.are_spells_blocked:
+                continue
+            if random.uniform(0, 1) < monster_action.probability:
+               chosen_monster_action = monster_action.type
+               break
 
-      # Determine monster action
-      chosenMonsterAction = MonsterActionEnum.ATTACK
-      for monsterAction in monster.monsterActions:
-         if self.hp / self.maxHp > monsterAction.healthRatioThreshold:
-            continue
-         if MonsterActionEnum.SLEEP == monsterAction.type and heroState.isAsleep:
-            continue
-         if MonsterActionEnum.STOPSPELL == monsterAction.type and heroState.areSpellsBlocked:
-            continue
-         if random.uniform(0, 1) < monsterAction.probability:
-            chosenMonsterAction = monsterAction.type
-            break
+        # Perform monster action
+        damage = 0
+        if chosen_monster_action == MonsterActionEnum.HEAL or chosen_monster_action == MonsterActionEnum.HEALMORE:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            if chosen_monster_action == MonsterActionEnum.HEAL:
+                message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of heal.' )
+            else:
+                message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of healmore.' )
+            if self.are_spells_blocked:
+                message_dialog.addMessage( 'But that spell hath been blocked.' )
+            else:
+                message_dialog.addMessage( 'The ' + self.get_name() + ' hath recovered.' )
+                self.hp = self.max_hp
+        elif chosen_monster_action == MonsterActionEnum.HURT or chosen_monster_action == MonsterActionEnum.HURTMORE:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            if chosen_monster_action == MonsterActionEnum.HURT:
+                message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of hurt.' )
+                damage = random.randint(self.gameState.gameInfo.spells['Hurt'].minDamageByMonster,
+                                        self.gameState.gameInfo.spells['Hurt'].maxDamageByMonster)
+            else:
+                message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of hurtmore.' )
+                damage = random.randint(self.gameState.gameInfo.spells['Hurtmore'].minDamageByMonster,
+                                        self.gameState.gameInfo.spells['Hurtmore'].maxDamageByMonster)
+            if self.gameState.pc.armor is not None:
+                damage = round(damage * self.gameState.pc.armor.hurtDmgModifier)
+            if self.are_spells_blocked:
+                message_dialog.addMessage( 'But that spell hath been blocked.' )
+                damage = 0
+        elif chosen_monster_action == MonsterActionEnum.SLEEP:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of sleep.' )
+            if self.are_spells_blocked:
+                message_dialog.addMessage( 'But that spell hath been blocked.' )
+            else:
+                message_dialog.addMessage( 'Thou art asleep.' )
+                player_asleep = True
+        elif chosen_monster_action == MonsterActionEnum.STOPSPELL:
+            AudioPlayer().playSound( 'castSpell.wav' )
+            SurfaceEffects.flickering( self.gameState.screen )
+            message_dialog.addMessage( 'The ' + self.get_name() + ' chants the spell of stopspell.' )
+            if self.are_spells_blocked:
+                message_dialog.addMessage( 'But that spell hath been blocked.' )
+            # TODO: Should always be blocked by certain items - Erdrick's Armor
+            elif random.uniform(0, 1) < 0.5:
+                message_dialog.addMessage( hero_state.get_name() + ' spells hath been blocked.' )
+                player_stopspelled = True
+            else:
+                message_dialog.addMessage( 'But that spell did not work.' )
+        elif (chosen_monster_action == MonsterActionEnum.BREATH_FIRE
+              or chosen_monster_action == MonsterActionEnum.BREATH_STRONG_FIRE):
+            AudioPlayer().playSound( 'fireBreathingAttack.wav' )
+            message_dialog.addMessage( 'The ' + self.get_name() + ' is breathing fire.' )
+            if chosen_monster_action == MonsterActionEnum.BREATH_FIRE:
+                damage = random.randint(16, 23)
+            else:
+               damage = random.randint(65, 72)
+               # TODO: Apply armor damage reduction
+        else: # chosen_monster_action == MonsterActionEnum.ATTACK
+            damage = self.gameState.pc.calcHitDamageFromMonster( monster )
+            if 0 == damage:
+                # TODO: Play sound?
+                message_dialog.addMessage('The ' + self.get_name() + ' attacks! ' + hero_state.get_name()
+                                          + ' dodges the strike.')
+            else:
+                AudioPlayer().playSound( 'Dragon Warrior [Dragon Quest] SFX (5).wav' )
+                message_dialog.addMessage( 'The ' + self.get_name() + ' attacks!' )
 
-      # Perform monster action
-      damage = 0
-      if chosenMonsterAction == MonsterActionEnum.HEAL or chosenMonsterAction == MonsterActionEnum.HEALMORE:
-         AudioPlayer().playSound( 'castSpell.wav' )
-         SurfaceEffects.flickering( self.gameState.screen )
-         if chosenMonsterAction == MonsterActionEnum.HEAL:
-            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of heal.' )
-         else:
-            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of healmore.' )
-         if monster_stopspelled:
-            messageDialog.addMessage( 'But that spell hath been blocked.' )
-         else:
-            messageDialog.addMessage( 'The ' + monster.name + ' hath recovered.' )
-            monster_hp = monster_max_hp
-      elif chosenMonsterAction == MonsterActionEnum.HURT or chosenMonsterAction == MonsterActionEnum.HURTMORE:
-         AudioPlayer().playSound( 'castSpell.wav' )
-         SurfaceEffects.flickering( self.gameState.screen )
-         if chosenMonsterAction == MonsterActionEnum.HURT:
-            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of hurt.' )
-            damage = random.randint( self.gameState.gameInfo.spells['Hurt'].minDamageByMonster, self.gameState.gameInfo.spells['Hurt'].maxDamageByMonster )
-         else:
-            messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of hurtmore.' )
-            damage = random.randint( self.gameState.gameInfo.spells['Hurtmore'].minDamageByMonster, self.gameState.gameInfo.spells['Hurtmore'].maxDamageByMonster )
-         if self.gameState.pc.armor is not None:
-            damage = round(damage * self.gameState.pc.armor.hurtDmgModifier)
-         if monster_stopspelled:
-            messageDialog.addMessage( 'But that spell hath been blocked.' )
-            damage = 0
-      elif chosenMonsterAction == MonsterActionEnum.SLEEP:
-         AudioPlayer().playSound( 'castSpell.wav' )
-         SurfaceEffects.flickering( self.gameState.screen )
-         messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of sleep.' )
-         if monster_stopspelled:
-            messageDialog.addMessage( 'But that spell hath been blocked.' )
-         else:
-            messageDialog.addMessage( 'Thou art asleep.' )
-            player_asleep = True
-      elif chosenMonsterAction == MonsterActionEnum.STOPSPELL:
-         AudioPlayer().playSound( 'castSpell.wav' )
-         SurfaceEffects.flickering( self.gameState.screen )
-         messageDialog.addMessage( 'The ' + monster.name + ' chants the spell of stopspell.' )
-         if monster_stopspelled:
-            messageDialog.addMessage( 'But that spell hath been blocked.' )
-         # TODO: Should always be blocked by certain items - Erdrick's Armor
-         elif random.uniform(0, 1) < 0.5:
-            messageDialog.addMessage( self.gameState.pc.name + ' spells hath been blocked.' )
-            player_stopspelled = True
-         else:
-            messageDialog.addMessage( 'But that spell did not work.' )
-      elif chosenMonsterAction == MonsterActionEnum.BREATH_FIRE or chosenMonsterAction == MonsterActionEnum.BREATH_STRONG_FIRE:
-         AudioPlayer().playSound( 'fireBreathingAttack.wav' )
-         messageDialog.addMessage( 'The ' + monster.name + ' is breathing fire.' )
-         if chosenMonsterAction == MonsterActionEnum.BREATH_FIRE:
-            damage = random.randint(16, 23)
-         else:
-            damage = random.randint(65, 72)
-         # TODO: Apply armor damage reduction
-      else: # chosenMonsterAction == MonsterActionEnum.ATTACK
-         damage = self.gameState.pc.calcHitDamageFromMonster( monster )
-         if 0 == damage:
-            # TODO: Play sound?
-            messageDialog.addMessage( 'The ' + monster.name + ' attacks! ' + self.gameState.pc.name + ' dodges the strike.' )
-         else:
-            audioPlayer.playSound( 'Dragon Warrior [Dragon Quest] SFX (5).wav' )
-            messageDialog.addMessage( 'The ' + monster.name + ' attacks!' )
+        if damage != 0:
+            message_dialog.addMessage( 'Thy hit points reduced by ' + str(damage) + '.' )
+            self.gameState.pc.hp -= damage
+            if self.gameState.pc.hp < 0:
+                self.gameState.pc.hp = 0
+            for flickerTimes in range( 10 ):
+                offset_pixels = Point( damageFlickerPixels, damageFlickerPixels )
+                self.gameState.screen.blit( origScreen, (0, 0) )
+                self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
+                self.gameState.screen.blit( monster.image, monsterImageDest_pixels )
+                GameDialog.createEncounterStatusDialog(self.gameState.pc).blit(self.gameState.screen,
+                                                                               False,
+                                                                               offset_pixels)
+                message_dialog.blit( self.gameState.screen, True, offset_pixels )
+                pygame.time.Clock().tick(30)
+                self.gameState.screen.blit( origScreen, (0, 0) )
+                self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
+                self.gameState.screen.blit( monster.image, monsterImageDest_pixels )
+                GameDialog.createEncounterStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
+                message_dialog.blit( self.gameState.screen, True )
+                pygame.time.Clock().tick(30)
+    '''
 
-      if damage != 0:
-         messageDialog.addMessage( 'Thy hit points reduced by ' + str(damage) + '.' )
-         self.gameState.pc.hp -= damage
-         if self.gameState.pc.hp < 0:
-            self.gameState.pc.hp = 0
-         for flickerTimes in range( 10 ):
-            offset_pixels = Point( damageFlickerPixels, damageFlickerPixels )
-            self.gameState.screen.blit( origScreen, (0, 0) )
-            self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
-            self.gameState.screen.blit( monster.image, monsterImageDest_pixels )
-            GameDialog.createEncounterStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False, offset_pixels )
-            messageDialog.blit( self.gameState.screen, True, offset_pixels )
-            pygame.time.Clock().tick(30)
-            self.gameState.screen.blit( origScreen, (0, 0) )
-            self.gameState.screen.blit( encounterImage, encounterImageDest_pixels )
-            self.gameState.screen.blit( monster.image, monsterImageDest_pixels )
-            GameDialog.createEncounterStatusDialog( self.gameState.pc ).blit( self.gameState.screen, False )
-            messageDialog.blit( self.gameState.screen, True )
-            pygame.time.Clock().tick(30)
+    def __str__(self) -> str:
+        return "%s(%s, %s, %s, %s, %s)" % (
+            self.__class__.__name__,
+            super(MonsterState, self).__str__(),
+            self.monster_info,
+            self.special_monster_info,
+            self.gp,
+            self.xp)
 
-   def __str__( self ) -> str:
-      return "%s(%s, %s, %s, %s, %s)" % (
-         self.__class__.__name__,
-         super(MonsterState, self).__str__(),
-         self.monsterInfo,
-         self.specialMonsterInfo,
-         self.gp,
-         self.xp)
+    def __repr__(self) -> str:
+        return "%s(%r, %r, %r, %r, %r)" % (
+            self.__class__.__name__,
+            super(MonsterState, self).__repr__(),
+            self.monster_info,
+            self.special_monster_info,
+            self.gp,
+            self.xp)
 
-   def __repr__( self ) -> str:
-      return "%s(%r, %r, %r, %r, %r)" % (
-         self.__class__.__name__,
-         super(MonsterState, self).__repr__(),
-         self.monsterInfo,
-         self.specialMonsterInfo,
-         self.gp,
-         self.xp)
 
 def main() -> None:
-   import pygame
-   monsterInfo = Monster( name='MonsterName',
-                          image=pygame.Surface( (0, 0) ),
-                          dmgImage=pygame.Surface( (0, 0) ),
-                          strength=1,
-                          agility=2,
-                          minHp=3,
-                          maxHp=4,
-                          sleepResist=5.1,
-                          stopspellResist=6.2,
-                          hurtResist=7.3,
-                          dodge=8.4,
-                          blockFactor=9.5,
-                          xp=10,
-                          minGp=11,
-                          maxGp=12,
-                          monsterActions=[] )
-   monsterState = MonsterState( monsterInfo, None )
-   print( monsterState, flush=True )
-   while monsterState.isAlive():
-      monsterState.hp -= 10
-      print( monsterState, flush=True )
+    import pygame
+    monster_info = MonsterInfo(
+        name='MonsterName',
+        image=pygame.Surface((0, 0)),
+        dmg_image=pygame.Surface((0, 0)),
+        strength=1,
+        agility=2,
+        min_hp=3,
+        max_hp=4,
+        sleep_resist=5.1,
+        stopspell_resist=6.2,
+        hurt_resist=7.3,
+        dodge=8.4,
+        block_factor=9.5,
+        xp=10,
+        min_gp=11,
+        max_gp=12,
+        monster_actions=[],
+        allows_critical_hits=False)
+    monster = MonsterState(monster_info, None)
+    print(monster, flush=True)
+    while monster.is_alive():
+        monster.hp -= 10
+        print(monster, flush=True)
+
 
 if __name__ == '__main__':
-   try:
-      main()
-   except Exception:
-      import traceback
-      traceback.print_exc()
+    try:
+        main()
+    except Exception:
+        import traceback
+        traceback.print_exc()
