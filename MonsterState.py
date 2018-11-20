@@ -19,12 +19,12 @@ class MonsterState(CombatCharacterState):
         return self.monster_info.name
 
     def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (self._turns_asleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
+        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
         if ret_val:
-            self._turns_asleep += 1
+            self.turns_asleep += 1
         else:
             self.is_asleep = False
-            self._turns_asleep = 0
+            self.turns_asleep = 0
         return ret_val
 
     def get_strength(self) -> int:

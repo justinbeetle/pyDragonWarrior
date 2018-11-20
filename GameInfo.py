@@ -6,10 +6,12 @@ from typing import Tuple
 
 import os
 import xml.etree.ElementTree
+import pygame
 
 from AudioPlayer import AudioPlayer
 from GameTypes import *
 from Point import Point
+from SurfaceEffects import SurfaceEffects
 
 
 class GameInfo:
@@ -65,6 +67,8 @@ class GameInfo:
                 int(element.attrib['gp']),
                 element.attrib['ignoresTilePenalties'] == 'yes',
                 float(element.attrib['hurtDmgModifier']),
+                float(element.attrib['fireDmgModifier']),
+                float(element.attrib['stopspellResistance']),
                 int(element.attrib['hpRegenTiles']))
             self.items[item_name] = self.armors[item_name]
          
@@ -725,8 +729,7 @@ class GameInfo:
 
             elif element.tag == 'DialogVendorBuyOptions':
                 if 'values' in element.attrib:
-                    dialog_vendor_buy_options: DialogVendorBuyOptions.DialogVendorBuyOptionsParamType = \
-                        element.attrib['values']
+                    dialog_vendor_buy_options: DialogVendorBuyOptionsParamType = element.attrib['values']
                 else:
                     dialog_vendor_buy_options = []
                     for option_element in element.findall("./DialogVendorBuyOption"):
@@ -739,8 +742,7 @@ class GameInfo:
 
             elif element.tag == 'DialogVendorSellOptions':
                 if 'values' in element.attrib:
-                    dialog_vendor_sell_options: DialogVendorSellOptions.DialogVendorSellOptionsParamType = \
-                        element.attrib['values']
+                    dialog_vendor_sell_options: DialogVendorSellOptionsParamType = element.attrib['values']
                 else:
                     dialog_vendor_sell_options = []
                     for option_element in element.findall("./DialogVendorSellOption"):
@@ -752,8 +754,8 @@ class GameInfo:
                                           self.parse_dialog(element),
                                           name=name,
                                           count=count,
-                                          mapName=map_name,
-                                          mapPos=map_pos))
+                                          map_name=map_name,
+                                          map_pos=map_pos))
 
             elif element.tag == 'DialogAction':
                 victory_dialog: Optional[DialogType] = None
@@ -771,19 +773,18 @@ class GameInfo:
                 dialog.append(DialogAction(DialogActionEnum[element.attrib['type']],
                                            name=name,
                                            count=count,
-                                           mapName=map_name,
-                                           mapPos=map_pos,
-                                           mapDir=map_dir,
-                                           victoryDialog=victory_dialog,
-                                           runAwayDialog=run_away_dialog,
-                                           encounterMusic=encounter_music))
+                                           map_name=map_name,
+                                           map_pos=map_pos,
+                                           map_dir=map_dir,
+                                           victory_dialog=victory_dialog,
+                                           run_away_dialog=run_away_dialog,
+                                           encounter_music=encounter_music))
 
             elif element.tag == 'DialogVariable':
                 name = element.attrib['name']
                 value = element.attrib['value']
                 if value == 'ITEM_LIST':
-                    value_for_dialog_vendor_buy_options: \
-                        DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType = []
+                    value_for_dialog_vendor_buy_options: DialogVendorBuyOptionsParamWithoutReplacementType = []
                     for item_element in element.findall("./Item"):
                         item_name = item_element.attrib['name']
                         item_gp = str(self.items[item_name].gp)
@@ -792,8 +793,7 @@ class GameInfo:
                         value_for_dialog_vendor_buy_options.append([item_name, item_gp])
                     dialog.append(DialogVendorBuyOptionsVariable(name, value_for_dialog_vendor_buy_options))
                 elif value == 'INVENTORY_ITEM_TYPE_LIST':
-                    value_for_dialog_vendor_sell_options: \
-                        DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType = []
+                    value_for_dialog_vendor_sell_options: DialogVendorSellOptionsParamWithoutReplacementType = []
                     for itemTypeElement in element.findall("./InventoryItemType"):
                         value_for_dialog_vendor_sell_options.append(itemTypeElement.attrib['type'])
                     dialog.append(DialogVendorSellOptionsVariable(name, value_for_dialog_vendor_sell_options))
@@ -837,7 +837,7 @@ class GameInfo:
         map_image_size_pixels = map_image_size_tiles * self.tile_size_pixels
 
         if map_decorations is None:
-            map_decorations = self.maps[map_name].mapDecorations
+            map_decorations = self.maps[map_name].map_decorations
       
         map_image = self.get_map_image(
             map_name,
@@ -847,7 +847,7 @@ class GameInfo:
             self.maps[map_name].dat,
             pygame.Color('pink'))  # Fill with a color to make is easier to identify any gaps
 
-        overlay_dat = self.maps[map_name].overlayDat
+        overlay_dat = self.maps[map_name].overlay_dat
         if overlay_dat is not None:
             map_overlay_image = self.get_map_image(
                 map_name,
@@ -885,25 +885,25 @@ class GameInfo:
                 y_s_px = (y + image_pad_tiles.y + self.maps[map_name].size[1]) * self.tile_size_pixels
                 # NW pad
                 if dat[0][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][0]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[0][0]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][0]]].image[0], (x_w_px, y_n_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][0]]].image,    (x_w_px, y_n_px))
                 # NE pad
                 if dat[0][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][last_c]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[0][last_c]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][last_c]]].image[0], (x_e_px, y_n_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][last_c]]].image,    (x_e_px, y_n_px))
                 # SW pad
                 if dat[last_r][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][0]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[last_r][0]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][0]]].image[0], (x_w_px, y_s_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][0]]].image,    (x_w_px, y_s_px))
                 # SE pad
                 if dat[last_r][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][last_c]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[last_r][last_c]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][last_c]]].image[0], (x_e_px, y_s_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][last_c]]].image,    (x_e_px, y_s_px))
@@ -912,13 +912,13 @@ class GameInfo:
                 y_px = int((y + image_pad_tiles.y) * self.tile_size_pixels)
                 # W pad
                 if dat[y][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[y][0]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[y][0]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[y][0]]].image[0], (x_w_px, y_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[y][0]]].image,    (x_w_px, y_px))
                 # E pad
                 if dat[y][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[y][last_c]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[y][last_c]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[y][last_c]]].image[0], (x_e_px, y_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[y][last_c]]].image,    (x_e_px, y_px))
@@ -930,13 +930,13 @@ class GameInfo:
                 x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
                 # N pad
                 if dat[0][x] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][x]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[0][x]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][x]]].image[0], (x_px, y_n_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[0][x]]].image,    (x_px, y_n_px))
                 # S pad
                 if dat[last_r][x] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][x]]].specialEdges:
+                    if self.tiles[self.tile_symbols[dat[last_r][x]]].special_edges:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][x]]].image[0], (x_px, y_s_px))
                     else:
                         map_image.blit(self.tiles[self.tile_symbols[dat[last_r][x]]].image,    (x_px, y_s_px))
@@ -948,7 +948,7 @@ class GameInfo:
                 if tile_symbol not in self.tile_symbols:
                     continue
                 x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
-                if self.tiles[self.tile_symbols[tile_symbol]].specialEdges:
+                if self.tiles[self.tile_symbols[tile_symbol]].special_edges:
                     # Determine which image to use
                     image_idx = 0
                     # TODO: Fix hardcoded exception for the bridge tile_symbol of 'b'
@@ -1047,13 +1047,17 @@ def main() -> None:
                         if e.key == pygame.K_ESCAPE:
                             is_running = False
                         elif e.key == pygame.K_DOWN:
-                            scroll_view(screen, map_image, Direction.SOUTH, map_image_rect, 1, tile_size_pixels, True)
+                            SurfaceEffects.scroll_view(
+                                screen, map_image, Direction.SOUTH, map_image_rect, 1, tile_size_pixels, True)
                         elif e.key == pygame.K_UP:
-                            scroll_view(screen, map_image, Direction.NORTH, map_image_rect, 1, tile_size_pixels, True)
+                            SurfaceEffects.scroll_view(
+                                screen, map_image, Direction.NORTH, map_image_rect, 1, tile_size_pixels, True)
                         elif e.key == pygame.K_LEFT:
-                            scroll_view(screen, map_image, Direction.WEST,  map_image_rect, 1, tile_size_pixels, True)
+                            SurfaceEffects.scroll_view(
+                                screen, map_image, Direction.WEST,  map_image_rect, 1, tile_size_pixels, True)
                         elif e.key == pygame.K_RIGHT:
-                            scroll_view(screen, map_image, Direction.EAST,  map_image_rect, 1, tile_size_pixels, True)
+                            SurfaceEffects.scroll_view(
+                                screen, map_image, Direction.EAST,  map_image_rect, 1, tile_size_pixels, True)
                     elif e.type == pygame.QUIT:
                         is_running = False
                     else:

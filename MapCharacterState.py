@@ -33,7 +33,7 @@ def main() -> None:
     # Test out character states
     state = MapCharacterState('myType', Point(5, 6), Direction.SOUTH)
     print(state, flush=True)
-    state.dir = Direction.WEST
+    state.direction = Direction.WEST
     print(state, flush=True)
 
 

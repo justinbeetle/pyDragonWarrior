@@ -4,6 +4,8 @@
 from __future__ import annotations
 from typing import Dict, List, NamedTuple, Optional, Union
 
+import pygame
+
 from dataclasses import dataclass
 from enum import Enum
 from Point import Point
@@ -120,50 +122,52 @@ class DialogGoTo:
     label: str
 
 
+# List of items that can be bought from the vendor where each item is a 2 element list
+# consisting of item name and gold cost (as str)
+# Optionally could also be a string for replacement by a DialogVariable
+DialogVendorBuyOptionsParamWithoutReplacementType = List[List[str]]
+DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
+
+
 # Dialog for a list of vendor buy options
 @dataclass
 class DialogVendorBuyOptions:
-    nameAndGpRowData: DialogVendorBuyOptionsParamType
+    name_and_gp_row_data: DialogVendorBuyOptionsParamType
 
-    # List of items that can be bought from the vendor where each item is a 2 element list
-    # consisting of item name and gold cost (as str)
-    # Optionally could also be a string for replacement by a DialogVariable
-    DialogVendorBuyOptionsParamWithoutReplacementType = List[List[str]]
-    DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
+
+# List of the classes of items that can be sold to the vendor
+# Optionally could also be a string for replacement by a DialogVariable
+DialogVendorSellOptionsParamWithoutReplacementType = List[str]
+DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacementType, str]
 
 
 @dataclass
 class DialogVendorBuyOptionsVariable:
     name: str
-    value: DialogVendorBuyOptions.DialogVendorBuyOptionsParamWithoutReplacementType
+    value: DialogVendorBuyOptionsParamWithoutReplacementType
 
 
 # Dialog for a list of vendor sell options
 @dataclass
 class DialogVendorSellOptions:
-    itemTypes: DialogVendorSellOptionsParamType
-
-    # List of the classes of items that can be sold to the vendor
-    # Optionally could also be a string for replacement by a DialogVariable
-    DialogVendorSellOptionsParamWithoutReplacemenType = List[str]
-    DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacemenType, str]
+    item_types: DialogVendorSellOptionsParamType
 
 
 @dataclass
 class DialogVendorSellOptionsVariable:
     name: str
-    value: DialogVendorSellOptions.DialogVendorSellOptionsParamWithoutReplacemenType
+    value: DialogVendorSellOptionsParamWithoutReplacementType
 
 
 # Conditionally branch dialog if the check condition is not met
 @dataclass
 class DialogCheck:
     type: DialogCheckEnum
-    failedCheckDialog: Optional[DialogType]
+    failed_check_dialog: Optional[DialogType]
     name: Optional[str] = None
     count: Union[int, str] = 1
-    mapName: Optional[str] = None
-    mapPos: Optional[Point] = None
+    map_name: Optional[str] = None
+    map_pos: Optional[Point] = None
 
 
 # Conditionally branch dialog if the check condition is not met
@@ -172,13 +176,13 @@ class DialogAction:
     type: DialogActionEnum
     name: Optional[str] = None
     count: Union[int, str] = 1
-    decaySteps: Optional[int] = None
-    mapName: Optional[str] = None
-    mapPos: Optional[Point] = None
-    mapDir: Optional[Direction] = None
-    victoryDialog: Optional[DialogType] = None
-    runAwayDialog: Optional[DialogType] = None
-    encounterMusic: Optional[str] = None
+    decay_steps: Optional[int] = None
+    map_name: Optional[str] = None
+    map_pos: Optional[Point] = None
+    map_dir: Optional[Direction] = None
+    victory_dialog: Optional[DialogType] = None
+    run_away_dialog: Optional[DialogType] = None
+    encounter_music: Optional[str] = None
 
 
 class Tile(NamedTuple):
@@ -186,19 +190,19 @@ class Tile(NamedTuple):
     symbol: str
     image: Union[pygame.Surface, List[pygame.Surface]]
     walkable: bool
-    canTalkOver: bool
-    hpPenalty: int
-    mpPenalty: int
+    can_talk_over: bool
+    hp_penalty: int
+    mp_penalty: int
     speed: float
-    spawnRate: float
-    specialEdges: bool
+    spawn_rate: float
+    special_edges: bool
 
 
 class Decoration(NamedTuple):
     name: str
     image: pygame.Surface
     walkable: bool
-    removeWithSearch: bool
+    remove_with_search: bool
     removeWithKey: bool
 
 
@@ -208,72 +212,72 @@ class CharacterType(NamedTuple):
 
 
 class LeavingTransition(NamedTuple):
-    destMap: str
-    destPoint: Point
-    destDir: Direction
-    respawnDecorations: bool
+    dest_map: str
+    dest_point: Point
+    dest_dir: Direction
+    respawn_decorations: bool
 
 
 class PointTransition(NamedTuple):
-    srcPoint: Point
-    destMap: str
-    destPoint: Point
-    destDir: Direction
-    respawnDecorations: bool
-    progressMarker: Optional[str] = None
-    inverseProgressMarker: Optional[str] = None
+    src_point: Point
+    dest_map: str
+    dest_point: Point
+    dest_dir: Direction
+    respawn_decorations: bool
+    progress_marker: Optional[str] = None
+    inverse_progress_marker: Optional[str] = None
 
 
 class NpcInfo(NamedTuple):
     type: str
     point: Point
-    dir: Direction
+    direction: Direction
     walking: bool
     dialog: Optional[DialogType] = None
-    progressMarker: Optional[str] = None
-    inverseProgressMarker: Optional[str] = None
+    progress_marker: Optional[str] = None
+    inverse_progress_marker: Optional[str] = None
 
 
 class MapDecoration(NamedTuple):
     type: Optional[str]
     point: Point
     dialog: Optional[DialogType] = None
-    progressMarker: Optional[str] = None
-    inverseProgressMarker: Optional[str] = None
+    progress_marker: Optional[str] = None
+    inverse_progress_marker: Optional[str] = None
 
 
 class SpecialMonster(NamedTuple):
     name: str  # TODO: Change to Monster reference instead of storing the monster name
     point: Point
-    approachDialog: Optional[DialogType] = None
-    victoryDialog: Optional[DialogType] = None
-    runAwayDialog: Optional[DialogType] = None
-    progressMarker: Optional[str] = None
-    inverseProgressMarker: Optional[str] = None
+    approach_dialog: Optional[DialogType] = None
+    victory_dialog: Optional[DialogType] = None
+    run_away_dialog: Optional[DialogType] = None
+    progress_marker: Optional[str] = None
+    inverse_progress_marker: Optional[str] = None
 
 
 class Map(NamedTuple):
     name: str
     dat: List[str]
-    overlayDat: Optional[List[str]]
+    overlay_dat: Optional[List[str]]
     size: Point
     music: str
-    lightDiameter: Optional[int]
-    leavingTransition: Optional[LeavingTransition]
-    pointTransitions: List[PointTransition]
+    light_diameter: Optional[int]
+    leaving_transition: Optional[LeavingTransition]
+    point_transitions: List[PointTransition]
     npcs: List[NpcInfo]
-    mapDecorations: List[MapDecoration]
-    monsterZones: List[MonsterZone]
-    encounterImage: Optional[pygame.Surface]
-    specialMonsters: List[SpecialMonster]
-    isOutside: bool
+    map_decorations: List[MapDecoration]
+    monster_zones: List[MonsterZone]
+    encounter_image: Optional[pygame.Surface]
+    special_monsters: List[SpecialMonster]
+    is_outside: bool
     origin: Optional[Point] = None
 
 
 class MonsterAction(NamedTuple):
     type: MonsterActionEnum
     probability: float
-    healthRatioThreshold: float
+    health_ratio_threshold: float
 
 
 class MonsterInfo(NamedTuple):
@@ -348,8 +352,9 @@ class Armor(NamedTuple):
     gp: int
     ignores_tile_penalties: bool
     hurt_dmg_modifier: float
+    fire_dmg_modifier: float
+    stopspell_resistance: float
     hp_regen_tiles: int
-    # TODO: Add fireDmbModified, stopspellBlock
 
 
 class Shield(NamedTuple):
@@ -382,62 +387,12 @@ class MapImageInfo(NamedTuple):
     size_pixels: Point
     overlay_image: Optional[pygame.Surface] = None
 
-
-# TODO: Where to put this???
-import pygame
-def scroll_view(screen: pygame.Surface,
-                image: pygame.Surface,
-                direction: Direction,
-                view_rect: pygame.Rect,
-                zoom_factor: int,
-                image_px_step_size: int,
-                update: bool = False) -> None:
-    src_rect = None
-    zoom_view_rect = screen.get_clip()
-    image_w, image_h = image.get_size()
-    
-    if direction == Direction.NORTH:
-        if view_rect.top > 0:
-            screen.scroll(dy=image_px_step_size * zoom_factor)
-            view_rect.move_ip(0, -image_px_step_size)
-            src_rect = view_rect.copy()
-            src_rect.h = image_px_step_size
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.h = image_px_step_size * zoom_factor
-    elif direction == Direction.SOUTH:
-        if view_rect.bottom < image_h:
-            screen.scroll(dy=-image_px_step_size * zoom_factor)
-            view_rect.move_ip(0, image_px_step_size)
-            src_rect = view_rect.copy()
-            src_rect.h = image_px_step_size
-            src_rect.bottom = view_rect.bottom
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.h = image_px_step_size * zoom_factor
-            dst_rect.bottom = zoom_view_rect.bottom
-    elif direction == Direction.WEST:
-        if view_rect.left > 0:
-            screen.scroll(dx=image_px_step_size * zoom_factor)
-            view_rect.move_ip(-image_px_step_size, 0)
-            src_rect = view_rect.copy()
-            src_rect.w = image_px_step_size
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.w = image_px_step_size * zoom_factor
-    elif direction == Direction.EAST:
-        if view_rect.right < image_w:
-            screen.scroll(dx=-image_px_step_size * zoom_factor)
-            view_rect.move_ip(image_px_step_size, 0)
-            src_rect = view_rect.copy()
-            src_rect.w = image_px_step_size
-            src_rect.right = view_rect.right
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.w = image_px_step_size * zoom_factor
-            dst_rect.right = zoom_view_rect.right
-    if src_rect is not None:
-        pygame.transform.scale(image.subsurface(src_rect),
-            dst_rect.size,
-            screen.subsurface(dst_rect))
-        if update:
-            pygame.display.update(zoom_view_rect)
+    @staticmethod
+    def create_null() -> MapImageInfo:
+        return MapImageInfo('null',
+                            pygame.Surface((0, 0)),
+                            Point(),
+                            Point())
 
 
 def main() -> None:

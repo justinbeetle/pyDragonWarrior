@@ -13,13 +13,13 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         self.hp = hp
         self.max_hp = max(hp, max_hp)
         self.is_asleep = False
-        self._turns_asleep = 0
+        self.turns_asleep = 0
         self.are_spells_blocked = False
         self.has_run_away = False
 
     def clear_combat_status_affects(self) -> None:
         self.is_asleep = False
-        self._turns_asleep = 0
+        self.turns_asleep = 0
         self.are_spells_blocked = False
         self.has_run_away = False
 
@@ -41,7 +41,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def does_spell_work(self, spell: Spell, target: CombatCharacterState) -> bool:
         if self.are_spells_blocked:
             return False
-        if target.get_spell_resistance(spell) < random.uniform(0, 1):
+        if target.get_spell_resistance(spell) > random.uniform(0, 1):
             return False
         if 'SLEEP' == spell.name.upper() and target.is_asleep:
             return False
@@ -79,7 +79,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_spell_resistance(self, spell: Spell) -> bool:
+    def get_spell_resistance(self, spell: Spell) -> float:
         raise NotImplementedError
 
     def __str__(self) -> str:
@@ -88,7 +88,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             self.hp,
             self.max_hp,
             self.is_asleep,
-            self._turns_asleep,
+            self.turns_asleep,
             self.are_spells_blocked)
 
     def __repr__(self) -> str:
@@ -97,5 +97,5 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             self.hp,
             self.max_hp,
             self.is_asleep,
-            self._turns_asleep,
+            self.turns_asleep,
             self.are_spells_blocked)

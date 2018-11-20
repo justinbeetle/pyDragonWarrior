@@ -52,7 +52,7 @@ class AudioPlayer:
                 # TODO: Switch to a more responsive approach which is not polling based
    
                 if (current_music_rel_file_path1 != self.music_rel_file_path1
-                    or current_music_rel_file_path2 != self.music_rel_file_path2):
+                        or current_music_rel_file_path2 != self.music_rel_file_path2):
                     current_music_rel_file_path1 = self.music_rel_file_path1
                     current_music_rel_file_path2 = self.music_rel_file_path2
                     first_time = True

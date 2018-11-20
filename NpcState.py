@@ -8,7 +8,7 @@ class NpcState(MapCharacterState):
     def __init__(self, npc_info: NpcInfo) -> None:
         super(NpcState, self).__init__(type_name=npc_info.type,
                                        pos_dat_tile=npc_info.point,
-                                       direction=npc_info.dir)
+                                       direction=npc_info.direction)
         self.npc_info = npc_info
 
     def __str__(self) -> str:
@@ -26,7 +26,7 @@ def main() -> None:
     # Test out character states
     npc_info = NpcInfo(type='myType',
                        point=Point(5, 6),
-                       dir=Direction.SOUTH,
+                       direction=Direction.SOUTH,
                        walking=False)
     state = NpcState(npc_info)
     print(state, flush=True)

@@ -52,8 +52,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
             HeroState.add_item_to_item_row_data(self.armor, 'E', limit_to_droppable, filter_types, item_row_data)
         if self.shield is not None:
             HeroState.add_item_to_item_row_data(self.shield, 'E', limit_to_droppable, filter_types, item_row_data)
-        for item in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
-            HeroState.add_item_to_item_row_data(item, 'E', limit_to_droppable, filter_types, item_row_data)
+        for tool in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
+            HeroState.add_item_to_item_row_data(tool, 'E', limit_to_droppable, filter_types, item_row_data)
         for item in sorted(self.unequipped_items, key=lambda inner_item: inner_item.name):
             item_count_str = str(self.unequipped_items[item])
             HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
@@ -249,12 +249,12 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return self.name
 
     def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (self._turns_asleep == 0 or random.uniform(0, 1) > 0.5)
+        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 0.5)
         if ret_val:
-            self._turns_asleep += 1
+            self.turns_asleep += 1
         else:
             self.is_asleep = False
-            self._turns_asleep = 0
+            self.turns_asleep = 0
         return ret_val
 
     def get_strength(self) -> int:
@@ -287,7 +287,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return False
 
     def get_spell_resistance(self, spell: Spell) -> float:
-        # TODO: With Erdricks armor STOPSPELL reistance should be 1.0
+        if spell.name == 'Stopspell' and self.armor is not None:
+            return self.armor.stopspell_resistance
         return 0
 
     def critical_hit_check(self, monster: CombatCharacterState) -> bool:

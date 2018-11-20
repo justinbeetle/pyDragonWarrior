@@ -1513,13 +1513,13 @@
          <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"/>
       </Weapons>
       <Armors>
-         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" hpRegenTiles="3"/>
-         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" hpRegenTiles="1"/>
+         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="0"   hpRegenTiles="3"/>
+         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="1.0" hpRegenTiles="1"/>
       </Armors>
       <Shields>
          <Shield name="Leather Shield"   defenseBonus="4"  gp="90"/>
