@@ -15,18 +15,21 @@ class HeroParty:
         self.gp = 0
         self.progress_markers: List[str] = []
 
-    def add_member(self, member: HeroState, order: Optional[int]=None, is_main_character=False) -> None:
+    def add_member(self, member: HeroState, order: Optional[int]=None, is_main_character: bool=False) -> None:
         if is_main_character:
             self.main_character = member
-        if order is None:
-            if is_main_character:
-                # Add new members that will be the main character for the party to the front
-                self.members = [member] + self.members
+        if member not in self.members:
+            if order is None:
+                if is_main_character:
+                    # Add new members that will be the main character for the party to the front
+                    self.members = [member] + self.members
+                else:
+                    # Add new members other than the main character to the back of the party
+                    self.members.append(member)
             else:
-                # Add new members other than the main character to the back of the party
-                self.members.append(member)
+                self.members.insert(order, member)
         else:
-            self.members.insert(order, member)
+            print('ERROR: Cannot add a member that is already in the party', flush=True)
 
     # Remove party member by name or reference
     def remove_member(self, member: Union[HeroState, str]) -> None:
@@ -86,56 +89,56 @@ class HeroParty:
             ret_val += 1
         return ret_val
 
-    # Gain items (ItemType) or a progress marker (str)
-    # Gained items always go to the main character
     # TODO: Should gained items instead go into a communal party stash?
-    def gain_item(self, item: Union[ItemType, str], count: int = 1) -> None:
-        if isinstance(item, str):
-            if item not in self.progress_markers:
-                self.progress_markers.append(item)
-                # print('Added progress marker', item, flush=True)
-            else:
-                print('WARN: Did not add previously added progress marker', item, flush=True)
-        else:
-            self.main_character.gain_item(item, count)
+    def gain_item(self, item: ItemType, count: int = 1) -> None:
+        self.main_character.gain_item(item, count)
 
     # Lose items
     # For lost items, first lose unequipped items then equipped items.
     # Start at the back of the party and move forward while skipping the main character then processing them last
-    def lose_item(self, item_name: str, count: int = 1) -> Optional[ItemType]:
-        ret_val = None
-        traversal_list = reversed(self.members)
+    def lose_item(self, item: ItemType, count: int = 1) -> None:
+        traversal_list = self.members.copy()
+        traversal_list.reverse()
         traversal_list.remove(self.main_character)
         traversal_list.append(self.main_character)
         remaining_count = count
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item_name, unequipped_only=True), remaining_count)
+            member_lose_count = min(member.get_item_count(item.name, unequipped_only=True), remaining_count)
             if 0 < member_lose_count:
-                ret_val = member.lose_item(item_name, member_lose_count, unequipped_only=True)
+                member.lose_item(item, member_lose_count, unequipped_only=True)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
-                return ret_val
+                return
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item_name, unequipped_only=False), remaining_count)
+            member_lose_count = min(member.get_item_count(item.name, unequipped_only=False), remaining_count)
             if 0 < member_lose_count:
-                ret_val = member.lose_item(item_name, member_lose_count, unequipped_only=False)
+                member.lose_item(item, member_lose_count, unequipped_only=False)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
-                return ret_val
-        if item_name in self.progress_markers:
-            self.progress_markers.remove(item_name)
-            # print('Removed progress marker', item_name, flush=True)
-            remaining_count -= 1
+                return
         if 0 < remaining_count:
             print('ERROR: Remaining count of ' + str(remaining_count) + ' on attempt to lose ' + str(count) + ' of '
-                  + item_name, flush=True)
-        return ret_val
+                  + item.name, flush=True)
 
-    def clear_combat_status_affects(self):
+    def gain_progress_marker(self, progress_marker: str) -> None:
+        if progress_marker not in self.progress_markers:
+            self.progress_markers.append(progress_marker)
+            # print('Gained progress marker', progress_marker, flush=True)
+        else:
+            print('WARN: Did not add previously added progress marker', progress_marker, flush=True)
+
+    def lose_progress_marker(self, progress_marker: str) -> None:
+        if progress_marker in self.progress_markers:
+            self.progress_markers.remove(progress_marker)
+            # print('Lost progress marker', progress_marker, flush=True)
+        else:
+            print('WARN: Unable to remove progress marker', progress_marker, flush=True)
+
+    def clear_combat_status_affects(self) -> None:
         for member in self.members:
             member.clear_combat_status_affects()
 
-    def is_still_in_combat(self):
+    def is_still_in_combat(self) -> bool:
         for member in self.members:
             if member.is_still_in_combat():
                 return True
@@ -182,13 +185,24 @@ class HeroParty:
 
 
 def main() -> None:
-    # TODO: Test out HeroParty
-    pass
+    from GameTypes import Direction, Level
+    level = Level(0, '1', 2, 3, 4, 25, 6)
+    hero_state = HeroState('hero', Point(7, 3), Direction.WEST, 'Sir Me', level)
+    hero_party = HeroParty(hero_state)
+    print(hero_party, '\n', flush=True)
+    for name in ['member1', 'member2', 'member3']:
+        member = HeroState('hero', Point(7, 3), Direction.WEST, name, level)
+        hero_party.add_member(member)
+        print(hero_party, '\n', flush=True)
 
 
 if __name__ == '__main__':
    try:
       main()
-   except Exception:
-      import traceback
-      traceback.print_exc()
+   except Exception as e:
+        import sys
+        import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

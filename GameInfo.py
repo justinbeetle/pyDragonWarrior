@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-# Imports to support type annotations
-from typing import Tuple
-
 import os
 import xml.etree.ElementTree
-import pygame
 
 from AudioPlayer import AudioPlayer
 from GameTypes import *
@@ -15,7 +11,11 @@ from Point import Point
 class GameInfo:
     TRANSPARENT_COLOR = pygame.Color(0, 128, 128)
    
-    def __init__(self, base_path: str, game_xml_path: str, tile_size_pixels: int, saved_game_file: Optional[str] = None) -> None:
+    def __init__(self,
+                 base_path: str,
+                 game_xml_path: str,
+                 tile_size_pixels: int,
+                 saved_game_file: Optional[str] = None) -> None:
 
         self.tile_size_pixels = tile_size_pixels
         self.dialog_sequences: Dict[str, DialogType] = {}
@@ -127,9 +127,9 @@ class GameInfo:
             if 'mpPenalty' in element.attrib:
                 mp_penalty = int(element.attrib['mpPenalty'])
             if 'speed' in element.attrib:
-                speed = GameInfo.parse_float(element.attrib['speed'])
+                speed = GameTypes.parse_float(element.attrib['speed'])
             if 'spawnRate' in element.attrib:
-                spawn_rate = GameInfo.parse_float(element.attrib['spawnRate'])
+                spawn_rate = GameTypes.parse_float(element.attrib['spawnRate'])
             if 'specialEdges' in element.attrib:
                 special_edges = element.attrib['specialEdges'] == 'yes'
             
@@ -453,8 +453,8 @@ class GameInfo:
                     if dmg_image.get_at((x, y)) != GameInfo.TRANSPARENT_COLOR:
                         dmg_image.set_at((x, y), pygame.Color('red'))
 
-            (min_hp, max_hp) = GameInfo.parse_int_range(element.attrib['hp'])
-            (min_gp, max_gp) = GameInfo.parse_int_range(element.attrib['gp'])
+            (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
+            (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
 
             monster_actions = []
             for monster_action_element in element.findall("./MonsterAction"):
@@ -473,11 +473,11 @@ class GameInfo:
                 int(element.attrib['agility']),
                 min_hp,
                 max_hp,
-                GameInfo.parse_float(element.attrib['sleepResist']),
-                GameInfo.parse_float(element.attrib['stopspellResist']),
-                GameInfo.parse_float(element.attrib['hurtResist']),
-                GameInfo.parse_float(element.attrib['dodge']),
-                GameInfo.parse_float(element.attrib['blockFactor']),
+                GameTypes.parse_float(element.attrib['sleepResist']),
+                GameTypes.parse_float(element.attrib['stopspellResist']),
+                GameTypes.parse_float(element.attrib['hurtResist']),
+                GameTypes.parse_float(element.attrib['dodge']),
+                GameTypes.parse_float(element.attrib['blockFactor']),
                 int(element.attrib['xp']),
                 min_gp,
                 max_gp,
@@ -495,8 +495,7 @@ class GameInfo:
 
         # Parse levels
         self.levels: List[Level] = []
-        self.levels_by_name: Dict[str, Level] = {}
-        self.levels_by_number: Dict[int, Level] = {}
+        levels_by_name: Dict[str, Level] = {}
         for element in xml_root.findall("./Levels/Level"):
             level_name = element.attrib['name']
             level_number = len(self.levels)
@@ -509,8 +508,7 @@ class GameInfo:
                 int(element.attrib['hp']),
                 int(element.attrib['mp']))
             self.levels.append(level)
-            self.levels_by_name[level_name] = level
-            self.levels_by_number[level_number] = level
+            levels_by_name[level_name] = level
 
         # Parse spells
         self.spells: Dict[str, Spell] = {}
@@ -531,11 +529,11 @@ class GameInfo:
             if 'availableOutsideCombat' in element.attrib:
                 available_outside_combat = element.attrib['availableOutsideCombat'] == 'yes'
             if 'hpRecover' in element.attrib:
-                (min_hp_recover, max_hp_recover) = GameInfo.parse_int_range(element.attrib['hpRecover'])
+                (min_hp_recover, max_hp_recover) = GameTypes.parse_int_range(element.attrib['hpRecover'])
             if 'damageByHero' in element.attrib:
-                (min_damage_by_hero, max_damage_by_hero) = GameInfo.parse_int_range(element.attrib['damageByHero'])
+                (min_damage_by_hero, max_damage_by_hero) = GameTypes.parse_int_range(element.attrib['damageByHero'])
             if 'damageByMonster' in element.attrib:
-                (min_damage_by_monster, max_damage_by_monster) = GameInfo.parse_int_range(
+                (min_damage_by_monster, max_damage_by_monster) = GameTypes.parse_int_range(
                     element.attrib['damageByMonster'])
             if 'excludedMap' in element.attrib:
                 excluded_map = element.attrib['excludedMap']
@@ -544,7 +542,7 @@ class GameInfo:
          
             self.spells[spell_name] = Spell(
                 spell_name,
-                self.levels_by_name[element.attrib['level']],
+                levels_by_name[element.attrib['level']],
                 int(element.attrib['mp']),
                 available_in_combat,
                 available_outside_combat,
@@ -644,23 +642,6 @@ class GameInfo:
         self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
         self.death_dialog = self.parse_dialog(death_state_element)
 
-    @staticmethod
-    def parse_float(value: Union[str, float, int]) -> float:
-        if isinstance(value, str) and '/' in value:
-            ret_val = int(value.split('/')[0]) / int(value.split('/')[1])
-        else:
-            ret_val = float(value)
-        return ret_val
-
-    @staticmethod
-    def parse_int_range(value: Union[str, int]) -> Tuple[int, int]:
-        if isinstance(value, str) and '-' in value:
-            min_val = int(value.split('-')[0])
-            max_val = int(value.split('-')[1])
-        else:
-            min_val = max_val = int(value)
-        return min_val, max_val
-
     def parse_dialog(self, dialog_root_element: Optional[xml.etree.ElementTree.Element]) -> Optional[DialogType]:
         if dialog_root_element is None:
             return None
@@ -684,8 +665,8 @@ class GameInfo:
                 else:
                     try:
                         count = int(element.attrib['count'])
-                    except:
-                        GameInfo.parse_int_range(element.attrib['count'])
+                    except ValueError:
+                        GameTypes.parse_int_range(element.attrib['count'])
                         count = element.attrib['count']
                   
             map_name = None
@@ -1042,26 +1023,26 @@ def main() -> None:
             is_running = True
          
             while is_running:
-                for e in pygame.event.get():
-                    if e.type == pygame.KEYDOWN:
-                        if e.key == pygame.K_ESCAPE:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
                             is_running = False
-                        elif e.key == pygame.K_DOWN:
+                        elif event.key == pygame.K_DOWN:
                             SurfaceEffects.scroll_view(
                                 screen, map_image, Direction.SOUTH, map_image_rect, 1, tile_size_pixels, True)
-                        elif e.key == pygame.K_UP:
+                        elif event.key == pygame.K_UP:
                             SurfaceEffects.scroll_view(
                                 screen, map_image, Direction.NORTH, map_image_rect, 1, tile_size_pixels, True)
-                        elif e.key == pygame.K_LEFT:
+                        elif event.key == pygame.K_LEFT:
                             SurfaceEffects.scroll_view(
                                 screen, map_image, Direction.WEST,  map_image_rect, 1, tile_size_pixels, True)
-                        elif e.key == pygame.K_RIGHT:
+                        elif event.key == pygame.K_RIGHT:
                             SurfaceEffects.scroll_view(
                                 screen, map_image, Direction.EAST,  map_image_rect, 1, tile_size_pixels, True)
-                    elif e.type == pygame.QUIT:
+                    elif event.type == pygame.QUIT:
                         is_running = False
                     else:
-                        print('e.type =', e.type, flush=True)
+                        print('event.type =', event.type, flush=True)
                 clock.tick(30)
 
     # Terminate pygame
@@ -1072,6 +1053,10 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
-        traceback.print_exc()
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

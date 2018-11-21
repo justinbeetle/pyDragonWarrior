@@ -9,9 +9,11 @@ from GameTypes import Spell
 
 
 class CombatCharacterState(metaclass=abc.ABCMeta):
-    def __init__(self, hp: int, max_hp: int = 0) -> None:
+    def __init__(self, hp: int, max_hp: int = 0, mp: int = 0, max_mp: int = 0) -> None:
         self.hp = hp
         self.max_hp = max(hp, max_hp)
+        self.mp = mp
+        self.max_mp = max(mp, max_mp)
         self.is_asleep = False
         self.turns_asleep = 0
         self.are_spells_blocked = False

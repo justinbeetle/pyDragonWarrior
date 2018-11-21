@@ -7,7 +7,6 @@ import math
 
 from GameTypes import *
 from HeroParty import HeroParty
-from HeroState import HeroState
 
 
 class GameDialogSpacing(Enum):
@@ -115,6 +114,7 @@ class GameDialog:
         self.row_data: Optional[List[List[Optional[str]]]] = None
         self.row_data_prompt: Optional[str] = None
         self.row_data_spacing: Optional[GameDialogSpacing] = None
+        self.row_data_trailing_message_lines: List[str] = []
         self.is_menu = False
         self.menu_row = 0
         self.menu_col = 0
@@ -186,61 +186,68 @@ class GameDialog:
     def create_status_dialog(pos_tile: Point,
                              size_tiles: Optional[Point],
                              title: Optional[str],
-                             row_data: List[List[Optional[str]]]) -> GameDialog:
+                             row_data: List[List[Optional[str]]],
+                             spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
+                             trailing_message: Optional[str] = None) -> GameDialog:
         if size_tiles is None:
+            # TODO: Calculate size based on row_data
             size_tiles = GameDialog.get_size_for_content('XP 1000000000', len(row_data), title)
+
+            # Add in length for trailing_message
+            if trailing_message is not None:
+                size_pixels = size_tiles * GameDialog.tile_size_pixels
+                trailing_message_lines = GameDialog.convert_message_to_lines(trailing_message, int(size_pixels.w))
+                size_tiles = GameDialog.get_size_for_content(
+                    'XP 1000000000', len(row_data) + len(trailing_message_lines), title)
         dialog = GameDialog(pos_tile, size_tiles, title)
-        dialog.add_row_data(row_data)
+        dialog.add_row_data(row_data, spacing_type=spacing_type, trailing_message=trailing_message)
         return dialog
 
     @staticmethod
-    def create_exploring_status_dialog(pc: Union[HeroState, HeroParty]) -> GameDialog:
-        if isinstance(pc, HeroState):
+    def create_exploring_status_dialog(party: HeroParty) -> GameDialog:
+        if 1 == len(party.members):
             return GameDialog.create_status_dialog(
                 Point(1, 1),
                 None,
-                pc.name,
-                [['LV', pc.level.name],
-                 ['HP', str(pc.hp)],
-                 ['MP', str(pc.mp)],
-                 ['GP', str(pc.gp)],
-                 ['XP', str(pc.xp)]])
-        elif 1 == len(pc.members):
-            return GameDialog.create_exploring_status_dialog(pc.main_character)
+                party.main_character.name,
+                [['LV', party.main_character.level.name],
+                 ['HP', str(party.main_character.hp)],
+                 ['MP', str(party.main_character.mp)],
+                 ['GP', str(party.gp)],
+                 ['XP', str(party.main_character.xp)]])
         else:
             # Use encounter dialog instead even when exploring for parties
-            return GameDialog.create_encounter_status_dialog(pc)
+            return GameDialog.create_encounter_status_dialog(party, 'Gold: ' + str(party.gp))
 
     @staticmethod
-    def create_encounter_status_dialog(pc: Union[HeroState, HeroParty]) -> GameDialog:
-        if isinstance(pc, HeroState):
-            return GameDialog.create_status_dialog(
-                Point(1, 1),
-                None,
-                pc.name,
-                [['LV', pc.level.name],
-                 ['HP', str(pc.hp)],
-                 ['MP', str(pc.mp)]])
-        elif 1 == len(pc.members):
-            return GameDialog.create_encounter_status_dialog(pc.main_character)
+    def create_encounter_status_dialog(party: HeroParty, trailing_message: Optional[str] = None) -> GameDialog:
+        title: Optional[str] = None
+        if 1 == len(party.members):
+            title = party.main_character.name
+            status_data: List[List[Optional[str]]] = [['LV', party.main_character.level.name],
+                                                      ['HP', str(party.main_character.hp)],
+                                                      ['MP', str(party.main_character.mp)]]
         else:
             status_data = [[''],
                            ['LV'],
                            ['HP'],
                            ['MP']]
-            for hero in pc.members:
-                status_data[0].append(hero.get_name())
-                status_data[1].append(hero.level.name)
-                status_data[2].append(str(hero.hp))
-                status_data[3].append(str(hero.mp))
-            return GameDialog.create_status_dialog(
-                Point(1, 1),
-                None,
-                None,
-                status_data)
+            for member in party.members:
+                status_data[0].append(member.get_name())
+                status_data[1].append(member.level.name)
+                status_data[2].append(str(member.hp))
+                status_data[3].append(str(member.mp))
+
+        return GameDialog.create_status_dialog(
+            Point(1, 1),
+            None,
+            title,
+            status_data,
+            trailing_message=trailing_message)
 
     @staticmethod
-    def create_full_status_dialog(pc: HeroState) -> GameDialog:
+    def create_full_status_dialog(party: HeroParty) -> GameDialog:
+        pc = party.main_character
         title = pc.name
         weapon_name = 'None'
         helm_name = 'None'
@@ -261,11 +268,11 @@ class GameDialog:
             ['Max Magic Points:', str(pc.level.mp)],
             ['Magic Points:', str(pc.mp)],
             ['Experience Points:', str(pc.xp)],
-            ['Gold Pieces:', str(pc.gp)],
-            ['Strenth:', str(pc.level.strength)],
+            ['Gold Pieces:', str(party.gp)],
+            ['Strength:', str(pc.level.strength)],
             ['Agility:', str(pc.level.agility)],
             ['Attack Strength:', str(pc.get_attack_strength())],
-            ['Defense Strenth:', str(pc.get_defense_strength())],
+            ['Defense Strength:', str(pc.get_defense_strength())],
             ['Weapon:', weapon_name],
             # ['Helm:', helm_name],  # TODO: Add use of helm
             ['Armor:', armor_name],
@@ -276,16 +283,12 @@ class GameDialog:
             title,
             row_data)
 
-    def add_message(self,
-                    new_message: str,
-                    append: bool = True) -> None:
-
-        self.acknowledged = False
-        self.row_data = None
-
-        # Turn message into lines of text
-        new_message_lines: List[str] = []
-        for line in new_message.split('\n'):
+    @staticmethod
+    def convert_message_to_lines(message: Optional[str], width_px: int) -> List[str]:
+        lines: List[str] = []
+        if message is None:
+            return lines
+        for line in message.split('\n'):
             line_to_display = ''
             for word in line.split(' '):
                 # print('word =', word, flush=True)
@@ -295,15 +298,26 @@ class GameDialog:
                     line_to_evaluate = line_to_display + ' ' + word
                 line_to_evaluate_size = Point(GameDialog.font.size(line_to_evaluate))
                 # print('line_to_evaluate =', line_to_evaluate, flush=True)
-                if line_to_evaluate_size[0] + 2 * GameDialog.outside_spacing_pixels <= self.image.get_width():
+                if line_to_evaluate_size[0] + 2 * GameDialog.outside_spacing_pixels <= width_px:
                     line_to_display = line_to_evaluate
                     # print('line_to_display =', line_to_display, flush=True)
                 else:
-                    new_message_lines.append(line_to_display)
+                    lines.append(line_to_display)
                     line_to_display = word
                     # print('line_to_display =', line_to_display, flush=True)
             if line_to_display is not None:
-                new_message_lines.append(line_to_display)
+                lines.append(line_to_display)
+        return lines
+
+    def add_message(self,
+                    new_message: str,
+                    append: bool = True) -> None:
+
+        self.acknowledged = False
+        self.row_data = None
+
+        # Turn message into lines of text
+        new_message_lines = GameDialog.convert_message_to_lines(new_message, self.image.get_width())
 
         # Determine the number of lines of text which can be displayed in the dialog
         num_rows = self.get_num_rows()
@@ -407,10 +421,11 @@ class GameDialog:
                             col_pos_x += GameDialog.font.size(self.row_data[row][col - 1])[0]
                     elif self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED and col % 2 == 1:
                         col_pos_x = self.image.get_width() * (col + 1) / num_cols\
-                                    - GameDialog.font.size(self.row_data[row][col])[0] - GameDialog.outside_spacing_pixels
+                                    - GameDialog.font.size(self.row_data[row][col])[0]\
+                                    - GameDialog.outside_spacing_pixels
                     else:
                         col_pos_x = first_col_pos_x + col * (
-                                    self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) / num_cols
+                                self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) / num_cols
                         if self.is_menu:
                             col_pos_x += GameDialog.selection_indicator_pixels + GameDialog.internal_spacing_pixels
                     self.image.blit(GameDialog.font.render(self.row_data[row][col],
@@ -418,6 +433,12 @@ class GameDialog:
                                                            self.font_color,
                                                            pygame.Color('black')),
                                     (col_pos_x, row_pos_y))
+                row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+
+            col_pos_x = GameDialog.outside_spacing_pixels
+            for lines in self.row_data_trailing_message_lines:
+                self.image.blit(GameDialog.font.render(lines, False, self.font_color, pygame.Color('black')),
+                                (col_pos_x, row_pos_y))
                 row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
             if self.is_menu:
@@ -477,12 +498,15 @@ class GameDialog:
                      row_data: List[List[Optional[str]]],
                      spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
                      is_menu: bool = False,
-                     prompt: Optional[str] = None) -> None:
+                     prompt: Optional[str] = None,
+                     trailing_message: Optional[str] = None) -> None:
         # NOTE:  spacing_type == OUTSIDE_JUSTIFIED assumes 2 columns in rowData
         # NOTE:  If is_menu and spacing_type == OUTSIDE_JUSTIFIED, each row constitutes a single menu item
         self.row_data = row_data
         self.row_data_prompt = prompt
         self.row_data_spacing = spacing_type
+        self.row_data_trailing_message_lines = GameDialog.convert_message_to_lines(trailing_message,
+                                                                                   self.image.get_width())
         self.is_menu = is_menu
         self.menu_row = 0
         self.menu_col = 0
@@ -501,9 +525,9 @@ class GameDialog:
         # Determine the number of lines of text which can be displayed in the dialog
         num_rows = self.get_num_rows()
         avail_rows = num_rows - len(self.displayed_message_lines)
-
-        if len(row_data) > avail_rows:
-            self.displayed_message_lines = self.displayed_message_lines[len(row_data) - avail_rows:]
+        new_rows = len(row_data) + len(self.row_data_trailing_message_lines)
+        if new_rows > avail_rows:
+            self.displayed_message_lines = self.displayed_message_lines[new_rows - avail_rows:]
 
         # Refresh image
         self.refresh_image()
@@ -528,7 +552,7 @@ class GameDialog:
             pygame.display.flip()
 
     def get_selected_menu_option(self) -> Optional[str]:
-        if self.row_data is not None:
+        if self.row_data is not None and self.menu_data is not None:
             return self.menu_data[self.menu_row][self.menu_col]
         return None
 
@@ -536,7 +560,7 @@ class GameDialog:
         self.draw_menu_indicator(pygame.Color('black'))
 
     def draw_menu_indicator(self, color: pygame.Color = None) -> None:
-        if self.row_data is None or len(self.menu_data) == 0:
+        if self.row_data is None or self.menu_data is None or len(self.menu_data) == 0:
             return
 
         if color is None:
@@ -586,7 +610,7 @@ class GameDialog:
         pygame.draw.polygon(self.image, color, pointlist)
 
     def process_event(self, e: pygame.Event, screen: pygame.Surface) -> None:
-        if self.row_data is None:
+        if self.row_data is None or self.menu_data is None:
             return
 
         if e.type == pygame.KEYDOWN:
@@ -629,6 +653,8 @@ class GameDialog:
 
 
 def main() -> None:
+    from HeroState import HeroState
+
     # Initialize pygame
     pygame.init()
     pygame.font.init()
@@ -645,10 +671,10 @@ def main() -> None:
     # Test out game dialog
     GameDialog.init(win_size_tiles, tile_size_pixels)
     level = Level(1, '1', 0, 20, 20, 15, 0)
-    pc_state = HeroState('hero', Point(5, 6), Direction.SOUTH, 'CAMDEN', level)
+    hero_party = HeroParty(HeroState('hero', Point(5, 6), Direction.SOUTH, 'CAMDEN', level))
 
     screen.fill(pygame.Color('pink'))
-    GameDialog.create_exploring_status_dialog(pc_state).blit(screen, False)
+    GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog('Hail!')
     message_dialog.draw_waiting_indicator()
     message_dialog.blit(screen, False)
@@ -657,21 +683,21 @@ def main() -> None:
 
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False
-                elif e.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN:
                     is_awaiting_selection = False
                     print('Selection made =', menu.get_selected_menu_option(), flush=True)
                 else:
-                    menu.process_event(e, screen)
-            elif e.type == pygame.QUIT:
+                    menu.process_event(event, screen)
+            elif event.type == pygame.QUIT:
                 is_awaiting_selection = False
         clock.tick(30)
 
     screen.fill(pygame.Color('pink'))
-    GameDialog.create_encounter_status_dialog(pc_state).blit(screen, False)
+    GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     GameDialog.create_message_dialog(
         'Word wrap testing...  Word wrap testing...  Word wrap testing...  ' +
         'Word wrap testing...  Word wrap testing...  Word wrap testing...').blit(screen, False)
@@ -680,21 +706,21 @@ def main() -> None:
 
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False
-                elif e.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN:
                     is_awaiting_selection = False
                     print('Selection made =', menu.get_selected_menu_option(), flush=True)
                 else:
-                    menu.process_event(e, screen)
-            elif e.type == pygame.QUIT:
+                    menu.process_event(event, screen)
+            elif event.type == pygame.QUIT:
                 is_awaiting_selection = False
         clock.tick(30)
 
     screen.fill(pygame.Color('pink'))
-    GameDialog.create_encounter_status_dialog(pc_state).blit(screen, False)
+    GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog(
         'Hail 1!\nHail 2!\nHail 3!\nHail 4!\nHail 5!\nHail 6!\nHail 7!\nHail 8!\nHail 9!\nHail 10!\nHail 11!')
     while message_dialog.has_more_content():
@@ -710,16 +736,16 @@ def main() -> None:
     message_dialog.blit(screen, True)
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for e in pygame.event.get():
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False
-                elif e.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN:
                     is_awaiting_selection = False
                     print('Selection made =', message_dialog.get_selected_menu_option(), flush=True)
                 else:
-                    message_dialog.process_event(e, screen)
-            elif e.type == pygame.QUIT:
+                    message_dialog.process_event(event, screen)
+            elif event.type == pygame.QUIT:
                 is_awaiting_selection = False
         clock.tick(30)
     message_dialog.add_message('\nLexie attacks!')
@@ -734,7 +760,10 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
-
-        traceback.print_exc()
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

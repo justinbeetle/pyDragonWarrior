@@ -11,13 +11,20 @@ import pygame
 # from GameDialog import GameDialog
 from GameTypes import *
 from GameInfo import GameInfo
+from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
 from HeroParty import HeroParty
 from HeroState import HeroState
 from NpcState import NpcState
 
 
-class GameState:
+class GameMode(Enum):
+    TITLE_SCREEN = 1
+    EXPLORING = 2
+    ENCOUNTER = 3  # TODO: Remove
+
+
+class GameState(GameStateInterface):
     PHASE_TICKS = 20
     NPC_MOVE_STEPS = 60
 
@@ -29,10 +36,10 @@ class GameState:
                  saved_game_file: Optional[str] = None) -> None:
 
         if desired_win_size_pixels is None:
-            self.screen = pygame.display.set_mode(
+            screen = pygame.display.set_mode(
                 (0, 0),
                 pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
-            win_size_pixels = Point(self.screen.get_size())
+            win_size_pixels = Point(screen.get_size())
             self.win_size_tiles = (win_size_pixels / tile_size_pixels).floor()
         else:
             self.win_size_tiles = (desired_win_size_pixels / tile_size_pixels).floor()
@@ -41,11 +48,12 @@ class GameState:
         self.win_size_pixels = self.win_size_tiles * tile_size_pixels
 
         if desired_win_size_pixels is not None:
-            self.screen = pygame.display.set_mode(
+            screen = pygame.display.set_mode(
                 self.win_size_pixels,
                 pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
 
-        self.is_running = True
+        super().__init__(screen)
+
         self.phase = Phase.A
         self.tick_count = 1
         self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, saved_game_file)
@@ -59,7 +67,6 @@ class GameState:
                        self.game_info.pc_name,
                        HeroState.calc_level(self.game_info.levels, self.game_info.pc_xp))
         pc.xp = self.game_info.pc_xp
-        pc.gp = self.game_info.pc_gp
         if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
             pc.hp = self.game_info.pc_hp
         if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
@@ -69,8 +76,9 @@ class GameState:
         pc.shield = self.game_info.pc_shield
         pc.other_equipped_items = self.game_info.pc_otherEquippedItems
         pc.unequipped_items = self.game_info.pc_unequippedItems
-        pc.progress_markers = self.game_info.pc_progressMarkers
         self.hero_party = HeroParty(pc)
+        self.hero_party.gp = self.game_info.pc_gp
+        self.hero_party.progress_markers = self.game_info.pc_progressMarkers
 
         # TODO: Remove Mocha from party
         mocha = HeroState('mocha',
@@ -92,6 +100,9 @@ class GameState:
         # TODO: Migrate these to here
         # self.message_dialog: Optional[GameDialog] = None
         # self.combat_encounter: Optional[CombatEncounter] = None
+
+        self.last_game_mode: Optional[GameMode] = None
+        self.game_mode = GameMode.TITLE_SCREEN
 
     def set_map(self,
                 new_map_name: str,
@@ -509,6 +520,9 @@ class GameState:
     def is_outside(self) -> bool:
         return self.game_info.maps[self.map_state.name].is_outside
 
+    def is_inside(self) -> bool:
+        return not self.is_outside()
+
     def make_map_transition(self,
                             transition: Optional[Union[LeavingTransition, PointTransition]]) -> bool:
         if transition is not None:
@@ -687,6 +701,50 @@ class GameState:
         self.tick_count += 1
         pygame.time.Clock().tick(40)
 
+    def get_hero_party(self) -> HeroParty:
+        return self.hero_party
+
+    def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
+        variables = DialogReplacementVariables()
+        variables.generic['[NAME]'] = self.hero_party.main_character.get_name()
+        variables.generic['[NEXT_LEVEL_XP]'] = str(
+            self.hero_party.main_character.calc_xp_to_next_level(self.game_info.levels))
+        map_origin = self.game_info.maps[self.map_state.name].origin
+        if map_origin is not None:
+            map_coord = self.hero_party.get_curr_pos_dat_tile() - map_origin
+            variables.generic['[X]'] = str(abs(map_coord.x))
+            variables.generic['[Y]'] = str(abs(map_coord.y))
+            if map_coord.x < 0:
+                variables.generic['[X_DIR]'] = 'West'
+            else:
+                variables.generic['[X_DIR]'] = 'East'
+            if map_coord.y < 0:
+                variables.generic['[Y_DIR]'] = 'North'
+            else:
+                variables.generic['[Y_DIR]'] = 'South'
+        return variables
+
+    def get_item(self, name: str) -> ItemType:
+        return self.game_info.items[name]
+
+    def get_levels(self, character_type: str) -> List[Level]:
+        return self.game_info.levels
+
+    def get_dialog_sequences(self) -> Dict[str, DialogType]:
+        return self.game_info.dialog_sequences
+
+    def is_in_combat(self) -> bool:
+        return GameMode.ENCOUNTER == self.game_mode
+
+    def get_light_diameter(self) -> Optional[float]:
+        return self.light_diameter
+
+    def set_light_diameter(self, light_diameter: Optional[float]) -> None:
+        self.light_diameter = light_diameter
+
+    def get_map_name(self) -> str:
+        return self.map_state.name
+
 
 def main() -> None:
     print('Not implemented', flush=True)
@@ -695,7 +753,10 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
-
-        traceback.print_exc()
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

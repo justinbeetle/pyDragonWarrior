@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import math
 import random
@@ -15,18 +15,16 @@ from GameTypes import Armor, Direction, Helm, ItemType, Level, Shield, Spell, To
 
 class HeroState(MapCharacterState, CombatCharacterState):
     def __init__(self,
-                 type: str,
+                 type_name: str,
                  pos_dat_tile: Point,
                  direction: Direction,
                  name: str,
                  level: Level) -> None:
-        MapCharacterState.__init__(self, type, pos_dat_tile, direction)
-        CombatCharacterState.__init__(self, hp=level.hp)
+        MapCharacterState.__init__(self, type_name, pos_dat_tile, direction)
+        CombatCharacterState.__init__(self, hp=level.hp, mp=level.mp)
 
         self.name = name
         self.level = level
-
-        self.mp = level.mp
         self.xp = level.xp
          
         self.weapon: Optional[Weapon] = None
@@ -106,7 +104,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def has_item(self, item_name: str) -> bool:
         return self.get_item_count(item_name) > 0
 
-    def get_item_count(self, item_name: str, unequipped_only=False) -> int:
+    def get_item_count(self, item_name: str, unequipped_only: bool=False) -> int:
         ret_val = 0
         for item in self.unequipped_items:
             if item_name == item.name:
@@ -137,7 +135,15 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def equip_item(self, item_name: str) -> None:
         # Equip an unequipped item - may result in the unequiping of a previously equipped item
         if not self.is_item_equipped(item_name):
-            item = self.lose_item(item_name)
+            # Find and remove item from other_equipped_items
+            item = None
+            for unequipped_item in self.unequipped_items:
+                if unequipped_item.name == item_name:
+                    item = unequipped_item
+                    self.lose_item(item)
+                    break
+
+            # Attempt to equip the item
             if item is not None:
                 if isinstance(item, Weapon):
                     if self.weapon is not None:
@@ -193,43 +199,31 @@ class HeroState(MapCharacterState, CombatCharacterState):
         else:
             self.unequipped_items[item] = count
 
-    def lose_item(self, item_name: str, count: int=1, unequipped_only=False) -> Optional[ItemType]:
+    def lose_item(self, item: ItemType, count: int=1, unequipped_only: bool=False) -> None:
         # Lost items are taken from unequippedItems where possible, else equipped items
-        ret_val = None
         remaining_items_to_lose = count
-        for item in self.unequipped_items:
-            if item_name == item.name:
-                ret_val = item
-                self.unequipped_items[item] -= count
-                if self.unequipped_items[item] <= 0:
-                    remaining_items_to_lose = -self.unequipped_items[item]
-                    del self.unequipped_items[item]
-                    break
+        if item in self.unequipped_items:
+            self.unequipped_items[item] -= count
+            remaining_items_to_lose = -self.unequipped_items[item]
+            if self.unequipped_items[item] <= 0:
+                del self.unequipped_items[item]
         if remaining_items_to_lose > 0 and not unequipped_only:
-            if self.weapon is not None and item_name == self.weapon.name:
-                ret_val = self.weapon
+            if self.weapon is not None and item == self.weapon:
                 self.weapon = None
                 remaining_items_to_lose -= 1
-            elif self.helm is not None and item_name == self.helm.name:
-                ret_val = self.helm
+            elif self.helm is not None and item == self.helm:
                 self.helm = None
                 remaining_items_to_lose -= 1
-            elif self.armor is not None and item_name == self.armor.name:
-                ret_val = self.armor
+            elif self.armor is not None and item == self.armor:
                 self.armor = None
                 remaining_items_to_lose -= 1
-            elif self.shield is not None and item_name == self.shield.name:
-                ret_val = self.shield
+            elif self.shield is not None and item == self.shield:
                 self.shield = None
                 remaining_items_to_lose -= 1
-            else:
-                for item in self.other_equipped_items:
-                    if item_name == item.name:
-                        ret_val = item
-                        self.other_equipped_items.remove(item)
-                        remaining_items_to_lose -= 1
-                        break
-        return ret_val
+            elif isinstance(item, Tool):
+                while item in self.other_equipped_items and 0 < remaining_items_to_lose:
+                    self.other_equipped_items.remove(item)
+                    remaining_items_to_lose -= 1
 
     def get_name(self) -> str:
         return self.name
@@ -374,18 +368,22 @@ class HeroState(MapCharacterState, CombatCharacterState):
 
 
 def main() -> None:
-   # Test out character states
-   level = Level( 0, '1', 2, 3, 4, 25, 6 )
-   hero_state = HeroState('hero', Point(7,3), Direction.WEST, 'Sir Me', level)
-   print(hero_state, flush=True)
-   while hero_state.is_alive():
-      hero_state.hp -= 10
-      print(hero_state, flush=True)
+    # Test out character states
+    level = Level(0, '1', 2, 3, 4, 25, 6)
+    hero_state = HeroState('hero', Point(7, 3), Direction.WEST, 'Sir Me', level)
+    print(hero_state, flush=True)
+    while hero_state.is_alive():
+        hero_state.hp -= 10
+        print(hero_state, flush=True)
 
 
 if __name__ == '__main__':
-   try:
-      main()
-   except Exception:
-      import traceback
-      traceback.print_exc()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

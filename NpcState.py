@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from MapCharacterState import *
+from MapCharacterState import MapCharacterState
 from GameTypes import NpcInfo
 
 
@@ -23,6 +23,9 @@ class NpcState(MapCharacterState):
 
 
 def main() -> None:
+    from Point import Point
+    from GameTypes import Direction
+
     # Test out character states
     npc_info = NpcInfo(type='myType',
                        point=Point(5, 6),
@@ -37,6 +40,10 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
-        traceback.print_exc()
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

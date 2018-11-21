@@ -1,22 +1,14 @@
 #!/usr/bin/env python
 
-from typing import Tuple
-
 import random
 
 from AudioPlayer import AudioPlayer
 from GameInfo import GameInfo
-from GameState import GameState
+from GameState import GameMode, GameState
 from GameDialog import *
 import GameEvents
 import SurfaceEffects
 from MonsterState import MonsterState
-
-
-class GameMode(Enum):
-    TITLE_SCREEN = 1
-    EXPLORING = 2
-    ENCOUNTER = 3  # TODO: Remove
 
 
 class Game:
@@ -34,22 +26,19 @@ class Game:
         GameDialog.init(self.game_state.win_size_tiles, tile_size_pixels)
 
     def run_game_loop(self) -> None:
-        self.last_game_mode: Optional[GameMode] = None
-        self.game_mode = GameMode.TITLE_SCREEN
-
         self.game_state.is_running = True
         while self.game_state.is_running:
-            if GameMode.TITLE_SCREEN == self.game_mode:
+            if GameMode.TITLE_SCREEN == self.game_state.game_mode:
                 self.title_screen_loop()
-            elif GameMode.EXPLORING == self.game_mode:
+            elif GameMode.EXPLORING == self.game_state.game_mode:
                 self.exploring_loop()
-            elif GameMode.ENCOUNTER == self.game_mode:
+            elif GameMode.ENCOUNTER == self.game_state.game_mode:
                 self.encounter_loop()
 
     def title_screen_loop(self) -> None:
         # TODO: Implement
         # for now transition straight to exploring
-        self.game_mode = GameMode.EXPLORING
+        self.game_state.game_mode = GameMode.EXPLORING
 
     def traverse_dialog(self,
                         message_dialog: GameDialog,
@@ -133,7 +122,7 @@ class Game:
             elif isinstance(item, DialogVariable):
                 # print( 'Dialog Variable =', item, flush=True )
                 try:
-                    (minVal, maxVal) = GameInfo.parse_int_range(item.value)
+                    (minVal, maxVal) = GameTypes.parse_int_range(item.value)
                     item.value = str(random.randint(minVal, maxVal))
                     # print( 'Dialog Variable (after value int conversion) =', item, flush=True )
                 except:
@@ -268,10 +257,10 @@ class Game:
                 elif item.type == DialogCheckEnum.IS_IN_COMBAT:
                     print('ERROR: DialogCheckEnum.IS_IN_COMBAT is not implemented to check the monster type',
                           flush=True)
-                    check_result = GameMode.ENCOUNTER == self.game_mode  # and (item.name is None or item.name ==
+                    check_result = GameMode.ENCOUNTER == self.game_state.game_mode  # and (item.name is None or item.name ==
 
                 elif item.type == DialogCheckEnum.IS_NOT_IN_COMBAT:
-                    check_result = GameMode.ENCOUNTER != self.game_mode
+                    check_result = GameMode.ENCOUNTER != self.game_state.game_mode
 
                 else:
                     print('ERROR: Unsupported DialogCheckEnum of', item.type, flush=True)
@@ -294,7 +283,7 @@ class Game:
                         for hero in self.game_state.hero_party.members:
                             hero.mp = hero.level.mp
                     else:
-                        (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
+                        (minRestore, maxRestore) = GameTypes.parse_int_range(item.count)
                         # TODO: Need to know which character to which magic restore should apply
                         self.game_state.hero_party.main_character.mp += random.randint(minRestore, maxRestore)
                     for hero in self.game_state.hero_party.members:
@@ -307,7 +296,7 @@ class Game:
                         for hero in self.game_state.hero_party.members:
                             hero.hp = hero.level.hp
                     else:
-                        (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
+                        (minRestore, maxRestore) = GameTypes.parse_int_range(item.count)
                         # TODO: Need to know which character to which health restore should apply
                         self.game_state.hero_party.main_character.hp += random.randint(minRestore, maxRestore)
                     for hero in self.game_state.hero_party.members:
@@ -342,9 +331,12 @@ class Game:
                         if item_name in self.game_state.game_info.items:
                             self.game_state.hero_party.gain_item(self.game_state.game_info.items[item_name], item_count)
                         else:
-                            self.game_state.hero_party.gain_item(item_name)
+                            self.game_state.hero_party.gain_progress_marker(item_name)
                     elif item.type == DialogActionEnum.LOSE_ITEM:
-                        self.game_state.hero_party.lose_item(item_name, item_count)
+                        if item_name in self.game_state.game_info.items:
+                            self.game_state.hero_party.lose_item(self.game_state.game_info.items[item_name], item_count)
+                        else:
+                            self.game_state.hero_party.lose_progress_marker(item_name)
 
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
                     if isinstance(item.count, int):
@@ -511,12 +503,12 @@ class Game:
         pygame.key.set_repeat(10, 10)
         map_name = self.game_state.map_state.name
 
-        while self.game_state.is_running and GameMode.EXPLORING == self.game_mode:
+        while self.game_state.is_running and GameMode.EXPLORING == self.game_state.game_mode:
 
             # Generate the map state a mode or map change
-            if (self.last_game_mode != self.game_mode or
+            if (self.game_state.last_game_mode != self.game_state.game_mode or
                     map_name != self.game_state.map_state.name):
-                self.last_game_mode = self.game_mode
+                self.game_state.last_game_mode = self.game_state.game_mode
                 map_name = self.game_state.map_state.name
 
                 # Play the music for the map
@@ -686,7 +678,8 @@ class Game:
                                     # print( 'action_result =', action_result, flush=True )
                                     if action_result == 'DROP':
                                         # TODO: Add an are you sure prompt here
-                                        self.game_state.hero_party.lose_item(item_result)
+                                        self.game_state.hero_party.lose_item(
+                                            self.game_state.game_info.items[item_result])
                                     elif action_result == 'EQUIP':
                                         self.game_state.hero_party.main_character.equip_item(item_result)
                                     elif action_result == 'UNEQUIP':
@@ -1167,7 +1160,7 @@ class Game:
             message_dialog.add_message(
                 'Thou has done well in defeating the ' + monster.get_name() + '. Thy experience increases by ' + str(
                     monster.xp) + '. Thy gold increases by ' + str(monster.gp) + '.')
-            self.game_state.hero_party.main_character.gp += monster.gp
+            self.game_state.hero_party.gp += monster.gp
             self.game_state.hero_party.main_character.xp += monster.xp
             GameDialog.create_exploring_status_dialog(
                 self.game_state.hero_party).blit(self.game_state.screen, False)
@@ -1194,8 +1187,8 @@ class Game:
             self.game_state.draw_map(True)
 
         # Return to exploring after completion of encounter
-        self.last_game_mode = GameMode.ENCOUNTER
-        self.game_mode = GameMode.EXPLORING
+        self.game_state.last_game_mode = GameMode.ENCOUNTER
+        self.game_state.game_mode = GameMode.EXPLORING
 
     def check_for_player_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         if self.game_state.hero_party.main_character.hp <= 0:
@@ -1212,12 +1205,12 @@ class Game:
             message_dialog.add_message('Thou art dead.')
             self.wait_for_acknowledgement(message_dialog)
             for hero in self.game_state.hero_party.members:
-                shero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_state.game_info.death_hero_pos_dat_tile
+                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_state.game_info.death_hero_pos_dat_tile
                 hero.curr_pos_offset_img_px = Point(0, 0)
                 hero.direction = self.game_state.game_info.death_hero_pos_dir
-                self.game_state.pending_dialog = self.game_state.game_info.death_dialog
                 hero.hp = hero.level.hp
                 hero.mp = hero.level.mp
+            self.game_state.pending_dialog = self.game_state.game_info.death_dialog
             self.game_state.hero_party.gp = self.game_state.hero_party.gp // 2
             self.game_state.set_map(self.game_state.game_info.death_map, respawn_decorations=True)
 
@@ -1330,11 +1323,11 @@ class Game:
             if not self.game_state.make_map_transition(transition):
                 # Check for special monster encounters
                 if self.game_state.get_special_monster() is not None:
-                    self.game_mode = GameMode.ENCOUNTER
+                    self.game_state.game_mode = GameMode.ENCOUNTER
                 # Check for random encounters
                 elif (len(self.game_state.get_tile_monsters()) > 0 and
                       random.uniform(0, 1) < dest_tile_type.spawn_rate):
-                    self.game_mode = GameMode.ENCOUNTER
+                    self.game_state.game_mode = GameMode.ENCOUNTER
 
 
 def main() -> None:
@@ -1378,6 +1371,11 @@ def main() -> None:
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)
         traceback.print_exc()

@@ -5,16 +5,11 @@ import os
 
 import pygame
 
-from AudioPlayer import AudioPlayer
-from Point import Point
-
 
 # Run like this: MapImageToDatConverter.py ..\unusedAssets\maps\brecconary.png data\maps\brecconary.dat
 def main():
     # Initialize pygame
     pygame.init()
-    pygame.font.init()
-    audio_player = AudioPlayer()
 
     # Setup to draw maps
     tile_size_pixels = 16
@@ -89,14 +84,16 @@ def main():
     map_dat_file.close()
 
     # Terminate pygame
-    audio_player.terminate()
-    pygame.font.quit()
     pygame.quit()
 
 
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as e:
+        import sys
         import traceback
-        traceback.print_exc()
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

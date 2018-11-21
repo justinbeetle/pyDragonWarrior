@@ -2,13 +2,39 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, NamedTuple, Optional, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
+import collections
 import pygame
+import random
 
 from dataclasses import dataclass
 from enum import Enum
 from Point import Point
+
+
+class GameTypes:
+    @staticmethod
+    def parse_float(value: Union[str, float, int]) -> float:
+        if isinstance(value, str) and '/' in value:
+            ret_val = int(value.split('/')[0]) / int(value.split('/')[1])
+        else:
+            ret_val = float(value)
+        return ret_val
+
+    @staticmethod
+    def parse_int_range(value: Union[str, int]) -> Tuple[int, int]:
+        if isinstance(value, str) and '-' in value:
+            min_val = int(value.split('-')[0])
+            max_val = int(value.split('-')[1])
+        else:
+            min_val = max_val = int(value)
+        return min_val, max_val
+
+    @staticmethod
+    def get_int_value(value: Union[str, int]) -> int:
+        (minVal, maxVal) = GameTypes.parse_int_range(value)
+        return random.randint(minVal, maxVal)
 
 
 class Direction(Enum):
@@ -122,6 +148,15 @@ class DialogVariable:
     name: str
     value: str
 
+    # Some variables may specify an int range that needs to be evaluated to resolve to a random value in that range
+    def evaluate(self) -> str:
+        value = self.value
+        try:
+            value = str(GameTypes.get_int_value(value))
+        except ValueError:
+            pass
+        return value
+
 
 # Dialog to branch to a labeled dialog state
 @dataclass
@@ -190,6 +225,14 @@ class DialogAction:
     victory_dialog: Optional[DialogType] = None
     run_away_dialog: Optional[DialogType] = None
     encounter_music: Optional[str] = None
+
+
+# Type to aggregate all the different dialog replacement variables
+@dataclass
+class DialogReplacementVariables:
+    generic: Dict[str, str] = collections.defaultdict  # type: ignore
+    vendor_buy_options: Dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = collections.defaultdict  # type: ignore
+    vendor_sell_options: Dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = collections.defaultdict  # type: ignore
 
 
 class Tile(NamedTuple):
@@ -400,15 +443,3 @@ class MapImageInfo(NamedTuple):
                             pygame.Surface((0, 0)),
                             Point(),
                             Point())
-
-
-def main() -> None:
-    pass
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception:
-        import traceback
-        traceback.print_exc()
