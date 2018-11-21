@@ -6,6 +6,7 @@ from __future__ import annotations
 import math
 
 from GameTypes import *
+from HeroParty import HeroParty
 from HeroState import HeroState
 
 
@@ -193,26 +194,50 @@ class GameDialog:
         return dialog
 
     @staticmethod
-    def create_exploring_status_dialog(pc: HeroState) -> GameDialog:
-        return GameDialog.create_status_dialog(
-            Point(1, 1),
-            None,
-            pc.name,
-            [['LV', pc.level.name],
-             ['HP', str(pc.hp)],
-             ['MP', str(pc.mp)],
-             ['GP', str(pc.gp)],
-             ['XP', str(pc.xp)]])
+    def create_exploring_status_dialog(pc: Union[HeroState, HeroParty]) -> GameDialog:
+        if isinstance(pc, HeroState):
+            return GameDialog.create_status_dialog(
+                Point(1, 1),
+                None,
+                pc.name,
+                [['LV', pc.level.name],
+                 ['HP', str(pc.hp)],
+                 ['MP', str(pc.mp)],
+                 ['GP', str(pc.gp)],
+                 ['XP', str(pc.xp)]])
+        elif 1 == len(pc.members):
+            return GameDialog.create_exploring_status_dialog(pc.main_character)
+        else:
+            # Use encounter dialog instead even when exploring for parties
+            return GameDialog.create_encounter_status_dialog(pc)
 
     @staticmethod
-    def create_encounter_status_dialog(pc: HeroState) -> GameDialog:
-        return GameDialog.create_status_dialog(
-            Point(1, 1),
-            None,
-            pc.name,
-            [['LV', pc.level.name],
-             ['HP', str(pc.hp)],
-             ['MP', str(pc.mp)]])
+    def create_encounter_status_dialog(pc: Union[HeroState, HeroParty]) -> GameDialog:
+        if isinstance(pc, HeroState):
+            return GameDialog.create_status_dialog(
+                Point(1, 1),
+                None,
+                pc.name,
+                [['LV', pc.level.name],
+                 ['HP', str(pc.hp)],
+                 ['MP', str(pc.mp)]])
+        elif 1 == len(pc.members):
+            return GameDialog.create_encounter_status_dialog(pc.main_character)
+        else:
+            status_data = [[''],
+                           ['LV'],
+                           ['HP'],
+                           ['MP']]
+            for hero in pc.members:
+                status_data[0].append(hero.get_name())
+                status_data[1].append(hero.level.name)
+                status_data[2].append(str(hero.hp))
+                status_data[3].append(str(hero.mp))
+            return GameDialog.create_status_dialog(
+                Point(1, 1),
+                None,
+                None,
+                status_data)
 
     @staticmethod
     def create_full_status_dialog(pc: HeroState) -> GameDialog:

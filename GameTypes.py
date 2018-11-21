@@ -17,7 +17,7 @@ class Direction(Enum):
     WEST = 3
     EAST = 4
 
-    def get_direction_vector(self) -> Point:
+    def get_vector(self) -> Point:
         if Direction.NORTH == self:
             vector = Point(0, -1)
         elif Direction.SOUTH == self:
@@ -28,7 +28,7 @@ class Direction(Enum):
             vector = Point(-1, 0)
         return vector
 
-    def get_opposite_direction(self) -> Direction:
+    def get_opposite(self) -> Direction:
         if Direction.NORTH == self:
             opposite = Direction.SOUTH
         elif Direction.SOUTH == self:
@@ -38,6 +38,13 @@ class Direction(Enum):
         else:
             opposite = Direction.EAST
         return opposite
+
+    @staticmethod
+    def get_direction(vector: Point) -> Direction:
+        for direction in Direction:
+            if direction.get_vector() == vector:
+                return direction
+        return Direction.SOUTH
 
 
 class Phase(Enum):

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from __future__ import annotations
 from typing import Tuple
 
 import os
@@ -11,7 +10,6 @@ import pygame
 from AudioPlayer import AudioPlayer
 from GameTypes import *
 from Point import Point
-from SurfaceEffects import SurfaceEffects
 
 
 class GameInfo:
@@ -998,6 +996,8 @@ class GameInfo:
 
 
 def main() -> None:
+    import SurfaceEffects
+
     # Initialize pygame
     pygame.init()
     audio_player = AudioPlayer()

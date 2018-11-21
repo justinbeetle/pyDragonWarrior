@@ -27,7 +27,6 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.level = level
 
         self.mp = level.mp
-        self.gp = 0
         self.xp = level.xp
          
         self.weapon: Optional[Weapon] = None
@@ -38,7 +37,6 @@ class HeroState(MapCharacterState, CombatCharacterState):
 
         self.other_equipped_items: List[Tool] = []
         self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
-        self.progress_markers: List[str] = []
 
     def get_item_row_data(self,
                           limit_to_droppable: bool = False,
@@ -108,15 +106,13 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def has_item(self, item_name: str) -> bool:
         return self.get_item_count(item_name) > 0
 
-    def get_item_count(self, item_name: str) -> int:
+    def get_item_count(self, item_name: str, unequipped_only=False) -> int:
         ret_val = 0
         for item in self.unequipped_items:
             if item_name == item.name:
                 ret_val = self.unequipped_items[item]
                 break
-        if self.is_item_equipped(item_name):
-            ret_val += 1
-        if item_name in self.progress_markers:
+        if not unequipped_only and self.is_item_equipped(item_name):
             ret_val += 1
         return ret_val
 
@@ -190,20 +186,14 @@ class HeroState(MapCharacterState, CombatCharacterState):
                     self.other_equipped_items.remove(item)
                     break
 
-    def gain_item(self, item: Union[ItemType, str], count: int = 1) -> None:
+    def gain_item(self, item: ItemType, count: int=1) -> None:
         # Gained items always go unequippedItems
-        if isinstance(item, str):
-            if item not in self.progress_markers:
-                self.progress_markers.append(item)
-                # print('Added progress marker', item, flush=True)
-            else:
-                print('WARN: Did not add previously added progress marker', item, flush=True)
-        elif item in self.unequipped_items:
+        if item in self.unequipped_items:
             self.unequipped_items[item] += count
         else:
             self.unequipped_items[item] = count
 
-    def lose_item(self, item_name: str, count: int = 1) -> Optional[ItemType]:
+    def lose_item(self, item_name: str, count: int=1, unequipped_only=False) -> Optional[ItemType]:
         # Lost items are taken from unequippedItems where possible, else equipped items
         ret_val = None
         remaining_items_to_lose = count
@@ -215,7 +205,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
                     remaining_items_to_lose = -self.unequipped_items[item]
                     del self.unequipped_items[item]
                     break
-        if remaining_items_to_lose > 0:
+        if remaining_items_to_lose > 0 and not unequipped_only:
             if self.weapon is not None and item_name == self.weapon.name:
                 ret_val = self.weapon
                 self.weapon = None
@@ -232,10 +222,6 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 ret_val = self.shield
                 self.shield = None
                 remaining_items_to_lose -= 1
-            elif item_name in self.progress_markers:
-                self.progress_markers.remove(item_name)
-                remaining_items_to_lose -= 1
-                # print('Removed progress marker', itemName, flush=True)
             else:
                 for item in self.other_equipped_items:
                     if item_name == item.name:
@@ -359,13 +345,12 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return ret_val
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
+        return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
             self.__class__.__name__,
             self.name,
             self.level,
             self.hp,
             self.mp,
-            self.gp,
             self.xp,
             self.type_name,
             self.curr_pos_dat_tile,
@@ -374,13 +359,12 @@ class HeroState(MapCharacterState, CombatCharacterState):
             self.direction)
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r, %r, %r, %r, %r, %r, %r)" % (
+        return "%s(%r, %r, %r, %r, %r, %r, %r, %r, %r, %r)" % (
             self.__class__.__name__,
             self.name,
             self.level,
             self.hp,
             self.mp,
-            self.gp,
             self.xp,
             self.type_name,
             self.curr_pos_dat_tile,

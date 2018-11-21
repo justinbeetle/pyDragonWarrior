@@ -72,6 +72,10 @@
       <CharacterType type="merchant"               image="merchant.png"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
+
+      <CharacterType type="cat"                    image="cat.png"/>
+      <CharacterType type="mocha"                  image="mocha.png"/>
+      <CharacterType type="little_boy"             image="little_boy.png"/>
    </CharacterTypes>
 
    <Maps>

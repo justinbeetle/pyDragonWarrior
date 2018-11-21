@@ -2,15 +2,14 @@
 
 from typing import Tuple
 
-import sys
-import os
 import random
 
 from AudioPlayer import AudioPlayer
 from GameInfo import GameInfo
 from GameState import GameState
 from GameDialog import *
-from SurfaceEffects import SurfaceEffects
+import GameEvents
+import SurfaceEffects
 from MonsterState import MonsterState
 
 
@@ -33,61 +32,6 @@ class Game:
                                     tile_size_pixels,
                                     saved_game_file)
         GameDialog.init(self.game_state.win_size_tiles, tile_size_pixels)
-
-    @staticmethod
-    def get_events() -> List[pygame.event.Event]:
-        # Translate joystick events to keyboard events
-        events: List[pygame.event.Event] = pygame.event.get()
-
-        # Process joystick taking into account keyboard repeat settings
-        is_keyboard_repeat_enabled = pygame.key.get_repeat() != (0, 0)
-
-        # Generate key down events from a joystick hat for the case were repeats are enabled
-        if is_keyboard_repeat_enabled:
-            for joystick_id in range(pygame.joystick.get_count()):
-                joystick = pygame.joystick.Joystick(joystick_id)
-                if not joystick.get_init():
-                    continue
-                for hat_id in range(joystick.get_numhats()):
-                    event = Game.get_event_for_joystick_hat_position(joystick.get_hat(hat_id))
-                    if event is not None:
-                        events.append(event)
-
-        # Translate joystick events to keyboard events
-        for e in events:
-            event = None
-            event_dict = {}
-            if e.type == pygame.JOYBUTTONDOWN:
-                if e.button == 0:
-                    event_dict['key'] = pygame.K_RETURN
-                    event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-                elif e.button == 1:
-                    event_dict['key'] = pygame.K_SPACE
-                    event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-            elif e.type == pygame.JOYHATMOTION and not is_keyboard_repeat_enabled:
-                event = Game.get_event_for_joystick_hat_position(e.value)
-            if event is not None:
-                events.append(event)
-
-        return events
-
-    @staticmethod
-    def get_event_for_joystick_hat_position(hat_position: Tuple[int, int]) -> Optional[pygame.event.Event]:
-        event = None
-        event_dict = {}
-        if hat_position == (0, -1):
-            event_dict['key'] = pygame.K_DOWN
-            event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-        elif hat_position == (0, 1):
-            event_dict['key'] = pygame.K_UP
-            event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-        elif hat_position == (-1, 0):
-            event_dict['key'] = pygame.K_LEFT
-            event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-        elif hat_position == (1, 0):
-            event_dict['key'] = pygame.K_RIGHT
-            event = pygame.event.Event(pygame.KEYDOWN, event_dict)
-        return event
 
     def run_game_loop(self) -> None:
         self.last_game_mode: Optional[GameMode] = None
@@ -120,12 +64,12 @@ class Game:
                 str, DialogVendorBuyOptionsParamWithoutReplacementType] = {}
             self.dialog_vendor_sell_options_variable_replacement: Dict[
                 str, DialogVendorSellOptionsParamWithoutReplacementType] = {}
-            self.dialog_variable_replacement['[NAME]'] = self.game_state.pc.name
+            self.dialog_variable_replacement['[NAME]'] = self.game_state.hero_party.main_character.name
             self.dialog_variable_replacement['[NEXT_LEVEL_XP]'] = str(
-                self.game_state.pc.calc_xp_to_next_level(self.game_state.game_info.levels))
+                self.game_state.hero_party.main_character.calc_xp_to_next_level(self.game_state.game_info.levels))
             map_origin = self.game_state.game_info.maps[self.game_state.map_state.name].origin
             if map_origin is not None:
-                map_coord = self.game_state.pc.curr_pos_dat_tile - map_origin
+                map_coord = self.game_state.hero_party.members[0].curr_pos_dat_tile - map_origin
                 self.dialog_variable_replacement['[X]'] = str(abs(map_coord.x))
                 self.dialog_variable_replacement['[Y]'] = str(abs(map_coord.y))
                 if map_coord.x < 0:
@@ -255,7 +199,7 @@ class Game:
                     item_types = item.item_types
                 else:
                     item_types = []
-                item_row_data = self.game_state.pc.get_item_row_data(True, item_types)
+                item_row_data = self.game_state.hero_party.main_character.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
                     self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
                     break
@@ -291,11 +235,11 @@ class Game:
                                 print('ERROR: Failed to convert item_count to int:', item.count, flush=True)
 
                     if item_name == 'gp':
-                        check_value = self.game_state.pc.gp
+                        check_value = self.game_state.hero_party.gp
                     elif item_name == 'lv':
-                        check_value = self.game_state.pc.level.number
+                        check_value = self.game_state.hero_party.main_character.level.number
                     else:
-                        check_value = self.game_state.pc.get_item_count(item_name)
+                        check_value = self.game_state.hero_party.get_item_count(item_name)
 
                     # print( 'check_value =', check_value, flush=True )
                     # print( 'item_name =', item_name, flush=True )
@@ -317,8 +261,9 @@ class Game:
                     check_result = self.game_state.is_light_restricted()
 
                 elif item.type == DialogCheckEnum.IS_AT_COORDINATES:
-                    check_result = item.map_name == self.game_state.map_state.name and (
-                            item.map_pos is None or item.map_pos == self.game_state.pc.curr_pos_dat_tile)
+                    check_result = item.map_name == self.game_state.map_state.name \
+                                   and (item.map_pos is None
+                                        or item.map_pos == self.game_state.hero_party.members[0].curr_pos_dat_tile)
 
                 elif item.type == DialogCheckEnum.IS_IN_COMBAT:
                     print('ERROR: DialogCheckEnum.IS_IN_COMBAT is not implemented to check the monster type',
@@ -346,21 +291,29 @@ class Game:
                     self.game_state.save()
                 elif item.type == DialogActionEnum.MAGIC_RESTORE:
                     if item.count == 'unlimited':
-                        self.game_state.pc.mp = self.game_state.pc.level.mp
+                        for hero in self.game_state.hero_party.members:
+                            hero.mp = hero.level.mp
                     else:
                         (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
-                        self.game_state.pc.mp += random.randint(minRestore, maxRestore)
-                    self.game_state.pc.mp = min(self.game_state.pc.mp, self.game_state.pc.level.mp)
-                    GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, True)
+                        # TODO: Need to know which character to which magic restore should apply
+                        self.game_state.hero_party.main_character.mp += random.randint(minRestore, maxRestore)
+                    for hero in self.game_state.hero_party.members:
+                        hero.mp = min(hero.mp, hero.level.mp)
+                    GameDialog.create_exploring_status_dialog(
+                        self.game_state.hero_party).blit(self.game_state.screen, True)
 
                 elif item.type == DialogActionEnum.HEALTH_RESTORE:
                     if item.count == 'unlimited':
-                        self.game_state.pc.hp = self.game_state.pc.level.hp
+                        for hero in self.game_state.hero_party.members:
+                            hero.hp = hero.level.hp
                     else:
                         (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
-                        self.game_state.pc.hp += random.randint(minRestore, maxRestore)
-                    self.game_state.pc.hp = min(self.game_state.pc.hp, self.game_state.pc.level.hp)
-                    GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, True)
+                        # TODO: Need to know which character to which health restore should apply
+                        self.game_state.hero_party.main_character.hp += random.randint(minRestore, maxRestore)
+                    for hero in self.game_state.hero_party.members:
+                        hero.hp = min(hero.hp, hero.level.hp)
+                    GameDialog.create_exploring_status_dialog(
+                        self.game_state.hero_party).blit(self.game_state.screen, True)
 
                 elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
                     # Perform variable replacement
@@ -378,19 +331,20 @@ class Game:
 
                     if item_name == 'gp':
                         if item.type == DialogActionEnum.GAIN_ITEM:
-                            self.game_state.pc.gp += item_count
+                            self.game_state.hero_party.gp += item_count
                         elif item.type == DialogActionEnum.LOSE_ITEM:
-                            self.game_state.pc.gp -= item_count
-                            if self.game_state.pc.gp < 0:
-                                self.game_state.pc.gp = 0
-                        GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, True)
+                            self.game_state.hero_party.gp -= item_count
+                            if self.game_state.hero_party.gp < 0:
+                                self.game_state.hero_party.gp = 0
+                        GameDialog.create_exploring_status_dialog(
+                            self.game_state.hero_party).blit(self.game_state.screen, True)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         if item_name in self.game_state.game_info.items:
-                            self.game_state.pc.gain_item(self.game_state.game_info.items[item_name], item_count)
+                            self.game_state.hero_party.gain_item(self.game_state.game_info.items[item_name], item_count)
                         else:
-                            self.game_state.pc.gain_item(item_name)
+                            self.game_state.hero_party.gain_item(item_name)
                     elif item.type == DialogActionEnum.LOSE_ITEM:
-                        self.game_state.pc.lose_item(item_name, item_count)
+                        self.game_state.hero_party.lose_item(item_name, item_count)
 
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
                     if isinstance(item.count, int):
@@ -403,11 +357,12 @@ class Game:
                     print('ERROR: DialogActionEnum.REPEL_MONSTERS is not implemented', flush=True)
 
                 elif item.type == DialogActionEnum.GOTO_COORDINATES:
-                    self.game_state.pc.curr_pos_offset_img_px = Point(0, 0)
-                    if item.map_pos is not None:
-                        self.game_state.pc.curr_pos_dat_tile = self.game_state.pc.dest_pos_dat_tile = item.map_pos
-                    if item.map_dir is not None:
-                        self.game_state.pc.direction = item.map_dir
+                    for hero in self.game_state.hero_party.members:
+                        hero.curr_pos_offset_img_px = Point(0, 0)
+                        if item.map_pos is not None:
+                            hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = item.map_pos
+                        if item.map_dir is not None:
+                            hero.direction = item.map_dir
                     if item.map_name is not None:
                         self.game_state.set_map(item.map_name)
                     else:
@@ -473,10 +428,10 @@ class Game:
         (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
         pygame.key.set_repeat()
         # print( 'Disabled key repeat', flush=True )
-        self.get_events()  # Clear event queue
+        GameEvents.get_events()  # Clear event queue
 
         # Create the status and message dialogs
-        GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+        GameDialog.create_exploring_status_dialog(self.game_state.hero_party).blit(self.game_state.screen, False)
         messageDialog = GameDialog.create_message_dialog()
 
         self.traverse_dialog(messageDialog, dialog)
@@ -499,7 +454,7 @@ class Game:
         is_waiting_indicator_drawn = False
         while self.game_state.is_running and is_awaiting_acknowledgement:
             # Process events
-            events = self.get_events()
+            events = GameEvents.get_events()
             if 0 == len(events):
                 pygame.time.Clock().tick(8)
                 if message_dialog is not None:
@@ -530,7 +485,7 @@ class Game:
 
         menu_result = None
         while self.game_state.is_running and menu_result is None:
-            events = self.get_events()
+            events = GameEvents.get_events()
             if 0 == len(events):
                 pygame.time.Clock().tick(30)
             for e in events:
@@ -579,14 +534,14 @@ class Game:
                 self.game_state.pending_dialog = None
 
             # Process events
-            events = self.get_events()
+            events = GameEvents.get_events()
 
             for e in events:
                 moving = False
                 menu = False
                 talking = False
                 searching = False
-                pc_dir_old = self.game_state.pc.direction
+                pc_dir_old = self.game_state.hero_party.members[0].direction
 
                 if e.type == pygame.QUIT:
                     self.game_state.is_running = False
@@ -596,20 +551,20 @@ class Game:
                     elif e.key == pygame.K_RETURN:
                         menu = True
                     elif e.key == pygame.K_DOWN:
-                        self.game_state.pc.direction = Direction.SOUTH
+                        self.game_state.hero_party.members[0].direction = Direction.SOUTH
                         moving = True
                     elif e.key == pygame.K_UP:
-                        self.game_state.pc.direction = Direction.NORTH
+                        self.game_state.hero_party.members[0].direction = Direction.NORTH
                         moving = True
                     elif e.key == pygame.K_LEFT:
-                        self.game_state.pc.direction = Direction.WEST
+                        self.game_state.hero_party.members[0].direction = Direction.WEST
                         moving = True
                     elif e.key == pygame.K_RIGHT:
-                        self.game_state.pc.direction = Direction.EAST
+                        self.game_state.hero_party.members[0].direction = Direction.EAST
                         moving = True
 
                 # Allow a change of direction without moving
-                if pc_dir_old != self.game_state.pc.direction:
+                if pc_dir_old != self.game_state.hero_party.members[0].direction:
                     # print('Change of direction detected', flush=True)
                     moving = False
                     self.game_state.advance_tick()
@@ -624,7 +579,8 @@ class Game:
                     # print( 'Disabled key repeat', flush=True )
                     pygame.event.get()  # Clear event queue
 
-                    GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+                    GameDialog.create_exploring_status_dialog(
+                        self.game_state.hero_party).blit(self.game_state.screen, False)
                     menu_dialog = GameDialog.create_exploring_menu()
                     menu_dialog.blit(self.game_state.screen, True)
                     menu_result = self.get_menu_result(menu_dialog)
@@ -635,11 +591,13 @@ class Game:
                         if not self.game_state.make_map_transition(self.game_state.get_point_transition()):
                             self.dialog_loop('There are no stairs here.')
                     elif menu_result == 'STATUS':
-                        GameDialog.create_full_status_dialog(self.game_state.pc).blit(self.game_state.screen, True)
+                        GameDialog.create_full_status_dialog(
+                            self.game_state.hero_party).blit(self.game_state.screen, True)
                         self.wait_for_acknowledgement()
                     elif menu_result == 'SEARCH':
                         searching = True
                     elif menu_result == 'SPELL':
+                        # TODO: Need to choose the spellcaster
                         availableSpellNames = self.game_state.get_available_spell_names()
                         if len(availableSpellNames) == 0:
                             self.dialog_loop('Thou hast not yet learned any spells.')
@@ -655,16 +613,18 @@ class Game:
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
-                                if self.game_state.pc.mp >= spell.mp:
-                                    self.game_state.pc.mp -= spell.mp
+                                if self.game_state.hero_party.main_character.mp >= spell.mp:
+                                    self.game_state.hero_party.main_character.mp -= spell.mp
 
                                     AudioPlayer().play_sound('castSpell.wav')
                                     SurfaceEffects.flickering(self.game_state.screen)
 
                                     if spell.max_hp_recover > 0:
+                                        # TODO: Need to choose the target for the spell
                                         hp_recover = random.randint(spell.min_hp_recover, spell.max_hp_recover)
-                                        self.game_state.pc.hp = min(self.game_state.pc.level.hp,
-                                                                    self.game_state.pc.hp + hp_recover)
+                                        self.game_state.hero_party.main_character.hp = min(
+                                            self.game_state.hero_party.main_character.level.hp,
+                                            self.game_state.hero_party.main_character.hp + hp_recover)
                                     elif spell.name == 'Radiant':
                                         if (self.game_state.light_diameter is not None
                                                 and self.game_state.light_diameter < 7):
@@ -678,22 +638,24 @@ class Game:
                                     elif spell.name == 'Return':
                                         # TODO: Return shouldn't work from caves and the return coordinates shouldn't be
                                         #       hardcoded
-                                        self.game_state.pc.curr_pos_dat_tile = Point(43, 44)
-                                        self.game_state.pc.curr_pos_offset_img_px = Point(0, 0)
-                                        self.game_state.pc.direction = Direction.SOUTH
+                                        for hero in self.game_state.hero_party.members:
+                                            hero.curr_pos_dat_tile = Point(43, 44)
+                                            hero.curr_pos_offset_img_px = Point(0, 0)
+                                            hero.direction = Direction.SOUTH
                                         self.game_state.set_map('overworld')
                                     elif spell.name == 'Repel':
                                         print('Spell not implemented', flush=True)
 
-                                    GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(
-                                        self.game_state.screen, False)
+                                    GameDialog.create_exploring_status_dialog(
+                                        self.game_state.hero_party).blit(self.game_state.screen, False)
                                     self.dialog_loop('[NAME] cast the spell of ' + spell.name + '.')
 
                                 else:
                                     self.dialog_loop('Thou dost not have enough magic to cast the spell.')
 
                     elif menu_result == 'ITEM':
-                        item_row_data = self.game_state.pc.get_item_row_data()
+                        # TODO: Need to choose the hero to use an item
+                        item_row_data = self.game_state.hero_party.main_character.get_item_row_data()
                         if len(item_row_data) == 0:
                             self.dialog_loop('Thou dost not have any items.')
                         else:
@@ -709,7 +671,7 @@ class Game:
                             # print( 'item_result =', item_result, flush=True )
 
                             if item_result is not None:
-                                item_options = self.game_state.pc.get_item_options(item_result)
+                                item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
                                 if len(item_row_data) == 0:
                                     self.dialog_loop('[NAME] studied the object and was confounded by it.')
                                 else:
@@ -724,11 +686,11 @@ class Game:
                                     # print( 'action_result =', action_result, flush=True )
                                     if action_result == 'DROP':
                                         # TODO: Add an are you sure prompt here
-                                        self.game_state.pc.lose_item(item_result)
+                                        self.game_state.hero_party.lose_item(item_result)
                                     elif action_result == 'EQUIP':
-                                        self.game_state.pc.equip_item(item_result)
+                                        self.game_state.hero_party.main_character.equip_item(item_result)
                                     elif action_result == 'UNEQUIP':
-                                        self.game_state.pc.unequip_item(item_result)
+                                        self.game_state.hero_party.main_character.unequip_item(item_result)
                                     elif action_result == 'USE':
                                         item = self.game_state.game_info.items[item_result]
                                         if isinstance(item, Tool) and item.use_dialog is not None:
@@ -743,11 +705,12 @@ class Game:
                     pygame.display.flip()
 
                 if talking:
-                    talk_dest_dat_tile = self.game_state.pc.curr_pos_dat_tile\
-                                       + self.game_state.pc.direction.get_direction_vector()
+                    talk_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile\
+                                       + self.game_state.hero_party.members[0].direction.get_vector()
                     talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
                     if talk_dest_tile_type.can_talk_over:
-                        talk_dest_dat_tile = talk_dest_dat_tile + self.game_state.pc.direction.get_direction_vector()
+                        talk_dest_dat_tile = talk_dest_dat_tile \
+                                             + self.game_state.hero_party.members[0].direction.get_vector()
                     dialog: DialogType = ['There is no one there.']
                     for npc in self.game_state.npcs:
                         if (npc.npc_info is not None and
@@ -757,9 +720,11 @@ class Game:
                                 dialog = npc.npc_info.dialog
 
                                 # NPC should turn to face you
-                                if npc.direction != self.game_state.pc.direction.get_opposite_direction():
+                                if (npc.direction !=
+                                        self.game_state.hero_party.members[0].direction.get_opposite()):
                                     self.game_state.erase_character(npc)
-                                    npc.direction = self.game_state.pc.direction.get_opposite_direction()
+                                    npc.direction =\
+                                        self.game_state.hero_party.members[0].direction.get_opposite()
                                     self.game_state.draw_character(npc)
                                     pygame.display.flip()
                             else:
@@ -823,10 +788,10 @@ class Game:
             # Pick the monster
             if monster_info is None:
                 monster_info = self.game_state.game_info.monsters[
-                    random.choice(self.game_state.get_tile_monsters(self.game_state.pc.curr_pos_dat_tile))]
+                    random.choice(self.game_state.get_tile_monsters())]
 
         # Initialize hero and monster  states
-        self.game_state.pc.clear_combat_status_affects()
+        self.game_state.hero_party.clear_combat_status_affects()
         monster = MonsterState(monster_info, special_monster_info)
 
         # Start encounter music
@@ -864,7 +829,7 @@ class Game:
         # Display status, command prompt dialog, and command menu
         is_start = True
         while self.game_state.is_running:
-            GameDialog.create_encounter_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+            GameDialog.create_encounter_status_dialog(self.game_state.hero_party).blit(self.game_state.screen, False)
 
             # The first time through, check to see if the monster runs away or takes the initiative
             skip_hero_attack = False
@@ -872,16 +837,16 @@ class Game:
                 is_start = False
 
                 # Check if the monster is going to run away.
-                if monster.should_run_away(self.game_state.pc):
+                if monster.should_run_away(self.game_state.hero_party.main_character):
                     # TODO: Play sound?
                     monster.has_run_away = True
                     message_dialog.add_message('The ' + monster.get_name() + ' is running away.')
                     break
 
                 # Check if the monster takes the initiative and attacks first
-                if monster.has_initiative(self.game_state.pc):
+                if monster.has_initiative(self.game_state.hero_party.main_character):
                     message_dialog.add_message('The ' + monster.get_name() + ' attacked before '
-                                               + self.game_state.pc.get_name() + ' was ready')
+                                               + self.game_state.hero_party.main_character.get_name() + ' was ready')
                     skip_hero_attack = True
 
             # Perform player character turn
@@ -889,17 +854,19 @@ class Game:
 
                 message_dialog.add_message('')
 
-                if self.game_state.pc.is_asleep:
+                if self.game_state.hero_party.main_character.is_asleep:
                     # Check if player wakes up
-                    if self.game_state.pc.is_still_asleep():
-                        if self.game_state.pc.turns_asleep == 1:
-                            message_dialog.add_message(self.game_state.pc.get_name() + ' is asleep.')
+                    if self.game_state.hero_party.main_character.is_still_asleep():
+                        if self.game_state.hero_party.main_character.turns_asleep == 1:
+                            message_dialog.add_message(self.game_state.hero_party.main_character.get_name()
+                                                       + ' is asleep.')
                         else:
-                            message_dialog.add_message(self.game_state.pc.get_name() + ' is still asleep.')
+                            message_dialog.add_message(self.game_state.hero_party.main_character.get_name()
+                                                       + ' is still asleep.')
                     else:
-                        message_dialog.add_message(self.game_state.pc.get_name() + ' awakes.')
+                        message_dialog.add_message(self.game_state.hero_party.main_character.get_name() + ' awakes.')
 
-                while self.game_state.is_running and not self.game_state.pc.is_asleep:
+                while self.game_state.is_running and not self.game_state.hero_party.main_character.is_asleep:
 
                     message_dialog.add_encounter_prompt()
                     message_dialog.blit(self.game_state.screen, True)
@@ -912,21 +879,24 @@ class Game:
                     # Process encounter menu selection
                     if menu_result == 'FIGHT':
 
-                        message_dialog.add_message(self.game_state.pc.name + ' attacks!')
+                        message_dialog.add_message(self.game_state.hero_party.main_character.name + ' attacks!')
 
                         # Check for a critical strike
-                        if self.game_state.pc.critical_hit_check(monster):
+                        if self.game_state.hero_party.main_character.critical_hit_check(monster):
                             # TODO: Play sound?
                             message_dialog.add_message('Excellent move!')
-                            damage = self.game_state.pc.calc_critical_hit_damage_to_monster(monster)
+                            damage = self.game_state.hero_party.main_character.calc_critical_hit_damage_to_monster(
+                                monster)
                         else:
-                            damage = self.game_state.pc.calc_regular_hit_damage_to_monster(monster)
+                            damage = self.game_state.hero_party.main_character.calc_regular_hit_damage_to_monster(
+                                monster)
 
                         # Check for a monster dodge
                         if 0 == damage or monster.is_dodging_attack():
                             audio_player.play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                             message_dialog.add_message(
-                                'The ' + monster.get_name() + ' dodges ' + self.game_state.pc.get_name() + "'s strike.")
+                                'The ' + monster.get_name() + ' dodges '
+                                + self.game_state.hero_party.main_character.get_name() + "'s strike.")
                         else:
                             # TODO: Play different sound based on damage of attack
                             audio_player.play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
@@ -950,18 +920,20 @@ class Game:
                         # The <monster name> attacked before <player name> was ready.
                         # The <monster name> attacks! Thy Hit Points decreased by 1.
                     elif menu_result == 'RUN':
-                        if monster.is_blocking_escape(self.game_state.pc):
+                        if monster.is_blocking_escape(self.game_state.hero_party.main_character):
                             # TODO: Play sound?
                             message_dialog.add_message(
-                                self.game_state.pc.get_name() + ' started to run away but was blocked in front.')
+                                self.game_state.hero_party.main_character.get_name()
+                                + ' started to run away but was blocked in front.')
                         else:
                             audio_player.play_sound('runAway.wav')
-                            message_dialog.add_message(self.game_state.pc.get_name() + ' started to run away.')
+                            message_dialog.add_message(self.game_state.hero_party.main_character.get_name()
+                                                       + ' started to run away.')
 
                             if run_away_dialog is not None:
                                 self.traverse_dialog(message_dialog, run_away_dialog, depth=1)
 
-                            self.game_state.pc.has_run_away = True
+                            self.game_state.hero_party.main_character.has_run_away = True
                             break
 
                     elif menu_result == 'SPELL':
@@ -981,18 +953,19 @@ class Game:
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
-                                if self.game_state.pc.mp >= spell.mp:
-                                    self.game_state.pc.mp -= spell.mp
+                                if self.game_state.hero_party.main_character.mp >= spell.mp:
+                                    self.game_state.hero_party.main_character.mp -= spell.mp
 
                                     AudioPlayer().play_sound('castSpell.wav')
                                     SurfaceEffects.flickering(self.game_state.screen)
 
                                     spell_worked = True
-                                    if self.game_state.pc.does_spell_work(spell, monster):
+                                    if self.game_state.hero_party.main_character.does_spell_work(spell, monster):
                                         if spell.max_hp_recover > 0:
                                             hp_recover = random.randint(spell.min_hp_recover, spell.max_hp_recover)
-                                            self.game_state.pc.hp = min(self.game_state.pc.level.hp,
-                                                                        self.game_state.pc.hp + hp_recover)
+                                            self.game_state.hero_party.main_character.hp = min(
+                                                self.game_state.hero_party.main_character.level.hp,
+                                                self.game_state.hero_party.main_character.hp + hp_recover)
                                         elif spell.max_damage_by_hero > 0:
                                             damage = random.randint(spell.min_damage_by_hero,
                                                                     spell.max_damage_by_hero)
@@ -1011,13 +984,15 @@ class Game:
 
                                     if spell_worked:
                                         message_dialog.add_message(
-                                            self.game_state.pc.name + ' cast the spell of ' + spell.name.lower() + '.')
+                                            self.game_state.hero_party.main_character.name
+                                            + ' cast the spell of ' + spell.name.lower() + '.')
                                     else:
                                         message_dialog.add_message(
-                                            self.game_state.pc.get_name() + ' cast the spell of ' + spell.name.lower()
+                                            self.game_state.hero_party.main_character.get_name()
+                                            + ' cast the spell of ' + spell.name.lower()
                                             + ' but the spell did not work.')
 
-                                    GameDialog.create_encounter_status_dialog(self.game_state.pc).blit(
+                                    GameDialog.create_encounter_status_dialog(self.game_state.hero_party).blit(
                                         self.game_state.screen, False)
 
                                 else:
@@ -1034,7 +1009,7 @@ class Game:
                     break
 
                 # Check for ran away death or monster death
-                if not self.game_state.pc.is_still_in_combat() or not monster.is_alive():
+                if not self.game_state.hero_party.is_still_in_combat() or not monster.is_alive():
                     break
 
                 message_dialog.blit(self.game_state.screen, True)
@@ -1058,7 +1033,7 @@ class Game:
                 continue
 
             # Check if the monster is going to run away.  Only random monsters should ever run away.
-            if monster.should_run_away(self.game_state.pc):
+            if monster.should_run_away(self.game_state.hero_party.main_character):
                 # TODO: Play sound?
                 monster.has_run_away = True
                 message_dialog.add_message('The ' + monster.get_name() + ' is running away.')
@@ -1070,9 +1045,11 @@ class Game:
                 monster_health_ratio = monster.hp / monster.max_hp
                 if monster_health_ratio > monster_action.health_ratio_threshold:
                     continue
-                if MonsterActionEnum.SLEEP == monster_action.type and self.game_state.pc.is_asleep:
+                if (MonsterActionEnum.SLEEP == monster_action.type
+                        and self.game_state.hero_party.main_character.is_asleep):
                     continue
-                if MonsterActionEnum.STOPSPELL == monster_action.type and self.game_state.pc.are_spells_blocked:
+                if (MonsterActionEnum.STOPSPELL == monster_action.type
+                        and self.game_state.hero_party.main_character.are_spells_blocked):
                     continue
                 if random.uniform(0, 1) < monster_action.probability:
                     chosen_monster_action = monster_action.type
@@ -1102,28 +1079,31 @@ class Game:
                 message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of '
                                            + spell.name.lower() + '.')
                 damage = random.randint(spell.min_damage_by_monster, spell.max_damage_by_monster)
-                if self.game_state.pc.armor is not None:
+                if self.game_state.hero_party.main_character.armor is not None:
                     # TODO: Allow damage reduction from other sources
-                    damage = round(damage * self.game_state.pc.armor.hurt_dmg_modifier)
-                if not monster.does_spell_work(spell, self.game_state.pc):
+                    damage = round(damage * self.game_state.hero_party.main_character.armor.hurt_dmg_modifier)
+                if not monster.does_spell_work(spell, self.game_state.hero_party.main_character):
                     message_dialog.add_message('But that spell hath been blocked.')
                     damage = 0
             elif chosen_monster_action == MonsterActionEnum.SLEEP:
                 AudioPlayer().play_sound('castSpell.wav')
                 SurfaceEffects.flickering(self.game_state.screen)
                 message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of sleep.')
-                if monster.does_spell_work(self.game_state.game_info.spells['Sleep'], self.game_state.pc):
+                if monster.does_spell_work(self.game_state.game_info.spells['Sleep'],
+                                           self.game_state.hero_party.main_character):
                     message_dialog.add_message('Thou art asleep.')
-                    self.game_state.pc.is_asleep = True
+                    self.game_state.hero_party.main_character.is_asleep = True
                 else:
                     message_dialog.add_message('But that spell hath been blocked.')
             elif chosen_monster_action == MonsterActionEnum.STOPSPELL:
                 AudioPlayer().play_sound('castSpell.wav')
                 SurfaceEffects.flickering(self.game_state.screen)
                 message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of stopspell.')
-                if monster.does_spell_work(self.game_state.game_info.spells['Stopspell'], self.game_state.pc):
-                    message_dialog.add_message(self.game_state.pc.name + "'s spells hath been blocked.")
-                    self.game_state.pc.are_spells_blocked = True
+                if monster.does_spell_work(self.game_state.game_info.spells['Stopspell'],
+                                           self.game_state.hero_party.main_character):
+                    message_dialog.add_message(self.game_state.hero_party.main_character.name
+                                               + "'s spells hath been blocked.")
+                    self.game_state.hero_party.main_character.are_spells_blocked = True
                 else:
                     # TODO: Different messages depending on why the spell did not work?
                     message_dialog.add_message('But that spell did not work.')
@@ -1136,15 +1116,16 @@ class Game:
                     damage = random.randint(16, 23)
                 else:
                     damage = random.randint(65, 72)
-                if self.game_state.pc.armor is not None:
+                if self.game_state.hero_party.main_character.armor is not None:
                     # TODO: Allow damage reduction from other sources
-                    damage = round(damage * self.game_state.pc.armor.fire_dmg_modifier)
+                    damage = round(damage * self.game_state.hero_party.main_character.armor.fire_dmg_modifier)
             else:  # chosen_monster_action == MonsterActionEnum.ATTACK
-                damage = self.game_state.pc.calc_hit_damage_from_monster(monster)
+                damage = self.game_state.hero_party.main_character.calc_hit_damage_from_monster(monster)
                 if 0 == damage:
                     # TODO: Play sound?
                     message_dialog.add_message(
-                        'The ' + monster.get_name() + ' attacks! ' + self.game_state.pc.name + ' dodges the strike.')
+                        'The ' + monster.get_name() + ' attacks! '
+                        + self.game_state.hero_party.main_character.name + ' dodges the strike.')
                 else:
                     # TODO: Play different sound based on strength of attack
                     audio_player.play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
@@ -1152,31 +1133,32 @@ class Game:
 
             if damage != 0:
                 message_dialog.add_message('Thy hit points reduced by ' + str(damage) + '.')
-                self.game_state.pc.hp -= damage
-                if self.game_state.pc.hp < 0:
-                    self.game_state.pc.hp = 0
+                self.game_state.hero_party.main_character.hp -= damage
+                if self.game_state.hero_party.main_character.hp < 0:
+                    self.game_state.hero_party.main_character.hp = 0
                 for flickerTimes in range(10):
                     offset_pixels = Point(damage_flicker_pixels, damage_flicker_pixels)
                     self.game_state.screen.blit(orig_screen, (0, 0))
                     self.game_state.screen.blit(encounter_image, encounter_image_dest_pixels)
                     self.game_state.screen.blit(monster.monster_info.image, monster_image_dest_pixels)
-                    GameDialog.create_encounter_status_dialog(self.game_state.pc).blit(self.game_state.screen, False,
-                                                                                       offset_pixels)
+                    GameDialog.create_encounter_status_dialog(
+                        self.game_state.hero_party).blit(self.game_state.screen, False, offset_pixels)
                     message_dialog.blit(self.game_state.screen, True, offset_pixels)
                     pygame.time.Clock().tick(30)
                     self.game_state.screen.blit(orig_screen, (0, 0))
                     self.game_state.screen.blit(encounter_image, encounter_image_dest_pixels)
                     self.game_state.screen.blit(monster.monster_info.image, monster_image_dest_pixels)
-                    GameDialog.create_encounter_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+                    GameDialog.create_encounter_status_dialog(
+                        self.game_state.hero_party).blit(self.game_state.screen, False)
                     message_dialog.blit(self.game_state.screen, True)
                     pygame.time.Clock().tick(30)
 
                 # Check for player death
-                if self.game_state.pc.hp <= 0:
+                if self.game_state.hero_party.main_character.hp <= 0:
                     break
 
         audio_player.stop_music()
-        if self.game_state.pc.hp <= 0:
+        if self.game_state.hero_party.main_character.hp <= 0:
             self.check_for_player_death(message_dialog)
         elif monster.hp <= 0:
             audio_player.play_sound('17_-_Dragon_Warrior_-_NES_-_Enemy_Defeated.ogg')
@@ -1185,15 +1167,17 @@ class Game:
             message_dialog.add_message(
                 'Thou has done well in defeating the ' + monster.get_name() + '. Thy experience increases by ' + str(
                     monster.xp) + '. Thy gold increases by ' + str(monster.gp) + '.')
-            self.game_state.pc.gp += monster.gp
-            self.game_state.pc.xp += monster.xp
-            GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
-            if self.game_state.pc.level_up_check(self.game_state.game_info.levels):
+            self.game_state.hero_party.main_character.gp += monster.gp
+            self.game_state.hero_party.main_character.xp += monster.xp
+            GameDialog.create_exploring_status_dialog(
+                self.game_state.hero_party).blit(self.game_state.screen, False)
+            if self.game_state.hero_party.main_character.level_up_check(self.game_state.game_info.levels):
                 self.wait_for_acknowledgement(message_dialog)
                 audio_player.play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
                 message_dialog.add_message(
                     '\nCourage and wit have served thee well. Thou hast been promoted to the next level.')
-                GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+                GameDialog.create_exploring_status_dialog(
+                    self.game_state.hero_party).blit(self.game_state.screen, False)
 
             message_dialog.blit(self.game_state.screen, True)
 
@@ -1206,7 +1190,7 @@ class Game:
         pygame.key.set_repeat(orig_repeat1, orig_repeat2)
 
         # Draw the map
-        if self.game_state.pc.hp > 0:
+        if self.game_state.hero_party.main_character.hp > 0:
             self.game_state.draw_map(True)
 
         # Return to exploring after completion of encounter
@@ -1214,26 +1198,27 @@ class Game:
         self.game_mode = GameMode.EXPLORING
 
     def check_for_player_death(self, message_dialog: Optional[GameDialog] = None) -> None:
-        if self.game_state.pc.hp <= 0:
+        if self.game_state.hero_party.main_character.hp <= 0:
             # Player death
-            self.game_state.pc.hp = 0
+            self.game_state.hero_party.main_character.hp = 0
             AudioPlayer().stop_music()
             AudioPlayer().play_sound('20_-_Dragon_Warrior_-_NES_-_Dead.ogg')
-            GameDialog.create_exploring_status_dialog(self.game_state.pc).blit(self.game_state.screen, False)
+            GameDialog.create_exploring_status_dialog(
+                self.game_state.hero_party).blit(self.game_state.screen, False)
             if message_dialog is None:
                 message_dialog = GameDialog.create_message_dialog()
             else:
                 message_dialog.add_message('')
             message_dialog.add_message('Thou art dead.')
             self.wait_for_acknowledgement(message_dialog)
-            self.game_state.pc.curr_pos_dat_tile = self.game_state.pc.dest_pos_dat_tile =\
-                self.game_state.game_info.death_hero_pos_dat_tile
-            self.game_state.pc.curr_pos_offset_img_px = Point(0, 0)
-            self.game_state.pc.direction = self.game_state.game_info.death_hero_pos_dir
-            self.game_state.pending_dialog = self.game_state.game_info.death_dialog
-            self.game_state.pc.hp = self.game_state.pc.level.hp
-            self.game_state.pc.mp = self.game_state.pc.level.mp
-            self.game_state.pc.gp = self.game_state.pc.gp // 2
+            for hero in self.game_state.hero_party.members:
+                shero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_state.game_info.death_hero_pos_dat_tile
+                hero.curr_pos_offset_img_px = Point(0, 0)
+                hero.direction = self.game_state.game_info.death_hero_pos_dir
+                self.game_state.pending_dialog = self.game_state.game_info.death_dialog
+                hero.hp = hero.level.hp
+                hero.mp = hero.level.mp
+            self.game_state.hero_party.gp = self.game_state.hero_party.gp // 2
             self.game_state.set_map(self.game_state.game_info.death_map, respawn_decorations=True)
 
     def scroll_tile(self) -> None:
@@ -1247,7 +1232,8 @@ class Game:
         tile_move_steps = self.game_state.game_info.tile_size_pixels // image_px_step_size
 
         # Determine the destination tile and pixel count for the scroll
-        hero_dest_dat_tile = self.game_state.pc.curr_pos_dat_tile + self.game_state.pc.direction.get_direction_vector()
+        hero_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
+                             + self.game_state.hero_party.members[0].direction.get_vector()
 
         # Validate if the destination tile is navigable
         movement_allowed = self.game_state.can_move_to_tile(hero_dest_dat_tile)
@@ -1256,8 +1242,14 @@ class Game:
         audio_player = AudioPlayer()
         movement_hp_penalty = 0
         if movement_allowed:
-            self.game_state.pc.dest_pos_dat_tile = hero_dest_dat_tile
             dest_tile_type = self.game_state.get_tile_info(hero_dest_dat_tile)
+
+            self.game_state.hero_party.members[0].dest_pos_dat_tile = hero_dest_dat_tile
+            for hero_idx in range(1, len(self.game_state.hero_party.members)):
+                hero = self.game_state.hero_party.members[hero_idx]
+                hero.dest_pos_dat_tile = self.game_state.hero_party.members[hero_idx-1].curr_pos_dat_tile
+                if hero.curr_pos_dat_tile != hero.dest_pos_dat_tile:
+                    hero.direction = Direction.get_direction(hero.dest_pos_dat_tile - hero.curr_pos_dat_tile)
 
             # Determine if the movement should result in a transition to another map
             if (self.game_state.game_info.maps[self.game_state.map_state.name].leaving_transition is not None
@@ -1277,7 +1269,7 @@ class Game:
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile)
 
             # Check for tile penalty effects
-            if dest_tile_type.hp_penalty > 0 and not self.game_state.pc.is_ignoring_tile_penalties():
+            if dest_tile_type.hp_penalty > 0 and not self.game_state.hero_party.is_ignoring_tile_penalties():
                 audio_player.play_sound('walking.wav')
                 movement_hp_penalty = dest_tile_type.hp_penalty
         else:
@@ -1292,12 +1284,16 @@ class Game:
                 # Scroll the view
                 SurfaceEffects.scroll_view(self.game_state.screen,
                                            self.game_state.get_map_image(),
-                                           self.game_state.pc.direction,
+                                           self.game_state.hero_party.members[0].direction,
                                            map_image_rect,
                                            1,
                                            image_px_step_size)
-                self.game_state.pc.curr_pos_offset_img_px = Point(map_image_rect.x - orig_map_image_rect.x,
-                                                                  map_image_rect.y - orig_map_image_rect.y)
+                self.game_state.hero_party.members[0].curr_pos_offset_img_px = Point(
+                    map_image_rect.x - orig_map_image_rect.x, map_image_rect.y - orig_map_image_rect.y)
+                for hero in self.game_state.hero_party.members[1:]:
+                    if hero.curr_pos_dat_tile != hero.dest_pos_dat_tile:
+                        hero.curr_pos_offset_img_px = hero.direction.get_vector() * image_px_step_size * (x+1)
+
                 if self.game_state.is_light_restricted():
                     self.game_state.draw_map(False)
 
@@ -1310,20 +1306,24 @@ class Game:
                     elif x == tile_move_steps - 1:
                         self.game_state.draw_map(False)
 
+            # Redraws the characters when movement_allowed is True
             self.game_state.advance_tick(movement_allowed)
 
         if movement_allowed:
-            prev_pos_dat_tile = self.game_state.pc.curr_pos_dat_tile
-            self.game_state.pc.curr_pos_dat_tile = self.game_state.pc.dest_pos_dat_tile
-            self.game_state.pc.curr_pos_offset_img_px = Point(0, 0)
+            prev_pos_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile
+            for hero in self.game_state.hero_party.members:
+                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile
+                hero.curr_pos_offset_img_px = Point(0, 0)
 
             # Redraw the map on a transition between interior and exterior
             if (self.game_state.is_interior(prev_pos_dat_tile) !=
-                    self.game_state.is_interior(self.game_state.pc.curr_pos_dat_tile)):
+                    self.game_state.is_interior(self.game_state.hero_party.members[0].curr_pos_dat_tile)):
                 self.game_state.draw_map(True)
 
             # Apply health penalty and check for player death
-            self.game_state.pc.hp -= movement_hp_penalty
+            for hero in self.game_state.hero_party.members:
+                if not hero.is_ignoring_tile_penalties():
+                    hero.hp -= movement_hp_penalty
             self.check_for_player_death()
 
             # At destination - now determine if an encounter should start
@@ -1332,12 +1332,15 @@ class Game:
                 if self.game_state.get_special_monster() is not None:
                     self.game_mode = GameMode.ENCOUNTER
                 # Check for random encounters
-                elif (len(self.game_state.get_tile_monsters(self.game_state.pc.curr_pos_dat_tile)) > 0 and
+                elif (len(self.game_state.get_tile_monsters()) > 0 and
                       random.uniform(0, 1) < dest_tile_type.spawn_rate):
                     self.game_mode = GameMode.ENCOUNTER
 
 
 def main() -> None:
+    import sys
+    import os
+
     pygame.init()
     pygame.mouse.set_visible(False)
 
