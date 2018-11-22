@@ -5,19 +5,17 @@ from __future__ import annotations
 from typing import Dict, Optional
 
 import os.path
+import pygame.mixer
+import pygame.time
 import threading
-
-import pygame
-mixer = pygame.mixer
-time = pygame.time
 
 
 class AudioPlayer:
     class __AudioPlayer:
         def __init__(self) -> None:
             # Choose a desired audio format
-            mixer.init(11025)  # Raises exception on fail
-            mixer.set_num_channels(32)
+            pygame.mixer.init(11025)  # Raises exception on fail
+            pygame.mixer.set_num_channels(32)
          
             self.music_path = './'
             self.sound_path = './'
@@ -31,7 +29,7 @@ class AudioPlayer:
         def __del__(self) -> None:
             self.terminate()
             self.music_thread.join()
-            mixer.quit()
+            pygame.mixer.quit()
          
         def set_music_path(self, music_path: str) -> None:
             self.music_path = music_path
@@ -49,7 +47,6 @@ class AudioPlayer:
             elif not interrupt:
                 self.music_rel_file_path2 = music_rel_file_path1
 
-         
         def __music_thread(self) -> None:
             first_time = True
             current_music_rel_file_path1: Optional[str] = None
@@ -66,24 +63,24 @@ class AudioPlayer:
                 if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
                     # load the music
                     if first_time:
-                        mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
+                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
                         first_time = False
                     else:
-                        mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path2))
+                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path2))
 
                     # start playing
-                    mixer.music.play()
+                    pygame.mixer.music.play()
 
                     # poll until finished
                     while (self.running
-                           and mixer.music.get_busy()
+                           and pygame.mixer.music.get_busy()
                            and current_music_rel_file_path1 == self.music_rel_file_path1
                            and current_music_rel_file_path2 == self.music_rel_file_path2):
                         # still playing and not changed
-                        time.wait(100)
-                    mixer.music.stop()
+                        pygame.time.wait(100)
+                    pygame.mixer.music.stop()
 
-                time.wait(100)
+                pygame.time.wait(100)
          
         def play_sound(self, sound_rel_file_path: str) -> None:
             sound_thread = threading.Thread(target=self.__sound_thread, args=[sound_rel_file_path])
@@ -92,11 +89,12 @@ class AudioPlayer:
         def __sound_thread(self, sound_rel_file_path: str) -> None:
             # Load the sound if not previously loaded
             if sound_rel_file_path not in self.sounds:
-                self.sounds[sound_rel_file_path] = mixer.Sound(os.path.join(self.sound_path, sound_rel_file_path))
+                self.sounds[sound_rel_file_path] = pygame.mixer.Sound(
+                    os.path.join(self.sound_path, sound_rel_file_path))
 
             channel = self.sounds[sound_rel_file_path].play()
             while self.running and channel.get_busy():
-                time.wait(10)
+                pygame.time.wait(10)
             
         def stop_music(self) -> None:
             self.music_rel_file_path1 = self.music_rel_file_path2 = None
@@ -118,10 +116,12 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.set_sound_path(sound_path)
 
-    # If interrupt is True, new music cuts in and then is replaced by the old music
-    # This is only applicable when music_file_path2 is not specified as it is implemented by leaving music_file_path2
-    # unchanged.
-    def play_music(self, music_file_path1: str, music_file_path2: Optional[str] = None, interrupt: bool = False) -> None:
+    # If interrupt is True, new music cuts in and then is replaced by the old music. This is only applicable when
+    # music_file_path2 is not specified as it is implemented by leaving music_file_path2 unchanged.
+    def play_music(self,
+                   music_file_path1: str,
+                   music_file_path2: Optional[str] = None,
+                   interrupt: bool = False) -> None:
         if self.instance is not None:
             self.instance.play_music(music_file_path1, music_file_path2, interrupt)
       
@@ -149,24 +149,24 @@ def main() -> None:
 
     print('Play Overture...', flush=True)
     audio_player.play_music('01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg')
-    time.wait(1000)
+    pygame.time.wait(1000)
     print('Play sound...', flush=True)
     audio_player.play_sound('walking.wav')
-    time.wait(1000)
+    pygame.time.wait(1000)
 
     print('Stop music...', flush=True)
     audio_player.stop_music()
-    time.wait(1000)
+    pygame.time.wait(1000)
     print('Play sound...', flush=True)
     audio_player.play_sound('walking.wav')
-    time.wait(1000)
+    pygame.time.wait(1000)
 
     print('Play Overture...', flush=True)
     audio_player.play_music('01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg')
-    time.wait(1000)
+    pygame.time.wait(1000)
     print('Play sound...', flush=True)
     audio_player.play_sound('walking.wav')
-    time.wait(1000)
+    pygame.time.wait(1000)
 
     print('Terminate...', flush=True)
     audio_player.terminate()

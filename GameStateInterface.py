@@ -9,6 +9,7 @@ import pygame
 
 from GenericGameState import GenericGameState
 from HeroParty import HeroParty
+from Point import Point
 
 
 class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
@@ -98,5 +99,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def save(self) -> None:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def get_win_size_pixels(self) -> Point:
+        raise NotImplementedError
 
-
+    @abc.abstractmethod
+    def get_tile_size_pixels(self) -> Point:
+        raise NotImplementedError

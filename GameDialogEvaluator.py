@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-from typing import Optional
+from typing import Optional, Union
 
 import pygame
-import random
 
 from AudioPlayer import AudioPlayer
-from HeroParty import HeroParty
-from GameDialog import *
-from GameTypes import *
+from GameDialog import GameDialog, GameDialogSpacing
+from GameTypes import DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, \
+    DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, DialogVendorSellOptions, \
+    DialogVendorSellOptionsVariable, GameTypes
 from GameStateInterface import GameStateInterface
 import GameEvents
+from Point import Point
 import SurfaceEffects
 
 
@@ -322,9 +323,8 @@ class GameDialogEvaluator:
                         for hero in self.hero_party.members:
                             hero.mp = hero.level.mp
                     else:
-                        (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
                         # TODO: Need to know which character to which magic restore should apply
-                        self.hero_party.main_character.mp += random.randint(minRestore, maxRestore)
+                        self.hero_party.main_character.mp += GameTypes.get_int_value(item.count)
                     for hero in self.hero_party.members:
                         hero.mp = min(hero.mp, hero.level.mp)
                     GameDialog.create_exploring_status_dialog(
@@ -335,9 +335,8 @@ class GameDialogEvaluator:
                         for hero in self.hero_party.members:
                             hero.hp = hero.level.hp
                     else:
-                        (minRestore, maxRestore) = GameInfo.parse_int_range(item.count)
                         # TODO: Need to know which character to which health restore should apply
-                        self.hero_party.main_character.hp += random.randint(minRestore, maxRestore)
+                        self.hero_party.main_character.hp += GameTypes.get_int_value(item.count)
                     for hero in self.hero_party.members:
                         hero.hp = min(hero.hp, hero.level.hp)
                     GameDialog.create_exploring_status_dialog(
@@ -432,7 +431,7 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.ATTACK_MONSTER:
                     # TODO: Make this work again
                     pass
-                    #self.game_state.initiate_encounter(monster_info=self.game_state.get_monster(item.name),
+                    # self.game_state.initiate_encounter(monster_info=self.game_state.get_monster(item.name),
                     #                                   victory_dialog=item.victory_dialog,
                     #                                   run_away_dialog=item.run_away_dialog,
                     #                                   encounter_music=item.encounter_music,

@@ -4,12 +4,11 @@
 from __future__ import annotations
 from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
-import collections
+from dataclasses import dataclass
+from enum import Enum
 import pygame
 import random
 
-from dataclasses import dataclass
-from enum import Enum
 from Point import Point
 
 

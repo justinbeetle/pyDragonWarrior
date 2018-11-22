@@ -23,6 +23,14 @@ class MonsterParty:
         # TODO: Update for monster parties with multiple members
         return 'A ' + self.members[0].get_name() + ' draws near!'
 
+    # Get the number of monsters defeated
+    def get_defeated_count(self) -> int:
+        ret_val = 0
+        for member in self.members:
+            if member.is_dead():
+                ret_val += 1
+        return ret_val
+
     # Get the amount of gold pieces to award at completion of encounter
     def get_gp(self) -> int:
         ret_val = 0

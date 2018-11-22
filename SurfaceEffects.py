@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pygame
+
 from GameTypes import Direction
 
 

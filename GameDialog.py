@@ -2,11 +2,14 @@
 
 # Imports to support type annotations
 from __future__ import annotations
+from typing import List, Optional, Union
 
+from enum import Enum
 import math
+import pygame
 
-from GameTypes import *
 from HeroParty import HeroParty
+from Point import Point
 
 
 class GameDialogSpacing(Enum):
@@ -274,7 +277,7 @@ class GameDialog:
             ['Attack Strength:', str(pc.get_attack_strength())],
             ['Defense Strength:', str(pc.get_defense_strength())],
             ['Weapon:', weapon_name],
-            # ['Helm:', helm_name],  # TODO: Add use of helm
+            ['Helm:', helm_name],
             ['Armor:', armor_name],
             ['Shield:', shield_name]]
         return GameDialog.create_status_dialog(
@@ -609,22 +612,22 @@ class GameDialog:
              row_pos_y + 3 / 4 * GameDialog.selection_indicator_pixels))
         pygame.draw.polygon(self.image, color, pointlist)
 
-    def process_event(self, e: pygame.Event, screen: pygame.Surface) -> None:
+    def process_event(self, event: pygame.Event, screen: pygame.Surface) -> None:
         if self.row_data is None or self.menu_data is None:
             return
 
-        if e.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             num_cols = len(self.menu_data[0])
             new_col = self.menu_col
             num_rows = len(self.menu_data)
             new_row = self.menu_row
-            if e.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN:
                 new_row = (self.menu_row + 1) % num_rows
-            elif e.key == pygame.K_UP:
+            elif event.key == pygame.K_UP:
                 new_row = (self.menu_row - 1) % num_rows
-            elif e.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT:
                 new_col = (self.menu_col - 1) % num_cols
-            elif e.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT:
                 new_col = (self.menu_col + 1) % num_cols
 
             # Skip over empty cells in menuOptions
@@ -653,6 +656,7 @@ class GameDialog:
 
 
 def main() -> None:
+    from GameTypes import Direction, Level
     from HeroState import HeroState
 
     # Initialize pygame

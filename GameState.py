@@ -1,21 +1,26 @@
 #!/usr/bin/env python
 
+from typing import Dict, List, Optional, Union
+
+from enum import Enum
 import os
+import pygame
 import xml.etree.ElementTree
 import xml.dom.minidom
 import random
 
-import pygame
 
 # from CombatEncounter import CombatEncounter
 # from GameDialog import GameDialog
-from GameTypes import *
+from GameTypes import DialogReplacementVariables, DialogType, Direction, ItemType, LeavingTransition, Level, \
+    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
 from HeroParty import HeroParty
 from HeroState import HeroState
 from NpcState import NpcState
+from Point import Point
 
 
 class GameMode(Enum):
@@ -81,12 +86,14 @@ class GameState(GameStateInterface):
         self.hero_party.progress_markers = self.game_info.pc_progressMarkers
 
         # TODO: Remove Mocha from party
+        '''
         mocha = HeroState('mocha',
                           self.game_info.initial_hero_pos_dat_tile,
                           self.game_info.initial_hero_pos_dir,
                           'Mocha',
                           self.game_info.levels[0])
         self.hero_party.add_member(mocha)
+        '''
 
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
@@ -398,7 +405,7 @@ class GameState(GameStateInterface):
                         and decoration.type is not None
                         and not self.game_info.decorations[decoration.type].walkable):
                     movement_allowed = False
-                    print('Movement not allowed: decoration not walkable', decoration, flush=True)
+                    # print('Movement not allowed: decoration not walkable', decoration, flush=True)
                     break
         else:
             for decoration in self.map_decorations:
@@ -406,7 +413,7 @@ class GameState(GameStateInterface):
                         and decoration.type is not None
                         and self.game_info.decorations[decoration.type].walkable):
                     movement_allowed = True
-                    print('Movement allowed: decoration walkable', decoration, flush=True)
+                    # print('Movement allowed: decoration walkable', decoration, flush=True)
                     break
 
         if movement_allowed:
@@ -751,6 +758,12 @@ class GameState(GameStateInterface):
 
     def get_map_name(self) -> str:
         return self.map_state.name
+
+    def get_win_size_pixels(self) -> Point:
+        return self.win_size_pixels
+
+    def get_tile_size_pixels(self) -> Point:
+        return self.game_info.tile_size_pixels
 
 
 def main() -> None:

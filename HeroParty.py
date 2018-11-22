@@ -8,6 +8,7 @@ from GameTypes import Direction
 from HeroState import HeroState
 from Point import Point
 
+
 class HeroParty:
     def __init__(self, main_character: HeroState) -> None:
         self.main_character = main_character
@@ -138,6 +139,12 @@ class HeroParty:
         for member in self.members:
             member.clear_combat_status_affects()
 
+    def has_surviving_members(self) -> bool:
+        for member in self.members:
+            if member.is_alive():
+                return True
+        return False
+
     def is_still_in_combat(self) -> bool:
         for member in self.members:
             if member.is_still_in_combat():
@@ -197,9 +204,9 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-   try:
-      main()
-   except Exception as e:
+    try:
+        main()
+    except Exception as e:
         import sys
         import traceback
         print(traceback.format_exception(None,  # <- type(e) by docs, but ignored

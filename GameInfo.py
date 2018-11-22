@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 
+from typing import Dict, List, Optional, Union
+
 import os
+import pygame
 import xml.etree.ElementTree
 
 from AudioPlayer import AudioPlayer
-from GameTypes import *
+from GameTypes import Armor, CharacterType, Decoration, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
+    DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsParamWithoutReplacementType, \
+    DialogVendorBuyOptionsParamType, DialogVendorBuyOptionsVariable, DialogVendorSellOptions, \
+    DialogVendorSellOptionsParamWithoutReplacementType, DialogVendorSellOptionsParamType, \
+    DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, LeavingTransition, Level, Map, MapDecoration, \
+    MapImageInfo, MonsterAction, MonsterActionEnum, MonsterInfo, MonsterZone, NpcInfo, Phase, PointTransition, Shield, \
+    SpecialMonster, Spell, Tile, Tool, Weapon
 from Point import Point
 
 

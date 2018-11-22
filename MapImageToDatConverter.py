@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import sys
 import os
-
 import pygame
 
 
@@ -13,7 +11,7 @@ def main():
 
     # Setup to draw maps
     tile_size_pixels = 16
-    screen = pygame.display.set_mode((160, 160), pygame.SRCALPHA|pygame.HWSURFACE)
+    screen = pygame.display.set_mode((160, 160), pygame.SRCALPHA | pygame.HWSURFACE)
     clock = pygame.time.Clock()
 
     # Load the map image to convert to dat file

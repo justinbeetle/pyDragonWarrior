@@ -6,15 +6,20 @@ import pygame
 
 from AudioPlayer import AudioPlayer
 from GameDialog import GameDialog
+from GameDialogEvaluator import GameDialogEvaluator
+from GameStateInterface import GameStateInterface
 from GameTypes import DialogType
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
 from MonsterState import MonsterState
+from Point import Point
 import SurfaceEffects
 
 
 class CombatEncounter:
+    MONSTER_SPACING_PIXELS = 20
+    DAMAGE_FLICKER_PIXELS = 4
     default_encounter_music = ''
 
     @staticmethod
@@ -22,9 +27,8 @@ class CombatEncounter:
         CombatEncounter.default_encounter_music = default_encounter_music
 
     def __init__(self,
-                 hero_party: HeroParty,
+                 game_state: GameStateInterface,
                  monster_party: MonsterParty,
-                 screen: pygame.Surface,
                  encounter_image: pygame.Surface,
                  message_dialog: Optional[GameDialog] = None,
                  approach_dialog: Optional[DialogType] = None,
@@ -32,10 +36,11 @@ class CombatEncounter:
                  run_away_dialog: Optional[DialogType] = None,
                  encounter_music: Optional[str] = None) -> None:
         self.is_first_turn = True
-        self.hero_party = hero_party
+        self.game_state = game_state
+        self.gde = GameDialogEvaluator(game_state)
+        self.hero_party = game_state.get_hero_party()
         self.monster_party = monster_party
-        self.screen = screen
-        self.background_image = screen.copy()
+        self.background_image = game_state.screen.copy()
         self.encounter_image = encounter_image
         self.approach_dialog = approach_dialog
         self.victory_dialog = victory_dialog
@@ -52,6 +57,91 @@ class CombatEncounter:
 
         self.hero_party.clear_combat_status_affects()
 
+    def encounter_loop(self) -> None:
+        # Start encounter music
+        AudioPlayer().play_music(self.encounter_music)
+        # AudioPlayer().playMusic('14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3',
+        #                         '24_Dragon_Quest_1_-_Monster_Battle.mp3')
+
+        # Save off initial key repeat settings
+        (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
+        pygame.key.set_repeat()
+        # print('Disabled key repeat', flush=True)
+
+        # Clear event queue
+        GameEvents.get_events()
+
+        # Render the status dialog, monsters, and approach dialog
+        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
+        self.render_monsters()
+        if self.approach_dialog is not None:
+            self.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
+        else:
+            self.message_dialog.add_message(self.monster_party.get_default_approach_dialog())
+        self.message_dialog.blit(self.game_state.screen, True)
+
+        # Check if monsters run away at the start of the encounter
+        for monster in self.monster_party.members:
+            if monster.is_still_in_combat():
+                if monster.should_run_away(self.hero_party.main_character):
+                    monster.has_run_away = True
+                    self.message_dialog.add_message('The ' + monster.get_name() + ' is running away.')
+
+        # Iterate through turns in the encounter until the encounter ends
+        while self.still_in_encounter():
+            for combatant in self.get_turn_order():
+                if combatant.is_still_in_combat():
+                    if isinstance(combatant, MonsterState):
+                        self.execute_monster_turn(combatant)
+                    elif isinstance(combatant, HeroState):
+                        self.execute_player_turn(combatant)
+                    if not self.still_in_encounter():
+                        break
+
+        # Handle the outcome of the encounter
+        AudioPlayer().stop_music()
+        if self.hero_party.has_surviving_members():
+            if self.hero_party.is_still_in_combat():
+                self.handle_victory()
+            else:
+                self.handle_running_away()
+        else:
+            self.handle_death()
+
+        # Wait for final acknowledgement
+        self.wait_for_acknowledgement(self.message_dialog)
+
+        # Restore initial background image and key repeat settings
+        self.game_state.screen.blit(self.background_image, (0, 0))
+        pygame.key.set_repeat(orig_repeat1, orig_repeat2)
+
+        # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
+        self.game_state.draw_map(False)
+        pygame.display.flip()
+
+    def render_monsters(self) -> None:
+        # Render the encounter background
+        encounter_image_size_px = Point(self.encounter_image.get_size())
+        encounter_image_dest_px = Point(
+            (self.game_state.win_size_px.w - encounter_image_size_px.w) / 2,
+            self.message_dialog.pos_tile.y * self.game_state.get_tile_size_pixels()
+            - encounter_image_size_px.h + CombatEncounter.DAMAGE_FLICKER_PIXELS)
+        self.game_state.screen.blit(self.encounter_image, encounter_image_dest_px)
+
+        # Render the monsters  CombatEncounter.MONSTER_SPACING_PIXELS
+        monster_width_px = CombatEncounter.MONSTER_SPACING_PIXELS * (len(self.monster_party.members) - 1)
+        for monster in self.monster_party.members:
+            monster_width_px += monster.monster_info.image.get_width()
+        monster_pos_x = self.game_state.get_win_size_pixels().x - monster_width_px / 2
+        for monster in self.monster_party.members:
+            if monster.is_still_in_combat():
+                monster_image_dest_px = Point(monster_pos_x,
+                                              encounter_image_dest_px.y + encounter_image_size_px.y
+                                              - monster.monster_info.image.get_height()
+                                              - self.game_state.get_tile_size_pixels())
+                self.game_state.screen.blit(monster.monster_info.monster_info.image, monster_image_dest_px)
+            monster_pos_x += CombatEncounter.MONSTER_SPACING_PIXELS + monster.monster_info.image.get_width()
+
     def get_turn_order(self) -> List[Union[HeroState,MonsterState]]:
         # TODO: In the future rework this method to better support parties with multiple members
         turn_order = []
@@ -60,7 +150,8 @@ class CombatEncounter:
             self.is_first_turn = False
             skip_hero_party = self.monster_party.members[0].has_initiative(self.hero_party.main_character)
         if skip_hero_party:
-            message_dialog.add_message()
+            self.message_dialog.add_message('The ' + self.monster_party.members[0].get_name() + ' attacked before '
+                                            + self.game_state.hero_party.main_character.get_name() + ' was ready.')
         else:
             for hero in self.hero_party.members:
                 if hero.is_still_in_combat():
@@ -70,42 +161,53 @@ class CombatEncounter:
                 turn_order.append(monster)
         return turn_order
 
-    def encounter_loop(self) -> None:
-        # Start encounter music
-        AudioPlayer().play_music(self.encounter_music)
-        # AudioPlayer().playMusic('14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3',
-        #                         '24_Dragon_Quest_1_-_Monster_Battle.mp3')
+    def still_in_encounter(self) -> bool:
+        return (self.game_state.is_running
+                and self.monster_party.is_still_in_combat()
+                and self.hero_party.is_still_in_combat())
 
-        # Render the status display
-        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.screen, False)
+    def execute_monster_turn(self, monster: MonsterState) -> None:
+        # TODO: Implement
+        pass
 
-        # Start the encounter dialog (used to position the encounter background)
-        if self.approach_dialog is not None:
-            self.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
-        else:
-            self.message_dialog.add_message(self.monster_party.get_default_approach_dialog())
+    def execute_player_turn(self, hero: HeroState) -> None:
+        # TODO: Implement
+        pass
 
-        # Render the encounter background
-        damage_flicker_pixels = 4
-        encounter_image_size_pixels = Point(encounter_image.get_size())
-        encounter_image_dest_pixels = Point(
-            (self.game_state.win_size_pixels.w - encounter_image_size_pixels.w) / 2,
-            message_dialog.pos_tile.y * self.game_state.game_info.tile_size_pixels
-            - encounter_image_size_pixels.h + damage_flicker_pixels)
-        self.game_state.screen.blit(encounter_image, encounter_image_dest_pixels)
+    def handle_victory(self) -> None:
+        if 0 < self.monster_party.get_defeated_count():
+            AudioPlayer().play_sound('17_-_Dragon_Warrior_-_NES_-_Enemy_Defeated.ogg')
+            gp = self.monster_party.get_gp()
+            xp = self.monster_party.get_xp()
+            # TODO: Update text for multiple monster encounters
+            self.message_dialog.add_message(
+                'Thou has done well in defeating the ' + self.monster_party[0].get_name()
+                + '. Thy experience increases by ' + str(xp) + '. Thy gold increases by ' + str(gp) + '.')
+            self.hero_party.gp += gp
+            for hero in self.hero_party.members:
+                if hero.is_still_in_combat():
+                    hero.xp += xp
+                    if hero.level_up_check(self.game_state.get_levels()):
+                        self.wait_for_acknowledgement(self.message_dialog)
+                        AudioPlayer().play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
+                        GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
+                        # TODO: Update text for multiple hero encounters
+                        self.message_dialog.add_message(
+                            '\nCourage and wit have served thee well. Thou hast been promoted to the next level.')
+                        self.message_dialog.blit(self.game_state.screen, True)
 
-        # Render the monster
-        monster_image_size_pixels = Point(monster_info.image.get_size())
-        monster_image_dest_pixels = Point(
-            (self.game_state.win_size_pixels.x - monster_image_size_pixels.x) / 2,
-            encounter_image_dest_pixels.y + encounter_image_size_pixels.y
-            - monster_image_size_pixels.y - self.game_state.game_info.tile_size_pixels)
-        self.game_state.screen.blit(monster.monster_info.image, monster_image_dest_pixels)
+        if self.victory_dialog is not None:
+            self.gde.traverse_dialog(self.message_dialog, self.victory_dialog)
 
-        # Check if monsters run away
+    def handle_running_away(self) -> None:
+        if self.run_away_dialog is not None:
+            self.traverse_dialog(self.message_dialog, self.run_away_dialog)
 
+    def handle_death(self) -> None:
+        # TODO: Implement
+        pass
 
-
+        '''
         # Display status, command prompt dialog, and command menu
         is_start = True
         while self.game_state.is_running:
@@ -445,7 +547,7 @@ class CombatEncounter:
             if victory_dialog is not None:
                 self.traverse_dialog(message_dialog, victory_dialog)
 
-            self.wait_for_acknowledgement(message_dialog)
+        self.wait_for_acknowledgement(message_dialog)
 
         # Restore initial key repeat settings
         pygame.key.set_repeat(orig_repeat1, orig_repeat2)
@@ -453,6 +555,7 @@ class CombatEncounter:
         # Draw the map
         if self.game_state.pc.hp > 0:
             self.game_state.draw_map(True)
+        '''
 
 
 def main() -> None:
