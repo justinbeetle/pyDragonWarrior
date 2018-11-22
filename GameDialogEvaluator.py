@@ -5,11 +5,13 @@ from typing import Optional
 import pygame
 import random
 
+from AudioPlayer import AudioPlayer
 from HeroParty import HeroParty
 from GameDialog import *
 from GameTypes import *
 from GameStateInterface import GameStateInterface
 import GameEvents
+import SurfaceEffects
 
 
 class GameDialogEvaluator:
@@ -36,9 +38,12 @@ class GameDialogEvaluator:
         self.traverse_dialog(message_dialog, dialog)
 
         # Restore initial background image and key repeat settings
-        self.game_state.screen.blit(background_image)
-        pygame.display.flip()
+        self.game_state.screen.blit(background_image, (0, 0))
         pygame.key.set_repeat(orig_repeat1, orig_repeat2)
+
+        # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
+        self.game_state.draw_map(False)
+        pygame.display.flip()
 
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
@@ -108,6 +113,7 @@ class GameDialogEvaluator:
         if depth == 0:
             self.wait_before_new_text = False
             # print('Initialized self.traverse_dialog_wait_before_new_text to False', flush=True)
+            self.replacement_variables = self.game_state.get_dialog_replacement_variables()
             self.replacement_variables.generic['[NAME]'] = self.hero_party.main_character.name
 
         # Ensure dialog is a list and not a str to allow iteration
@@ -365,23 +371,26 @@ class GameDialogEvaluator:
                         if item_to_gain is not None:
                             self.hero_party.gain_item(item_to_gain, item_count)
                         else:
-                            # Actually a progress marker
-                            self.hero_party.gain_item(item_name)
+                            self.hero_party.gain_progress_marker(item_name)
                     elif item.type == DialogActionEnum.LOSE_ITEM:
-                        self.hero_party.lose_item(item_name, item_count)
+                        item_to_lose = self.game_state.get_item(item_name)
+                        if item_to_lose is not None:
+                            self.hero_party.lose_item(item_to_lose, item_count)
+                        else:
+                            self.hero_party.lose_progress_marker(item_name)
 
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
                     if isinstance(item.count, int):
-                        self.game_state.light_diameter = item.count
+                        self.game_state.set_light_diameter(item.count)
                     else:
-                        self.game_state.light_diameter = None
+                        self.game_state.set_light_diameter(None)
                     self.game_state.draw_map()
 
                 elif item.type == DialogActionEnum.REPEL_MONSTERS:
                     print('ERROR: DialogActionEnum.REPEL_MONSTERS is not implemented', flush=True)
 
                 elif item.type == DialogActionEnum.GOTO_COORDINATES:
-                    for hero in self.game_state.hero_party.members:
+                    for hero in self.hero_party.members:
                         hero.curr_pos_offset_img_px = Point(0, 0)
                         if item.map_pos is not None:
                             hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = item.map_pos
@@ -390,7 +399,7 @@ class GameDialogEvaluator:
                     if item.map_name is not None:
                         self.game_state.set_map(item.map_name)
                     else:
-                        self.game_state.set_map(self.game_state.map_state.name)
+                        self.game_state.set_map(self.game_state.get_map_name())
                     self.game_state.draw_map(flip_buffer=message_dialog.is_empty())
                     if not message_dialog.is_empty():
                         message_dialog.blit(self.game_state.screen, True)
@@ -406,9 +415,7 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.PLAY_MUSIC:
                     # print( 'Play music', item.name, flush=True )
                     if isinstance(item.name, str):
-                        AudioPlayer().play_music(
-                            item.name,
-                            self.game_state.game_info.maps[self.game_state.map_state.name].music)
+                        AudioPlayer().play_music(item.name, interrupt=True)
 
                 elif item.type == DialogActionEnum.VISUAL_EFFECT:
                     if item.name == 'fadeToBlackAndBack':
@@ -417,20 +424,19 @@ class GameDialogEvaluator:
                         SurfaceEffects.flickering(self.game_state.screen)
                     elif item.name == 'rainbowEffect':
                         SurfaceEffects.rainbow_effect(self.game_state.screen,
-                                                      self.game_state.game_info.tiles['water'].image[0])
+                                                      self.game_state.get_tile('water').image[0])
                     else:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)
 
                 elif item.type == DialogActionEnum.ATTACK_MONSTER:
-                    monster_info = None
-                    if item.name in self.game_state.game_info.monsters:
-                        monster_info = self.game_state.game_info.monsters[item.name]
-                    self.encounter_loop(monster_info=monster_info,
-                                        victory_dialog=item.victory_dialog,
-                                        run_away_dialog=item.run_away_dialog,
-                                        encounter_music=item.encounter_music,
-                                        message_dialog=message_dialog)
+                    # TODO: Make this work again
+                    pass
+                    #self.game_state.initiate_encounter(monster_info=self.game_state.get_monster(item.name),
+                    #                                   victory_dialog=item.victory_dialog,
+                    #                                   run_away_dialog=item.run_away_dialog,
+                    #                                   encounter_music=item.encounter_music,
+                    #                                   message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.OPEN_DOOR:
                     self.game_state.open_door()

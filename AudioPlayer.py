@@ -39,10 +39,16 @@ class AudioPlayer:
         def set_sound_path(self, sound_path: str) -> None:
             self.sound_path = sound_path
          
-        def play_music(self, music_rel_file_path1: str, music_rel_file_path2: Optional[str] = None) -> None:
-            self.music_rel_file_path1 = self.music_rel_file_path2 = music_rel_file_path1
+        def play_music(self,
+                       music_rel_file_path1: str,
+                       music_rel_file_path2: Optional[str] = None,
+                       interrupt: bool = False) -> None:
+            self.music_rel_file_path1 = music_rel_file_path1
             if music_rel_file_path2 is not None:
                 self.music_rel_file_path2 = music_rel_file_path2
+            elif not interrupt:
+                self.music_rel_file_path2 = music_rel_file_path1
+
          
         def __music_thread(self) -> None:
             first_time = True
@@ -111,10 +117,13 @@ class AudioPlayer:
     def set_sound_path(self, sound_path: str) -> None:
         if self.instance is not None:
             self.instance.set_sound_path(sound_path)
-      
-    def play_music(self, music_file_path1: str, music_file_path2: Optional[str] = None) -> None:
+
+    # If interrupt is True, new music cuts in and then is replaced by the old music
+    # This is only applicable when music_file_path2 is not specified as it is implemented by leaving music_file_path2
+    # unchanged.
+    def play_music(self, music_file_path1: str, music_file_path2: Optional[str] = None, interrupt: bool = False) -> None:
         if self.instance is not None:
-            self.instance.play_music(music_file_path1, music_file_path2)
+            self.instance.play_music(music_file_path1, music_file_path2, interrupt)
       
     def play_sound(self, sound_file_path: str) -> None:
         if self.instance is not None:

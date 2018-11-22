@@ -6,6 +6,7 @@ from AudioPlayer import AudioPlayer
 from GameInfo import GameInfo
 from GameState import GameMode, GameState
 from GameDialog import *
+from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
 import SurfaceEffects
 from MonsterState import MonsterState
@@ -23,6 +24,7 @@ class Game:
                                     desired_win_size_pixels,
                                     tile_size_pixels,
                                     saved_game_file)
+        self.gde = GameDialogEvaluator(self.game_state)
         GameDialog.init(self.game_state.win_size_tiles, tile_size_pixels)
 
     def run_game_loop(self) -> None:
@@ -40,6 +42,7 @@ class Game:
         # for now transition straight to exploring
         self.game_state.game_mode = GameMode.EXPLORING
 
+    '''
     def traverse_dialog(self,
                         message_dialog: GameDialog,
                         dialog: Union[DialogType, str],
@@ -85,7 +88,7 @@ class Game:
                 # displayed.
                 if self.traverse_dialog_wait_before_new_text:
                     # print( 'Waiting because self.traverseDialogWaitBeforeNewText is True', flush=True )
-                    self.wait_for_acknowledgement(message_dialog)
+                    self.gde.wait_for_acknowledgement(message_dialog)
                 # else:
                 #   print( 'Not waiting because self.traverseDialogWaitBeforeNewText is False', flush=True )
 
@@ -99,7 +102,7 @@ class Game:
 
                 message_dialog.blit(self.game_state.screen, True)
                 while self.game_state.is_running and message_dialog.has_more_content():
-                    self.wait_for_acknowledgement(message_dialog)
+                    self.gde.wait_for_acknowledgement(message_dialog)
                     message_dialog.advance_content()
                     message_dialog.blit(self.game_state.screen, True)
                 self.traverse_dialog_wait_before_new_text = True
@@ -108,13 +111,13 @@ class Game:
             elif isinstance(item, list):
                 # print( 'Dialog Sub Tree =', item, flush=True )
                 if self.game_state.is_running:
-                    self.traverse_dialog(message_dialog, item, depth + 1)
+                    self.gde.traverse_dialog(message_dialog, item, depth + 1)
 
             elif isinstance(item, DialogGoTo):
                 # print( 'Dialog Go To =', item, flush=True )
                 if item.label in self.game_state.game_info.dialog_sequences:
                     if self.game_state.is_running:
-                        self.traverse_dialog(message_dialog, self.game_state.game_info.dialog_sequences[item.label],
+                        self.gde.traverse_dialog(message_dialog, self.game_state.game_info.dialog_sequences[item.label],
                                              depth + 1)
                 else:
                     print('ERROR: ' + item.label + ' not found in dialogSequences', flush=True)
@@ -146,10 +149,10 @@ class Game:
                 message_dialog.blit(self.game_state.screen, True)
                 menu_result = None
                 while self.game_state.is_running and menu_result is None:
-                    menu_result = self.get_menu_result(message_dialog)
+                    menu_result = self.gde.get_menu_result(message_dialog)
                 if self.game_state.is_running and menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
-                    self.traverse_dialog(message_dialog, item[menu_result], depth + 1)
+                    self.gde.traverse_dialog(message_dialog, item[menu_result], depth + 1)
 
             elif isinstance(item, DialogVendorBuyOptions):
                 # print('Dialog Vendor Buy Options =', item, flush=True)
@@ -163,7 +166,7 @@ class Game:
                     name_and_gp_row_data = []
                 if len(name_and_gp_row_data) == 0:
                     print('ERROR: No options from vendor', flush=True)
-                    self.traverse_dialog(message_dialog, 'Nature calls and I need to run.  Sorry!', depth + 1)
+                    self.gde.traverse_dialog(message_dialog, 'Nature calls and I need to run.  Sorry!', depth + 1)
                     break
                 self.traverse_dialog_wait_before_new_text = False
                 # print('Set self.traverseDialogWaitBeforeNewText to False', flush=True)
@@ -171,7 +174,7 @@ class Game:
                 message_dialog.blit(self.game_state.screen, True)
                 menu_result = None
                 while self.game_state.is_running and menu_result is None:
-                    menu_result = self.get_menu_result(message_dialog)
+                    menu_result = self.gde.get_menu_result(message_dialog)
                 if menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
                     self.dialog_variable_replacement['[ITEM]'] = menu_result
@@ -190,7 +193,7 @@ class Game:
                     item_types = []
                 item_row_data = self.game_state.hero_party.main_character.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
-                    self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
+                    self.gde.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
                     break
                 self.traverse_dialog_wait_before_new_text = False
                 # print( 'Set self.traverseDialogWaitBeforeNewText to False', flush=True )
@@ -198,7 +201,7 @@ class Game:
                 message_dialog.blit(self.game_state.screen, True)
                 menu_result = None
                 while self.game_state.is_running and menu_result is None:
-                    menu_result = self.get_menu_result(message_dialog)
+                    menu_result = self.gde.get_menu_result(message_dialog)
                 if menu_result is not None:
                     # print( 'menu_result =', menu_result, flush=True )
                     self.dialog_variable_replacement['[ITEM]'] = menu_result
@@ -267,7 +270,7 @@ class Game:
 
                 if not check_result:
                     if item.failed_check_dialog is not None:
-                        self.traverse_dialog(message_dialog, item.failed_check_dialog, depth + 1)
+                        self.gde.traverse_dialog(message_dialog, item.failed_check_dialog, depth + 1)
                     break
 
             elif isinstance(item, DialogAction):
@@ -410,7 +413,7 @@ class Game:
                 print('ERROR: Not a supported type', item, flush=True)
 
         if depth == 0 and not message_dialog.is_empty():
-            self.wait_for_acknowledgement(message_dialog)
+            self.gde.wait_for_acknowledgement(message_dialog)
 
     def dialog_loop(self,
                     dialog: Union[DialogType, str]) -> None:
@@ -426,7 +429,7 @@ class Game:
         GameDialog.create_exploring_status_dialog(self.game_state.hero_party).blit(self.game_state.screen, False)
         messageDialog = GameDialog.create_message_dialog()
 
-        self.traverse_dialog(messageDialog, dialog)
+        self.gde.traverse_dialog(messageDialog, dialog)
 
         # Restore initial key repeat settings
         pygame.key.set_repeat(orig_repeat1, orig_repeat2)
@@ -456,13 +459,13 @@ class Game:
                         message_dialog.draw_waiting_indicator()
                     is_waiting_indicator_drawn = not is_waiting_indicator_drawn
                     message_dialog.blit(self.game_state.screen, True)
-            for e in events:
-                if e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         self.game_state.is_running = False
-                    elif e.key == pygame.K_RETURN or e.key == pygame.K_SPACE:
+                    elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                         is_awaiting_acknowledgement = False
-                elif e.type == pygame.QUIT:
+                elif event.type == pygame.QUIT:
                     self.game_state.is_running = False
 
         if self.game_state.is_running:
@@ -480,23 +483,24 @@ class Game:
             events = GameEvents.get_events()
             if 0 == len(events):
                 pygame.time.Clock().tick(30)
-            for e in events:
-                if e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         self.game_state.is_running = False
-                    elif e.key == pygame.K_RETURN:
+                    elif event.key == pygame.K_RETURN:
                         menu_result = menu_dialog.get_selected_menu_option()
-                    elif e.key == pygame.K_SPACE:
+                    elif event.key == pygame.K_SPACE:
                         menu_result = ""
                     else:
-                        menu_dialog.process_event(e, self.game_state.screen)
-                elif e.type == pygame.QUIT:
+                        menu_dialog.process_event(event, self.game_state.screen)
+                elif event.type == pygame.QUIT:
                     self.game_state.is_running = False
 
         if menu_result == "":
             menu_result = None
 
         return menu_result
+    '''
 
     def exploring_loop(self) -> None:
 
@@ -522,36 +526,36 @@ class Game:
                 self.game_state.draw_map()
 
             if self.game_state.pending_dialog is not None:
-                self.dialog_loop(self.game_state.pending_dialog)
+                self.gde.dialog_loop(self.game_state.pending_dialog)
                 self.game_state.pending_dialog = None
 
             # Process events
             events = GameEvents.get_events()
 
-            for e in events:
+            for event in events:
                 moving = False
                 menu = False
                 talking = False
                 searching = False
                 pc_dir_old = self.game_state.hero_party.members[0].direction
 
-                if e.type == pygame.QUIT:
+                if event.type == pygame.QUIT:
                     self.game_state.is_running = False
-                elif e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         self.game_state.is_running = False
-                    elif e.key == pygame.K_RETURN:
+                    elif event.key == pygame.K_RETURN:
                         menu = True
-                    elif e.key == pygame.K_DOWN:
+                    elif event.key == pygame.K_DOWN:
                         self.game_state.hero_party.members[0].direction = Direction.SOUTH
                         moving = True
-                    elif e.key == pygame.K_UP:
+                    elif event.key == pygame.K_UP:
                         self.game_state.hero_party.members[0].direction = Direction.NORTH
                         moving = True
-                    elif e.key == pygame.K_LEFT:
+                    elif event.key == pygame.K_LEFT:
                         self.game_state.hero_party.members[0].direction = Direction.WEST
                         moving = True
-                    elif e.key == pygame.K_RIGHT:
+                    elif event.key == pygame.K_RIGHT:
                         self.game_state.hero_party.members[0].direction = Direction.EAST
                         moving = True
 
@@ -575,24 +579,24 @@ class Game:
                         self.game_state.hero_party).blit(self.game_state.screen, False)
                     menu_dialog = GameDialog.create_exploring_menu()
                     menu_dialog.blit(self.game_state.screen, True)
-                    menu_result = self.get_menu_result(menu_dialog)
+                    menu_result = self.gde.get_menu_result(menu_dialog)
                     # print( 'menu_result =', menu_result, flush=True )
                     if menu_result == 'TALK':
                         talking = True
                     elif menu_result == 'STAIRS':
                         if not self.game_state.make_map_transition(self.game_state.get_point_transition()):
-                            self.dialog_loop('There are no stairs here.')
+                            self.gde.dialog_loop('There are no stairs here.')
                     elif menu_result == 'STATUS':
                         GameDialog.create_full_status_dialog(
                             self.game_state.hero_party).blit(self.game_state.screen, True)
-                        self.wait_for_acknowledgement()
+                        self.gde.wait_for_acknowledgement()
                     elif menu_result == 'SEARCH':
                         searching = True
                     elif menu_result == 'SPELL':
                         # TODO: Need to choose the spellcaster
                         availableSpellNames = self.game_state.get_available_spell_names()
                         if len(availableSpellNames) == 0:
-                            self.dialog_loop('Thou hast not yet learned any spells.')
+                            self.gde.dialog_loop('Thou hast not yet learned any spells.')
                         else:
                             menu_dialog = GameDialog.create_menu_dialog(
                                 Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
@@ -601,7 +605,7 @@ class Game:
                                 availableSpellNames,
                                 1)
                             menu_dialog.blit(self.game_state.screen, True)
-                            menu_result = self.get_menu_result(menu_dialog)
+                            menu_result = self.gde.get_menu_result(menu_dialog)
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
@@ -640,16 +644,16 @@ class Game:
 
                                     GameDialog.create_exploring_status_dialog(
                                         self.game_state.hero_party).blit(self.game_state.screen, False)
-                                    self.dialog_loop('[NAME] cast the spell of ' + spell.name + '.')
+                                    self.gde.dialog_loop('[NAME] cast the spell of ' + spell.name + '.')
 
                                 else:
-                                    self.dialog_loop('Thou dost not have enough magic to cast the spell.')
+                                    self.gde.dialog_loop('Thou dost not have enough magic to cast the spell.')
 
                     elif menu_result == 'ITEM':
                         # TODO: Need to choose the hero to use an item
                         item_row_data = self.game_state.hero_party.main_character.get_item_row_data()
                         if len(item_row_data) == 0:
-                            self.dialog_loop('Thou dost not have any items.')
+                            self.gde.dialog_loop('Thou dost not have any items.')
                         else:
                             menu_dialog = GameDialog.create_menu_dialog(
                                 Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
@@ -659,13 +663,13 @@ class Game:
                                 2,
                                 GameDialogSpacing.OUTSIDE_JUSTIFIED)
                             menu_dialog.blit(self.game_state.screen, True)
-                            item_result = self.get_menu_result(menu_dialog)
+                            item_result = self.gde.get_menu_result(menu_dialog)
                             # print( 'item_result =', item_result, flush=True )
 
                             if item_result is not None:
                                 item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
                                 if len(item_row_data) == 0:
-                                    self.dialog_loop('[NAME] studied the object and was confounded by it.')
+                                    self.gde.dialog_loop('[NAME] studied the object and was confounded by it.')
                                 else:
                                     menu_dialog = GameDialog.create_menu_dialog(
                                         Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
@@ -674,7 +678,7 @@ class Game:
                                         item_options,
                                         len(item_options))
                                     menu_dialog.blit(self.game_state.screen, True)
-                                    action_result = self.get_menu_result(menu_dialog)
+                                    action_result = self.gde.get_menu_result(menu_dialog)
                                     # print( 'action_result =', action_result, flush=True )
                                     if action_result == 'DROP':
                                         # TODO: Add an are you sure prompt here
@@ -687,7 +691,7 @@ class Game:
                                     elif action_result == 'USE':
                                         item = self.game_state.game_info.items[item_result]
                                         if isinstance(item, Tool) and item.use_dialog is not None:
-                                            self.dialog_loop(item.use_dialog)
+                                            self.gde.dialog_loop(item.use_dialog)
 
                     elif menu_result != None:
                         print('ERROR:  Unsupoorted menu_result =', menu_result, flush=True)
@@ -723,7 +727,7 @@ class Game:
                             else:
                                 dialog = ['They pay you no mind.']
                             break
-                    self.dialog_loop(dialog)
+                    self.gde.dialog_loop(dialog)
 
                 if searching:
                     dialog = ['[NAME] searched the ground and found nothing.']
@@ -736,7 +740,7 @@ class Game:
                             dialog = decoration.dialog
                             break
 
-                    self.dialog_loop(dialog)
+                    self.gde.dialog_loop(dialog)
 
                 if moving:
                     self.scroll_tile()
@@ -865,7 +869,7 @@ class Game:
                     message_dialog.blit(self.game_state.screen, True)
                     menu_result = None
                     while self.game_state.is_running and menu_result is None:
-                        menu_result = self.get_menu_result(message_dialog)
+                        menu_result = self.gde.get_menu_result(message_dialog)
                     if not self.game_state.is_running:
                         break
 
@@ -924,7 +928,7 @@ class Game:
                                                        + ' started to run away.')
 
                             if run_away_dialog is not None:
-                                self.traverse_dialog(message_dialog, run_away_dialog, depth=1)
+                                self.gde.traverse_dialog(message_dialog, run_away_dialog, depth=1)
 
                             self.game_state.hero_party.main_character.has_run_away = True
                             break
@@ -942,7 +946,7 @@ class Game:
                                 available_spell_names,
                                 1)
                             menu_dialog.blit(self.game_state.screen, True)
-                            menu_result = self.get_menu_result(menu_dialog)
+                            menu_result = self.gde.get_menu_result(menu_dialog)
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
@@ -1006,7 +1010,7 @@ class Game:
                     break
 
                 message_dialog.blit(self.game_state.screen, True)
-                self.wait_for_acknowledgement(message_dialog)
+                self.gde.wait_for_acknowledgement(message_dialog)
 
             # Perform monster turn
             message_dialog.add_message('')
@@ -1165,7 +1169,7 @@ class Game:
             GameDialog.create_exploring_status_dialog(
                 self.game_state.hero_party).blit(self.game_state.screen, False)
             if self.game_state.hero_party.main_character.level_up_check(self.game_state.game_info.levels):
-                self.wait_for_acknowledgement(message_dialog)
+                self.gde.wait_for_acknowledgement(message_dialog)
                 audio_player.play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
                 message_dialog.add_message(
                     '\nCourage and wit have served thee well. Thou hast been promoted to the next level.')
@@ -1175,9 +1179,9 @@ class Game:
             message_dialog.blit(self.game_state.screen, True)
 
             if victory_dialog is not None:
-                self.traverse_dialog(message_dialog, victory_dialog)
+                self.gde.traverse_dialog(message_dialog, victory_dialog)
 
-            self.wait_for_acknowledgement(message_dialog)
+            self.gde.wait_for_acknowledgement(message_dialog)
 
         # Restore initial key repeat settings
         pygame.key.set_repeat(orig_repeat1, orig_repeat2)
@@ -1203,7 +1207,7 @@ class Game:
             else:
                 message_dialog.add_message('')
             message_dialog.add_message('Thou art dead.')
-            self.wait_for_acknowledgement(message_dialog)
+            self.gde.wait_for_acknowledgement(message_dialog)
             for hero in self.game_state.hero_party.members:
                 hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_state.game_info.death_hero_pos_dat_tile
                 hero.curr_pos_offset_img_px = Point(0, 0)

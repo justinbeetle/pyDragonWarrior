@@ -123,14 +123,14 @@ class HeroParty:
     def gain_progress_marker(self, progress_marker: str) -> None:
         if progress_marker not in self.progress_markers:
             self.progress_markers.append(progress_marker)
-            # print('Gained progress marker', progress_marker, flush=True)
+            print('Gained progress marker', progress_marker, flush=True)
         else:
             print('WARN: Did not add previously added progress marker', progress_marker, flush=True)
 
     def lose_progress_marker(self, progress_marker: str) -> None:
         if progress_marker in self.progress_markers:
             self.progress_markers.remove(progress_marker)
-            # print('Lost progress marker', progress_marker, flush=True)
+            print('Lost progress marker', progress_marker, flush=True)
         else:
             print('WARN: Unable to remove progress marker', progress_marker, flush=True)
 

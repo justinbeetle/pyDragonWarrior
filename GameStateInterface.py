@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from typing import Dict, List, Optional
-from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, MapDecoration
+from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, MapDecoration, MonsterInfo, Tile
 
 import abc
 import pygame
@@ -24,7 +24,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_item(self, name: str) -> ItemType:
+    def get_item(self, name: str) -> Optional[ItemType]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -33,6 +33,14 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_dialog_sequences(self) -> Dict[str, DialogType]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_tile(self, name: str) -> Tile:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_monster(self, name: str) -> Optional[MonsterInfo]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -64,6 +72,13 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def set_map(self,
+                new_map_name: str,
+                one_time_decorations: Optional[List[MapDecoration]] = None,
+                respawn_decorations: bool = False) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def is_facing_door(self) -> bool:
         raise NotImplementedError
 
@@ -73,6 +88,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def remove_decoration(self, decoration: MapDecoration) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def draw_map(self, flip_buffer: bool = True) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod

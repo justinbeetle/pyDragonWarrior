@@ -228,11 +228,11 @@ class DialogAction:
 
 
 # Type to aggregate all the different dialog replacement variables
-@dataclass
 class DialogReplacementVariables:
-    generic: Dict[str, str] = collections.defaultdict  # type: ignore
-    vendor_buy_options: Dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = collections.defaultdict  # type: ignore
-    vendor_sell_options: Dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = collections.defaultdict  # type: ignore
+    def __init__(self) -> None:
+        self.generic: Dict[str, str] = {}
+        self.vendor_buy_options: Dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = {}
+        self.vendor_sell_options: Dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = {}
 
 
 class Tile(NamedTuple):

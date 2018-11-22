@@ -108,12 +108,8 @@ class GameState(GameStateInterface):
                 new_map_name: str,
                 one_time_decorations: Optional[List[MapDecoration]] = None,
                 respawn_decorations: bool = False) -> None:
-        # print( 'setMap to', newMapName, flush=True )
-        old_map_name = None
-        try:
-            old_map_name = self.map_state.name
-        except:
-            pass
+        # print('setMap to', new_map_name, flush=True)
+        old_map_name = self.map_state.name
 
         # Set light diameter for the new map if there was not an old map or if the new default map
         # diameter is unlimited.  Also update the light diameter for the new map if the default light
@@ -132,7 +128,7 @@ class GameState(GameStateInterface):
         if respawn_decorations:
             self.removed_decorations_by_map = {}
 
-        self.map_decorations = self.game_info.maps[new_map_name].map_decorations
+        self.map_decorations = self.game_info.maps[new_map_name].map_decorations.copy()
         if one_time_decorations is not None:
             self.map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
@@ -402,7 +398,7 @@ class GameState(GameStateInterface):
                         and decoration.type is not None
                         and not self.game_info.decorations[decoration.type].walkable):
                     movement_allowed = False
-                    # print('Movement not allowed: decoration not walkable', decoration, flush=True)
+                    print('Movement not allowed: decoration not walkable', decoration, flush=True)
                     break
         else:
             for decoration in self.map_decorations:
@@ -410,7 +406,7 @@ class GameState(GameStateInterface):
                         and decoration.type is not None
                         and self.game_info.decorations[decoration.type].walkable):
                     movement_allowed = True
-                    # print('Movement allowed: decoration walkable', decoration, flush=True)
+                    print('Movement allowed: decoration walkable', decoration, flush=True)
                     break
 
         if movement_allowed:
@@ -724,14 +720,24 @@ class GameState(GameStateInterface):
                 variables.generic['[Y_DIR]'] = 'South'
         return variables
 
-    def get_item(self, name: str) -> ItemType:
-        return self.game_info.items[name]
+    def get_item(self, name: str) -> Optional[ItemType]:
+        if name in self.game_info.items:
+            return self.game_info.items[name]
+        return None
 
     def get_levels(self, character_type: str) -> List[Level]:
         return self.game_info.levels
 
     def get_dialog_sequences(self) -> Dict[str, DialogType]:
         return self.game_info.dialog_sequences
+
+    def get_tile(self, name: str) -> Tile:
+        return self.game_info.tiles[name]
+
+    def get_monster(self, name: str) -> Optional[MonsterInfo]:
+        if name in self.game_info.monsters:
+            return self.game_info.monsters[name]
+        return None
 
     def is_in_combat(self) -> bool:
         return GameMode.ENCOUNTER == self.game_mode
@@ -741,6 +747,7 @@ class GameState(GameStateInterface):
 
     def set_light_diameter(self, light_diameter: Optional[float]) -> None:
         self.light_diameter = light_diameter
+        self.draw_map()
 
     def get_map_name(self) -> str:
         return self.map_state.name

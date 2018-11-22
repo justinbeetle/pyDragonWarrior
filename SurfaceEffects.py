@@ -82,7 +82,7 @@ def rainbow_effect(screen: pygame.Surface,
                       pygame.Color('violet')]
 
     # Cycle through the rainbow colors
-    for i in range(5):
+    for i in range(4):
         for rainbow_color in rainbow_colors:
             try:
                 pygame.transform.threshold(screen,
