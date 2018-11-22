@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import math
 import random
@@ -10,382 +10,380 @@ import random
 from MapCharacterState import MapCharacterState
 from CombatCharacterState import CombatCharacterState
 from Point import Point
-from GameTypes import Armor, Direction, Helm, ItemType, Level, Shield, Tool, Weapon
+from GameTypes import Armor, Direction, Helm, ItemType, Level, Shield, Spell, Tool, Weapon
+
 
 class HeroState(MapCharacterState, CombatCharacterState):
-   def __init__( self,
-                 type: str,
-                 pos_datTile: Point,
-                 dir: Direction,
+    def __init__(self,
+                 type_name: str,
+                 pos_dat_tile: Point,
+                 direction: Direction,
                  name: str,
-                 level: Level ) -> None:
+                 level: Level) -> None:
+        MapCharacterState.__init__(self, type_name, pos_dat_tile, direction)
+        CombatCharacterState.__init__(self, hp=level.hp, mp=level.mp)
 
-      MapCharacterState.__init__( self, type, pos_datTile, dir )
-      CombatCharacterState.__init__( self, hp=level.hp )
-
-      self.name = name
-      self.level = level
-
-      self.mp = level.mp
-      self.gp = 0
-      self.xp = level.xp
+        self.name = name
+        self.level = level
+        self.xp = level.xp
          
-      self.weapon: Optional[Weapon] = None
+        self.weapon: Optional[Weapon] = None
 
-      self.helm: Optional[Helm] = None
-      self.armor: Optional[Armor] = None
-      self.shield: Optional[Shield] = None
+        self.helm: Optional[Helm] = None
+        self.armor: Optional[Armor] = None
+        self.shield: Optional[Shield] = None
 
-      self.otherEquippedItems: List[Tool] = []
-      self.unequippedItems: Dict[ItemType, int] = {} # Dictionary where keys are items and values are the item counts
-      self.progressMarkers: List[str] = []
+        self.other_equipped_items: List[Tool] = []
+        self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
 
-   def getItemRowData( self, limitToDropable: bool = False, filterTypes: Optional[List[str]] = None ) -> List[List[str]]:
-      itemRowData: List[List[str]] = []
-      if self.weapon is not None:
-         self.addItemToItemRowData( self.weapon, 'E', limitToDropable, filterTypes, itemRowData )
-      if self.helm is not None:
-         self.addItemToItemRowData( self.helm, 'E', limitToDropable, filterTypes, itemRowData )
-      if self.armor is not None:
-         self.addItemToItemRowData( self.armor, 'E', limitToDropable, filterTypes, itemRowData )
-      if self.shield is not None:
-         self.addItemToItemRowData( self.shield, 'E', limitToDropable, filterTypes, itemRowData )
-      #for item in self.otherEquippedItems:
-      for tool in sorted(self.otherEquippedItems, key=lambda tool: tool.name):
-         self.addItemToItemRowData( tool, 'E', limitToDropable, filterTypes, itemRowData )
-      #for item in self.unequippedItems:
-      for item in sorted(self.unequippedItems, key=lambda item: item.name):
-         self.addItemToItemRowData( item, str( self.unequippedItems[item] ), limitToDropable, filterTypes, itemRowData )
-      return itemRowData
+    def get_item_row_data(self,
+                          limit_to_droppable: bool = False,
+                          filter_types: Optional[List[str]] = None) -> List[List[str]]:
+        item_row_data: List[List[str]] = []
+        if self.weapon is not None:
+            HeroState.add_item_to_item_row_data(self.weapon, 'E', limit_to_droppable, filter_types, item_row_data)
+        if self.helm is not None:
+            HeroState.add_item_to_item_row_data(self.helm, 'E', limit_to_droppable, filter_types, item_row_data)
+        if self.armor is not None:
+            HeroState.add_item_to_item_row_data(self.armor, 'E', limit_to_droppable, filter_types, item_row_data)
+        if self.shield is not None:
+            HeroState.add_item_to_item_row_data(self.shield, 'E', limit_to_droppable, filter_types, item_row_data)
+        for tool in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
+            HeroState.add_item_to_item_row_data(tool, 'E', limit_to_droppable, filter_types, item_row_data)
+        for item in sorted(self.unequipped_items, key=lambda inner_item: inner_item.name):
+            item_count_str = str(self.unequipped_items[item])
+            HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
+        return item_row_data
 
-   def addItemToItemRowData( self, item: ItemType, colValue: str, limitToDropable: bool, filterTypes: Optional[List[str]], itemRowData: List[List[str]] ) -> None:
-      itemPassedTypeFilter = False
-      if filterTypes is None:
-         itemPassedTypeFilter = True
-      else:
-         for filterType in filterTypes:
-            if filterType == 'Weapon' and isinstance( item, Weapon ):
-               itemPassedTypeFilter = True
-               break
-            elif filterType == 'Helm' and isinstance( item, Helm ):
-               itemPassedTypeFilter = True
-               break
-            elif filterType == 'Armor' and isinstance( item, Armor ):
-               itemPassedTypeFilter = True
-               break
-            elif filterType == 'Shield' and isinstance( item, Shield ):
-               itemPassedTypeFilter = True
-               break
-            elif filterType == 'Tool' and isinstance( item, Tool ):
-               itemPassedTypeFilter = True
-               break
-      if itemPassedTypeFilter and (not limitToDropable or not isinstance(item, Tool) or item.droppable):
-         itemRowData.append( [item.name, colValue] )
+    @staticmethod
+    def add_item_to_item_row_data(item: ItemType,
+                                  col_value: str,
+                                  limit_to_droppable: bool,
+                                  filter_types: Optional[List[str]],
+                                  item_row_data: List[List[str]]) -> None:
+        item_passed_type_filter = False
+        if filter_types is None:
+            item_passed_type_filter = True
+        else:
+            for filterType in filter_types:
+                if filterType == 'Weapon' and isinstance(item, Weapon):
+                    item_passed_type_filter = True
+                    break
+                elif filterType == 'Helm' and isinstance(item, Helm):
+                    item_passed_type_filter = True
+                    break
+                elif filterType == 'Armor' and isinstance(item, Armor):
+                    item_passed_type_filter = True
+                    break
+                elif filterType == 'Shield' and isinstance(item, Shield):
+                    item_passed_type_filter = True
+                    break
+                elif filterType == 'Tool' and isinstance(item, Tool):
+                    item_passed_type_filter = True
+                    break
+        if item_passed_type_filter and (not limit_to_droppable or not isinstance(item, Tool) or item.droppable):
+            item_row_data.append([item.name, col_value])
 
-   def isItemEquipped( self, itemName: str ) -> bool:
-      retVal = False
-      if self.weapon is not None and itemName == self.weapon.name:
-         retVal = True
-      elif self.helm is not None and itemName == self.helm.name:
-         retVal = True
-      elif self.armor is not None and itemName == self.armor.name:
-         retVal = True
-      elif self.shield is not None and itemName == self.shield.name:
-         retVal = True
-      else:
-         for item in self.otherEquippedItems:
-            if itemName == item.name:
-               retVal = True
-               break
-      return retVal
+    def is_item_equipped(self, item_name: str) -> bool:
+        ret_val = False
+        if self.weapon is not None and item_name == self.weapon.name:
+            ret_val = True
+        elif self.helm is not None and item_name == self.helm.name:
+            ret_val = True
+        elif self.armor is not None and item_name == self.armor.name:
+            ret_val = True
+        elif self.shield is not None and item_name == self.shield.name:
+            ret_val = True
+        else:
+            for item in self.other_equipped_items:
+                if item_name == item.name:
+                    ret_val = True
+                    break
+        return ret_val
 
-   def hasItem( self, itemName: str ) -> bool:
-      return self.getItemCount( itemName) > 0
+    def has_item(self, item_name: str) -> bool:
+        return self.get_item_count(item_name) > 0
 
-   def getItemCount( self, itemName: str ) -> int:
-      retVal = 0
-      for item in self.unequippedItems:
-         if itemName == item.name:
-            retVal = self.unequippedItems[item]
-            break
-      if self.isItemEquipped( itemName ):
-         retVal += 1
-      if itemName in self.progressMarkers:
-         retVal += 1
-      return retVal
+    def get_item_count(self, item_name: str, unequipped_only: bool=False) -> int:
+        ret_val = 0
+        for item in self.unequipped_items:
+            if item_name == item.name:
+                ret_val = self.unequipped_items[item]
+                break
+        if not unequipped_only and self.is_item_equipped(item_name):
+            ret_val += 1
+        return ret_val
 
-   def getItemOptions( self, itemName: str ) -> List[str]:
-      itemOptions = []
-      isEquipped = False
-      if self.isItemEquipped( itemName ):
-         itemOptions.append( 'UNEQUIP' )
-         itemOptions.append( 'DROP' ) # At present all equipable items are also droppable
-         isEquipped = True
-      for item in self.unequippedItems:
-         if itemName == item.name:
-            if (not isinstance(item, Tool) or item.equippable) and not isEquipped:
-               itemOptions.append( 'EQUIP' )
-            if isinstance(item, Tool) and item.useDialog is not None:
-               itemOptions.append( 'USE' )
-            if (not isinstance(item, Tool) or item.droppable) and not isEquipped:
-               itemOptions.append( 'DROP' )
-            break
-      return itemOptions
+    def get_item_options(self, item_name: str) -> List[str]:
+        item_options = []
+        is_equipped = False
+        if self.is_item_equipped(item_name):
+            item_options.append('UNEQUIP')
+            item_options.append('DROP')  # At present all equipable items are also droppable
+            is_equipped = True
+        for item in self.unequipped_items:
+            if item_name == item.name:
+                if (not isinstance(item, Tool) or item.equippable) and not is_equipped:
+                    item_options.append('EQUIP')
+                if isinstance(item, Tool) and item.use_dialog is not None:
+                    item_options.append('USE')
+                if (not isinstance(item, Tool) or item.droppable) and not is_equipped:
+                    item_options.append('DROP')
+                break
+        return item_options
 
-   def equipItem( self, itemName: str ) -> None:
-      # Equip an unequipped item - may result in the unequiping of a previously equipped item
-      if not self.isItemEquipped( itemName ):
-         item = self.loseItem( itemName )
-         if item is not None:
-            if isinstance( item, Weapon ):
-               if self.weapon is not None:
-                  self.gainItem( self.weapon )
-               self.weapon = item
-            elif isinstance( item, Helm ):
-               if self.helm is not None:
-                  self.gainItem( self.helm )
-               self.helm = item
-            elif isinstance( item, Armor ):
-               if self.armor is not None:
-                  self.gainItem( self.armor )
-               self.armor = item
-            elif isinstance( item, Shield ):
-               if self.shield is not None:
-                  self.gainItem( self.shield )
-               self.shield = item
-            elif isinstance( item, Tool ) and item.equippable:
-               self.otherEquippedItems.append( item )
+    def equip_item(self, item_name: str) -> None:
+        # Equip an unequipped item - may result in the unequiping of a previously equipped item
+        if not self.is_item_equipped(item_name):
+            # Find and remove item from other_equipped_items
+            item = None
+            for unequipped_item in self.unequipped_items:
+                if unequipped_item.name == item_name:
+                    item = unequipped_item
+                    self.lose_item(item)
+                    break
+
+            # Attempt to equip the item
+            if item is not None:
+                if isinstance(item, Weapon):
+                    if self.weapon is not None:
+                        self.gain_item(self.weapon)
+                    self.weapon = item
+                elif isinstance(item, Helm):
+                    if self.helm is not None:
+                        self.gain_item(self.helm)
+                    self.helm = item
+                elif isinstance(item, Armor):
+                    if self.armor is not None:
+                        self.gain_item(self.armor)
+                    self.armor = item
+                elif isinstance(item, Shield):
+                    if self.shield is not None:
+                        self.gain_item(self.shield)
+                    self.shield = item
+                elif isinstance(item, Tool) and item.equippable:
+                    self.other_equipped_items.append(item)
+                else:
+                    print('ERROR: Item cannot be equipped:', item, flush=True)
+                    self.gain_item(item)
             else:
-               print( 'ERROR: Item cannot be equipped:', item, flush=True )
-               self.gainItem( item )
-         else:
-            print( 'WARN: Item not in inventory:', itemName, flush=True )
-      else:
-         print( 'WARN: Item already equipped:', itemName, flush=True )
+                print('WARN: Item not in inventory:', item_name, flush=True)
+        else:
+            print('WARN: Item already equipped:', item_name, flush=True)
          
-   def unequipItem( self, itemName: str ) -> None:
-      # Unequip an equipped item by removing it as eqipped and adding it as unequipped
-      if self.weapon is not None and itemName == self.weapon.name:
-         self.gainItem( self.weapon )
-         self.weapon = None
-      elif self.helm is not None and itemName == self.helm.name:
-         self.gainItem( self.helm )
-         self.helm = None
-      elif self.armor is not None and itemName == self.armor.name:
-         self.gainItem( self.armor )
-         self.armor = None
-      elif self.shield is not None and itemName == self.shield.name:
-         self.gainItem( self.shield )
-         self.shield = None
-      else:
-         for item in self.otherEquippedItems:
-            if itemName == item.name:
-               self.gainItem( item )
-               self.otherEquippedItems.remove( item )
-               break
-
-   def gainItem( self, item: Union[ItemType, str], count: int = 1 ) -> None:
-      # Gained items always go unequippedItems
-      if isinstance(item, str):
-         if item not in self.progressMarkers:
-            self.progressMarkers.append( item )
-            #print( 'Added progress marker', item, flush=True )
-         else:
-            print( 'WARN: Did not add previously added progress marker', item, flush=True )
-      elif item in self.unequippedItems:
-         self.unequippedItems[item] += count
-      else:
-         self.unequippedItems[item] = count
-
-   def loseItem( self, itemName: str, count: int = 1 ) -> Optional[ItemType]:
-      # Lost items are taken from unequippedItems where possible, else equipped items
-      retVal = None
-      remainingItemsToLose = count
-      for item in self.unequippedItems:
-         if itemName == item.name:
-            retVal = item
-            self.unequippedItems[item] -= count
-            if self.unequippedItems[item] <= 0:
-               remainingItemsToLose = -self.unequippedItems[item]
-               del self.unequippedItems[item]
-               break
-      if remainingItemsToLose > 0:
-         if self.weapon is not None and itemName == self.weapon.name:
-            retVal = self.weapon
+    def unequip_item(self, item_name: str) -> None:
+        # Unequip an equipped item by removing it as eqipped and adding it as unequipped
+        if self.weapon is not None and item_name == self.weapon.name:
+            self.gain_item(self.weapon)
             self.weapon = None
-            remainingItemsToLose -= 1
-         elif self.helm is not None and itemName == self.helm.name:
-            retVal = self.helm
+        elif self.helm is not None and item_name == self.helm.name:
+            self.gain_item(self.helm)
             self.helm = None
-            remainingItemsToLose -= 1
-         elif self.armor is not None and itemName == self.armor.name:
-            retVal = self.armor
+        elif self.armor is not None and item_name == self.armor.name:
+            self.gain_item(self.armor)
             self.armor = None
-            remainingItemsToLose -= 1
-         elif self.shield is not None and itemName == self.shield.name:
-            retVal = self.shield
+        elif self.shield is not None and item_name == self.shield.name:
+            self.gain_item(self.shield)
             self.shield = None
-            remainingItemsToLose -= 1
-         elif itemName in self.progressMarkers:
-            self.progressMarkers.remove( itemName )
-            remainingItemsToLose -= 1
-            #print( 'Removed progress marker', itemName, flush=True )
-         else:
-            for item in self.otherEquippedItems:
-               if itemName == item.name:
-                  retVal = item
-                  self.otherEquippedItems.remove( item )
-                  remainingItemsToLose -= 1
-                  break
-      return retVal
+        else:
+            for item in self.other_equipped_items:
+                if item_name == item.name:
+                    self.gain_item(item)
+                    self.other_equipped_items.remove(item)
+                    break
 
-   def isStillAsleep(self) -> bool:
-      retVal = self.isAsleep and (self.turnsAsleep == 0 or random.uniform(0, 1) > 0.5)
-      if retVal:
-         self.turnsAsleep += 1
-      else:
-         self.isAsleep = False
-         self.turnsAsleep = 0
-      return retVal
+    def gain_item(self, item: ItemType, count: int=1) -> None:
+        # Gained items always go unequippedItems
+        if item in self.unequipped_items:
+            self.unequipped_items[item] += count
+        else:
+            self.unequipped_items[item] = count
 
-   def getStrength( self ) -> int:
-      return self.level.strength
+    def lose_item(self, item: ItemType, count: int=1, unequipped_only: bool=False) -> None:
+        # Lost items are taken from unequippedItems where possible, else equipped items
+        remaining_items_to_lose = count
+        if item in self.unequipped_items:
+            self.unequipped_items[item] -= count
+            remaining_items_to_lose = -self.unequipped_items[item]
+            if self.unequipped_items[item] <= 0:
+                del self.unequipped_items[item]
+        if remaining_items_to_lose > 0 and not unequipped_only:
+            if self.weapon is not None and item == self.weapon:
+                self.weapon = None
+                remaining_items_to_lose -= 1
+            elif self.helm is not None and item == self.helm:
+                self.helm = None
+                remaining_items_to_lose -= 1
+            elif self.armor is not None and item == self.armor:
+                self.armor = None
+                remaining_items_to_lose -= 1
+            elif self.shield is not None and item == self.shield:
+                self.shield = None
+                remaining_items_to_lose -= 1
+            elif isinstance(item, Tool):
+                while item in self.other_equipped_items and 0 < remaining_items_to_lose:
+                    self.other_equipped_items.remove(item)
+                    remaining_items_to_lose -= 1
 
-   def getAgility( self ) -> int:
-      return self.level.agility
+    def get_name(self) -> str:
+        return self.name
 
-   def getAttackStrength( self ) -> int:
-      retVal = self.getStrength()
-      if self.weapon is not None:
-         retVal += self.weapon.attackBonus
-      for item in self.otherEquippedItems:
-         retVal += item.attackBonus
-      return math.floor(retVal)
+    def is_still_asleep(self) -> bool:
+        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 0.5)
+        if ret_val:
+            self.turns_asleep += 1
+        else:
+            self.is_asleep = False
+            self.turns_asleep = 0
+        return ret_val
 
-   def getDefenseStrength( self ) -> int:
-      retVal = self.getAgility() // 2
-      if self.helm is not None:
-         retVal += self.helm.defenseBonus
-      if self.armor is not None:
-         retVal += self.armor.defenseBonus
-      if self.shield is not None:
-         retVal += self.shield.defenseBonus
-      for item in self.otherEquippedItems:
-         retVal += item.defenseBonus
-      return retVal
+    def get_strength(self) -> int:
+        return self.level.strength
 
-   def allowsCriticalHits( self ) -> bool:
-      return False
+    def get_agility(self) -> int:
+        return self.level.agility
 
-   def criticalHitCheck( self, monster: MonsterState ) -> bool:
-      return random.uniform(0, 1) < 1/32
+    def get_attack_strength(self) -> int:
+        ret_val = self.get_strength()
+        if self.weapon is not None:
+            ret_val += self.weapon.attack_bonus
+        for item in self.other_equipped_items:
+            ret_val += item.attack_bonus
+        return math.floor(ret_val)
 
-   def calcRegularHitDamageToMonster( self, monster: MonsterState ) -> int:
-      return HeroState.calcDamage(
-         ( self.getAttackStrength() - monster.getAgility() // 2 ) // 4,
-         ( self.getAttackStrength() - monster.getAgility() // 2 ) // 2 )
+    def get_defense_strength(self) -> int:
+        ret_val = self.get_agility() // 2
+        if self.helm is not None:
+            ret_val += self.helm.defense_bonus
+        if self.armor is not None:
+            ret_val += self.armor.defense_bonus
+        if self.shield is not None:
+            ret_val += self.shield.defense_bonus
+        for item in self.other_equipped_items:
+            ret_val += item.defense_bonus
+        return ret_val
 
-   def calcCriticalHitDamageToMonster( self, monster: MonsterState ) -> int:
-      return HeroState.calcDamage(
-         self.getAttackStrength() // 2,
-         self.getAttackStrength() )
+    def allows_critical_hits(self) -> bool:
+        return False
 
-   def calcHitDamageFromMonster( self, monster: MonsterState ) -> int:
-      if self.getDefenseStrength() < monster.getStrength():
-         return HeroState.calcDamage(
-            ( monster.getStrength() - self.getDefenseStrength() // 2 ) // 4,
-            ( monster.getStrength() - self.getDefenseStrength() // 2 ) // 2 )
-      else:
-         return HeroState.calcDamage(
-            0,
-            ( monster.getStrength() + 4 ) // 6 )
+    def get_spell_resistance(self, spell: Spell) -> float:
+        if spell.name == 'Stopspell' and self.armor is not None:
+            return self.armor.stopspell_resistance
+        return 0
 
-   # TODO: Add spell checks and damage calc methods
+    def critical_hit_check(self, monster: CombatCharacterState) -> bool:
+        return monster.allows_critical_hits() and random.uniform(0, 1) < 1/32
 
-   @staticmethod
-   def calcDamage( minDamage: int, maxDamage: int ) -> int:
-      #print( 'minDamage =', minDamage, flush=True )
-      #print( 'maxDamage =', maxDamage, flush=True )
-      damage = math.floor( minDamage + random.uniform(0, 1) * ( maxDamage - minDamage ) )
-      if damage < 1:
-         if random.uniform(0, 1) < 0.5:
-            damage = 0
-         else:
-            damage = 1
-      return damage
+    def calc_regular_hit_damage_to_monster(self, monster: CombatCharacterState) -> int:
+        return HeroState.calc_damage(
+            (self.get_attack_strength() - monster.get_agility() // 2) // 4,
+            (self.get_attack_strength() - monster.get_agility() // 2) // 2)
 
-   @staticmethod
-   def calcLevel( levels: List[Level], xp: int ) -> Level:
-      for level in reversed(levels):
-         if level.xp <= xp:
-            return level
-      return levels[0]
+    def calc_critical_hit_damage_to_monster(self, monster: CombatCharacterState) -> int:
+        return HeroState.calc_damage(
+            self.get_attack_strength() // 2,
+            self.get_attack_strength())
 
-   def levelUpCheck( self, levels: List[Level] ) -> bool:
-      leveledUp = False
-      if self.level is not None:
-         newLevel = HeroState.calcLevel(levels, self.xp)
-         leveledUp = self.level != newLevel
-         self.level = newLevel
-      return leveledUp
+    def calc_hit_damage_from_monster(self, monster: CombatCharacterState) -> int:
+        if self.get_defense_strength() < monster.get_strength():
+            return HeroState.calc_damage(
+                (monster.get_strength() - self.get_defense_strength() // 2) // 4,
+                (monster.get_strength() - self.get_defense_strength() // 2) // 2)
+        else:
+            return HeroState.calc_damage(0, (monster.get_strength() + 4) // 6)
 
-   def isIgnoringTilePenalties( self ) -> bool:
-      retVal = False
-      if not retVal and self.armor is not None:
-         retVal = self.armor.ignoresTilePenalties
-      return retVal
+    # TODO: Add spell checks and damage calc methods
 
-   def calcXpToNextLevel( self, levels: List[Level] ) -> int:
-      retVal = 0
-      if self.level is not None:
-         for level in levels:
-            if level.xp > self.level.xp:
-               retVal = level.xp - self.xp
-               break
-      return retVal
+    # TODO: Add method for determining available spells
 
-   def __str__( self ) -> str:
-      return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
-         self.__class__.__name__,
-         self.name,
-         self.level,
-         self.hp,
-         self.mp,
-         self.gp,
-         self.xp,
-         self.typeName,
-         self.currPos_datTile,
-         self.destPos_datTile,
-         self.currPosOffset_imgPx,
-         self.dir)
+    @staticmethod
+    def calc_damage(min_damage: int, max_damage: int) -> int:
+        # print('min_damage =', min_damage, flush=True)
+        # print('max_damage =', max_damage, flush=True)
+        damage = math.floor(min_damage + random.uniform(0, 1) * (max_damage - min_damage))
+        if damage < 1:
+            if random.uniform(0, 1) < 0.5:
+                damage = 0
+            else:
+                damage = 1
+        return damage
 
-   def __repr__( self ) -> str:
-      return "%s(%r, %r, %r, %r, %r, %r, %r, %r, %r, %r, %r)" % (
-         self.__class__.__name__,
-         self.name,
-         self.level,
-         self.hp,
-         self.mp,
-         self.gp,
-         self.xp,
-         self.typeName,
-         self.currPos_datTile,
-         self.destPos_datTile,
-         self.currPosOffset_imgPx,
-         self.dir)
+    @staticmethod
+    def calc_level(levels: List[Level], xp: int) -> Level:
+        for level in reversed(levels):
+            if level.xp <= xp:
+                return level
+        return levels[0]
+
+    def level_up_check(self, levels: List[Level]) -> bool:
+        leveled_up = False
+        if self.level is not None:
+            new_level = HeroState.calc_level(levels, self.xp)
+            leveled_up = self.level != new_level
+            self.level = new_level
+        return leveled_up
+
+    def is_ignoring_tile_penalties(self) -> bool:
+        ret_val = False
+        if not ret_val and self.armor is not None:
+            ret_val = self.armor.ignores_tile_penalties
+        return ret_val
+
+    def calc_xp_to_next_level(self, levels: List[Level]) -> int:
+        ret_val = 0
+        if self.level is not None:
+            for level in levels:
+                if level.xp > self.level.xp:
+                    ret_val = level.xp - self.xp
+                    break
+        return ret_val
+
+    def __str__(self) -> str:
+        return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
+            self.__class__.__name__,
+            self.name,
+            self.level,
+            self.hp,
+            self.mp,
+            self.xp,
+            self.type_name,
+            self.curr_pos_dat_tile,
+            self.dest_pos_dat_tile,
+            self.curr_pos_offset_img_px,
+            self.direction)
+
+    def __repr__(self) -> str:
+        return "%s(%r, %r, %r, %r, %r, %r, %r, %r, %r, %r)" % (
+            self.__class__.__name__,
+            self.name,
+            self.level,
+            self.hp,
+            self.mp,
+            self.xp,
+            self.type_name,
+            self.curr_pos_dat_tile,
+            self.dest_pos_dat_tile,
+            self.curr_pos_offset_img_px,
+            self.direction)
+
 
 def main() -> None:
-   # Test out character states
-   level = Level( 0, '1', 2, 3, 4, 25, 6 )
-   heroState = HeroState( 'hero', Point(7,3), Direction.WEST, 'Sir Me', level )
-   print( heroState, flush=True )
-   while heroState.isAlive():
-      heroState.hp -= 10
-      print( heroState, flush=True )
+    # Test out character states
+    level = Level(0, '1', 2, 3, 4, 25, 6)
+    hero_state = HeroState('hero', Point(7, 3), Direction.WEST, 'Sir Me', level)
+    print(hero_state, flush=True)
+    while hero_state.is_alive():
+        hero_state.hp -= 10
+        print(hero_state, flush=True)
+
 
 if __name__ == '__main__':
-   try:
-      main()
-   except Exception:
-      import traceback
-      traceback.print_exc()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)

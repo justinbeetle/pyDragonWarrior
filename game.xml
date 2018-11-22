@@ -72,6 +72,10 @@
       <CharacterType type="merchant"               image="merchant.png"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
+
+      <CharacterType type="cat"                    image="cat.png"/>
+      <CharacterType type="mocha"                  image="mocha.png"/>
+      <CharacterType type="little_boy"             image="little_boy.png"/>
    </CharacterTypes>
 
    <Maps>
@@ -1455,6 +1459,22 @@
       </MonsterSet>
    </MonsterSets>
 
+   <Spells>
+      <!-- TODO: Reimplement with dialog scripting like the tools, with the possible exception of combat spells -->
+      <!-- TODO: Remove level from spells to support different spell sets by character type -->
+      <Spell name="Heal"      level="3"  mp="4"  availableInCombat="yes" availableOutsideCombat="yes" hpRecover="10-17"/>
+      <Spell name="Hurt"      level="4"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="5-12" damageByMonster="3-10"/>
+      <Spell name="Sleep"     level="7"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
+      <Spell name="Radiant"   level="9"  mp="3"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Stopspell" level="10" mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
+      <Spell name="Outside"   level="12" mp="6"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Return"    level="13" mp="8"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Repel"     level="15" mp="2"  availableInCombat="no"  availableOutsideCombat="yes"/>
+      <Spell name="Healmore"  level="17" mp="10" availableInCombat="yes" availableOutsideCombat="yes" hpRecover="85-100"/>
+      <Spell name="Hurtmore"  level="19" mp="5"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="58-65" damageByMonster="20-30"/>
+   </Spells>
+
+   <!-- TODO: Should have different levels by character types to allow deltas between warriors, mages, etc. -->
    <Levels>
       <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
       <Level name="2"  xp="7"     strength="6"   agility="5"   hp="22"  mp="0"/>
@@ -1488,20 +1508,6 @@
       <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
    </Levels>
 
-   <Spells>
-      <!-- TODO: Reimplement with dialog scripting like the tools, with the possible exception of combat spells -->
-      <Spell name="Heal"      level="3"  mp="4"  availableInCombat="yes" availableOutsideCombat="yes" hpRecover="10-17"/>
-      <Spell name="Hurt"      level="4"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="5-12" damageByMonster="3-10"/>
-      <Spell name="Sleep"     level="7"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
-      <Spell name="Radiant"   level="9"  mp="3"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Stopspell" level="10" mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
-      <Spell name="Outside"   level="12" mp="6"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Return"    level="13" mp="8"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Repel"     level="15" mp="2"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Healmore"  level="17" mp="10" availableInCombat="yes" availableOutsideCombat="yes" hpRecover="85-100"/>
-      <Spell name="Hurtmore"  level="19" mp="5"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="58-65" damageByMonster="20-30"/>
-   </Spells>
-
    <Items>
       <Weapons>
          <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"/>
@@ -1513,13 +1519,13 @@
          <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"/>
       </Weapons>
       <Armors>
-         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  hpRegenTiles="1000000"/>
-         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" hpRegenTiles="3"/>
-         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" hpRegenTiles="1"/>
+         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="0"   hpRegenTiles="3"/>
+         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="1.0" hpRegenTiles="1"/>
       </Armors>
       <Shields>
          <Shield name="Leather Shield"   defenseBonus="4"  gp="90"/>

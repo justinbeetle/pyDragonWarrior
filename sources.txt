@@ -51,7 +51,7 @@ python -m pip install --upgrade pygame
 python -m pip install --upgrade pyinstaller
 python -m pip install --upgrade mypy
 
-python -m mypy Point.py --strict
+python -m mypy Point.py --strict --ignore-missing-imports"
 
 
 cd C:\Users\Justin\Desktop\Adventure\Adventure

@@ -1,102 +1,97 @@
 #!/usr/bin/env python
 
-import sys
 import os
-
 import pygame
 
-from AudioPlayer import AudioPlayer
-from Point import Point
 
 # Run like this: MapImageToDatConverter.py ..\unusedAssets\maps\brecconary.png data\maps\brecconary.dat
 def main():
-   # Initialize pygame
-   pygame.init()
-   pygame.font.init()
-   audioPlayer = AudioPlayer()
+    # Initialize pygame
+    pygame.init()
 
-   # Setup to draw maps
-   tileSize_pixels = 16
-   winSize_tiles = Point( 1 , 1 )
-   winSize_pixels = winSize_tiles * tileSize_pixels
-   screen = pygame.display.set_mode( (160, 160), pygame.SRCALPHA|pygame.HWSURFACE )
-   clock = pygame.time.Clock()
+    # Setup to draw maps
+    tile_size_pixels = 16
+    screen = pygame.display.set_mode((160, 160), pygame.SRCALPHA | pygame.HWSURFACE)
+    clock = pygame.time.Clock()
 
-   # Load the map image to convert to dat file
-   basePath = os.path.split(os.path.abspath(__file__))[0]
-   mapImageFileName = os.path.join(basePath, sys.argv[1])
-   print( 'mapImageFileName =', mapImageFileName, flush=True )
-   mapDatFileName = os.path.join(basePath, sys.argv[2])
-   print( 'mapDatFileName =', mapDatFileName, flush=True )
-   mapImage = pygame.image.load(mapImageFileName).convert()
-   print( 'mapImage.get_width() =', mapImage.get_width(), flush=True )
-   print( 'mapImage.get_width() / tileSize_pixels =', mapImage.get_width() / tileSize_pixels, flush=True )
-   print( 'mapImage.get_height() =', mapImage.get_height(), flush=True )
-   print( 'mapImage.get_height() / tileSize_pixels =', mapImage.get_height() / tileSize_pixels, flush=True )
+    # Load the map image to convert to dat file
+    base_path = os.path.split(os.path.abspath(__file__))[0]
+    map_image_file_name = os.path.join(base_path, sys.argv[1])
+    print('map_image_file_name =', map_image_file_name, flush=True)
+    map_dat_file_name = os.path.join(base_path, sys.argv[2])
+    print('mapDatFileName =', map_dat_file_name, flush=True)
+    map_image = pygame.image.load(map_image_file_name).convert()
+    print('mapImage.get_width() =', map_image.get_width(), flush=True)
+    print('mapImage.get_width() / tileSize_pixels =', map_image.get_width() / tile_size_pixels, flush=True)
+    print('mapImage.get_height() =', map_image.get_height(), flush=True)
+    print('mapImage.get_height() / tileSize_pixels =', map_image.get_height() / tile_size_pixels, flush=True)
 
-   print( 'Enter symbol for border:', flush=True )
-   borderSymbol = '\n'
-   while borderSymbol == '\n':
-      borderSymbol = sys.stdin.read(1)
+    print('Enter symbol for border:', flush=True)
+    border_symbol = '\n'
+    while border_symbol == '\n':
+        border_symbol = sys.stdin.read(1)
 
-   # Convert the image to dat file
-   tileImageToSymbolMap = {}
-   mapDatFile = open( mapDatFileName, 'w' )
+    # Convert the image to dat file
+    tile_image_to_symbol_map = {}
+    map_dat_file = open(map_dat_file_name, 'w')
 
-   for map_y in range( mapImage.get_height() // tileSize_pixels + 2 ):
-      mapDatFile.write( borderSymbol )
-   mapDatFile.write( '\n' )
-   for map_y in range( mapImage.get_height() // tileSize_pixels ):
-      map_y_px = map_y * tileSize_pixels
-      mapDatFile.write( borderSymbol )
-      for map_x in range( mapImage.get_width() // tileSize_pixels ):
-         map_x_px = map_x * tileSize_pixels
-         currentTile = mapImage.subsurface( pygame.Rect( map_x_px, map_y_px, tileSize_pixels, tileSize_pixels ) )
-         screen.blit( currentTile, (0, 0) )
+    for map_y in range(map_image.get_height() // tile_size_pixels + 2):
+        map_dat_file.write(border_symbol)
+    map_dat_file.write('\n')
+    for map_y in range(map_image.get_height() // tile_size_pixels):
+        map_y_px = map_y * tile_size_pixels
+        map_dat_file.write(border_symbol)
+        for map_x in range(map_image.get_width() // tile_size_pixels):
+            map_x_px = map_x * tile_size_pixels
+            current_tile = map_image.subsurface(pygame.Rect(map_x_px, map_y_px, tile_size_pixels, tile_size_pixels))
+            screen.blit(current_tile, (0, 0))
          
-         # Determine if the tile has previously been seen
-         isNewTile = True
-         for tile in tileImageToSymbolMap:
-            isTileMatch = True
-            for tile_x in range( tileSize_pixels ):
-               for tile_y in range( tileSize_pixels ):
-                  if tile.get_at( (tile_x, tile_y) ) != currentTile.get_at( (tile_x, tile_y) ):
-                     isTileMatch = False
-                     break
-               if not isTileMatch:
-                  break
-               
-            if isTileMatch:
-               symbol = tileImageToSymbolMap[tile]
-               isNewTile = False
-               break
+            # Determine if the tile has previously been seen
+            is_new_tile = True
+            for tile in tile_image_to_symbol_map:
+                is_tile_match = True
+                for tile_x in range(tile_size_pixels):
+                    for tile_y in range(tile_size_pixels):
+                        if tile.get_at((tile_x, tile_y)) != current_tile.get_at((tile_x, tile_y)):
+                            is_tile_match = False
+                            break
+                    if not is_tile_match:
+                        break
 
-         if isNewTile:
-            pygame.display.flip()
-            pygame.event.pump()
-            clock.tick(5)
-            # Prompt user for tile symbol
-            print( 'Enter symbol for this tile ' + str(map_x) + ',' + str(map_y) + ':', flush=True )
-            symbol = '\n'
-            while symbol == '\n':
-               symbol = sys.stdin.read(1)
-            tileImageToSymbolMap[ currentTile ] = symbol
+                if is_tile_match:
+                    symbol = tile_image_to_symbol_map[tile]
+                    is_new_tile = False
+                    break
+
+            if is_new_tile:
+                pygame.display.flip()
+                pygame.event.pump()
+                clock.tick(5)
+                # Prompt user for tile symbol
+                print('Enter symbol for this tile ' + str(map_x) + ',' + str(map_y) + ':', flush=True)
+                symbol = '\n'
+                while symbol == '\n':
+                    symbol = sys.stdin.read(1)
+                tile_image_to_symbol_map[current_tile] = symbol
             
-         mapDatFile.write( symbol )
-      mapDatFile.write( borderSymbol )
-      mapDatFile.write( '\n' )
-   for map_y in range( mapImage.get_height() // tileSize_pixels + 2 ):
-      mapDatFile.write( borderSymbol )
-   mapDatFile.close()
+            map_dat_file.write(symbol)
+        map_dat_file.write(border_symbol)
+        map_dat_file.write('\n')
+    for map_y in range(map_image.get_height() // tile_size_pixels + 2):
+        map_dat_file.write(border_symbol)
+    map_dat_file.close()
 
-   # Terminate pygame
-   audioPlayer.terminate()
-   pygame.font.quit()
-   pygame.quit()
+    # Terminate pygame
+    pygame.quit()
+
 
 if __name__ == '__main__':
-   try:
-      main()
-   except Exception:
-      import traceback
-      traceback.print_exc()
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)
