@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from typing import Dict, List, Optional
-from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, MapDecoration, MonsterInfo, Tile
+from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, MapDecoration, MonsterInfo, Spell, Tile
 
 import abc
 import pygame
@@ -20,26 +20,27 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def get_hero_party(self) -> HeroParty:
         raise NotImplementedError
 
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
         raise NotImplementedError
 
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_item(self, name: str) -> Optional[ItemType]:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def get_levels(self, character_type: str) -> List[Level]:
-        raise NotImplementedError
-
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_dialog_sequences(self) -> Dict[str, DialogType]:
         raise NotImplementedError
 
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_tile(self, name: str) -> Tile:
         raise NotImplementedError
 
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_monster(self, name: str) -> Optional[MonsterInfo]:
         raise NotImplementedError
@@ -103,6 +104,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def get_win_size_pixels(self) -> Point:
         raise NotImplementedError
 
+    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
-    def get_tile_size_pixels(self) -> Point:
+    def get_tile_size_pixels(self) -> int:
         raise NotImplementedError

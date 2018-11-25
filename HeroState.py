@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import math
 import random
@@ -10,46 +10,50 @@ import random
 from MapCharacterState import MapCharacterState
 from CombatCharacterState import CombatCharacterState
 from Point import Point
-from GameTypes import Armor, Direction, Helm, ItemType, Level, Shield, Spell, Tool, Weapon
+from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, DialogActionEnum, Direction, Helm, ItemType, \
+    Level,  Shield, Spell, Tool, Weapon
 
 
 class HeroState(MapCharacterState, CombatCharacterState):
     def __init__(self,
-                 type_name: str,
+                 character_type: CharacterType,
                  pos_dat_tile: Point,
                  direction: Direction,
                  name: str,
-                 level: Level) -> None:
-        MapCharacterState.__init__(self, type_name, pos_dat_tile, direction)
-        CombatCharacterState.__init__(self, hp=level.hp, mp=level.mp)
-
+                 xp: int = 0) -> None:
+        MapCharacterState.__init__(self, character_type, pos_dat_tile, direction)
         self.name = name
-        self.level = level
-        self.xp = level.xp
-         
-        self.weapon: Optional[Weapon] = None
+        self.level = self.calc_level(xp)
+        self.xp = xp
+        CombatCharacterState.__init__(self, hp=self.level.hp, mp=self.level.mp)
 
+        self.weapon: Optional[Weapon] = None
         self.helm: Optional[Helm] = None
         self.armor: Optional[Armor] = None
         self.shield: Optional[Shield] = None
-
         self.other_equipped_items: List[Tool] = []
         self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
 
+    @staticmethod
+    def create_null(name: str = 'null') -> HeroState:
+        return HeroState(CharacterType.create_null(), Point(), Direction.SOUTH, name)
+
     def get_item_row_data(self,
                           limit_to_droppable: bool = False,
+                          limit_to_unequipped: bool = False,
                           filter_types: Optional[List[str]] = None) -> List[List[str]]:
         item_row_data: List[List[str]] = []
-        if self.weapon is not None:
-            HeroState.add_item_to_item_row_data(self.weapon, 'E', limit_to_droppable, filter_types, item_row_data)
-        if self.helm is not None:
-            HeroState.add_item_to_item_row_data(self.helm, 'E', limit_to_droppable, filter_types, item_row_data)
-        if self.armor is not None:
-            HeroState.add_item_to_item_row_data(self.armor, 'E', limit_to_droppable, filter_types, item_row_data)
-        if self.shield is not None:
-            HeroState.add_item_to_item_row_data(self.shield, 'E', limit_to_droppable, filter_types, item_row_data)
-        for tool in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
-            HeroState.add_item_to_item_row_data(tool, 'E', limit_to_droppable, filter_types, item_row_data)
+        if not limit_to_unequipped:
+            if self.weapon is not None:
+                HeroState.add_item_to_item_row_data(self.weapon, 'E', limit_to_droppable, filter_types, item_row_data)
+            if self.helm is not None:
+                HeroState.add_item_to_item_row_data(self.helm, 'E', limit_to_droppable, filter_types, item_row_data)
+            if self.armor is not None:
+                HeroState.add_item_to_item_row_data(self.armor, 'E', limit_to_droppable, filter_types, item_row_data)
+            if self.shield is not None:
+                HeroState.add_item_to_item_row_data(self.shield, 'E', limit_to_droppable, filter_types, item_row_data)
+            for tool in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
+                HeroState.add_item_to_item_row_data(tool, 'E', limit_to_droppable, filter_types, item_row_data)
         for item in sorted(self.unequipped_items, key=lambda inner_item: inner_item.name):
             item_count_str = str(self.unequipped_items[item])
             HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
@@ -266,61 +270,95 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def allows_critical_hits(self) -> bool:
         return False
 
-    def get_spell_resistance(self, spell: Spell) -> float:
-        if spell.name == 'Stopspell' and self.armor is not None:
+    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
+        if DialogActionEnum.STOPSPELL == action and self.armor is not None:
             return self.armor.stopspell_resistance
         return 0
 
-    def critical_hit_check(self, monster: CombatCharacterState) -> bool:
-        return monster.allows_critical_hits() and random.uniform(0, 1) < 1/32
+    def get_spell_resistance(self, spell: Spell) -> float:
+        if 'STOPSPELL' == spell.name.upper() and self.armor is not None:
+            return self.armor.stopspell_resistance
+        return 0
 
-    def calc_regular_hit_damage_to_monster(self, monster: CombatCharacterState) -> int:
-        return HeroState.calc_damage(
-            (self.get_attack_strength() - monster.get_agility() // 2) // 4,
-            (self.get_attack_strength() - monster.get_agility() // 2) // 2)
+    def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
+        if ActionCategoryTypeEnum.MAGICAL:
+            if self.armor is not None:
+                self.armor.hurt_dmg_modifier
+        elif ActionCategoryTypeEnum.FIRE:
+            if self.armor is not None:
+                self.armor.fire_dmg_modifier
+        return 1.0
 
-    def calc_critical_hit_damage_to_monster(self, monster: CombatCharacterState) -> int:
-        return HeroState.calc_damage(
-            self.get_attack_strength() // 2,
-            self.get_attack_strength())
-
-    def calc_hit_damage_from_monster(self, monster: CombatCharacterState) -> int:
-        if self.get_defense_strength() < monster.get_strength():
-            return HeroState.calc_damage(
-                (monster.get_strength() - self.get_defense_strength() // 2) // 4,
-                (monster.get_strength() - self.get_defense_strength() // 2) // 2)
+    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+        is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
+        if is_critical_hit:
+            min_damage = self.get_attack_strength() // 2
+            max_damage = self.get_attack_strength()
         else:
-            return HeroState.calc_damage(0, (monster.get_strength() + 4) // 6)
+            min_damage = (self.get_attack_strength() - target.get_agility() // 2) // 4
+            max_damage = (self.get_attack_strength() - target.get_agility() // 2) // 2
+        damage = CombatCharacterState.calc_damage(
+            min_damage,
+            max_damage,
+            target,
+            ActionCategoryTypeEnum.PHYSICAL)
+        return damage, is_critical_hit
 
     # TODO: Add spell checks and damage calc methods
 
     # TODO: Add method for determining available spells
+    def get_castable_spells(self, is_in_combat: bool, is_inside: bool) -> List[Spell]:
+        castable_spells = []
+        for spell in self.get_available_spells():
+            if spell.mp <= self.mp:
+                if is_in_combat and not spell.available_in_combat:
+                    continue
+                if not is_in_combat and not spell.available_outside_combat:
+                    continue
+                if is_inside and not spell.available_inside:
+                    continue
+                if not is_inside and not spell.available_outside:
+                    continue
+                castable_spells.append(spell)
+        return castable_spells
+
+    def get_available_spells(self) -> List[Spell]:
+        available_spells = []
+        for level in self.character_type.levels:
+            if level.xp < self.xp and level.spell is not None:
+                available_spells.append(level.spell)
+        return available_spells
+
+    def get_castable_spell_names(self, is_in_combat: bool, is_inside: bool) -> List[str]:
+        return HeroState.get_spell_names(self.get_castable_spells(is_in_combat, is_inside))
+
+    def get_available_spell_names(self) -> List[str]:
+        return HeroState.get_spell_names(self.get_available_spells())
 
     @staticmethod
-    def calc_damage(min_damage: int, max_damage: int) -> int:
-        # print('min_damage =', min_damage, flush=True)
-        # print('max_damage =', max_damage, flush=True)
-        damage = math.floor(min_damage + random.uniform(0, 1) * (max_damage - min_damage))
-        if damage < 1:
-            if random.uniform(0, 1) < 0.5:
-                damage = 0
-            else:
-                damage = 1
-        return damage
+    def get_spell_names(spells: List[Spell]) -> List[str]:
+        spell_names = []
+        for spell in spells:
+            spell_names.append(spell.name)
+        return spell_names
 
-    @staticmethod
-    def calc_level(levels: List[Level], xp: int) -> Level:
-        for level in reversed(levels):
+    def calc_level(self, xp: int) -> Level:
+        if 0 == len(self.character_type.levels):
+            return Level.create_null()
+        for level in reversed(self.character_type.levels):
             if level.xp <= xp:
                 return level
-        return levels[0]
+        return self.character_type.levels[0]
 
-    def level_up_check(self, levels: List[Level]) -> bool:
+    def level_up_check(self) -> bool:
         leveled_up = False
         if self.level is not None:
-            new_level = HeroState.calc_level(levels, self.xp)
+            new_level = self.calc_level(self.xp)
             leveled_up = self.level != new_level
             self.level = new_level
+            self.max_hp = self.level.hp
+            self.max_mp = self.level.mp
         return leveled_up
 
     def is_ignoring_tile_penalties(self) -> bool:
@@ -329,48 +367,35 @@ class HeroState(MapCharacterState, CombatCharacterState):
             ret_val = self.armor.ignores_tile_penalties
         return ret_val
 
-    def calc_xp_to_next_level(self, levels: List[Level]) -> int:
-        ret_val = 0
+    def calc_xp_to_next_level(self) -> int:
         if self.level is not None:
-            for level in levels:
+            for level in self.character_type.levels:
                 if level.xp > self.level.xp:
-                    ret_val = level.xp - self.xp
-                    break
-        return ret_val
+                    return level.xp - self.xp
+        return 0
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
+        return "%s(%s, %s, %s, %s, %s)" % (
             self.__class__.__name__,
+            MapCharacterState.__str__(self),
+            CombatCharacterState.__str__(self),
             self.name,
             self.level,
-            self.hp,
-            self.mp,
-            self.xp,
-            self.type_name,
-            self.curr_pos_dat_tile,
-            self.dest_pos_dat_tile,
-            self.curr_pos_offset_img_px,
-            self.direction)
+            self.xp)
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r, %r, %r, %r, %r, %r)" % (
+        return "%s(%r, %r, %r, %r, %r)" % (
             self.__class__.__name__,
+            MapCharacterState.__repr__(self),
+            CombatCharacterState.__repr__(self),
             self.name,
             self.level,
-            self.hp,
-            self.mp,
-            self.xp,
-            self.type_name,
-            self.curr_pos_dat_tile,
-            self.dest_pos_dat_tile,
-            self.curr_pos_offset_img_px,
-            self.direction)
+            self.xp)
 
 
 def main() -> None:
     # Test out character states
-    level = Level(0, '1', 2, 3, 4, 25, 6)
-    hero_state = HeroState('hero', Point(7, 3), Direction.WEST, 'Sir Me', level)
+    hero_state = HeroState.create_null()
     print(hero_state, flush=True)
     while hero_state.is_alive():
         hero_state.hp -= 10
@@ -387,3 +412,4 @@ if __name__ == '__main__':
                                          e,
                                          e.__traceback__),
               file=sys.stderr, flush=True)
+        traceback.print_exc()

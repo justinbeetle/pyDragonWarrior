@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
 
 from dataclasses import dataclass
 from enum import Enum
@@ -34,6 +34,28 @@ class GameTypes:
     def get_int_value(value: Union[str, int]) -> int:
         (minVal, maxVal) = GameTypes.parse_int_range(value)
         return random.randint(minVal, maxVal)
+
+    @staticmethod
+    def dialog_contains_action(dialog: DialogType, action: DialogActionEnum) -> bool:
+        return GameTypes.get_dialog_action(dialog, action) is not None
+
+    @staticmethod
+    def get_dialog_action(dialog: DialogType, action: DialogActionEnum) -> Optional[DialogAction]:
+        # Not checking sub-trees and the like.  The use dialog for spells and monster action should always be linear.
+        for element in dialog:
+            if isinstance(element, DialogAction):
+                if element.type == action:
+                    return DialogAction
+        return None
+
+    @staticmethod
+    def dialog_contains_action_category(dialog: DialogType, category: ActionCategoryTypeEnum) -> bool:
+        # Not checking sub-trees and the like.  The use dialog for spells and monster action should always be linear.
+        for element in dialog:
+            if isinstance(element, DialogAction):
+                if category == element.category:
+                    return True
+        return False
 
 
 class Direction(Enum):
@@ -95,8 +117,8 @@ class DialogCheckEnum(Enum):
 # Actions that can be triggered from dialog
 class DialogActionEnum(Enum):
     SAVE_GAME = 1                      # attributes: <none>
-    MAGIC_RESTORE = 2                  # attributes: count (number, range, or unlimited)
-    HEALTH_RESTORE = 3                 # attributes: count (number, range, or unlimited)
+    MAGIC_RESTORE = 2                  # attributes: count (number, range, or unlimited), category
+    HEALTH_RESTORE = 3                 # attributes: count (number, range, or unlimited), category
     LOSE_ITEM = 4                      # attributes: item (if unknown name, treated as a progress marker),
     #                                                count (defaults to 1)
     GAIN_ITEM = 5                      # attributes: item (if unknown name, treated as a progress marker),
@@ -108,14 +130,32 @@ class DialogActionEnum(Enum):
     PLAY_SOUND = 10                    # attributes: name
     PLAY_MUSIC = 11                    # attributes: name (play it once and return to looping on the prior music)
     VISUAL_EFFECT = 12                 # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
-    ATTACK_MONSTER = 13                # attributes: name, victoryDialog (victoryDialogScript in XML),
-    #                                                runAwayDialog (runAwayDialogScript in XML), encounterMusic
+    START_ENCOUNTER = 13               # attributes: name, approach_dialog (approachDialogScript in XML),
+    #                                                victory_dialog (victoryDialogScript in XML),
+    #                                                run_away_dialog (runAwayDialogScript in XML), encounterMusic
     OPEN_DOOR = 14                     # attributes: <none>
-    MONSTER_SLEEP = 15                 # attributes: bypass (to bypass resistances)
-    MONSTER_STOP_SPELL = 16            # attributes: bypass (to bypass resistances)
+    SLEEP = 15                         # attributes: bypass (to bypass resistances), category
+    STOPSPELL = 16                     # attributes: bypass (to bypass resistances)
+    DAMAGE_TARGET = 17                 # attributes: count (number, range, unlimited, or default), category
+    #                                                bypass (to bypass resistances and damage modifiers)
+
+
+class ActionCategoryTypeEnum(Enum):
+    PHYSICAL = 1
+    MAGICAL = 2
+    FIRE = 3
+    ICE = 4
+
+
+class TargetTypeEnum(Enum):
+    SINGLE_ALLY = 1
+    ALL_ALLIES = 2
+    SINGLE_ENEMY = 3
+    ALL_ENEMIES = 4
 
 
 # Alternate options to attacking (or attempting to run away) which may be attempted by a monster
+# TODO: Get rid of this in favor of actions defined in XML
 class MonsterActionEnum(Enum):
     HEAL = 1
     HURT = 2
@@ -127,10 +167,37 @@ class MonsterActionEnum(Enum):
     BREATH_STRONG_FIRE = 8
     ATTACK = 9
 
+    def is_spell(self) -> bool:
+        return (MonsterActionEnum.HEAL == self
+                or MonsterActionEnum.HURT == self
+                or MonsterActionEnum.SLEEP == self
+                or MonsterActionEnum.STOPSPELL == self
+                or MonsterActionEnum.HEALMORE == self
+                or MonsterActionEnum.HURTMORE == self)
+
+    def is_heal_spell(self) -> bool:
+        return MonsterActionEnum.HEAL == self or MonsterActionEnum.HEALMORE == self
+
+    def is_hurt_spell(self) -> bool:
+        return MonsterActionEnum.HURT == self or MonsterActionEnum.HURTMORE == self
+
+    def get_spell(self, spells: Dict[str, Spell]) -> Optional[Spell]:
+        if self.name.capitalize() in spells:
+            return spells[self.name.capitalize()]
+        return None
+
+    def requires_target(self) -> bool:
+        return (MonsterActionEnum.ATTACK == self
+                or self.is_hurt_spell()
+                or self.is_fire_attack())
+
+    def is_fire_attack(self) -> bool:
+        return MonsterActionEnum.BREATH_FIRE == self or MonsterActionEnum.BREATH_STRONG_FIRE == self
+
 
 # Dialog type
-DialogType = List[Union[str,
-                        Dict[str, 'DialogType'],
+DialogType = List[Union[str,  # a string of dialog
+                        Dict[str, 'DialogType'],  # branching dialog
                         'DialogVariable',
                         'DialogGoTo',
                         'DialogVendorBuyOptions',
@@ -221,9 +288,11 @@ class DialogAction:
     map_name: Optional[str] = None
     map_pos: Optional[Point] = None
     map_dir: Optional[Direction] = None
+    approach_dialog: Optional[DialogType] = None
     victory_dialog: Optional[DialogType] = None
     run_away_dialog: Optional[DialogType] = None
     encounter_music: Optional[str] = None
+    category: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL  # TODO: Change to list of categories?
 
 
 # Type to aggregate all the different dialog replacement variables
@@ -256,8 +325,13 @@ class Decoration(NamedTuple):
 
 
 class CharacterType(NamedTuple):
-    type: str
+    name: str
     images: Dict[Direction, Dict[Phase, pygame.Surface]]
+    levels: List[Level] = []
+
+    @staticmethod
+    def create_null(name: str = 'null') -> CharacterType:
+        return CharacterType(name, {})
 
 
 class LeavingTransition(NamedTuple):
@@ -278,13 +352,17 @@ class PointTransition(NamedTuple):
 
 
 class NpcInfo(NamedTuple):
-    type: str
+    character_type: CharacterType
     point: Point
     direction: Direction
     walking: bool
     dialog: Optional[DialogType] = None
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
+
+    @staticmethod
+    def create_null(name: str = 'null') -> NpcInfo:
+        return NpcInfo(CharacterType.create_null(name), Point(), Direction.SOUTH, False)
 
 
 class MapDecoration(NamedTuple):
@@ -324,7 +402,36 @@ class Map(NamedTuple):
 
 
 class MonsterAction(NamedTuple):
-    type: MonsterActionEnum
+    name: str
+    spell: Optional[Spell]
+    target_type: TargetTypeEnum
+    use_dialog: DialogType
+
+    def is_spell(self) -> bool:
+        return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.MAGICAL)
+
+    def is_damage_action(self) -> bool:
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET)
+
+    def is_heal_action(self) -> bool:
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.HEALTH_RESTORE)
+
+    def is_sleep_action(self) -> bool:
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.SLEEP)
+
+    def is_stopspell_action(self) -> bool:
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.STOPSPELL)
+
+    def is_fire_attack(self) -> bool:
+        return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.FIRE)
+
+    def get_damage_range(self) -> Tuple[int, int]:
+        return GameTypes.parse_int_range(
+            GameTypes.get_dialog_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET).count)
+
+
+class MonsterActionRule(NamedTuple):
+    action: MonsterAction
     probability: float
     health_ratio_threshold: float
 
@@ -345,7 +452,7 @@ class MonsterInfo(NamedTuple):
     xp: int
     min_gp: int
     max_gp: int
-    monster_actions: List[MonsterAction]
+    monster_action_rules: List[MonsterActionRule]
     allows_critical_hits: bool
 
 
@@ -365,22 +472,31 @@ class Level(NamedTuple):
     agility: int
     hp: int
     mp: int
+    spell: Optional[Spell] = None
+
+    @staticmethod
+    def create_null() -> Level:
+        return Level(0, 'null', 0, 0, 0, 1, 0, None)
 
 
 class Spell(NamedTuple):
     name: str
-    level: Level
     mp: int
     available_in_combat: bool
     available_outside_combat: bool
+    available_inside: bool
+    available_outside: bool
+    target_type: Optional[TargetTypeEnum]
+    use_dialog: DialogType
+    # TODO: Eventually replacing the following with use_dialog
     min_hp_recover: int
     max_hp_recover: int
     min_damage_by_hero: int
     max_damage_by_hero: int
     min_damage_by_monster: int
     max_damage_by_monster: int
-    excluded_map: Optional[str]
-    included_map: Optional[str]
+
+
 
 
 class Weapon(NamedTuple):
@@ -442,3 +558,24 @@ class MapImageInfo(NamedTuple):
                             pygame.Surface((0, 0)),
                             Point(),
                             Point())
+
+
+def main() -> None:
+    print(MonsterActionEnum.ATTACK.name)
+    print(MonsterActionEnum.ATTACK.value)
+
+    print('SOUTH' in Direction.__members__)
+    print(Direction.SOUTH in Direction)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        import sys
+        import traceback
+        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                         e,
+                                         e.__traceback__),
+              file=sys.stderr, flush=True)
+        traceback.print_exc()

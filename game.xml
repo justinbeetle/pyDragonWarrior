@@ -56,12 +56,47 @@
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
    </Decorations>
 
+   <Levels>
+      <CharacterLevels type="hero">
+         <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
+         <Level name="2"  xp="7"     strength="6"   agility="5"   hp="22"  mp="0"/>
+         <Level name="3"  xp="23"    strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
+         <Level name="4"  xp="47"    strength="8"   agility="9"   hp="31"  mp="16"  spell="Hurt"/>
+         <Level name="5"  xp="110"   strength="13"  agility="11"  hp="35"  mp="20"/>
+         <Level name="6"  xp="220"   strength="17"  agility="11"  hp="38"  mp="24"/>
+         <Level name="7"  xp="450"   strength="19"  agility="18"  hp="40"  mp="26"  spell="Sleep"/>
+         <Level name="8"  xp="800"   strength="23"  agility="21"  hp="46"  mp="29"/>
+         <Level name="9"  xp="1300"  strength="31"  agility="23"  hp="50"  mp="36"  spell="Radiant"/>
+         <Level name="10" xp="2000"  strength="36"  agility="32"  hp="54"  mp="40"  spell="Stopspell"/>
+         <Level name="11" xp="2900"  strength="41"  agility="36"  hp="62"  mp="50"/>
+         <Level name="12" xp="4000"  strength="49"  agility="41"  hp="63"  mp="58"  spell="Outside"/>
+         <Level name="13" xp="5500"  strength="53"  agility="49"  hp="70"  mp="64"  spell="Return"/>
+         <Level name="14" xp="7500"  strength="61"  agility="56"  hp="78"  mp="70"/>
+         <Level name="15" xp="10000" strength="69"  agility="65"  hp="86"  mp="72"  spell="Repel"/>
+         <Level name="16" xp="13000" strength="73"  agility="71"  hp="92"  mp="95"/>
+         <Level name="17" xp="17000" strength="73"  agility="79"  hp="100" mp="100" spell="Healmore"/>
+         <Level name="18" xp="21000" strength="86"  agility="85"  hp="115" mp="108"/>
+         <Level name="19" xp="25000" strength="88"  agility="87"  hp="130" mp="115" spell="Hurtmore"/>
+         <Level name="20" xp="29000" strength="93"  agility="89"  hp="138" mp="128"/>
+         <Level name="21" xp="33000" strength="96"  agility="91"  hp="149" mp="135"/>
+         <Level name="22" xp="37000" strength="98"  agility="91"  hp="158" mp="146"/>
+         <Level name="23" xp="41000" strength="100" agility="95"  hp="165" mp="153"/>
+         <Level name="24" xp="45000" strength="104" agility="99"  hp="170" mp="161"/>
+         <Level name="25" xp="49000" strength="114" agility="101" hp="174" mp="161"/>
+         <Level name="26" xp="53000" strength="118" agility="106" hp="180" mp="168"/>
+         <Level name="27" xp="57000" strength="126" agility="108" hp="189" mp="175"/>
+         <Level name="28" xp="61000" strength="131" agility="116" hp="195" mp="180"/>
+         <Level name="29" xp="65000" strength="136" agility="121" hp="200" mp="190"/>
+         <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
+      </CharacterLevels>
+   </Levels>
+
    <CharacterTypes>
-      <CharacterType type="hero"                   image="hero.png"/>
-      <CharacterType type="hero_sword"             image="hero_sword.png"/>
-      <CharacterType type="hero_shield"            image="hero_shield.png"/>
-      <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
-      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png"/>
+      <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
+      <CharacterType type="hero_sword"             image="hero_sword.png"             levels="hero"/>
+      <CharacterType type="hero_shield"            image="hero_shield.png"            levels="hero"/>
+      <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"  levels="hero"/>
+      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png" levels="hero"/>
       <CharacterType type="king"                   image="king.png"/>
       <CharacterType type="princess"               image="princess.png"/>
       <CharacterType type="guard"                  image="guard.png"/>
@@ -1048,7 +1083,7 @@
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
                <DialogOption name="No" label="fight_dragon_lord">
                    <Dialog>"Thou art a fool!"</Dialog>
-                   <DialogAction type="ATTACK_MONSTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
+                   <DialogAction type="START_ENCOUNTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
    </Maps>
 
@@ -1057,7 +1092,7 @@
          <!-- TODO: Whole screen should go black, different combat music should play -->
          <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
          <Dialog>The Dragonlord revealed his true self!</Dialog>
-         <DialogAction type="ATTACK_MONSTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
+         <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
 
       <DialogScript label="defeated_dragonlord_second_form">
          <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
@@ -1243,73 +1278,73 @@
       <Monster name="Drakee"                 image="drakee.png"                 strength="9"   agility="6"   hp="5-6"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="2"/>
       <Monster name="Ghost"                  image="ghost.png"                  strength="11"  agility="8"   hp="6-7"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="3"   gp="3-4"/>
       <Monster name="Magician"               image="magician.png"               strength="11"  agility="12"  hp="10-13"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="4"   gp="9-11">
-         <MonsterAction type="HURT" probability="0.5"/></Monster>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
       <Monster name="Magidrakee"             image="magidrakee.png"             strength="14"  agility="14"  hp="12-15"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="5"   gp="9-11">
-         <MonsterAction type="HURT" probability="0.5"/></Monster>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
       <Monster name="Scorpion"               image="scorpion.png"               strength="18"  agility="16"  hp="16-20"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="6"   gp="12-15"/>
       <Monster name="Druin"                  image="druin.png"                  strength="20"  agility="18"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="7"   gp="12-15"/>
       <Monster name="Poltergeist"            image="poltergeist.png"            strength="18"  agility="20"  hp="18-23"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="8"   gp="13-17">
-         <MonsterAction type="HURT" probability="0.75"/></Monster>
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
       <Monster name="Droll"                  image="droll.png"                  strength="24"  agility="24"  hp="19-25"   sleepResist="0/16"  stopspellResist="14/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="10"  gp="18-24"/>
       <Monster name="Drakeema"               image="drakeema.png"               strength="22"  agility="26"  hp="16-20"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="11"  gp="15-19">
-         <MonsterAction type="HEAL" probability="0.25" healthRatioThreshold="0.25"/>
-         <MonsterAction type="HURT" probability="0.5"/></Monster>
+         <MonsterActionRule type="Heal" probability="0.25" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
       <Monster name="Skeleton"               image="skeleton.png"               strength="28"  agility="22"  hp="23-30"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="11"  gp="22-29"/>
       <Monster name="Warlock"                image="warlock.png"                strength="28"  agility="22"  hp="23-30"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="13"  gp="26-34">
-         <MonsterAction type="SLEEP" probability="0.25"/>
-         <MonsterAction type="HURT" probability="0.5"/></Monster>
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
       <Monster name="Metal Scorpion"         image="metal_scorpion.png"         strength="36"  agility="42"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="14"  gp="30-39"/>
       <Monster name="Wolf"                   image="wolf.png"                   strength="40"  agility="30"  hp="26-34"   sleepResist="1/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="16"  gp="37-49"/>
       <Monster name="Wraith"                 image="wraith.png"                 strength="44"  agility="34"  hp="28-36"   sleepResist="7/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="17"  gp="45-59">
-         <MonsterAction type="HEAL" probability="0.25" healthRatioThreshold="0.25"/>
-         <MonsterAction type="HURT" probability="0.5"/></Monster>
+         <MonsterActionRule type="Heal" probability="0.25" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
       <Monster name="Metal Slime"            image="metal_slime.png"            strength="10"  agility="255" hp="4"       sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="1/64"  blockFactor="0.25"  xp="115" gp="4-5">
-         <MonsterAction type="HURT" probability="0.75"/></Monster>
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
       <Monster name="Specter"                image="specter.png"                strength="40"  agility="38"  hp="28-36"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="18"  gp="52-69">
-         <MonsterAction type="SLEEP" probability="0.25"/>
-         <MonsterAction type="HURT" probability="0.75"/></Monster>
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
       <Monster name="Wolflord"               image="wolflord.png"               strength="50"  agility="36"  hp="29-38"   sleepResist="4/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="20"  gp="60-79">
-         <MonsterAction type="STOPSPELL" probability="0.5"/></Monster>
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
       <Monster name="Druinlord"              image="druinlord.png"              strength="47"  agility="40"  hp="27-35"   sleepResist="15/16" stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="20"  gp="63-84">
-         <MonsterAction type="HEAL" probability="0.75" healthRatioThreshold="0.25"/>
-         <MonsterAction type="HURT" probability="0.25"/></Monster>
+         <MonsterActionRule type="Heal" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.25"/></Monster>
       <Monster name="Drollmagi"              image="drollmagi.png"              strength="52"  agility="50"  hp="29-38"   sleepResist="2/16"  stopspellResist="2/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="22"  gp="67-89">
-         <MonsterAction type="STOPSPELL" probability="0.5"/></Monster>
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
       <Monster name="Wyvern"                 image="wyvern.png"                 strength="56"  agility="48"  hp="32-42"   sleepResist="4/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="24"  gp="75-99"/>
       <Monster name="Rogue Scorpion"         image="rogue_scorpion.png"         strength="60"  agility="90"  hp="27-35"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="26"  gp="82-109"/>
       <Monster name="Wraith Knight"          image="wraith_knight.png"          strength="68"  agility="56"  hp="35-46"   sleepResist="5/16"  stopspellResist="0/16"  hurtResist="3/16"  dodge="4/64"  blockFactor="0.375" xp="28"  gp="90-119">
-         <MonsterAction type="HEAL" probability="0.75" healthRatioThreshold="0.25"/></Monster>
+         <MonsterActionRule type="Heal" probability="0.75" healthRatioThreshold="0.25"/></Monster>
       <Monster name="Golem"                  image="golem.png"                  strength="120" agility="60"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="0.375" xp="5"   gp="7-9"/>
       <Monster name="Goldman"                image="goldman.png"                strength="48"  agility="40"  hp="38-50"   sleepResist="13/16" stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="6"   gp="150-199"/>
       <Monster name="Knight"                 image="knight.png"                 strength="76"  agility="78"  hp="42-55"   sleepResist="6/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="33"  gp="97-129">
-         <MonsterAction type="STOPSPELL" probability="0.5"/></Monster>
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
       <Monster name="Magiwyvern"             image="magiwyvern.png"             strength="78"  agility="68"  hp="44-58"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="34"  gp="105-139">
-         <MonsterAction type="SLEEP" probability="0.5"/></Monster>
+         <MonsterActionRule type="Sleep" probability="0.5"/></Monster>
       <Monster name="Demon Knight"           image="demon_knight.png"           strength="79"  agility="64"  hp="38-50"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="15/64" blockFactor="0.375" xp="37"  gp="112-149"/>
       <Monster name="Werewolf"               image="werewolf.png"               strength="86"  agility="70"  hp="46-60"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="7/64"  blockFactor="0.375" xp="40"  gp="116-154"/>
       <Monster name="Green Dragon"           image="green_dragon.png"           strength="88"  agility="74"  hp="49-65"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="2/16"  dodge="2/64"  blockFactor="0.5"   xp="45"  gp="120-159">
-         <MonsterAction type="BREATH_FIRE" probability="0.25"/></Monster>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
       <Monster name="Starwyvern"             image="starwyvern.png"             strength="86"  agility="80"  hp="49-65"   sleepResist="8/16"  stopspellResist="0/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="0.5"   xp="43"  gp="120-159">
-         <MonsterAction type="HEALMORE" probability="0.75" healthRatioThreshold="0.25"/>
-         <MonsterAction type="BREATH_FIRE" probability="0.25"/></Monster>
+         <MonsterActionRule type="Healmore" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
       <Monster name="Wizard"                 image="wizard.png"                 strength="80"  agility="70"  hp="49-65"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="0.5"   xp="50"  gp="123-164">
-         <MonsterAction type="HURTMORE" probability="0.5"/></Monster>
+         <MonsterActionRule type="Hurtmore" probability="0.5"/></Monster>
       <Monster name="Axe Knight"             image="axe_knight.png"             strength="94"  agility="82"  hp="53-70"   sleepResist="15/16" stopspellResist="3/16"  hurtResist="1/16"  dodge="1/64"  blockFactor="0.5"   xp="54"  gp="123-164">
-         <MonsterAction type="SLEEP" probability="0.25"/></Monster>
+         <MonsterActionRule type="Sleep" probability="0.25"/></Monster>
       <Monster name="Blue Dragon"            image="blue_dragon.png"            strength="98"  agility="84"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="7/16"  dodge="2/64"  blockFactor="0.5"   xp="60"  gp="112-149">
-         <MonsterAction type="BREATH_FIRE" probability="0.25"/></Monster>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
       <Monster name="Stoneman"               image="stoneman.png"               strength="100" agility="40"  hp="121-160" sleepResist="2/16"  stopspellResist="15/16" hurtResist="1/16"  dodge="1/64"  blockFactor="1.0"   xp="65"  gp="105-139"/>
       <Monster name="Armored Knight"         image="armored_knight.png"         strength="105" agility="86"  hp="68-90"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="1.0"   xp="70"  gp="105-139">
-         <MonsterAction type="HEALMORE" probability="0.75" healthRatioThreshold="0.25"/>
-         <MonsterAction type="HURTMORE" probability="0.25"/></Monster>
+         <MonsterActionRule type="Healmore" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurtmore" probability="0.25"/></Monster>
       <Monster name="Red Dragon"             image="red_dragon.png"             strength="120" agility="90"  hp="76-100"  sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="1.0"   xp="100" gp="105-139">
-         <MonsterAction type="SLEEP" probability="0.25"/>
-         <MonsterAction type="BREATH_FIRE" probability="0.25"/></Monster>
-      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0"> <!-- TODO: hero criticals not possible -->
-         <MonsterAction type="STOPSPELL" probability="0.25"/>
-         <MonsterAction type="HURTMORE" probability="0.75"/></Monster>
-      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0"> <!-- TODO: hero criticals not possible -->
-         <MonsterAction type="BREATH_STRONG_FIRE" probability="0.5"/></Monster>
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
+      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no">
+         <MonsterActionRule type="Stopspell" probability="0.25"/>
+         <MonsterActionRule type="Hurtmore" probability="0.75"/></Monster>
+      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no">
+         <MonsterActionRule type="BreathStrongFire" probability="0.5"/></Monster>
    </Monsters>
 
    <MonsterSets>
@@ -1459,54 +1494,105 @@
       </MonsterSet>
    </MonsterSets>
 
-   <Spells>
-      <!-- TODO: Reimplement with dialog scripting like the tools, with the possible exception of combat spells -->
-      <!-- TODO: Remove level from spells to support different spell sets by character type -->
-      <Spell name="Heal"      level="3"  mp="4"  availableInCombat="yes" availableOutsideCombat="yes" hpRecover="10-17"/>
-      <Spell name="Hurt"      level="4"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="5-12" damageByMonster="3-10"/>
-      <Spell name="Sleep"     level="7"  mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
-      <Spell name="Radiant"   level="9"  mp="3"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Stopspell" level="10" mp="2"  availableInCombat="yes" availableOutsideCombat="no"/>
-      <Spell name="Outside"   level="12" mp="6"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Return"    level="13" mp="8"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Repel"     level="15" mp="2"  availableInCombat="no"  availableOutsideCombat="yes"/>
-      <Spell name="Healmore"  level="17" mp="10" availableInCombat="yes" availableOutsideCombat="yes" hpRecover="85-100"/>
-      <Spell name="Hurtmore"  level="19" mp="5"  availableInCombat="yes" availableOutsideCombat="no"  damageByHero="58-65" damageByMonster="20-30"/>
-   </Spells>
+   <MonsterActions default="Attack">
+      <MonsterAction name="Attack"           target="SINGLE_ENEMY">
+         <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
 
-   <!-- TODO: Should have different levels by character types to allow deltas between warriors, mages, etc. -->
-   <Levels>
-      <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
-      <Level name="2"  xp="7"     strength="6"   agility="5"   hp="22"  mp="0"/>
-      <Level name="3"  xp="23"    strength="8"   agility="7"   hp="24"  mp="6"/>
-      <Level name="4"  xp="47"    strength="8"   agility="9"   hp="31"  mp="16"/>
-      <Level name="5"  xp="110"   strength="13"  agility="11"  hp="35"  mp="20"/>
-      <Level name="6"  xp="220"   strength="17"  agility="11"  hp="38"  mp="24"/>
-      <Level name="7"  xp="450"   strength="19"  agility="18"  hp="40"  mp="26"/>
-      <Level name="8"  xp="800"   strength="23"  agility="21"  hp="46"  mp="29"/>
-      <Level name="9"  xp="1300"  strength="31"  agility="23"  hp="50"  mp="36"/>
-      <Level name="10" xp="2000"  strength="36"  agility="32"  hp="54"  mp="40"/>
-      <Level name="11" xp="2900"  strength="41"  agility="36"  hp="62"  mp="50"/>
-      <Level name="12" xp="4000"  strength="49"  agility="41"  hp="63"  mp="58"/>
-      <Level name="13" xp="5500"  strength="53"  agility="49"  hp="70"  mp="64"/>
-      <Level name="14" xp="7500"  strength="61"  agility="56"  hp="78"  mp="70"/>
-      <Level name="15" xp="10000" strength="69"  agility="65"  hp="86"  mp="72"/>
-      <Level name="16" xp="13000" strength="73"  agility="71"  hp="92"  mp="95"/>
-      <Level name="17" xp="17000" strength="73"  agility="79"  hp="100" mp="100"/>
-      <Level name="18" xp="21000" strength="86"  agility="85"  hp="115" mp="108"/>
-      <Level name="19" xp="25000" strength="88"  agility="87"  hp="130" mp="115"/>
-      <Level name="20" xp="29000" strength="93"  agility="89"  hp="138" mp="128"/>
-      <Level name="21" xp="33000" strength="96"  agility="91"  hp="149" mp="135"/>
-      <Level name="22" xp="37000" strength="98"  agility="91"  hp="158" mp="146"/>
-      <Level name="23" xp="41000" strength="100" agility="95"  hp="165" mp="153"/>
-      <Level name="24" xp="45000" strength="104" agility="99"  hp="170" mp="161"/>
-      <Level name="25" xp="49000" strength="114" agility="101" hp="174" mp="161"/>
-      <Level name="26" xp="53000" strength="118" agility="106" hp="180" mp="168"/>
-      <Level name="27" xp="57000" strength="126" agility="108" hp="189" mp="175"/>
-      <Level name="28" xp="61000" strength="131" agility="116" hp="195" mp="180"/>
-      <Level name="29" xp="65000" strength="136" agility="121" hp="200" mp="190"/>
-      <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
-   </Levels>
+      <MonsterAction name="Heal"             spell="Heal"/>
+
+      <MonsterAction name="Hurt"             spell="Hurt"/>
+
+      <MonsterAction name="Sleep"            spell="Sleep"/>
+
+      <MonsterAction name="Stopspell"        spell="Stopspell"/>
+
+      <MonsterAction name="Healmore"         spell="Healmore"/>
+
+      <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
+
+      <MonsterAction name="BreathFire"       target="SINGLE_ENEMY">
+         <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
+
+      <MonsterAction name="BreathStrongFire" target="SINGLE_ENEMY">
+         <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
+   </MonsterActions>
+
+   <Spells>
+      <Spell name="Heal"      mp="4"  availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY" hpRecover="10-17">
+         <Dialog>[ACTOR] cast the spell of heal.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="10-17" category="MAGICAL"/></Spell>
+
+      <Spell name="Hurt"      mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="SINGLE_ENEMY" damageByHero="5-12" damageByMonster="3-10">
+         <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></Spell>
+
+      <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
+         <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="SLEEP"/></Spell>
+
+      <Spell name="Radiant"   mp="3"  availableInCombat="no"  availableOutsideCombat="yes">
+         <Dialog>[ACTOR] cast the spell of radiant.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogCheck type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogCheck>
+         <DialogAction type="SET_LIGHT_DIAMETER" count="7" decay="70"/></Spell>
+
+      <Spell name="Stopspell" mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="ALL_ENEMIES">
+         <Dialog>[ACTOR] cast the spell of stopspell.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="STOPSPELL"/></Spell>
+
+      <Spell name="Outside"   mp="6"  availableInCombat="no"  availableOutsideCombat="yes" availableOutside="no">
+         <Dialog>[ACTOR] cast the spell of outside.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_INSIDE"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+         <DialogAction type="GOTO_LAST_OUTSIDE_COORDINATES"/>
+         <Dialog>[NAME] was transported outside.</Dialog></Spell>
+
+      <Spell name="Return"    mp="8"  availableInCombat="no"  availableOutsideCombat="yes" availableInside="no">
+         <Dialog>[ACTOR] cast the spell of return.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+         <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
+         <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Spell>
+
+      <Spell name="Repel"     mp="2"  availableInCombat="no"  availableOutsideCombat="yes">
+         <Dialog>[ACTOR] cast the spell of repel.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="REPEL_MONSTERS" decay="128"/></Spell>
+
+      <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY" hpRecover="85-100">
+         <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="85-100"/></Spell>
+
+      <Spell name="Hurtmore"  mp="5"  availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY" damageByHero="58-65" damageByMonster="20-30">
+         <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></Spell>
+   </Spells>
 
    <Items>
       <Weapons>
@@ -1546,7 +1632,7 @@
          <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes">
             <DialogAction type="HEALTH_RESTORE" count="23-30"/>
             <DialogAction type="LOSE_ITEM" name="Herb"/>
-            <Dialog>[NAME] ate the Herb.</Dialog></Tool>
+            <Dialog>[NAME] ate the herb.</Dialog></Tool>
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
             <DialogCheck type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogCheck>
@@ -1585,8 +1671,8 @@
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
             <Dialog>[NAME] blew the Fairy Flute.</Dialog>
-            <DialogCheck type="IS_IN_COMBAT" name="Golem"><Dialog>But nothing happened.</Dialog></DialogCheck>
-            <DialogAction type="MONSTER_SLEEP" bypass="yes"/></Tool> 
+            <DialogCheck type="IS_IN_COMBAT" target="Golem"><DialogAction type="SLEEP"/></DialogCheck>
+            <DialogAction type="SLEEP" bypass="yes"/></Tool> 
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
             <Dialog>[NAME] held Erdrick's Token tightly.</Dialog>
@@ -1615,7 +1701,7 @@
             <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
             <Dialog>[NAME] played a sweet melody on the harp.</Dialog>
             <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogCheck>
-            <DialogAction type="ATTACK_MONSTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool> <!-- TODO: Should only start an encounter where monsters reside -->
+            <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool> <!-- TODO: Should only start an encounter where monsters reside -->
 
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
             <Dialog>[NAME] held the Gwaelin's Love tightly.</Dialog>

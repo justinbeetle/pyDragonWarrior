@@ -7,17 +7,24 @@ from MonsterState import MonsterState
 
 
 class MonsterParty:
-    def __init__(self, monsters: List[MonsterState] = None) -> None:
+    def __init__(self, monsters: List[MonsterState] = []) -> None:
         self.members = monsters
 
-    def add_monster(self, monster: MonsterState):
+    def add_monster(self, monster: MonsterState) -> None:
         self.members.append(monster)
 
-    def is_still_in_combat(self):
+    def is_still_in_combat(self) -> bool:
         for member in self.members:
             if member.is_still_in_combat():
                 return True
         return False
+
+    def get_still_in_combat_members(self) -> List[MonsterState]:
+        alive_members = []
+        for member in self.members:
+            if member.is_still_in_combat():
+                alive_members.append(member)
+        return alive_members
 
     def get_default_approach_dialog(self) -> str:
         # TODO: Update for monster parties with multiple members

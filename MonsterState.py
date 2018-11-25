@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from typing import Optional
+from typing import Optional, List, Tuple
+
 import random
 
 from CombatCharacterState import CombatCharacterState
-from GameTypes import MonsterInfo, SpecialMonster, Spell
+from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
 
 
 class MonsterState(CombatCharacterState):
@@ -40,8 +41,17 @@ class MonsterState(CombatCharacterState):
         return self.get_agility()
 
     def allows_critical_hits(self) -> bool:
-        # TODO: Remove this hack
-        return not self.get_name().startswith('Dragonlord')
+        return not self.monster_info.allows_critical_hits
+
+    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
+        if DialogActionEnum.SLEEP == action:
+            return self.monster_info.sleep_resist
+        elif DialogActionEnum.STOPSPELL == action:
+            return self.monster_info.stopspell_resist
+        elif DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
+            return self.monster_info.hurt_resist
+        return 0
 
     def get_spell_resistance(self, spell: Spell) -> float:
         if 'HURT' == spell.name.upper() or 'HURTMORE' == spell.name.upper():
@@ -51,6 +61,24 @@ class MonsterState(CombatCharacterState):
         if 'STOPSPELL' == spell.name.upper():
             return self.monster_info.stopspell_resist
         return 0
+
+    def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
+        return 1.0
+
+    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+        is_critical_hit = False
+        if target.get_defense_strength() < self.get_strength():
+            min_damage = (self.get_strength() - target.get_defense_strength() // 2) // 4
+            max_damage = (self.get_strength() - target.get_defense_strength() // 2) // 2
+        else:
+            min_damage = 0
+            max_damage = (self.get_strength() + 4) // 6
+        damage = CombatCharacterState.calc_damage(
+            min_damage,
+            max_damage,
+            target,
+            ActionCategoryTypeEnum.PHYSICAL)
+        return damage, is_critical_hit
 
     # Determine if the monster has the initiative and attacks first in an encounter
     def has_initiative(self, hero_state: CombatCharacterState) -> bool:
@@ -234,7 +262,7 @@ def main() -> None:
         xp=10,
         min_gp=11,
         max_gp=12,
-        monster_actions=[],
+        monster_action_rules=[],
         allows_critical_hits=False)
     monster = MonsterState(monster_info, None)
     print(monster, flush=True)

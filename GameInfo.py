@@ -12,8 +12,8 @@ from GameTypes import Armor, CharacterType, Decoration, DialogAction, DialogActi
     DialogVendorBuyOptionsParamType, DialogVendorBuyOptionsVariable, DialogVendorSellOptions, \
     DialogVendorSellOptionsParamWithoutReplacementType, DialogVendorSellOptionsParamType, \
     DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, LeavingTransition, Level, Map, MapDecoration, \
-    MapImageInfo, MonsterAction, MonsterActionEnum, MonsterInfo, MonsterZone, NpcInfo, Phase, PointTransition, Shield, \
-    SpecialMonster, Spell, Tile, Tool, Weapon
+    MapImageInfo, MonsterAction, MonsterActionRule, MonsterActionEnum, MonsterInfo, MonsterZone, NpcInfo, Phase, \
+    PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
 from Point import Point
 
 
@@ -209,10 +209,89 @@ class GameInfo:
                                                            remove_with_search,
                                                            remove_with_key)
 
+        # Parse spells
+        self.spells: Dict[str, Spell] = {}
+        for element in xml_root.findall("./Spells/Spell"):
+            spell_name = element.attrib['name']
+            available_in_combat = True
+            available_outside_combat = True
+            available_inside = True
+            available_outside = True
+            target_type = None
+            if 'availableInCombat' in element.attrib:
+                available_in_combat = element.attrib['availableInCombat'] == 'yes'
+            if 'availableOutsideCombat' in element.attrib:
+                available_outside_combat = element.attrib['availableOutsideCombat'] == 'yes'
+            if 'availableInside' in element.attrib:
+                available_inside = element.attrib['availableInside'] == 'yes'
+            if 'availableOutside' in element.attrib:
+                available_outside = element.attrib['availableOutside'] == 'yes'
+            if 'target' in element.attrib:
+                target_type = TargetTypeEnum[element.attrib['target']]
+            use_dialog = self.parse_dialog(element)
+            if use_dialog is None:
+                print('ERROR: No use dialog for spell', spell_name, flush=True)
+                continue
+
+            min_hp_recover = 0
+            max_hp_recover = 0
+            min_damage_by_hero = 0
+            max_damage_by_hero = 0
+            min_damage_by_monster = 0
+            max_damage_by_monster = 0
+            if 'hpRecover' in element.attrib:
+                (min_hp_recover, max_hp_recover) = GameTypes.parse_int_range(element.attrib['hpRecover'])
+            if 'damageByHero' in element.attrib:
+                (min_damage_by_hero, max_damage_by_hero) = GameTypes.parse_int_range(element.attrib['damageByHero'])
+            if 'damageByMonster' in element.attrib:
+                (min_damage_by_monster, max_damage_by_monster) = GameTypes.parse_int_range(
+                    element.attrib['damageByMonster'])
+
+            self.spells[spell_name] = Spell(
+                spell_name,
+                int(element.attrib['mp']),
+                available_in_combat,
+                available_outside_combat,
+                available_inside,
+                available_outside,
+                target_type,
+                use_dialog,
+                min_hp_recover,
+                max_hp_recover,
+                min_damage_by_hero,
+                max_damage_by_hero,
+                min_damage_by_monster,
+                max_damage_by_monster)
+
+        # Parse levels
+        levels: Dict[str, List[Level]] = {}
+        for element in xml_root.findall("./Levels/CharacterLevels"):
+            character_type = element.attrib['type']
+            levels[character_type] = []
+            for level_element in element.findall("./Level"):
+                level_name = level_element.attrib['name']
+                level_number = len(levels[character_type])
+                level_spell = None
+                if 'spell' in level_element.attrib and level_element.attrib['spell'] in self.spells:
+                    level_spell = self.spells[level_element.attrib['spell']]
+                level = Level(
+                    level_number,
+                    level_name,
+                    int(level_element.attrib['xp']),
+                    int(level_element.attrib['strength']),
+                    int(level_element.attrib['agility']),
+                    int(level_element.attrib['hp']),
+                    int(level_element.attrib['mp']),
+                    level_spell)
+                levels[character_type].append(level)
+
         # Parse characters
         self.character_types: Dict[str, CharacterType] = {}
         for element in xml_root.findall("./CharacterTypes/CharacterType"):
             character_type = element.attrib['type']
+            character_levels: List[Level] = []
+            if 'levels' in element.attrib and element.attrib['levels'] in levels:
+                character_levels = levels[element.attrib['levels']]
             character_type_filename = os.path.join(character_path, element.attrib['image'])
             # print('Loading image', character_type_filename, flush=True)
             character_type_image = pygame.image.load(character_type_filename).convert()
@@ -232,7 +311,9 @@ class GameInfo:
                     direction_character_type_images[phase] = image
                     x_px += character_type_image.get_height() + 1
                 character_type_images[direction] = direction_character_type_images
-            self.character_types[character_type] = CharacterType(character_type, character_type_images)
+            self.character_types[character_type] = CharacterType(character_type,
+                                                                 character_type_images,
+                                                                 character_levels)
 
         # Parse maps
         self.maps: Dict[str, Map] = {}
@@ -303,7 +384,7 @@ class GameInfo:
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in npc_element.attrib:
                     inverse_progress_marker = npc_element.attrib['inverseProgressMarker']
-                npcs.append(NpcInfo(npc_element.attrib['type'],
+                npcs.append(NpcInfo(self.character_types[npc_element.attrib['type']],
                                     Point(int(npc_element.attrib['x']),
                                           int(npc_element.attrib['y'])),
                                     Direction[npc_element.attrib['dir']],
@@ -444,6 +525,33 @@ class GameInfo:
             if dialog_script is not None:
                 self.dialog_sequences[element.attrib['label']] = dialog_script
 
+        # Parse monster actions
+        monster_actions: Dict[str, MonsterAction] = {}
+        for element in xml_root.findall("./MonsterActions/MonsterAction"):
+            action_name = element.attrib['name']
+            spell = None
+            target_type = TargetTypeEnum.SINGLE_ENEMY
+            use_dialog = None
+            if 'spell' in element.attrib and element.attrib['spell'] in self.spells:
+                spell = self.spells[element.attrib['spell']]
+                target_type = spell.target_type
+                use_dialog = spell.use_dialog
+            else:
+                if 'target' in element.attrib:
+                    target_type = TargetTypeEnum[element.attrib['target']]
+                use_dialog = self.parse_dialog(element)
+            if target_type is None:
+                print('ERROR: No target type for monster action', action_name, flush=True)
+                continue
+            if use_dialog is None:
+                print('ERROR: No use dialog for monster action', action_name, flush=True)
+                continue
+            monster_actions[action_name] = MonsterAction(action_name,
+                                                              spell,
+                                                              target_type,
+                                                              use_dialog)
+        self.default_monster_action = monster_actions[xml_root.find('MonsterActions').attrib['default']]
+
         # Parse monsters
         self.monsters: Dict[str, MonsterInfo] = {}
         for element in xml_root.findall("./Monsters/Monster"):
@@ -465,14 +573,19 @@ class GameInfo:
             (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
             (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
 
-            monster_actions = []
-            for monster_action_element in element.findall("./MonsterAction"):
+            monster_action_rules = []
+            for monster_action_rules_element in element.findall("./MonsterActionRule"):
                 health_ratio_threshold = 1.0
-                if 'healthRatioThreshold' in monster_action_element.attrib:
-                    health_ratio_threshold = float(monster_action_element.attrib['healthRatioThreshold'])
-                monster_actions.append(MonsterAction(MonsterActionEnum[monster_action_element.attrib['type']],
-                                                     float(monster_action_element.attrib['probability']),
-                                                     health_ratio_threshold))
+                if 'healthRatioThreshold' in monster_action_rules_element.attrib:
+                    health_ratio_threshold = float(monster_action_rules_element.attrib['healthRatioThreshold'])
+                monster_action_rules.append(MonsterActionRule(
+                    monster_actions[monster_action_rules_element.attrib['type']],
+                    float(monster_action_rules_element.attrib['probability']),
+                    health_ratio_threshold))
+
+            allows_critical_hits = True
+            if 'allowsCriticalHits' in element.attrib:
+                allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
          
             self.monsters[monster_name] = MonsterInfo(
                 monster_name,
@@ -490,8 +603,8 @@ class GameInfo:
                 int(element.attrib['xp']),
                 min_gp,
                 max_gp,
-                monster_actions,
-                not monster_name.startswith('Dragonlord'))  # TODO: Actually add and parse allow_critical_hits
+                monster_action_rules,
+                allows_critical_hits)
          
         # Parse monster sets
         self.monster_sets: Dict[str, List[str]] = {}
@@ -501,68 +614,6 @@ class GameInfo:
                 monsters.append(monster_element.attrib['name'])
             self.monster_sets[element.attrib['name']] = monsters
             self.monster_sets[element.attrib['name']] = monsters
-
-        # Parse levels
-        self.levels: List[Level] = []
-        levels_by_name: Dict[str, Level] = {}
-        for element in xml_root.findall("./Levels/Level"):
-            level_name = element.attrib['name']
-            level_number = len(self.levels)
-            level = Level(
-                level_number,
-                level_name,
-                int(element.attrib['xp']),
-                int(element.attrib['strength']),
-                int(element.attrib['agility']),
-                int(element.attrib['hp']),
-                int(element.attrib['mp']))
-            self.levels.append(level)
-            levels_by_name[level_name] = level
-
-        # Parse spells
-        self.spells: Dict[str, Spell] = {}
-        for element in xml_root.findall("./Spells/Spell"):
-            spell_name = element.attrib['name']
-            available_in_combat = True
-            available_outside_combat = True
-            min_hp_recover = 0
-            max_hp_recover = 0
-            min_damage_by_hero = 0
-            max_damage_by_hero = 0
-            min_damage_by_monster = 0
-            max_damage_by_monster = 0
-            excluded_map = None
-            included_map = None
-            if 'availableInCombat' in element.attrib:
-                available_in_combat = element.attrib['availableInCombat'] == 'yes'
-            if 'availableOutsideCombat' in element.attrib:
-                available_outside_combat = element.attrib['availableOutsideCombat'] == 'yes'
-            if 'hpRecover' in element.attrib:
-                (min_hp_recover, max_hp_recover) = GameTypes.parse_int_range(element.attrib['hpRecover'])
-            if 'damageByHero' in element.attrib:
-                (min_damage_by_hero, max_damage_by_hero) = GameTypes.parse_int_range(element.attrib['damageByHero'])
-            if 'damageByMonster' in element.attrib:
-                (min_damage_by_monster, max_damage_by_monster) = GameTypes.parse_int_range(
-                    element.attrib['damageByMonster'])
-            if 'excludedMap' in element.attrib:
-                excluded_map = element.attrib['excludedMap']
-            if 'includedMap' in element.attrib:
-                included_map = element.attrib['includedMap']
-         
-            self.spells[spell_name] = Spell(
-                spell_name,
-                levels_by_name[element.attrib['level']],
-                int(element.attrib['mp']),
-                available_in_combat,
-                available_outside_combat,
-                min_hp_recover,
-                max_hp_recover,
-                min_damage_by_hero,
-                max_damage_by_hero,
-                min_damage_by_monster,
-                max_damage_by_monster,
-                excluded_map,
-                included_map)
          
         # Parse initial game state
         self.pc_name = ''
@@ -793,27 +844,6 @@ class GameInfo:
       
         return None
 
-    def get_castable_spell_names(self, is_in_combat: bool, level: Level, available_mp: int, map_name: str) -> List[str]:
-        available_spells = []
-        for spellName in self.spells:
-            spell = self.spells[spellName]
-            if (spell.level.number <= level.number
-                and spell.mp <= available_mp
-                and spell.excluded_map != map_name
-                and (spell.included_map is None or spell.included_map == map_name)
-                and ((is_in_combat and spell.available_in_combat)
-                     or (not is_in_combat and spell.available_outside_combat))):
-                available_spells.append(spell.name)
-        return available_spells
-
-    def get_available_spell_names(self, level: Level) -> List[str]:
-        available_spells = []
-        for spellName in self.spells:
-            spell = self.spells[spellName]
-            if spell.level.number <= level.number:
-                available_spells.append(spell.name)
-        return available_spells
-
     def get_map_image_info(self,
                            map_name: str,
                            image_pad_tiles: Point = Point(0, 0),
@@ -1007,6 +1037,7 @@ def main() -> None:
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
    
     # Iterate through and render the different maps
+    is_running = True
     for map_name in game_info.maps:
         audio_player.play_music(game_info.maps[map_name].music)
         map_image_info = game_info.get_map_image_info(map_name, image_pad_tiles)
@@ -1029,13 +1060,15 @@ def main() -> None:
             pygame.display.flip()
 
             pygame.key.set_repeat(10, 10)
-            is_running = True
-         
-            while is_running:
+
+            done_with_map = False
+            while is_running and not done_with_map:
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             is_running = False
+                        elif event.key == pygame.K_RETURN:
+                            done_with_map = True
                         elif event.key == pygame.K_DOWN:
                             SurfaceEffects.scroll_view(
                                 screen, map_image, Direction.SOUTH, map_image_rect, 1, tile_size_pixels, True)
@@ -1069,3 +1102,4 @@ if __name__ == '__main__':
                                          e,
                                          e.__traceback__),
               file=sys.stderr, flush=True)
+        traceback.print_exc()

@@ -19,10 +19,13 @@ class GameDialogSpacing(Enum):
 
 
 class GameDialog:
+    NOMINAL_HEALTH_FONT_COLOR = pygame.Color('white')
+    LOW_HEALTH_FONT_COLOR = pygame.Color(252, 116, 96)
+
     win_size_tiles = Point(20, 15)
     tile_size_pixels = 48
     font_size = 32
-    font_color = pygame.Color('white')
+    font_color = NOMINAL_HEALTH_FONT_COLOR
     font: pygame.Font
     outside_spacing_pixels = 24
     internal_spacing_pixels = 10
@@ -674,8 +677,7 @@ def main() -> None:
 
     # Test out game dialog
     GameDialog.init(win_size_tiles, tile_size_pixels)
-    level = Level(1, '1', 0, 20, 20, 15, 0)
-    hero_party = HeroParty(HeroState('hero', Point(5, 6), Direction.SOUTH, 'CAMDEN', level))
+    hero_party = HeroParty(HeroState.create_null())
 
     screen.fill(pygame.Color('pink'))
     GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)
@@ -736,7 +738,7 @@ def main() -> None:
 
     # messageDialog.addEncounterPrompt()
     message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
-    message_dialog.set_font_color(pygame.Color(252, 116, 96))
+    message_dialog.set_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
     message_dialog.blit(screen, True)
     is_awaiting_selection = True
     while is_awaiting_selection:

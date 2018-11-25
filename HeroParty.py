@@ -151,6 +151,13 @@ class HeroParty:
                 return True
         return False
 
+    def get_still_in_combat_members(self) -> List[HeroState]:
+        alive_members = []
+        for member in self.members:
+            if member.is_still_in_combat():
+                alive_members.append(member)
+        return alive_members
+
     def is_ignoring_tile_penalties(self) -> bool:
         for member in self.members:
             if not member.is_ignoring_tile_penalties():
@@ -174,6 +181,33 @@ class HeroParty:
             member.curr_pos_dat_tile = member.dest_pos_dat_tile = pos
             member.direction = direction
 
+    def get_lowest_health_ratio(self) -> float:
+        lowest_health_ratio = 1.0
+        for member in self.members:
+            lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
+        return lowest_health_ratio
+
+    # Get listing of all unequipped items for the party
+    def get_item_row_data(self,
+                          limit_to_droppable: bool = False,
+                          filter_types: Optional[List[str]] = None) -> List[List[str]]:
+        item_row_data: List[List[str]] = []
+        for member in self.members:
+            member_item_row_data = member.get_item_row_data(limit_to_droppable, True, filter_types)
+            if 0 == len(item_row_data):
+                item_row_data = member_item_row_data
+            else:
+                for member_row in member_item_row_data:
+                    found = False
+                    for row in item_row_data:
+                        if member_row[0] == row[0]:
+                            row[0] = str(int(member_row[0]) + int(row[0]))
+                            found = True
+                    if not found:
+                        item_row_data.append(member_row)
+        item_row_data.sort(key=lambda x: x[0])
+        return item_row_data
+
     def __str__(self) -> str:
         return "%s(%s, %s, %s, %s)" % (
             self.__class__.__name__,
@@ -192,13 +226,13 @@ class HeroParty:
 
 
 def main() -> None:
-    from GameTypes import Direction, Level
-    level = Level(0, '1', 2, 3, 4, 25, 6)
-    hero_state = HeroState('hero', Point(7, 3), Direction.WEST, 'Sir Me', level)
+    from GameTypes import CharacterType, Direction
+    character_type = CharacterType('myType', {}, [])
+    hero_state = HeroState(character_type, Point(7, 3), Direction.WEST, 'Sir Me')
     hero_party = HeroParty(hero_state)
     print(hero_party, '\n', flush=True)
     for name in ['member1', 'member2', 'member3']:
-        member = HeroState('hero', Point(7, 3), Direction.WEST, name, level)
+        member = HeroState(character_type, Point(7, 3), Direction.WEST, name)
         hero_party.add_member(member)
         print(hero_party, '\n', flush=True)
 

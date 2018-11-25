@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-from typing import Optional, Union
+from typing import Optional, List, Union
 
 import pygame
 
 from AudioPlayer import AudioPlayer
+from CombatCharacterState import CombatCharacterState
 from GameDialog import GameDialog, GameDialogSpacing
-from GameTypes import DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, \
-    DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, DialogVendorSellOptions, \
-    DialogVendorSellOptionsVariable, GameTypes
+from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
+    DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, \
+    DialogVendorSellOptions, DialogVendorSellOptionsVariable, GameTypes
 from GameStateInterface import GameStateInterface
 import GameEvents
 from Point import Point
@@ -21,6 +22,28 @@ class GameDialogEvaluator:
         self.hero_party = game_state.get_hero_party()
         self.replacement_variables = game_state.get_dialog_replacement_variables()
         self.wait_before_new_text = False
+
+        self.actor: CombatCharacterState = self.hero_party.main_character
+        self.targets: List[CombatCharacterState] = self.hero_party.members
+
+    # Set the source - the source may be called out for performing an action
+    # The target may be called out in the dialog associated with the action
+    def set_actor(self, source: CombatCharacterState) -> None:
+        self.actor = source
+        self.replacement_variables.generic['[ACTOR]'] = source.get_name()
+
+    # Set the targets on which actions will be performed
+    # When the target is singular, it may be called out in the dialog associated with the action
+    def set_targets(self, targets: List[CombatCharacterState]) -> None:
+        self.targets = targets
+        if 1 == len(targets):
+            self.replacement_variables.generic['[TARGET]'] = targets[0].get_name()
+        else:
+            del self.replacement_variables.generic['[TARGET]']
+
+    def restore_default_source_and_target(self) -> None:
+        self.set_actor(self.hero_party.main_character)
+        self.set_targets(self.hero_party.members)
 
     def dialog_loop(self, dialog: Union[DialogType, str]) -> None:
         # Save off initial background image and key repeat settings
@@ -106,6 +129,20 @@ class GameDialogEvaluator:
 
         return menu_result
 
+    def update_status_dialog(self, update_display: bool = False) -> None:
+        # TODO: Store off the message_dialog and ensure it is using the correct font color too
+        if self.hero_party.get_lowest_health_ratio() >= 0.25:
+            GameDialog.set_default_font_color(GameDialog.NOMINAL_HEALTH_FONT_COLOR)
+        else:
+            GameDialog.set_default_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
+
+        if self.game_state.is_in_combat():
+            GameDialog.create_encounter_status_dialog(
+                self.hero_party).blit(self.game_state.screen, update_display)
+        else:
+            GameDialog.create_exploring_status_dialog(
+                self.hero_party).blit(self.game_state.screen, update_display)
+
     def traverse_dialog(self,
                         message_dialog: GameDialog,
                         dialog: Union[DialogType, str],
@@ -115,7 +152,12 @@ class GameDialogEvaluator:
             self.wait_before_new_text = False
             # print('Initialized self.traverse_dialog_wait_before_new_text to False', flush=True)
             self.replacement_variables = self.game_state.get_dialog_replacement_variables()
-            self.replacement_variables.generic['[NAME]'] = self.hero_party.main_character.name
+            self.replacement_variables.generic['[NAME]'] = self.hero_party.main_character.get_name()
+            self.replacement_variables.generic['[ACTOR]'] = self.actor.get_name()
+            if 1 == len(self.targets):
+                self.replacement_variables.generic['[TARGET]'] = self.targets[0].get_name()
+            else:
+                del self.replacement_variables.generic['[TARGET]']
 
         # Ensure dialog is a list and not a str to allow iteration
         if isinstance(dialog, str):
@@ -228,7 +270,7 @@ class GameDialogEvaluator:
                     item_types = item.item_types
                 else:
                     item_types = []
-                item_row_data = self.hero_party.main_character.get_item_row_data(True, item_types)
+                item_row_data = self.hero_party.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
                     self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
                     break
@@ -266,8 +308,10 @@ class GameDialogEvaluator:
                     if item_name == 'gp':
                         check_value = self.hero_party.gp
                     elif item_name == 'lv':
+                        # Check against the level of the main character
                         check_value = self.hero_party.main_character.level.number
                     else:
+                        # Check against the cumulative count for the party
                         check_value = self.hero_party.get_item_count(item_name)
 
                     # print( 'check_value =', check_value, flush=True )
@@ -316,31 +360,31 @@ class GameDialogEvaluator:
                 self.wait_before_new_text = False
                 # print( 'Set self.traverse_dialog_wait_before_new_text to False', flush=True )
 
+                if (ActionCategoryTypeEnum.MAGICAL == item.category
+                        and self.game_state.is_in_combat()
+                        and self.actor.are_spells_blocked):
+                    message_dialog.add_message('But that spell hath been blocked.')
+                    continue
+
                 if item.type == DialogActionEnum.SAVE_GAME:
                     self.game_state.save()
                 elif item.type == DialogActionEnum.MAGIC_RESTORE:
                     if item.count == 'unlimited':
-                        for hero in self.hero_party.members:
-                            hero.mp = hero.level.mp
+                        for target in self.targets:
+                            target.mp = target.max_mp
                     else:
-                        # TODO: Need to know which character to which magic restore should apply
-                        self.hero_party.main_character.mp += GameTypes.get_int_value(item.count)
-                    for hero in self.hero_party.members:
-                        hero.mp = min(hero.mp, hero.level.mp)
-                    GameDialog.create_exploring_status_dialog(
-                        self.hero_party).blit(self.game_state.screen, True)
+                        for target in self.targets:
+                            target.mp = min(target.max_mp, target.mp + GameTypes.get_int_value(item.count))
+                    self.update_status_dialog(True)
 
                 elif item.type == DialogActionEnum.HEALTH_RESTORE:
                     if item.count == 'unlimited':
-                        for hero in self.hero_party.members:
-                            hero.hp = hero.level.hp
+                        for target in self.targets:
+                            target.hp = target.max_hp
                     else:
-                        # TODO: Need to know which character to which health restore should apply
-                        self.hero_party.main_character.hp += GameTypes.get_int_value(item.count)
-                    for hero in self.hero_party.members:
-                        hero.hp = min(hero.hp, hero.level.hp)
-                    GameDialog.create_exploring_status_dialog(
-                        self.hero_party).blit(self.game_state.screen, True)
+                        for target in self.targets:
+                            target.hp = min(target.max_hp, target.hp + GameTypes.get_int_value(item.count))
+                    self.update_status_dialog(True)
 
                 elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
                     # Perform variable replacement
@@ -363,8 +407,7 @@ class GameDialogEvaluator:
                             self.hero_party.gp -= item_count
                             if self.hero_party.gp < 0:
                                 self.hero_party.gp = 0
-                        GameDialog.create_exploring_status_dialog(
-                            self.hero_party).blit(self.game_state.screen, True)
+                        self.update_status_dialog(True)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         item_to_gain = self.game_state.get_item(item_name)
                         if item_to_gain is not None:
@@ -428,7 +471,7 @@ class GameDialogEvaluator:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)
 
-                elif item.type == DialogActionEnum.ATTACK_MONSTER:
+                elif item.type == DialogActionEnum.START_ENCOUNTER:
                     # TODO: Make this work again
                     pass
                     # self.game_state.initiate_encounter(monster_info=self.game_state.get_monster(item.name),
@@ -439,6 +482,36 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.OPEN_DOOR:
                     self.game_state.open_door()
+
+                elif item.type == DialogActionEnum.SLEEP:
+                    worked = False
+                    for target in self.targets:
+                        if self.actor.does_action_work(item.type, item.category, target):
+                            target.is_asleep = True
+                            worked = False
+                            message_dialog.add_message(target.get_name() + ' is asleep.')
+                    if not worked:
+                        message_dialog.add_message('But that spell did not work.')
+
+                elif item.type == DialogActionEnum.STOPSPELL:
+                    worked = False
+                    for target in self.targets:
+                        if self.actor.does_action_work(item.type, item.category, target):
+                            target.are_spells_blocked = True
+                            worked = False
+                            message_dialog.add_message(target.get_name() + "'s spells are blocked.")
+                    if not worked:
+                        message_dialog.add_message('But that spell did not work.')
+
+                elif item.type == DialogActionEnum.DAMAGE_TARGET:
+                    worked = False
+                    for target in self.targets:
+                        if self.actor.does_action_work(item.type, item.category, target):
+                            # TODO: Need to address visualization of damage to target
+                            damage = round(GameTypes.get_int_value(item.count) * target.get_damage_modifier(item.category))
+                            target.hp = max(0, target.hp - damage)
+                    if not worked:
+                        message_dialog.add_message('But that spell did not work.')
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

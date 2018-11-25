@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 from Point import Point
-from GameTypes import Direction
+from GameTypes import CharacterType, Direction
 
 
 class MapCharacterState:
-    def __init__(self, type_name: str, pos_dat_tile: Point, direction: Direction) -> None:
-        self.type_name = type_name
+    def __init__(self, character_type: CharacterType, pos_dat_tile: Point, direction: Direction) -> None:
+        self.character_type = character_type
         self.curr_pos_dat_tile = Point(pos_dat_tile)
         self.dest_pos_dat_tile = Point(pos_dat_tile)
         self.curr_pos_offset_img_px = Point(0, 0)
@@ -14,7 +14,7 @@ class MapCharacterState:
 
     def __str__(self) -> str:
         return "%s(%s, %s, %s, %s, %s)" % (self.__class__.__name__,
-                                           self.type_name,
+                                           self.character_type,
                                            self.curr_pos_dat_tile,
                                            self.dest_pos_dat_tile,
                                            self.curr_pos_offset_img_px,
@@ -22,7 +22,7 @@ class MapCharacterState:
 
     def __repr__(self) -> str:
         return "%s(%r, %r, %r, %r, %r)" % (self.__class__.__name__,
-                                           self.type_name,
+                                           self.character_type,
                                            self.curr_pos_dat_tile,
                                            self.dest_pos_dat_tile,
                                            self.curr_pos_offset_img_px,
@@ -31,7 +31,7 @@ class MapCharacterState:
 
 def main() -> None:
     # Test out character states
-    state = MapCharacterState('myType', Point(5, 6), Direction.SOUTH)
+    state = MapCharacterState(CharacterType.create_null(), Point(5, 6), Direction.SOUTH)
     print(state, flush=True)
     state.direction = Direction.WEST
     print(state, flush=True)

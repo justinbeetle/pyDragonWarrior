@@ -6,10 +6,12 @@ import pygame
 import random
 
 from AudioPlayer import AudioPlayer
+from CombatCharacterState import CombatCharacterState
 from GameState import GameMode, GameState
 from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import Direction, DialogType, LeavingTransition, MonsterActionEnum, MonsterInfo, PointTransition, Tool
+from GameTypes import ActionCategoryTypeEnum, Direction, DialogType, LeavingTransition, MonsterActionEnum, \
+    MonsterInfo, PointTransition, TargetTypeEnum, Tool
 import GameEvents
 from MonsterState import MonsterState
 from Point import Point
@@ -137,59 +139,33 @@ class Game:
                     elif menu_result == 'SEARCH':
                         searching = True
                     elif menu_result == 'SPELL':
-                        # TODO: Need to choose the spellcaster
-                        availableSpellNames = self.game_state.get_available_spell_names()
-                        if len(availableSpellNames) == 0:
+                        # TODO: Need to choose the source (spellcaster)
+                        source = self.game_state.hero_party.main_character
+                        available_spell_names = source.get_available_spell_names()
+                        if len(available_spell_names) == 0:
                             self.gde.dialog_loop('Thou hast not yet learned any spells.')
                         else:
                             menu_dialog = GameDialog.create_menu_dialog(
                                 Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
                                 None,
                                 'SPELLS',
-                                availableSpellNames,
+                                available_spell_names,
                                 1)
                             menu_dialog.blit(self.game_state.screen, True)
                             menu_result = self.gde.get_menu_result(menu_dialog)
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
-                                if self.game_state.hero_party.main_character.mp >= spell.mp:
-                                    self.game_state.hero_party.main_character.mp -= spell.mp
-
-                                    AudioPlayer().play_sound('castSpell.wav')
-                                    SurfaceEffects.flickering(self.game_state.screen)
-
-                                    if spell.max_hp_recover > 0:
-                                        # TODO: Need to choose the target for the spell
-                                        hp_recover = random.randint(spell.min_hp_recover, spell.max_hp_recover)
-                                        self.game_state.hero_party.main_character.hp = min(
-                                            self.game_state.hero_party.main_character.level.hp,
-                                            self.game_state.hero_party.main_character.hp + hp_recover)
-                                    elif spell.name == 'Radiant':
-                                        if (self.game_state.light_diameter is not None
-                                                and self.game_state.light_diameter < 7):
-                                            # TODO: Add diminishing light diameter
-                                            self.game_state.light_diameter = 7
-                                            self.game_state.draw_map()
-                                    elif spell.name == 'Outside':
-                                        # TODO: If not on the overworld map, go to the last coordinates from the
-                                        #       overworld map
-                                        print('Spell not implemented', flush=True)
-                                    elif spell.name == 'Return':
-                                        # TODO: Return shouldn't work from caves and the return coordinates shouldn't be
-                                        #       hardcoded
-                                        for hero in self.game_state.hero_party.members:
-                                            hero.curr_pos_dat_tile = Point(43, 44)
-                                            hero.curr_pos_offset_img_px = Point(0, 0)
-                                            hero.direction = Direction.SOUTH
-                                        self.game_state.set_map('overworld')
-                                    elif spell.name == 'Repel':
-                                        print('Spell not implemented', flush=True)
+                                # TODO: Depending on the spell may need to select the target(s)
+                                targets = [source]
+                                if source.mp >= spell.mp:
+                                    source.mp -= spell.mp
+                                    self.gde.set_actor(source)
+                                    self.gde.set_targets(targets)
+                                    self.gde.dialog_loop(spell.use_dialog)
 
                                     GameDialog.create_exploring_status_dialog(
                                         self.game_state.hero_party).blit(self.game_state.screen, False)
-                                    self.gde.dialog_loop('[NAME] cast the spell of ' + spell.name + '.')
-
                                 else:
                                     self.gde.dialog_loop('Thou dost not have enough magic to cast the spell.')
 
@@ -422,15 +398,11 @@ class Game:
 
                         message_dialog.add_message(self.game_state.hero_party.main_character.name + ' attacks!')
 
-                        # Check for a critical strike
-                        if self.game_state.hero_party.main_character.critical_hit_check(monster):
+                        # Check for damage and a critical strike
+                        (damage, is_critical_hit) = self.game_state.hero_party.main_character.get_attack_damage(monster)
+                        if is_critical_hit:
                             # TODO: Play sound?
                             message_dialog.add_message('Excellent move!')
-                            damage = self.game_state.hero_party.main_character.calc_critical_hit_damage_to_monster(
-                                monster)
-                        else:
-                            damage = self.game_state.hero_party.main_character.calc_regular_hit_damage_to_monster(
-                                monster)
 
                         # Check for a monster dodge
                         if 0 == damage or monster.is_dodging_attack():
@@ -478,7 +450,9 @@ class Game:
                             break
 
                     elif menu_result == 'SPELL':
-                        available_spell_names = self.game_state.get_available_spell_names()
+                        # TODO: Need to choose the source (spellcaster)
+                        source = self.game_state.hero_party.main_character
+                        available_spell_names = source.get_available_spell_names()
                         if len(available_spell_names) == 0:
                             message_dialog.add_message('Thou hast not yet learned any spells.')
                             continue
@@ -494,8 +468,34 @@ class Game:
                             # print( 'menu_result =', menu_result, flush=True )
                             if menu_result is not None:
                                 spell = self.game_state.game_info.spells[menu_result]
-                                if self.game_state.hero_party.main_character.mp >= spell.mp:
+                                # TODO: Depending on the spell may need to select the target(s)
+                                if TargetTypeEnum.SINGLE_ALLY == spell.target_type:
+                                    targets = [source]
+                                elif TargetTypeEnum.ALL_ALLIES == spell.target_type:
+                                    targets = self.game_state.hero_party.members
+                                else:
+                                    targets = [monster]
+                                if source.mp >= spell.mp:
+                                    source.mp -= spell.mp
+                                    self.gde.set_actor(source)
+                                    self.gde.set_targets(targets)
+                                    self.gde.dialog_loop(spell.use_dialog)
+                                    self.gde.restore_default_source_and_target()
+
+
+                                spell = self.game_state.game_info.spells[menu_result]
+                                if self.source.mp >= spell.mp:
+                                    source.mp -= spell.mp
+                                    self.gde.set_actor(source)
+                                    self.gde.set_targets(targets)
+                                    self.gde.dialog_loop(spell.use_dialog)
+
+                                    GameDialog.create_exploring_status_dialog(
+                                        self.game_state.hero_party).blit(self.game_state.screen, False)
+
+
                                     self.game_state.hero_party.main_character.mp -= spell.mp
+
 
                                     AudioPlayer().play_sound('castSpell.wav')
                                     SurfaceEffects.flickering(self.game_state.screen)
@@ -581,87 +581,60 @@ class Game:
                 break
 
             # Determine the monster action
-            chosen_monster_action = MonsterActionEnum.ATTACK
-            for monster_action in monster.monster_info.monster_actions:
+            target = self.game_state.hero_party.main_character
+            chosen_monster_action = self.game_state.game_info.default_monster_action
+            for monster_action_rule in monster.monster_info.monster_action_rules:
                 monster_health_ratio = monster.hp / monster.max_hp
-                if monster_health_ratio > monster_action.health_ratio_threshold:
+                if monster_health_ratio > monster_action_rule.health_ratio_threshold:
                     continue
-                if (MonsterActionEnum.SLEEP == monster_action.type
-                        and self.game_state.hero_party.main_character.is_asleep):
+                if monster_action_rule.action.is_sleep_action() and target.is_asleep:
                     continue
-                if (MonsterActionEnum.STOPSPELL == monster_action.type
-                        and self.game_state.hero_party.main_character.are_spells_blocked):
+                if monster_action_rule.action.is_stopspell_action() and target.are_spells_blocked:
                     continue
-                if random.uniform(0, 1) < monster_action.probability:
-                    chosen_monster_action = monster_action.type
+                if random.uniform(0, 1) < monster_action_rule.probability:
+                    chosen_monster_action = monster_action_rule.action
                     break
 
             # Perform the monster action
             damage = 0
-            if chosen_monster_action == MonsterActionEnum.HEAL or chosen_monster_action == MonsterActionEnum.HEALMORE:
+            if chosen_monster_action.spell is not None:
+                spell = chosen_monster_action.spell
                 AudioPlayer().play_sound('castSpell.wav')
                 SurfaceEffects.flickering(self.game_state.screen)
-                if chosen_monster_action == MonsterActionEnum.HEAL:
-                    message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of heal.')
-                else:
-                    message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of healmore.')
-                if monster.are_spells_blocked:
-                    message_dialog.add_message('But that spell hath been blocked.')
-                else:
+                message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of '
+                                           + chosen_monster_action.name.lower() + '.')
+                if not monster.does_spell_work(spell, target):
+                    if monster.are_spells_blocked:
+                        message_dialog.add_message('But that spell hath been blocked.')
+                    else:
+                        message_dialog.add_message('But that spell did not work.')
+                elif chosen_monster_action.is_heal_action():
                     message_dialog.add_message('The ' + monster.get_name() + ' hath recovered.')
                     monster.hp = monster.max_hp
-            elif chosen_monster_action == MonsterActionEnum.HURT or chosen_monster_action == MonsterActionEnum.HURTMORE:
-                AudioPlayer().play_sound('castSpell.wav')
-                SurfaceEffects.flickering(self.game_state.screen)
-                if chosen_monster_action == MonsterActionEnum.HURT:
-                    spell = self.game_state.game_info.spells['Hurt']
-                else:
-                    spell = self.game_state.game_info.spells['Hurtmore']
-                message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of '
-                                           + spell.name.lower() + '.')
-                damage = random.randint(spell.min_damage_by_monster, spell.max_damage_by_monster)
-                if self.game_state.hero_party.main_character.armor is not None:
-                    # TODO: Allow damage reduction from other sources
-                    damage = round(damage * self.game_state.hero_party.main_character.armor.hurt_dmg_modifier)
-                if not monster.does_spell_work(spell, self.game_state.hero_party.main_character):
-                    message_dialog.add_message('But that spell hath been blocked.')
-                    damage = 0
-            elif chosen_monster_action == MonsterActionEnum.SLEEP:
-                AudioPlayer().play_sound('castSpell.wav')
-                SurfaceEffects.flickering(self.game_state.screen)
-                message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of sleep.')
-                if monster.does_spell_work(self.game_state.game_info.spells['Sleep'],
-                                           self.game_state.hero_party.main_character):
+                elif chosen_monster_action.is_damage_action():
+                    damage = CombatCharacterState.calc_damage(spell.min_damage_by_monster,
+                                                              spell.max_damage_by_monster,
+                                                              target,
+                                                              ActionCategoryTypeEnum.MAGICAL)
+                elif chosen_monster_action.is_sleep_action():
                     message_dialog.add_message('Thou art asleep.')
-                    self.game_state.hero_party.main_character.is_asleep = True
+                    target.is_asleep = True
+                elif chosen_monster_action.is_stopspell_action():
+                    message_dialog.add_message(target.get_name() + "'s spells hath been blocked.")
+                    target.are_spells_blocked = True
                 else:
-                    message_dialog.add_message('But that spell hath been blocked.')
-            elif chosen_monster_action == MonsterActionEnum.STOPSPELL:
-                AudioPlayer().play_sound('castSpell.wav')
-                SurfaceEffects.flickering(self.game_state.screen)
-                message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of stopspell.')
-                if monster.does_spell_work(self.game_state.game_info.spells['Stopspell'],
-                                           self.game_state.hero_party.main_character):
-                    message_dialog.add_message(self.game_state.hero_party.main_character.name
-                                               + "'s spells hath been blocked.")
-                    self.game_state.hero_party.main_character.are_spells_blocked = True
-                else:
-                    # TODO: Different messages depending on why the spell did not work?
-                    message_dialog.add_message('But that spell did not work.')
-                    # message_dialog.add_message('But that spell hath been blocked.')
-            elif (chosen_monster_action == MonsterActionEnum.BREATH_FIRE
-                  or chosen_monster_action == MonsterActionEnum.BREATH_STRONG_FIRE):
+                    print('ERROR: Failed to perform action ', chosen_monster_action, flush=True)
+            elif chosen_monster_action.is_fire_attack():
                 AudioPlayer().play_sound('fireBreathingAttack.wav')
                 message_dialog.add_message('The ' + monster.get_name() + ' is breathing fire.')
-                if chosen_monster_action == MonsterActionEnum.BREATH_FIRE:
-                    damage = random.randint(16, 23)
-                else:
-                    damage = random.randint(65, 72)
-                if self.game_state.hero_party.main_character.armor is not None:
-                    # TODO: Allow damage reduction from other sources
-                    damage = round(damage * self.game_state.hero_party.main_character.armor.fire_dmg_modifier)
-            else:  # chosen_monster_action == MonsterActionEnum.ATTACK
-                damage = self.game_state.hero_party.main_character.calc_hit_damage_from_monster(monster)
+                damage_range = chosen_monster_action.get_damage_range()
+                print('fire damage_range =', damage_range, flush=True)
+                damage = CombatCharacterState.calc_damage(damage_range[0],
+                                                          damage_range[1],
+                                                          target,
+                                                          ActionCategoryTypeEnum.FIRE)
+            else:  # regular attack
+                damage = monster.get_attack_damage(self.game_state.hero_party.main_character)[0]
                 if 0 == damage:
                     # TODO: Play sound?
                     message_dialog.add_message(
@@ -712,7 +685,7 @@ class Game:
             self.game_state.hero_party.main_character.xp += monster.xp
             GameDialog.create_exploring_status_dialog(
                 self.game_state.hero_party).blit(self.game_state.screen, False)
-            if self.game_state.hero_party.main_character.level_up_check(self.game_state.game_info.levels):
+            if self.game_state.hero_party.main_character.level_up_check():
                 self.gde.wait_for_acknowledgement(message_dialog)
                 audio_player.play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
                 message_dialog.add_message(

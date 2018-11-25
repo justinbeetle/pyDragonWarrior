@@ -13,7 +13,7 @@ import random
 # from CombatEncounter import CombatEncounter
 # from GameDialog import GameDialog
 from GameTypes import DialogReplacementVariables, DialogType, Direction, ItemType, LeavingTransition, Level, \
-    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Tile
+    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Spell, Tile
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
@@ -66,12 +66,11 @@ class GameState(GameStateInterface):
 
         # Set character state for new game
         self.pending_dialog = self.game_info.initial_state_dialog
-        pc = HeroState('hero_sword_and_shield',
+        pc = HeroState(self.game_info.character_types['hero_sword_and_shield'],
                        self.game_info.initial_hero_pos_dat_tile,
                        self.game_info.initial_hero_pos_dir,
                        self.game_info.pc_name,
-                       HeroState.calc_level(self.game_info.levels, self.game_info.pc_xp))
-        pc.xp = self.game_info.pc_xp
+                       self.game_info.pc_xp)
         if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
             pc.hp = self.game_info.pc_hp
         if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
@@ -252,23 +251,6 @@ class GameState(GameStateInterface):
         save_game_file = open(save_game_file_path, 'w')
         save_game_file.write(xml_string)
         save_game_file.close()
-
-    def get_castable_combat_spell_names(self) -> List[str]:  # TODO: This should be a method in HeroState
-        return self.game_info.get_castable_spell_names(
-            True,
-            self.hero_party.main_character.level,
-            self.hero_party.main_character.mp,
-            self.map_state.name)
-
-    def get_castable_non_combat_spell_names(self) -> List[str]:  # TODO: This should be a method in HeroState
-        return self.game_info.get_castable_spell_names(
-            False,
-            self.hero_party.main_character.level,
-            self.hero_party.main_character.mp,
-            self.map_state.name)
-
-    def get_available_spell_names(self) -> List[str]:  # TODO: This should be a method in HeroState
-        return self.game_info.get_available_spell_names(self.hero_party.main_character.level)
 
     def get_map_image_rect(self) -> pygame.Rect:
         # Always rendering to the entire screen but need to determine the
@@ -503,7 +485,7 @@ class GameState(GameStateInterface):
                 else:
                     character_images = self.game_info.character_types['hero'].images
             else:
-                character_images = self.game_info.character_types[character.type_name].images
+                character_images = character.character_type.images
             self.screen.blit(
                 character_images[character.direction][self.phase],
                 self.get_tile_screen_rect(
@@ -710,8 +692,7 @@ class GameState(GameStateInterface):
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
         variables = DialogReplacementVariables()
         variables.generic['[NAME]'] = self.hero_party.main_character.get_name()
-        variables.generic['[NEXT_LEVEL_XP]'] = str(
-            self.hero_party.main_character.calc_xp_to_next_level(self.game_info.levels))
+        variables.generic['[NEXT_LEVEL_XP]'] = str(self.hero_party.main_character.calc_xp_to_next_level())
         map_origin = self.game_info.maps[self.map_state.name].origin
         if map_origin is not None:
             map_coord = self.hero_party.get_curr_pos_dat_tile() - map_origin
@@ -732,8 +713,8 @@ class GameState(GameStateInterface):
             return self.game_info.items[name]
         return None
 
-    def get_levels(self, character_type: str) -> List[Level]:
-        return self.game_info.levels
+    def get_spells(self) -> Dict[str, Spell]:
+        return self.game_info.spells
 
     def get_dialog_sequences(self) -> Dict[str, DialogType]:
         return self.game_info.dialog_sequences
@@ -762,7 +743,7 @@ class GameState(GameStateInterface):
     def get_win_size_pixels(self) -> Point:
         return self.win_size_pixels
 
-    def get_tile_size_pixels(self) -> Point:
+    def get_tile_size_pixels(self) -> int:
         return self.game_info.tile_size_pixels
 
 

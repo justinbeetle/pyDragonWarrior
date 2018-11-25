@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 from __future__ import annotations
+from typing import Tuple
 
 import abc
+import math
 import random
 
-from GameTypes import Spell
+from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, Spell
 
 
 class CombatCharacterState(metaclass=abc.ABCMeta):
@@ -39,6 +41,22 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
 
     def is_still_in_combat(self) -> bool:
         return self.is_alive() and not self.has_run_away
+
+    # TODO: In progress work to generalize and replace does_spell_work with does_action_work
+    def does_action_work(self,
+                         action: DialogActionEnum,
+                         category: ActionCategoryTypeEnum,
+                         target: CombatCharacterState,
+                         bypass_resistance: bool = False) -> bool:
+        if ActionCategoryTypeEnum.MAGICAL == category and self.are_spells_blocked:
+            return False
+        if DialogActionEnum.SLEEP == action and target.is_asleep:
+            return False
+        if DialogActionEnum.STOPSPELL == action and target.are_spells_blocked:
+            return False
+        if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
+            return False
+        return True
 
     def does_spell_work(self, spell: Spell, target: CombatCharacterState) -> bool:
         if self.are_spells_blocked:
@@ -80,9 +98,36 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def allows_critical_hits(self) -> bool:
         raise NotImplementedError
 
+    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
+    @abc.abstractmethod
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
+        raise NotImplementedError
+
     @abc.abstractmethod
     def get_spell_resistance(self, spell: Spell) -> float:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
+        raise NotImplementedError
+
+    # Return damage along with a bool indicating whether the attack was a critical hit
+    @abc.abstractmethod
+    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+        raise NotImplementedError
+
+    @staticmethod
+    def calc_damage(min_damage: int, max_damage: int, target: CombatCharacterState, damage_type: ActionCategoryTypeEnum) -> int:
+        # print('min_damage =', min_damage, flush=True)
+        # print('max_damage =', max_damage, flush=True)
+        modifier = target.get_damage_modifier(damage_type)
+        damage = math.floor(min_damage + random.uniform(0, 1) * (max_damage - min_damage) * modifier)
+        if damage < 1:
+            if random.uniform(0, 1) < 0.5:
+                damage = 0
+            else:
+                damage = 1
+        return damage
 
     def __str__(self) -> str:
         return "%s(%s, %s, %s, %s, %s)" % (
