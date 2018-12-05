@@ -11,7 +11,7 @@ import random
 
 
 # from CombatEncounter import CombatEncounter
-# from GameDialog import GameDialog
+from GameDialog import GameDialog
 from GameTypes import DialogReplacementVariables, DialogType, Direction, ItemType, LeavingTransition, Level, \
     MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Spell, Tile
 from GameInfo import GameInfo
@@ -722,11 +722,6 @@ class GameState(GameStateInterface):
     def get_tile(self, name: str) -> Tile:
         return self.game_info.tiles[name]
 
-    def get_monster(self, name: str) -> Optional[MonsterInfo]:
-        if name in self.game_info.monsters:
-            return self.game_info.monsters[name]
-        return None
-
     def is_in_combat(self) -> bool:
         return GameMode.ENCOUNTER == self.game_mode
 
@@ -745,6 +740,20 @@ class GameState(GameStateInterface):
 
     def get_tile_size_pixels(self) -> int:
         return self.game_info.tile_size_pixels
+
+    def initiate_encounter(self,
+                           monster_info: MonsterInfo,
+                           approach_dialog: Optional[DialogType],
+                           victory_dialog: Optional[DialogType],
+                           run_away_dialog: Optional[DialogType],
+                           encounter_music: Optional[str],
+                           message_dialog: Optional[GameDialog]) -> None:
+        # TODO: Restore support for this
+        print('ERROR: initiate_encounter is not currently implemented', flush=True)
+
+    def handle_death(self) -> None:
+        # TODO: Restore support for this
+        print('ERROR: handle_death is not currently implemented', flush=True)
 
 
 def main() -> None:

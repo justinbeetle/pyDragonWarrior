@@ -1,3 +1,20 @@
+Current Efforts:
+   Dialog scripting of items, spells, and monster actions
+   Allow dialog evaluation to trigger monster and player damage effects
+   Get standalone combat testing from CombatEncounter.py and test with both party sizes of 1 and greater
+   Drop CombatEncounter.py into Game.py
+   Get test saves for testing all quest encounters
+   Get fairy flute to work on Golum correctly
+   Look into the damage calculations - seeming a little funky
+   More sets of updates to GameDialog - add class for row data and allow multiple row data entries to support a nicer gold display at bottom.  More spacing types to fix the status display for larger party sizes.
+   Add character selection from menu and target selection for spells, etc.
+   Add trading of items between characters
+   Add color changes to dialogs based on party health
+
+
+
+
+
 1)  Render a sample overworld - DONE!
 2)  Move around the overworld - DONE!
 3)  Move around but block on mountains and water - DONE!
@@ -25,7 +42,7 @@
 25) Add spells - Partially implemented
 26) Add item control (equip, unequip, drop, use) - DONE!
 27) Improved monster AI (running, spells, different attack types) - Partially implemented
-28) game.xml changes to make it easier to specify chest contents
+28) game.xml changes to make it easier to specify chest contents - Partially implemented
 29) game.xml changes to make it easier to specify transitions
 30) Add special monsters - Partially implemented
 31) Door, chest, hidden item, and special monster respawn control - Partially implemented
@@ -61,3 +78,7 @@ Raise an army
    Construct forts to defend against the monster hordes
    Recruit and rescue other knights to man them
    Fight to reclaim forts claimed by the monsters
+
+Cam's Great Ideas:
+   Erdrick's Shield - find in pieces, need a gem to put them back together
+   			find sword first, then both gems (for sword and shield), and guys (special monsters) trying to stop you from getting it 

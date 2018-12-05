@@ -7,6 +7,7 @@ from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, M
 import abc
 import pygame
 
+from GameDialog import GameDialog
 from GenericGameState import GenericGameState
 from HeroParty import HeroParty
 from Point import Point
@@ -38,11 +39,6 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_tile(self, name: str) -> Tile:
-        raise NotImplementedError
-
-    # TODO: Remove and instead get from GameInfo
-    @abc.abstractmethod
-    def get_monster(self, name: str) -> Optional[MonsterInfo]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -107,4 +103,18 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_tile_size_pixels(self) -> int:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def initiate_encounter(self,
+                           monster_info: MonsterInfo,
+                           approach_dialog: Optional[DialogType],
+                           victory_dialog: Optional[DialogType],
+                           run_away_dialog: Optional[DialogType],
+                           encounter_music: Optional[str],
+                           message_dialog: Optional[GameDialog]) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def handle_death(self) -> None:
         raise NotImplementedError

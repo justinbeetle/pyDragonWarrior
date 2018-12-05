@@ -315,6 +315,101 @@ class GameInfo:
                                                                  character_type_images,
                                                                  character_levels)
 
+        # Parse monster actions
+        monster_actions: Dict[str, MonsterAction] = {}
+        for element in xml_root.findall("./MonsterActions/MonsterAction"):
+            action_name = element.attrib['name']
+            spell = None
+            target_type = TargetTypeEnum.SINGLE_ENEMY
+            if 'spell' in element.attrib and element.attrib['spell'] in self.spells:
+                spell = self.spells[element.attrib['spell']]
+                target_type = spell.target_type
+                use_dialog = spell.use_dialog
+            else:
+                if 'target' in element.attrib:
+                    target_type = TargetTypeEnum[element.attrib['target']]
+                use_dialog = self.parse_dialog(element)
+            if target_type is None:
+                print('ERROR: No target type for monster action', action_name, flush=True)
+                continue
+            if use_dialog is None:
+                print('ERROR: No use dialog for monster action', action_name, flush=True)
+                continue
+            monster_actions[action_name] = MonsterAction(action_name,
+                                                         spell,
+                                                         target_type,
+                                                         use_dialog)
+
+        # Get default monster action
+        monster_actions_element = xml_root.find('MonsterActions')
+        if monster_actions_element is not None and 'default' in monster_actions_element:
+            self.default_monster_action = monster_actions[monster_actions_element.attrib['default']]
+        else:
+            self.default_monster_action = next(iter(monster_actions.values()))
+
+        # Parse monsters
+        self.monsters: Dict[str, MonsterInfo] = {}
+        for element in xml_root.findall("./Monsters/Monster"):
+            monster_name = element.attrib['name']
+
+            monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
+            unscaled_monster_image = pygame.image.load(monster_image_file_name).convert()
+            monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                   (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                    unscaled_monster_image.get_height() * monster_scale_factor))
+            monster_image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
+
+            dmg_image = monster_image.copy()
+            for x in range(dmg_image.get_width()):
+                for y in range(dmg_image.get_height()):
+                    if dmg_image.get_at((x, y)) != GameInfo.TRANSPARENT_COLOR:
+                        dmg_image.set_at((x, y), pygame.Color('red'))
+
+            (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
+            (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
+
+            monster_action_rules = []
+            for monster_action_rules_element in element.findall("./MonsterActionRule"):
+                health_ratio_threshold = 1.0
+                if 'healthRatioThreshold' in monster_action_rules_element.attrib:
+                    health_ratio_threshold = float(monster_action_rules_element.attrib['healthRatioThreshold'])
+                monster_action_rules.append(MonsterActionRule(
+                    monster_actions[monster_action_rules_element.attrib['type']],
+                    float(monster_action_rules_element.attrib['probability']),
+                    health_ratio_threshold))
+
+            allows_critical_hits = True
+            if 'allowsCriticalHits' in element.attrib:
+                allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
+
+            self.monsters[monster_name] = MonsterInfo(
+                monster_name,
+                monster_image,
+                dmg_image,
+                int(element.attrib['strength']),
+                int(element.attrib['agility']),
+                min_hp,
+                max_hp,
+                GameTypes.parse_float(element.attrib['sleepResist']),
+                GameTypes.parse_float(element.attrib['stopspellResist']),
+                GameTypes.parse_float(element.attrib['hurtResist']),
+                GameTypes.parse_float(element.attrib['dodge']),
+                GameTypes.parse_float(element.attrib['blockFactor']),
+                int(element.attrib['xp']),
+                min_gp,
+                max_gp,
+                monster_action_rules,
+                allows_critical_hits)
+
+        # Parse monster sets
+        self.monster_sets: Dict[str, List[str]] = {}
+        for element in xml_root.findall("./MonsterSets/MonsterSet"):
+            monsters: List[str] = []
+            for monster_element in element.findall("./Monster"):
+                monsters.append(monster_element.attrib['name'])
+            self.monster_sets[element.attrib['name']] = monsters
+            self.monster_sets[element.attrib['name']] = monsters
+
         # Parse maps
         self.maps: Dict[str, Map] = {}
         for element in xml_root.findall("./Maps/Map"):
@@ -434,7 +529,7 @@ class GameInfo:
                 if 'inverseProgressMarker' in monster_element.attrib:
                     inverse_progress_marker = monster_element.attrib['inverseProgressMarker']
                 special_monsters.append(SpecialMonster(
-                    monster_element.attrib['name'],
+                    self.monsters[monster_element.attrib['name']],
                     Point(int(monster_element.attrib['x']),
                           int(monster_element.attrib['y'])),
                     victory_dialog,
@@ -524,96 +619,6 @@ class GameInfo:
             dialog_script = self.parse_dialog(element)
             if dialog_script is not None:
                 self.dialog_sequences[element.attrib['label']] = dialog_script
-
-        # Parse monster actions
-        monster_actions: Dict[str, MonsterAction] = {}
-        for element in xml_root.findall("./MonsterActions/MonsterAction"):
-            action_name = element.attrib['name']
-            spell = None
-            target_type = TargetTypeEnum.SINGLE_ENEMY
-            use_dialog = None
-            if 'spell' in element.attrib and element.attrib['spell'] in self.spells:
-                spell = self.spells[element.attrib['spell']]
-                target_type = spell.target_type
-                use_dialog = spell.use_dialog
-            else:
-                if 'target' in element.attrib:
-                    target_type = TargetTypeEnum[element.attrib['target']]
-                use_dialog = self.parse_dialog(element)
-            if target_type is None:
-                print('ERROR: No target type for monster action', action_name, flush=True)
-                continue
-            if use_dialog is None:
-                print('ERROR: No use dialog for monster action', action_name, flush=True)
-                continue
-            monster_actions[action_name] = MonsterAction(action_name,
-                                                              spell,
-                                                              target_type,
-                                                              use_dialog)
-        self.default_monster_action = monster_actions[xml_root.find('MonsterActions').attrib['default']]
-
-        # Parse monsters
-        self.monsters: Dict[str, MonsterInfo] = {}
-        for element in xml_root.findall("./Monsters/Monster"):
-            monster_name = element.attrib['name']
-
-            monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
-            unscaled_monster_image = pygame.image.load(monster_image_file_name).convert()
-            monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                   (unscaled_monster_image.get_width() * monster_scale_factor,
-                                                    unscaled_monster_image.get_height() * monster_scale_factor))
-            monster_image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
-
-            dmg_image = monster_image.copy()
-            for x in range(dmg_image.get_width()):
-                for y in range(dmg_image.get_height()):
-                    if dmg_image.get_at((x, y)) != GameInfo.TRANSPARENT_COLOR:
-                        dmg_image.set_at((x, y), pygame.Color('red'))
-
-            (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
-            (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
-
-            monster_action_rules = []
-            for monster_action_rules_element in element.findall("./MonsterActionRule"):
-                health_ratio_threshold = 1.0
-                if 'healthRatioThreshold' in monster_action_rules_element.attrib:
-                    health_ratio_threshold = float(monster_action_rules_element.attrib['healthRatioThreshold'])
-                monster_action_rules.append(MonsterActionRule(
-                    monster_actions[monster_action_rules_element.attrib['type']],
-                    float(monster_action_rules_element.attrib['probability']),
-                    health_ratio_threshold))
-
-            allows_critical_hits = True
-            if 'allowsCriticalHits' in element.attrib:
-                allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
-         
-            self.monsters[monster_name] = MonsterInfo(
-                monster_name,
-                monster_image,
-                dmg_image,
-                int(element.attrib['strength']),
-                int(element.attrib['agility']),
-                min_hp,
-                max_hp,
-                GameTypes.parse_float(element.attrib['sleepResist']),
-                GameTypes.parse_float(element.attrib['stopspellResist']),
-                GameTypes.parse_float(element.attrib['hurtResist']),
-                GameTypes.parse_float(element.attrib['dodge']),
-                GameTypes.parse_float(element.attrib['blockFactor']),
-                int(element.attrib['xp']),
-                min_gp,
-                max_gp,
-                monster_action_rules,
-                allows_critical_hits)
-         
-        # Parse monster sets
-        self.monster_sets: Dict[str, List[str]] = {}
-        for element in xml_root.findall("./MonsterSets/MonsterSet"):
-            monsters: List[str] = []
-            for monster_element in element.findall("./Monster"):
-                monsters.append(monster_element.attrib['name'])
-            self.monster_sets[element.attrib['name']] = monsters
-            self.monster_sets[element.attrib['name']] = monsters
          
         # Parse initial game state
         self.pc_name = ''

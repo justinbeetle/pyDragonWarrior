@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Optional, Union
+from typing import cast, List, Optional, Union
 
 import pygame
 import random
@@ -30,8 +30,8 @@ class Game:
                                     desired_win_size_pixels,
                                     tile_size_pixels,
                                     saved_game_file)
-        self.gde = GameDialogEvaluator(self.game_state)
-        GameDialog.init(self.game_state.win_size_tiles, tile_size_pixels)
+        self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
+        GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
 
     def run_game_loop(self) -> None:
         self.game_state.is_running = True
@@ -161,7 +161,7 @@ class Game:
                                 if source.mp >= spell.mp:
                                     source.mp -= spell.mp
                                     self.gde.set_actor(source)
-                                    self.gde.set_targets(targets)
+                                    self.gde.set_targets(cast(List[CombatCharacterState], targets))
                                     self.gde.dialog_loop(spell.use_dialog)
 
                                     GameDialog.create_exploring_status_dialog(
@@ -293,12 +293,12 @@ class Game:
         orig_screen = self.game_state.screen.copy()
 
         # Determine the monster for the encounter
-        special_monster_info = None
         if monster_info is None:
             # Check for special monsters
             special_monster_info = self.game_state.get_special_monster()
             if special_monster_info is not None:
-                monster_info = self.game_state.game_info.monsters[special_monster_info.name]
+                monster = MonsterState(special_monster_info)
+                monster_info = special_monster_info.monster_info
                 victory_dialog = special_monster_info.victory_dialog
                 run_away_dialog = special_monster_info.run_away_dialog
 
@@ -306,10 +306,10 @@ class Game:
             if monster_info is None:
                 monster_info = self.game_state.game_info.monsters[
                     random.choice(self.game_state.get_tile_monsters())]
+                monster = MonsterState(monster_info)
 
         # Initialize hero and monster  states
         self.game_state.hero_party.clear_combat_status_affects()
-        monster = MonsterState(monster_info, special_monster_info)
 
         # Start encounter music
         if encounter_music is None:
@@ -470,9 +470,9 @@ class Game:
                                 spell = self.game_state.game_info.spells[menu_result]
                                 # TODO: Depending on the spell may need to select the target(s)
                                 if TargetTypeEnum.SINGLE_ALLY == spell.target_type:
-                                    targets = [source]
+                                    targets: List[CombatCharacterState] = [source]
                                 elif TargetTypeEnum.ALL_ALLIES == spell.target_type:
-                                    targets = self.game_state.hero_party.members
+                                    targets = cast(List[CombatCharacterState], self.game_state.hero_party.members)
                                 else:
                                     targets = [monster]
                                 if source.mp >= spell.mp:
@@ -482,20 +482,8 @@ class Game:
                                     self.gde.dialog_loop(spell.use_dialog)
                                     self.gde.restore_default_source_and_target()
 
-
-                                spell = self.game_state.game_info.spells[menu_result]
-                                if self.source.mp >= spell.mp:
-                                    source.mp -= spell.mp
-                                    self.gde.set_actor(source)
-                                    self.gde.set_targets(targets)
-                                    self.gde.dialog_loop(spell.use_dialog)
-
                                     GameDialog.create_exploring_status_dialog(
                                         self.game_state.hero_party).blit(self.game_state.screen, False)
-
-
-                                    self.game_state.hero_party.main_character.mp -= spell.mp
-
 
                                     AudioPlayer().play_sound('castSpell.wav')
                                     SurfaceEffects.flickering(self.game_state.screen)

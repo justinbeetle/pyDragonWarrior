@@ -15,6 +15,7 @@ Images:
    https://github.com/bobbylight/DragonWarriorJS/tree/master/src/res
    http://mikesrpgcenter.com/dw1/index.html
    http://www.realmofdarkness.net/dq/games/nes/dw
+   http://www.realmofdarkness.net/dq/games/snes/dq3/maps
    https://www.spriters-resource.com/nes/D.html
 
 Formulas:     https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/61640
@@ -22,6 +23,7 @@ Item Info:    https://strategywiki.org/wiki/Dragon_Warrior/Items_and_Equipment
 Level Info:   https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/18342
 Monster Info: http://www.woodus.com/den/games/dw1nes/monsters.php
 Gameplay:     https://www.youtube.com/watch?v=jmzHrNVelL0&t=551s
+Dialog:       https://gamefaqs.gamespot.com/nes/563408-dragon-warrior/faqs/54647
 
 
 
@@ -51,7 +53,7 @@ python -m pip install --upgrade pygame
 python -m pip install --upgrade pyinstaller
 python -m pip install --upgrade mypy
 
-python -m mypy Point.py --strict --ignore-missing-imports"
+python -m mypy Point.py --strict --ignore-missing-imports
 
 
 cd C:\Users\Justin\Desktop\Adventure\Adventure

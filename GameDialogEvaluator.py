@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
-from typing import Optional, List, Union
+from typing import cast, Optional, List, Union
 
 import pygame
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
+from CombatEncounterInterface import CombatEncounterInterface
 from GameDialog import GameDialog, GameDialogSpacing
 from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
     DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, \
     DialogVendorSellOptions, DialogVendorSellOptionsVariable, GameTypes
+from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
 from Point import Point
@@ -17,20 +19,25 @@ import SurfaceEffects
 
 
 class GameDialogEvaluator:
-    def __init__(self, game_state: GameStateInterface) -> None:
+    def __init__(self,
+                 game_info: GameInfo,
+                 game_state: GameStateInterface,
+                 combat_encounter: Optional[CombatEncounterInterface] = None) -> None:
+        self.game_info = game_info
         self.game_state = game_state
+        self.combat_encounter = combat_encounter
         self.hero_party = game_state.get_hero_party()
         self.replacement_variables = game_state.get_dialog_replacement_variables()
         self.wait_before_new_text = False
 
         self.actor: CombatCharacterState = self.hero_party.main_character
-        self.targets: List[CombatCharacterState] = self.hero_party.members
+        self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
 
     # Set the source - the source may be called out for performing an action
     # The target may be called out in the dialog associated with the action
-    def set_actor(self, source: CombatCharacterState) -> None:
-        self.actor = source
-        self.replacement_variables.generic['[ACTOR]'] = source.get_name()
+    def set_actor(self, actor: CombatCharacterState) -> None:
+        self.actor = actor
+        self.replacement_variables.generic['[ACTOR]'] = actor.get_name()
 
     # Set the targets on which actions will be performed
     # When the target is singular, it may be called out in the dialog associated with the action
@@ -43,7 +50,10 @@ class GameDialogEvaluator:
 
     def restore_default_source_and_target(self) -> None:
         self.set_actor(self.hero_party.main_character)
-        self.set_targets(self.hero_party.members)
+        self.set_targets(cast(List[CombatCharacterState], self.hero_party.members))
+
+    def set_combat_encounter(self, combat_encounter: CombatEncounterInterface) -> None:
+        self.combat_encounter = combat_encounter
 
     def dialog_loop(self, dialog: Union[DialogType, str]) -> None:
         # Save off initial background image and key repeat settings
@@ -179,8 +189,13 @@ class GameDialogEvaluator:
                 #   print('Not waiting because self.traverse_dialog_wait_before_new_text is False', flush=True)
 
                 # Perform variable replacement
+                # If a replacement is made, perform capitalization fixing to ensure that any replacement variables
+                # at the start of a sentence are appropriately capitalized.
+                orig_item = item
                 for variable in self.replacement_variables.generic:
                     item = item.replace(variable, str(self.replacement_variables.generic[variable]))
+                if orig_item != item:
+                    item = GameDialog.fix_capitalization(item)
 
                 if not message_dialog.is_empty():
                     message_dialog.add_message('')
@@ -472,13 +487,15 @@ class GameDialogEvaluator:
                               flush=True)
 
                 elif item.type == DialogActionEnum.START_ENCOUNTER:
-                    # TODO: Make this work again
-                    pass
-                    # self.game_state.initiate_encounter(monster_info=self.game_state.get_monster(item.name),
-                    #                                   victory_dialog=item.victory_dialog,
-                    #                                   run_away_dialog=item.run_away_dialog,
-                    #                                   encounter_music=item.encounter_music,
-                    #                                   message_dialog=message_dialog)
+                    if item.name is None or item.name not in self.game_info.monsters:
+                        print('ERROR: No defined monster with name', item.name, flush=True)
+                    else:
+                        self.game_state.initiate_encounter(monster_info=self.game_info.monsters[item.name],
+                                                           approach_dialog=item.approach_dialog,
+                                                           victory_dialog=item.victory_dialog,
+                                                           run_away_dialog=item.run_away_dialog,
+                                                           encounter_music=item.encounter_music,
+                                                           message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.OPEN_DOOR:
                     self.game_state.open_door()
@@ -505,13 +522,20 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
+                    damagedTargets = []
                     for target in self.targets:
                         if self.actor.does_action_work(item.type, item.category, target):
+                            worked = True
                             # TODO: Need to address visualization of damage to target
                             damage = round(GameTypes.get_int_value(item.count) * target.get_damage_modifier(item.category))
-                            target.hp = max(0, target.hp - damage)
+                            if 0 < damage:
+                                damagedTargets.append(target)
+                                target.hp = max(0, target.hp - damage)
                     if not worked:
+                        # TODO: May not have been a spell - handle that as well
                         message_dialog.add_message('But that spell did not work.')
+                    elif 0 < len(damagedTargets) and self.combat_encounter is not None:
+                        self.combat_encounter.render_damage_to_targets(damagedTargets)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

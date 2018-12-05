@@ -1496,6 +1496,7 @@
 
    <MonsterActions default="Attack">
       <MonsterAction name="Attack"           target="SINGLE_ENEMY">
+         <Dialog>[ACTOR] attacks!</Dialog>
          <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
 
       <MonsterAction name="Heal"             spell="Heal"/>
@@ -1511,11 +1512,89 @@
       <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
 
       <MonsterAction name="BreathFire"       target="SINGLE_ENEMY">
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
 
       <MonsterAction name="BreathStrongFire" target="SINGLE_ENEMY">
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
    </MonsterActions>
+
+<!--
+MC/PC actually different for different party members, or branching based on party size?
+
+Monster approach:                         A [ACTOR] draws near!
+
+Monster initiative MC:                    The [ACTOR] attacked before [TARGET] was ready.
+Monster initiative PC:                    The [ACTOR] attacked before [TARGET] was ready.
+
+MC spell cast:                            [ACTOR] cast the spell of [SPELLNAME].
+PC spell cast:                            [ACTOR] cast the spell of [SPELLNAME].
+Monster spell cast:                       The [ACTOR] cast the spell of [SPELLNAME].
+
+TODO: Combine these into the prior sentence
+Spell did not work due to STOPSPELL:      But that spell hath been blocked.
+Spell did not work for any other reason:  But that spell did not work.
+
+sleep success against MC:                 Thou art asleep.
+sleep success against PC:                 [TARGET] is asleep.
+sleep success against monster:            Thou has put the [TARGET] to sleep.
+
+MC still asleep:                          Thou art still asleep.
+PC still asleep:                          [ACTOR] is asleep.
+Monster still asleep:                     The [ACTOR] is asleep.
+
+MC wakes:                                 [ACTOR] awakes.
+PC wakes:                                 [ACTOR] awakes.
+Monster wakes:                            The [ACTOR] hath woken up.
+
+stopspell success against MC:             [ACTOR]'s spells hath been blocked.
+stopspell success against PC:             [ACTOR]'s spells hath been blocked.
+stopspell success against monster:        The [ACTOR]'s spells hath been blocked.
+
+MC healed:                                <none>
+PC healed:                                <none>
+Monster healed:                           The [TARGET] hath recovered.
+
+MC regular attack:                        [ACTOR] attacks!
+PC regular attack:                        [ACTOR] attacks!
+Monster regular attack:                   The [ACTOR] attacks!
+
+Monster fire attack:                      The [ACTOR] is breathing fire.
+
+MC Excellent move:                        Excellent move!
+PC Excellent move:                        Excellent move!
+Monster Excellent move:                   Excellent move!
+
+MC dodge:                                 [TARGET] dodges the strike.
+PC dodge:                                 [TARGET] dodges the strike.
+Monster dodge:                            It is dodging!
+
+No damage on attack to MC:                [TARGET] dodges the strike.
+No damage on attack to PC:                [TARGET] dodges the strike.
+No damage on attach to monster:           A miss! No damage hath been scored!
+
+Damage to MC:                             Thy hit points reduced by [DAMAGE].
+Damage to PC:                             [TARGET]'s hit points reduced by [DAMAGE].
+Damage to monster:                        The [TARGET]'s hit points reduced by [DAMAGE].
+
+MC run away (success):                    [ACTOR] started to run away.
+PC run away (success):                    [ACTOR] started to run away.
+Monster run away (success):               The [ACTOR] is running away.
+
+MC run away (failure):                    [ACTOR] started to run away but was blocked in front.
+PC run away (failure):                    [ACTOR] started to run away but was blocked in front.
+Monster run away (failure):               The [ACTOR] tried to run away but was blocked in front.
+
+
+You have vanquished all your foes.
+All part members gain # experience points.  You obtain X pieces of gold.
+
+[NAME]'s party attemps to flee.  But all escape paths are blocked.
+# monster type and # monster type appear!
+-->
 
    <Spells>
       <Spell name="Heal"      mp="4"  availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY" hpRecover="10-17">
@@ -1596,6 +1675,7 @@
 
    <Items>
       <Weapons>
+         <!-- TODO: Add usage dialog defining the attack behavior of the weapon as dialog -->
          <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"/>
          <Weapon name="Club"             attackBonus="4"   gp="60"/>
          <Weapon name="Copper Sword"     attackBonus="10"  gp="180"/>

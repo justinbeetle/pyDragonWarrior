@@ -336,6 +336,12 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def get_available_spell_names(self) -> List[str]:
         return HeroState.get_spell_names(self.get_available_spells())
 
+    def get_spell(self, name: str) -> Optional[Spell]:
+        for spell in self.get_available_spells():
+            if name == spell.name:
+                return spell
+        return None
+
     @staticmethod
     def get_spell_names(spells: List[Spell]) -> List[str]:
         spell_names = []

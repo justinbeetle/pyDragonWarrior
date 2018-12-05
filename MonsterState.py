@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
 import random
 
@@ -9,15 +9,23 @@ from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, Spe
 
 
 class MonsterState(CombatCharacterState):
-    def __init__(self, monster_info: MonsterInfo, special_monster_info: Optional[SpecialMonster] = None) -> None:
-        super(MonsterState, self).__init__(hp=random.randint(monster_info.min_hp, monster_info.max_hp))
-        self.monster_info = monster_info
-        self.special_monster_info = special_monster_info
-        self.gp = random.randint(monster_info.min_gp, monster_info.max_gp)
-        self.xp = monster_info.xp  # TODO: Should this also come from a range?
+    def __init__(self, monster_info: Union[MonsterInfo, SpecialMonster]) -> None:
+        if isinstance(monster_info, SpecialMonster):
+            self.monster_info = monster_info.monster_info
+            self.special_monster_info: Optional[SpecialMonster] = monster_info
+        else:
+            self.monster_info = monster_info
+            self.special_monster_info = None
+        super(MonsterState, self).__init__(hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp))
+        self.gp = random.randint(self.monster_info.min_gp, self.monster_info.max_gp)
+        self.xp = self.monster_info.xp  # TODO: Should this also come from a range?
+        self.name = 'the ' + self.monster_info.name
 
     def get_name(self) -> str:
-        return self.monster_info.name
+        return self.name
+
+    def set_name(self, name: str) -> None:
+        self.name = name
 
     def is_still_asleep(self) -> bool:
         ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
@@ -264,7 +272,7 @@ def main() -> None:
         max_gp=12,
         monster_action_rules=[],
         allows_critical_hits=False)
-    monster = MonsterState(monster_info, None)
+    monster = MonsterState(monster_info)
     print(monster, flush=True)
     while monster.is_alive():
         monster.hp -= 10
@@ -281,3 +289,4 @@ if __name__ == '__main__':
                                          e,
                                          e.__traceback__),
               file=sys.stderr, flush=True)
+        traceback.print_exc()

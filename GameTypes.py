@@ -45,7 +45,7 @@ class GameTypes:
         for element in dialog:
             if isinstance(element, DialogAction):
                 if element.type == action:
-                    return DialogAction
+                    return element
         return None
 
     @staticmethod
@@ -374,7 +374,7 @@ class MapDecoration(NamedTuple):
 
 
 class SpecialMonster(NamedTuple):
-    name: str  # TODO: Change to Monster reference instead of storing the monster name
+    monster_info: MonsterInfo
     point: Point
     approach_dialog: Optional[DialogType] = None
     victory_dialog: Optional[DialogType] = None
@@ -426,8 +426,10 @@ class MonsterAction(NamedTuple):
         return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.FIRE)
 
     def get_damage_range(self) -> Tuple[int, int]:
-        return GameTypes.parse_int_range(
-            GameTypes.get_dialog_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET).count)
+        dialog_action = GameTypes.get_dialog_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET)
+        if dialog_action is not None:
+            return GameTypes.parse_int_range(dialog_action.count)
+        return 0, 0
 
 
 class MonsterActionRule(NamedTuple):
@@ -497,8 +499,6 @@ class Spell(NamedTuple):
     max_damage_by_monster: int
 
 
-
-
 class Weapon(NamedTuple):
     name: str
     attack_bonus: int
@@ -558,6 +558,58 @@ class MapImageInfo(NamedTuple):
                             pygame.Surface((0, 0)),
                             Point(),
                             Point())
+
+
+'''
+class GameInfo:
+    def __init__(self, tile_size_pixels: int):
+        self.tile_size_pixels = tile_size_pixels
+        self.saves_path = './'
+
+        self.dialog_sequences: Dict[str, DialogType] = {}
+
+        # Item info
+        self.weapons: Dict[str, Weapon] = {}
+        self.armors: Dict[str, Armor] = {}
+        self.shields: Dict[str, Shield] = {}
+        self.tools: Dict[str, Tool] = {}
+        self.items: Dict[str, ItemType] = {}  # Super set of all of the above
+
+        # Player character info
+        self.spells: Dict[str, Spell] = {}
+        self.character_types: Dict[str, CharacterType] = {}
+
+        # Monster info
+        self.default_monster_action
+        self.monsters: Dict[str, MonsterInfo] = {}
+        self.monster_sets: Dict[str, List[str]] = {}
+
+        # Map info
+        self.tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
+        self.tiles: Dict[str, Tile] = {}
+        self.decorations: Dict[str, Decoration] = {}
+        self.maps: Dict[str, Map] = {}
+
+        # New game info
+        # TODO: Replace most of this with a HeroParty
+        self.pc_name
+        self.initial_map
+        self.initial_hero_pos_dat_tile
+        self.initial_hero_pos_dir = Direction[initial_state_element.attrib['dir']]
+        self.initial_state_dialog
+        self.pc_xp = 0
+        self.pc_gp = 0
+        self.pc_hp = None
+        self.pc_mp = None
+        self.new_game_dialog
+        
+        # Death info
+        self.death_map = death_state_element.attrib['map']
+        self.death_hero_pos_dat_tile = Point(int(death_state_element.attrib['x']),
+                                             int(death_state_element.attrib['y']))
+        self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
+        self.death_dialog = self.parse_dialog(death_state_element)
+'''
 
 
 def main() -> None:

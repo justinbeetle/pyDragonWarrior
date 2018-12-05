@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
-from typing import List, Optional, Union
+from typing import cast, List, Optional, Union
 
 import pygame
 import random
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
+from CombatEncounterInterface import CombatEncounterInterface
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
+from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
-from GameTypes import ActionCategoryTypeEnum, DialogType, MonsterActionEnum
+from GameTypes import DialogType, MonsterInfo, SpecialMonster, TargetTypeEnum
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
@@ -20,7 +22,7 @@ from Point import Point
 import SurfaceEffects
 
 
-class CombatEncounter:
+class CombatEncounter(CombatEncounterInterface):
     MONSTER_SPACING_PIXELS = 20
     DAMAGE_FLICKER_PIXELS = 4
     default_encounter_music = ''
@@ -30,6 +32,7 @@ class CombatEncounter:
         CombatEncounter.default_encounter_music = default_encounter_music
 
     def __init__(self,
+                 game_info: GameInfo,
                  game_state: GameStateInterface,
                  monster_party: MonsterParty,
                  encounter_image: pygame.Surface,
@@ -39,8 +42,9 @@ class CombatEncounter:
                  run_away_dialog: Optional[DialogType] = None,
                  encounter_music: Optional[str] = None) -> None:
         self.is_first_turn = True
+        self.game_info = game_info
         self.game_state = game_state
-        self.gde = GameDialogEvaluator(game_state)
+        self.gde = GameDialogEvaluator(game_info, game_state, self)
         self.hero_party = game_state.get_hero_party()
         self.monster_party = monster_party
         self.background_image = game_state.screen.copy()
@@ -81,22 +85,35 @@ class CombatEncounter:
             self.gde.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
         else:
             self.message_dialog.add_message(self.monster_party.get_default_approach_dialog())
+            self.message_dialog.add_message('')
         self.message_dialog.blit(self.game_state.screen, True)
 
         # Check if monsters run away at the start of the encounter
+        last_turn_was_monster_turn = False
         for monster in self.monster_party.members:
             if monster.is_still_in_combat():
                 if monster.should_run_away(self.hero_party.main_character):
+                    if last_turn_was_monster_turn:
+                        self.gde.wait_for_acknowledgement(self.message_dialog)
+                    else:
+                        # Pause to allow time to see the monsters before they run away
+                        pygame.time.Clock().tick(1000)
+                    last_turn_was_monster_turn = True
                     monster.has_run_away = True
-                    self.message_dialog.add_message('The ' + monster.get_name() + ' is running away.')
+                    self.message_dialog.add_message(monster.get_name() + ' is running away.')
+                    self.render_monsters()
 
         # Iterate through turns in the encounter until the encounter ends
         while self.still_in_encounter():
             for combatant in self.get_turn_order():
                 if combatant.is_still_in_combat():
                     if isinstance(combatant, MonsterState):
+                        if last_turn_was_monster_turn:
+                            self.gde.wait_for_acknowledgement(self.message_dialog)
+                        last_turn_was_monster_turn = True
                         self.execute_monster_turn(combatant)
                     elif isinstance(combatant, HeroState):
+                        last_turn_was_monster_turn = False
                         self.execute_player_turn(combatant)
                     if not self.still_in_encounter():
                         break
@@ -122,22 +139,24 @@ class CombatEncounter:
         self.game_state.draw_map(False)
         pygame.display.flip()
 
-    def render_monsters(self, damage_image_monsters: List[MonsterState] = []) -> None:
+    def render_monsters(self,
+                        damage_image_monsters: List[CombatCharacterState] = [],
+                        force_display_monsters: List[CombatCharacterState] = []) -> None:
         # Render the encounter background
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
             (self.game_state.get_win_size_pixels().w - encounter_image_size_px.w) / 2,
-            self.message_dialog.pos_tile.y * self.game_state.get_tile_size_pixels()
+            self.message_dialog.pos_tile.y * self.game_info.tile_size_pixels
             - encounter_image_size_px.h + CombatEncounter.DAMAGE_FLICKER_PIXELS)
         self.game_state.screen.blit(self.encounter_image, encounter_image_dest_px)
 
-        # Render the monsters  CombatEncounter.MONSTER_SPACING_PIXELS
+        # Render the monsters
         monster_width_px = CombatEncounter.MONSTER_SPACING_PIXELS * (len(self.monster_party.members) - 1)
         for monster in self.monster_party.members:
             monster_width_px += monster.monster_info.image.get_width()
-        monster_pos_x = self.game_state.get_win_size_pixels().x - monster_width_px / 2
+        monster_pos_x = (self.game_state.get_win_size_pixels().x - monster_width_px) / 2
         for monster in self.monster_party.members:
-            if monster.is_still_in_combat():
+            if monster.is_still_in_combat() or monster in force_display_monsters:
                 if monster in damage_image_monsters:
                     monster_image = monster.monster_info.dmg_image
                 else:
@@ -145,9 +164,51 @@ class CombatEncounter:
                 monster_image_dest_px = Point(monster_pos_x,
                                               encounter_image_dest_px.y + encounter_image_size_px.y
                                               - monster.monster_info.image.get_height()
-                                              - self.game_state.get_tile_size_pixels())
+                                              - self.game_info.tile_size_pixels)
                 self.game_state.screen.blit(monster_image, monster_image_dest_px)
+
             monster_pos_x += CombatEncounter.MONSTER_SPACING_PIXELS + monster.monster_info.image.get_width()
+
+    def render_damage_to_targets(self, targets: List[CombatCharacterState]) -> None:
+        # Determine if rendering damage to the hero party or monster party.
+        # NOTE: At present not supporting concurrent damage to members of both parties
+        if 0 == len(targets):
+            # No targets so this is a no-op
+            return
+
+        if isinstance(targets[0], MonsterState):
+            self.render_damage_to_monster_party(targets)
+        else:
+            self.render_damage_to_hero_party()
+
+    def render_damage_to_monster_party(self, targets: List[CombatCharacterState]) -> None:
+        for flickerTimes in range(10):
+            self.render_monsters(targets, targets)
+            pygame.display.flip()
+            pygame.time.Clock().tick(30)
+
+            self.render_monsters([], targets)
+            pygame.display.flip()
+            pygame.time.Clock().tick(30)
+
+        # Final render to drop any of the targets which were killed
+        self.render_monsters()
+
+    def render_damage_to_hero_party(self) -> None:
+        status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
+        for flickerTimes in range(10):
+            offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
+            self.game_state.screen.blit(self.background_image, (0, 0))
+            self.render_monsters()
+            status_dialog.blit(self.game_state.screen, False, offset_pixels)
+            self.message_dialog.blit(self.game_state.screen, True, offset_pixels)
+
+            pygame.time.Clock().tick(30)
+            self.game_state.screen.blit(self.background_image, (0, 0))
+            self.render_monsters()
+            status_dialog.blit(self.game_state.screen, False)
+            self.message_dialog.blit(self.game_state.screen, True)
+            pygame.time.Clock().tick(30)
 
     def get_turn_order(self) -> List[Union[HeroState, MonsterState]]:
         # TODO: In the future rework this method to better support parties with multiple members
@@ -157,7 +218,7 @@ class CombatEncounter:
             self.is_first_turn = False
             skip_hero_party = self.monster_party.members[0].has_initiative(self.hero_party.main_character)
         if skip_hero_party:
-            self.message_dialog.add_message('The ' + self.monster_party.members[0].get_name() + ' attacked before '
+            self.message_dialog.add_message(self.monster_party.members[0].get_name() + ' attacked before '
                                             + self.hero_party.main_character.get_name() + ' was ready.')
         else:
             for hero in self.hero_party.members:
@@ -195,7 +256,8 @@ class CombatEncounter:
         if monster.should_run_away(self.hero_party.main_character):
             # TODO: Play sound?
             monster.has_run_away = True
-            self.message_dialog.add_message('The ' + monster.get_name() + ' is running away.')
+            self.message_dialog.add_message(monster.get_name() + ' is running away.')
+            self.render_monsters()
             return
 
         # Determine the target for the monster action (if needed)
@@ -203,99 +265,32 @@ class CombatEncounter:
 
         # Determine the monster action
         # TODO: Could move this into the MonsterState class
-        chosen_monster_action = MonsterActionEnum.ATTACK
-        for monster_action in monster.monster_info.monster_actions:
+        chosen_monster_action = self.game_info.default_monster_action
+        for monster_action_rule in monster.monster_info.monster_action_rules:
             monster_health_ratio = monster.hp / monster.max_hp
-            if monster_health_ratio > monster_action.health_ratio_threshold:
+            if monster_health_ratio > monster_action_rule.health_ratio_threshold:
                 continue
-            if MonsterActionEnum.SLEEP == monster_action.type and target.is_asleep:
+            if monster_action_rule.action.is_sleep_action() and target.is_asleep:
                 continue
-            if MonsterActionEnum.STOPSPELL == monster_action.type and target.are_spells_blocked:
+            if monster_action_rule.action.is_stopspell_action() and target.are_spells_blocked:
                 continue
-            if random.uniform(0, 1) < monster_action.probability:
-                chosen_monster_action = monster_action.type
+            if random.uniform(0, 1) < monster_action_rule.probability:
+                chosen_monster_action = monster_action_rule.action
                 break
 
+        # Revise the target for the selected action
+        self.gde.set_actor(monster)
+        if TargetTypeEnum.SINGLE_ALLY == chosen_monster_action.target_type:
+            self.gde.set_targets([monster])
+        elif TargetTypeEnum.ALL_ALLIES == chosen_monster_action.target_type:
+            self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
+        elif TargetTypeEnum.SINGLE_ENEMY == chosen_monster_action.target_type:
+            self.gde.set_targets([target])
+        else:  # TargetTypeEnum.ALL_ENEMIES
+            self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
+
         # Perform the monster action
-        damage = 0
-        if chosen_monster_action.is_spell():
-            spell = chosen_monster_action.get_spell(self.game_state.get_spells())
-            if spell is not None:
-                AudioPlayer().play_sound('castSpell.wav')
-                SurfaceEffects.flickering(self.game_state.screen)
-                self.message_dialog.add_message('The ' + monster.get_name() + ' chants the spell of '
-                                                + chosen_monster_action.name.lower() + '.')
-                if not monster.does_spell_work(spell, target):
-                    if monster.are_spells_blocked:
-                        self.message_dialog.add_message('But that spell hath been blocked.')
-                    else:
-                        self.message_dialog.add_message('But that spell did not work.')
-                elif chosen_monster_action.is_heal_spell():
-                    self.message_dialog.add_message('The ' + monster.get_name() + ' hath recovered.')
-                    monster.hp = monster.max_hp
-                elif chosen_monster_action.is_hurt_spell():
-                    spell = chosen_monster_action.get_spell(self.game_state.get_spells())
-                    damage = CombatCharacterState.calc_damage(spell.min_damage_by_monster,
-                                                              spell.max_damage_by_monster,
-                                                              target,
-                                                              ActionCategoryTypeEnum.MAGICAL)
-                elif MonsterActionEnum.SLEEP == chosen_monster_action:
-                    # TODO: Should this apply to all hero's or only a single one?
-                    self.message_dialog.add_message('Thou art asleep.')
-                    target.is_asleep = True
-                elif MonsterActionEnum.STOPSPELL == chosen_monster_action:
-                    # TODO: Should this apply to all hero's or only a single one?
-                    self.message_dialog.add_message(target.get_name() + "'s spells hath been blocked.")
-                    target.are_spells_blocked = True
-                else:
-                    print('ERROR: Failed to perform action for spell', chosen_monster_action.name, flush=True)
-            else:
-                print('ERROR: Failed to find spell for', chosen_monster_action.name, flush=True)
-                chosen_monster_action = MonsterActionEnum.ATTACK
-
-        if chosen_monster_action.is_fire_attack():
-            AudioPlayer().play_sound('fireBreathingAttack.wav')
-            self.message_dialog.add_message('The ' + monster.get_name() + ' is breathing fire.')
-            if chosen_monster_action == MonsterActionEnum.BREATH_FIRE:
-                min_damage = 16
-                max_damage = 23
-            else:
-                min_damage = 65
-                max_damage = 72
-            damage = CombatCharacterState.calc_damage(min_damage,
-                                                      max_damage,
-                                                      target,
-                                                      ActionCategoryTypeEnum.FIRE)
-        elif MonsterActionEnum.ATTACK == chosen_monster_action:
-            damage = monster.get_attack_damage(target)[0]
-            if 0 == damage:
-                # TODO: Play sound?
-                self.message_dialog.add_message(
-                    'The ' + monster.get_name() + ' attacks! ' + target.get_name() + ' dodges the strike.')
-            else:
-                # TODO: Play different sound based on strength of attack
-                AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
-                self.message_dialog.add_message('The ' + monster.get_name() + ' attacks!')
-
-        if 0 < damage:
-            self.message_dialog.add_message('Thy hit points reduced by ' + str(damage) + '.')
-            target.hp -= damage
-            if target.hp < 0:
-                target.hp = 0
-            status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
-            for flickerTimes in range(10):
-                offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
-                self.game_state.screen.blit(self.background_image, (0, 0))
-                self.render_monsters()
-                status_dialog.blit(self.game_state.screen, False, offset_pixels)
-                self.message_dialog.blit(self.game_state.screen, True, offset_pixels)
-
-                pygame.time.Clock().tick(30)
-                self.game_state.screen.blit(self.background_image, (0, 0))
-                self.render_monsters()
-                status_dialog.blit(self.game_state.screen, False)
-                self.message_dialog.blit(self.game_state.screen, True)
-                pygame.time.Clock().tick(30)
+        self.gde.traverse_dialog(self.message_dialog, chosen_monster_action.use_dialog, depth=1)
 
     def execute_player_turn(self, hero: HeroState) -> None:
         self.message_dialog.add_message('')
@@ -338,21 +333,14 @@ class CombatEncounter:
                     if target.is_dodging_attack():
                         AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                         self.message_dialog.add_message(
-                            'The ' + target.get_name() + ' dodges ' + hero.get_name() + "'s strike.")
+                            target.get_name() + ' dodges ' + hero.get_name() + "'s strike.")
                     else:
                         # TODO: Play different sound based on damage of attack
                         AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
                         self.message_dialog.add_message(
-                            'The ' + target.get_name() + "'s hit points reduced by " + str(damage) + '.')
+                            target.get_name() + "'s hit points reduced by " + str(damage) + '.')
                         target.hp -= damage
-                        for flickerTimes in range(10):
-                            self.render_monsters([target])
-                            pygame.display.flip()
-                            pygame.time.Clock().tick(30)
-
-                            self.render_monsters()
-                            pygame.display.flip()
-                            pygame.time.Clock().tick(30)
+                        self.render_damage_to_targets([target])
 
             elif menu_result == 'RUN':
                 target = random.choice(self.monster_party.get_still_in_combat_members())
@@ -367,7 +355,7 @@ class CombatEncounter:
                     break
 
             elif menu_result == 'SPELL':
-                available_spell_names = self.game_state.get_available_spell_names()
+                available_spell_names = hero.get_available_spell_names()
                 if len(available_spell_names) == 0:
                     self.message_dialog.add_message('Thou hast not yet learned any spells.')
                     continue
@@ -382,8 +370,8 @@ class CombatEncounter:
                     menu_result = self.gde.get_menu_result(menu_dialog)
                     # print( 'menu_result =', menu_result, flush=True )
                     if menu_result is not None:
-                        spell = self.game_state.get_spells()[menu_result]
-                        if hero.mp >= spell.mp:
+                        spell = hero.get_spell(menu_result)
+                        if spell is not None and hero.mp >= spell.mp:
                             hero.mp -= spell.mp
 
                             AudioPlayer().play_sound('castSpell.wav')
@@ -401,7 +389,7 @@ class CombatEncounter:
                                 elif spell.max_damage_by_hero > 0:
                                     damage = random.randint(spell.min_damage_by_hero,
                                                             spell.max_damage_by_hero)
-                                    self.message_dialog.add_message('The ' + target.get_name()
+                                    self.message_dialog.add_message(target.get_name()
                                                                + "'s hit points reduced by "
                                                                + str(damage) + '.')
                                     target.hp -= damage
@@ -450,13 +438,13 @@ class CombatEncounter:
             xp = self.monster_party.get_xp()
             # TODO: Update text for multiple monster encounters
             self.message_dialog.add_message(
-                'Thou has done well in defeating the ' + self.monster_party.members[0].get_name()
+                '\nThou has done well in defeating ' + self.monster_party.get_defeated_monster_summary()
                 + '. Thy experience increases by ' + str(xp) + '. Thy gold increases by ' + str(gp) + '.')
             self.hero_party.gp += gp
             for hero in self.hero_party.members:
                 if hero.is_still_in_combat():
                     hero.xp += xp
-                    if hero.level_up_check(self.game_state.get_levels('')):
+                    if hero.level_up_check():
                         self.gde.wait_for_acknowledgement(self.message_dialog)
                         AudioPlayer().play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
                         GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
@@ -473,17 +461,14 @@ class CombatEncounter:
             self.gde.traverse_dialog(self.message_dialog, self.run_away_dialog)
 
     def handle_death(self) -> None:
-        # TODO: Implement
-        pass
+        self.game_state.handle_death()
 
 
 def main() -> None:
-    from unittest.mock import MagicMock
-    mock_game_state = mock.create_autospec(spec=GameStateInterface)
-
     # Initialize pygame
     pygame.init()
     pygame.font.init()
+    clock = pygame.time.Clock()
 
     # Setup the screen
     win_size_pixels = Point(1280, 960)
@@ -491,13 +476,56 @@ def main() -> None:
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
     screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
-    clock = pygame.time.Clock()
-    pygame.key.set_repeat()
+    screen.fill(pygame.Color('pink'))
+    GameDialog.static_init(win_size_tiles, tile_size_pixels)
 
-    # Test out game dialog
-    GameDialog.init(win_size_tiles, tile_size_pixels)
-    level = Level(1, '1', 0, 20, 20, 15, 0)
-    hero_party = HeroParty(HeroState('hero', Point(5, 6), Direction.SOUTH, 'CAMDEN', level))
+    # Initialize GameInfo
+    import os
+    from GameInfo import GameInfo
+    base_path = os.path.split(os.path.abspath(__file__))[0]
+    game_xml_path = os.path.join(base_path, 'game.xml')
+    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
+    for map in game_info.maps:
+        if game_info.maps[map].encounter_image is not None:
+            encounter_image = game_info.maps[map].encounter_image
+
+    # Setup a mock game state
+    from unittest import mock
+    from unittest.mock import MagicMock
+    from GameTypes import DialogReplacementVariables
+    mock_game_state = mock.create_autospec(spec=GameStateInterface)
+    mock_game_state.screen = screen
+    mock_game_state.is_running = True
+    mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
+    mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
+
+    # Create a series of hero party and monster party tuples for encounters
+    from GameTypes import Direction
+    combat_parties = []
+    for i in range(1, 4):
+        hero_party = HeroParty(HeroState(game_info.character_types['hero'], Point(), Direction.NORTH, 'Camden', 20000))
+        monster_party = MonsterParty(cast(List[Union[MonsterInfo, SpecialMonster, MonsterState]],
+                                          list(game_info.monsters.values())[0:i]))
+        monster_party.add_monster(list(game_info.monsters.values())[0])
+        combat_parties.append((hero_party, monster_party))
+    for monster_name in ['Golem', 'Knight', 'Magiwyvern', 'Starwyvern', 'Red Dragon']:
+        monster_party = MonsterParty([game_info.monsters[monster_name]])
+        combat_parties.append((hero_party, monster_party))
+
+    # Run a series of combat encounters
+    CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
+    for (hero_party, monster_party) in combat_parties:
+        mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
+        combat_encounter = CombatEncounter(game_info,
+                                           mock_game_state,
+                                           monster_party,
+                                           encounter_image)
+        combat_encounter.encounter_loop()
+        clock.tick(1000)
+
+    # Terminate pygame
+    AudioPlayer().terminate()
+    pygame.quit()
 
 
 if __name__ == '__main__':
@@ -510,3 +538,4 @@ if __name__ == '__main__':
                                          e,
                                          e.__traceback__),
               file=sys.stderr, flush=True)
+        traceback.print_exc()

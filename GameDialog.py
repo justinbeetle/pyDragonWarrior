@@ -32,8 +32,8 @@ class GameDialog:
     selection_indicator_pixels = 16
 
     @staticmethod
-    def init(win_size_tiles: Point,
-             tile_size_pixels: int) -> None:
+    def static_init(win_size_tiles: Point,
+                    tile_size_pixels: int) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
         # GameDialog.font_size = 1
@@ -321,6 +321,9 @@ class GameDialog:
 
         self.acknowledged = False
         self.row_data = None
+
+        # Fix capitalization in message
+        new_message = GameDialog.fix_capitalization(new_message)
 
         # Turn message into lines of text
         new_message_lines = GameDialog.convert_message_to_lines(new_message, self.image.get_width())
@@ -657,11 +660,22 @@ class GameDialog:
     def is_acknowledged(self) -> bool:
         return self.acknowledged
 
+    @staticmethod
+    def fix_capitalization(message: str) -> str:
+        for punctuation in ['.', '!', '?']:
+            sentences = []
+            for sentence in message.split(punctuation):
+                start_of_sentence_index = len(sentence) - len(sentence.lstrip())
+                if start_of_sentence_index < len(sentence):
+                    sentence = (sentence[0:start_of_sentence_index]
+                                + sentence[start_of_sentence_index].upper()
+                                + sentence[start_of_sentence_index+1:])
+                sentences.append(sentence)
+            message = punctuation.join(sentences)
+        return message
+
 
 def main() -> None:
-    from GameTypes import Direction, Level
-    from HeroState import HeroState
-
     # Initialize pygame
     pygame.init()
     pygame.font.init()
@@ -676,7 +690,8 @@ def main() -> None:
     pygame.key.set_repeat()
 
     # Test out game dialog
-    GameDialog.init(win_size_tiles, tile_size_pixels)
+    GameDialog.static_init(win_size_tiles, tile_size_pixels)
+    from HeroState import HeroState
     hero_party = HeroParty(HeroState.create_null())
 
     screen.fill(pygame.Color('pink'))
@@ -705,8 +720,8 @@ def main() -> None:
     screen.fill(pygame.Color('pink'))
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     GameDialog.create_message_dialog(
-        'Word wrap testing...  Word wrap testing...  Word wrap testing...  ' +
-        'Word wrap testing...  Word wrap testing...  Word wrap testing...').blit(screen, False)
+        'word wrap testing...  Word wrap testing...  word wrap testing...  ' +
+        'Word Wrap testing...  word Wrap testing...  Word Wrap testing...').blit(screen, False)
     menu = GameDialog.create_encounter_menu()
     menu.blit(screen, True)
 
@@ -773,3 +788,4 @@ if __name__ == '__main__':
                                          e,
                                          e.__traceback__),
               file=sys.stderr, flush=True)
+        traceback.print_exc()
