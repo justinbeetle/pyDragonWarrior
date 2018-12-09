@@ -66,7 +66,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def encounter_loop(self) -> None:
         # Start encounter music
-        AudioPlayer().play_music(self.encounter_music)
+        AudioPlayer().play_music(self.encounter_music, self.encounter_music, music_file_start2=3.0)
         # AudioPlayer().playMusic('14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3',
         #                         '24_Dragon_Quest_1_-_Monster_Battle.mp3')
 
@@ -348,6 +348,8 @@ class CombatEncounter(CombatEncounterInterface):
                         1)
                     menu_dialog.blit(self.game_state.screen, True)
                     menu_result = self.gde.get_menu_result(menu_dialog)
+                    menu_dialog.erase(self.game_state.screen, self.background_image)
+
                     # print( 'menu_result =', menu_result, flush=True )
                     if menu_result is not None:
                         spell = hero.get_spell(menu_result)
@@ -374,8 +376,9 @@ class CombatEncounter(CombatEncounterInterface):
                         GameDialogSpacing.OUTSIDE_JUSTIFIED)
                     menu_dialog.blit(self.game_state.screen, True)
                     item_result = self.gde.get_menu_result(menu_dialog)
-                    # print( 'item_result =', item_result, flush=True )
+                    menu_dialog.erase(self.game_state.screen, self.background_image)
 
+                    # print( 'item_result =', item_result, flush=True )
                     if item_result is None:
                         continue
                     item = hero.get_item(item_result)
@@ -387,6 +390,7 @@ class CombatEncounter(CombatEncounterInterface):
                     else:
                         self.message_dialog.add_message(hero.get_name()
                                                         + ' studied the object and was confounded by it.')
+                        return
             else:
                 continue
 

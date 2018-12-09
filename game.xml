@@ -1615,7 +1615,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
-         <DialogAction type="SLEEP"/></Spell>
+         <DialogAction type="SLEEP" category="MAGICAL"/></Spell>
 
       <Spell name="Radiant"   mp="3"  availableInCombat="no"  availableOutsideCombat="yes">
          <Dialog>[ACTOR] cast the spell of radiant.</Dialog>
@@ -1630,7 +1630,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
-         <DialogAction type="STOPSPELL"/></Spell>
+         <DialogAction type="STOPSPELL" category="MAGICAL"/></Spell>
 
       <Spell name="Outside"   mp="6"  availableInCombat="no"  availableOutsideCombat="yes" availableOutside="no">
          <Dialog>[ACTOR] cast the spell of outside.</Dialog>
@@ -1733,7 +1733,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
 
          <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes" target="SINGLE_ALLY">
-            <DialogAction type="HEALTH_RESTORE" count="23-30"/>
+            <DialogAction type="HEALTH_RESTORE" count="23-30" category="PHYSICAL"/>
             <DialogAction type="LOSE_ITEM" name="Herb"/>
             <Dialog>[ACTOR] ate the herb.</Dialog></Tool>
 
@@ -1774,7 +1774,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
             <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
-            <DialogAction type="SLEEP" name="Golem" bypass="yes"/></Tool> 
+            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
             <Dialog>[ACTOR] held Erdrick's Token tightly.</Dialog>

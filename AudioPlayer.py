@@ -21,8 +21,11 @@ class AudioPlayer:
             self.sound_path = './'
             self.music_rel_file_path1: Optional[str] = None
             self.music_rel_file_path2: Optional[str] = None
+            self.music_file_start1 = 0.0
+            self.music_file_start2 = 0.0
             self.running = True
             self.sounds: Dict[str, pygame.mixer.Sound] = {}
+            self.music_thread_lock = threading.RLock()
             self.music_thread = threading.Thread(target=self.__music_thread)
             self.music_thread.start()
          
@@ -40,12 +43,19 @@ class AudioPlayer:
         def play_music(self,
                        music_rel_file_path1: str,
                        music_rel_file_path2: Optional[str] = None,
-                       interrupt: bool = False) -> None:
+                       interrupt: bool = False,
+                       music_file_start1: float = 0.0,
+                       music_file_start2: float = 0.0) -> None:
+            self.music_thread_lock.acquire()
             self.music_rel_file_path1 = music_rel_file_path1
+            self.music_file_start1 = music_file_start1
             if music_rel_file_path2 is not None:
                 self.music_rel_file_path2 = music_rel_file_path2
+                self.music_file_start2 = music_file_start2
             elif not interrupt:
                 self.music_rel_file_path2 = music_rel_file_path1
+                self.music_file_start2 = music_file_start1
+            self.music_thread_lock.release()
 
         def __music_thread(self) -> None:
             first_time = True
@@ -53,7 +63,8 @@ class AudioPlayer:
             current_music_rel_file_path2: Optional[str] = None
             while self.running:
                 # TODO: Switch to a more responsive approach which is not polling based
-   
+
+                self.music_thread_lock.acquire()
                 if (current_music_rel_file_path1 != self.music_rel_file_path1
                         or current_music_rel_file_path2 != self.music_rel_file_path2):
                     current_music_rel_file_path1 = self.music_rel_file_path1
@@ -63,13 +74,14 @@ class AudioPlayer:
                 if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
                     # load the music
                     if first_time:
-                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
                         first_time = False
                     else:
-                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path2))
+                        self.music_rel_file_path1 = self.music_rel_file_path2
+                        self.music_file_start1 = self.music_file_start2
+                    pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
 
                     # start playing
-                    pygame.mixer.music.play()
+                    pygame.mixer.music.play(start=self.music_file_start1)
 
                     # poll until finished
                     while (self.running
@@ -77,9 +89,13 @@ class AudioPlayer:
                            and current_music_rel_file_path1 == self.music_rel_file_path1
                            and current_music_rel_file_path2 == self.music_rel_file_path2):
                         # still playing and not changed
+                        self.music_thread_lock.release()
                         pygame.time.wait(100)
+                        self.music_thread_lock.acquire()
+
                     pygame.mixer.music.stop()
 
+                self.music_thread_lock.release()
                 pygame.time.wait(100)
          
         def play_sound(self, sound_rel_file_path: str) -> None:
@@ -121,9 +137,15 @@ class AudioPlayer:
     def play_music(self,
                    music_file_path1: str,
                    music_file_path2: Optional[str] = None,
-                   interrupt: bool = False) -> None:
+                   interrupt: bool = False,
+                   music_file_start1: float = 0.0,
+                   music_file_start2: float = 0.0) -> None:
         if self.instance is not None:
-            self.instance.play_music(music_file_path1, music_file_path2, interrupt)
+            self.instance.play_music(music_file_path1,
+                                     music_file_path2,
+                                     interrupt,
+                                     music_file_start1,
+                                     music_file_start2)
       
     def play_sound(self, sound_file_path: str) -> None:
         if self.instance is not None:

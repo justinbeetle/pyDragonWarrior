@@ -140,12 +140,17 @@ class GameDialogEvaluator:
 
         return menu_result
 
-    def update_status_dialog(self, update_display: bool = False) -> None:
+    def update_status_dialog(self, update_display: bool = False, message_dialog: Optional[GameDialog] = None) -> None:
         # TODO: Store off the message_dialog and ensure it is using the correct font color too
         if self.hero_party.get_lowest_health_ratio() >= 0.25:
-            GameDialog.set_default_font_color(GameDialog.NOMINAL_HEALTH_FONT_COLOR)
+            font_color = GameDialog.NOMINAL_HEALTH_FONT_COLOR
         else:
-            GameDialog.set_default_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
+            font_color = GameDialog.LOW_HEALTH_FONT_COLOR
+
+        GameDialog.set_default_font_color(font_color)
+        if message_dialog is not None:
+            message_dialog.set_font_color(font_color)
+            message_dialog.blit(self.game_state.screen)
 
         if self.game_state.is_in_combat():
             GameDialog.create_encounter_status_dialog(
@@ -383,23 +388,6 @@ class GameDialogEvaluator:
 
                 if item.type == DialogActionEnum.SAVE_GAME:
                     self.game_state.save()
-                elif item.type == DialogActionEnum.MAGIC_RESTORE:
-                    if item.count == 'unlimited':
-                        for target in self.targets:
-                            target.mp = target.max_mp
-                    else:
-                        for target in self.targets:
-                            target.mp = min(target.max_mp, target.mp + GameTypes.get_int_value(item.count))
-                    self.update_status_dialog(True)
-
-                elif item.type == DialogActionEnum.HEALTH_RESTORE:
-                    if item.count == 'unlimited':
-                        for target in self.targets:
-                            target.hp = target.max_hp
-                    else:
-                        for target in self.targets:
-                            target.hp = min(target.max_hp, target.hp + GameTypes.get_int_value(item.count))
-                    self.update_status_dialog(True)
 
                 elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
                     # Perform variable replacement
@@ -422,7 +410,7 @@ class GameDialogEvaluator:
                             self.hero_party.gp -= item_count
                             if self.hero_party.gp < 0:
                                 self.hero_party.gp = 0
-                        self.update_status_dialog(True)
+                        self.update_status_dialog(True, message_dialog)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         item_to_gain = self.game_state.get_item(item_name)
                         if item_to_gain is not None:
@@ -500,6 +488,41 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.OPEN_DOOR:
                     self.game_state.open_door()
 
+                elif item.type == DialogActionEnum.MAGIC_RESTORE:
+                    worked = False
+                    for target in self.targets:
+                        if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
+                            if item.count == 'unlimited':
+                                target.mp = target.max_mp
+                            else:
+                                target.mp = min(target.max_mp, target.mp + GameTypes.get_int_value(item.count))
+                            worked = True
+                    if not worked:
+                        if ActionCategoryTypeEnum.MAGICAL == item.category:
+                            message_dialog.add_message('But that spell did not work.')
+                        else:
+                            message_dialog.add_message('But it did nothing.')
+                    else:
+                        self.update_status_dialog(True, message_dialog)
+
+                elif item.type == DialogActionEnum.HEALTH_RESTORE:
+                    worked = False
+                    for target in self.targets:
+                        if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
+                            if item.count == 'unlimited':
+                                target.hp = target.max_hp
+                            else:
+                                target.hp = min(target.max_hp, target.hp + GameTypes.get_int_value(item.count))
+                            worked = True
+                            message_dialog.add_message(target.get_name() + ' hath recovered.')
+                    if not worked:
+                        if ActionCategoryTypeEnum.MAGICAL == item.category:
+                            message_dialog.add_message('But that spell did not work.')
+                        else:
+                            message_dialog.add_message('But it did nothing.')
+                    else:
+                        self.update_status_dialog(True, message_dialog)
+
                 elif item.type == DialogActionEnum.SLEEP:
                     worked = False
                     for target in self.targets:
@@ -508,7 +531,10 @@ class GameDialogEvaluator:
                             worked = True
                             message_dialog.add_message(target.get_name() + ' is asleep.')
                     if not worked:
-                        message_dialog.add_message('But that spell did not work.')
+                        if ActionCategoryTypeEnum.MAGICAL == item.category:
+                            message_dialog.add_message('But that spell did not work.')
+                        else:
+                            message_dialog.add_message('But it did nothing.')
 
                 elif item.type == DialogActionEnum.STOPSPELL:
                     worked = False
@@ -518,7 +544,10 @@ class GameDialogEvaluator:
                             worked = True
                             message_dialog.add_message(target.get_name() + "'s spells are blocked.")
                     if not worked:
-                        message_dialog.add_message('But that spell did not work.')
+                        if ActionCategoryTypeEnum.MAGICAL == item.category:
+                            message_dialog.add_message('But that spell did not work.')
+                        else:
+                            message_dialog.add_message('But it did nothing.')
 
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
@@ -533,8 +562,6 @@ class GameDialogEvaluator:
                             else:
                                 (damage, is_critical_hit) = self.actor.get_attack_damage(target, item.category)
 
-                            print('DAMAGE_TARGET: ' + self.actor.get_name() + ' damages ' + target.get_name() + ' by '
-                                  + str(damage) + ' - item.count =', item.count, flush=True)
                             if 0 < damage:
                                 if is_critical_hit:
                                     # TODO: Play sound?
@@ -543,8 +570,8 @@ class GameDialogEvaluator:
                                 # Check for a dodge
                                 if target.is_dodging_attack():
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
-                                    self.message_dialog.add_message(
-                                        target.get_name() + ' dodges ' + hero.get_name() + "'s strike.")
+                                    message_dialog.add_message(
+                                        target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
                                 else:
                                     # TODO: Play different sound based on damage of attack
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
@@ -566,6 +593,7 @@ class GameDialogEvaluator:
                         # TODO: May not have been a spell - handle that as well
                         message_dialog.add_message('But that spell did not work.')
                     elif 0 < len(damagedTargets) and self.combat_encounter is not None:
+                        self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damagedTargets)
 
                 else:

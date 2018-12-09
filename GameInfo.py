@@ -7,13 +7,14 @@ import pygame
 import xml.etree.ElementTree
 
 from AudioPlayer import AudioPlayer
-from GameTypes import Armor, CharacterType, Decoration, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
-    DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsParamWithoutReplacementType, \
-    DialogVendorBuyOptionsParamType, DialogVendorBuyOptionsVariable, DialogVendorSellOptions, \
-    DialogVendorSellOptionsParamWithoutReplacementType, DialogVendorSellOptionsParamType, \
-    DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, LeavingTransition, Level, Map, MapDecoration, \
-    MapImageInfo, MonsterAction, MonsterActionRule, MonsterActionEnum, MonsterInfo, MonsterZone, NpcInfo, Phase, \
-    PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
+from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, Decoration, DialogAction, DialogActionEnum, \
+    DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
+    DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
+    DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
+    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, \
+    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterActionEnum, \
+    MonsterInfo, MonsterZone, NpcInfo, Phase, PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, \
+    Tool, Weapon
 from Point import Point
 
 
@@ -837,7 +838,11 @@ class GameInfo:
                 if 'bypass' in element.attrib:
                     bypass = element.attrib['bypass'] == 'yes'
 
-                # TODO: For DAMAGE_TARGET count should NOT default to 1
+                category = ActionCategoryTypeEnum.PHYSICAL
+                if 'category' in element.attrib:
+                    category = ActionCategoryTypeEnum[element.attrib['category']]
+
+                # For DAMAGE_TARGET count should NOT default to 1
                 if (DialogActionEnum[element.attrib['type']] == DialogActionEnum.DAMAGE_TARGET
                         and 'count' not in element.attrib):
                     count = 'default'
@@ -846,6 +851,7 @@ class GameInfo:
                                            name=name,
                                            count=count,
                                            bypass=bypass,
+                                           category=category,
                                            map_name=map_name,
                                            map_pos=map_pos,
                                            map_dir=map_dir,

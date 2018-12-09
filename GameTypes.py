@@ -135,7 +135,7 @@ class DialogActionEnum(Enum):
     #                                                run_away_dialog (runAwayDialogScript in XML), encounterMusic
     OPEN_DOOR = 14                     # attributes: <none>
     SLEEP = 15                         # attributes: bypass (to bypass resistances), category
-    STOPSPELL = 16                     # attributes: bypass (to bypass resistances)
+    STOPSPELL = 16                     # attributes: bypass (to bypass resistances), category
     DAMAGE_TARGET = 17                 # attributes: count (number, range, unlimited, or default), category
     #                                                bypass (to bypass resistances and damage modifiers)
 
