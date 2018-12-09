@@ -189,7 +189,7 @@ class Game:
                             if item_result is not None:
                                 item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
                                 if len(item_row_data) == 0:
-                                    self.gde.dialog_loop('[NAME] studied the object and was confounded by it.')
+                                    self.gde.dialog_loop('[ACTOR] studied the object and was confounded by it.')
                                 else:
                                     menu_dialog = GameDialog.create_menu_dialog(
                                         Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
@@ -202,15 +202,14 @@ class Game:
                                     # print( 'action_result =', action_result, flush=True )
                                     if action_result == 'DROP':
                                         # TODO: Add an are you sure prompt here
-                                        self.game_state.hero_party.lose_item(
-                                            self.game_state.game_info.items[item_result])
+                                        self.game_state.hero_party.lose_item(item_result)
                                     elif action_result == 'EQUIP':
                                         self.game_state.hero_party.main_character.equip_item(item_result)
                                     elif action_result == 'UNEQUIP':
                                         self.game_state.hero_party.main_character.unequip_item(item_result)
                                     elif action_result == 'USE':
-                                        item = self.game_state.game_info.items[item_result]
-                                        if isinstance(item, Tool) and item.use_dialog is not None:
+                                        item = self.game_state.hero_party.get_item(item_result)
+                                        if item is not None and isinstance(item, Tool) and item.use_dialog is not None:
                                             self.gde.dialog_loop(item.use_dialog)
 
                     elif menu_result is not None:

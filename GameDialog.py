@@ -372,7 +372,12 @@ class GameDialog:
             self.refresh_image()
 
     def is_empty(self) -> bool:
-        return len(self.displayed_message_lines) == 0
+        return len(self.displayed_message_lines) + len(self.remaining_message_lines) == 0
+
+    def is_last_row_blank(self) -> bool:
+        if self.is_empty():
+            return True
+        return (self.displayed_message_lines + self.remaining_message_lines)[-1] == ''
 
     def has_more_content(self) -> bool:
         return len(self.remaining_message_lines) != 0

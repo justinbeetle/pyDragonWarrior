@@ -69,11 +69,16 @@ class MonsterParty:
         return MonsterParty.get_monster_summary(self.members) + ' draw near!'
 
     def get_defeated_monster_summary(self) -> str:
-        defeated_monsters = []
+        #defeated_monsters = []
+        #for monster in self.members:
+        #    if monster.is_dead():
+        #        defeated_monsters.append(monster)
+        #return MonsterParty.get_monster_summary(defeated_monsters)
+        terms = []
         for monster in self.members:
             if monster.is_dead():
-                defeated_monsters.append(monster)
-        return MonsterParty.get_monster_summary(defeated_monsters)
+                terms.append(monster.get_name())
+        return MonsterParty.concatenate_string_list(terms)
 
     @staticmethod
     def get_monster_summary(monsters: List[MonsterState]) -> str:
@@ -98,13 +103,19 @@ class MonsterParty:
             terms.append(term)
 
         # Finally concatenate the terms into a single string
-        if 1 != len(terms):
-            terms[-1] = 'and ' + terms[-1]
+        return MonsterParty.concatenate_string_list(terms)
+
+    @staticmethod
+    def concatenate_string_list(terms: List[str]) -> str:
+        if 0 == len(terms):
+            raise ValueError
+        if 1 == len(terms):
+            return terms[0]
+        terms[-1] = 'and ' + terms[-1]
         if 2 == len(terms):
-            merged_terms = ' '.join(terms)
+            return ' '.join(terms)
         else:
-            merged_terms = ', '.join(terms)
-        return merged_terms
+            return ', '.join(terms)
 
     # Get the number of monsters defeated
     def get_defeated_count(self) -> int:

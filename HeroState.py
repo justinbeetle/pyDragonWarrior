@@ -118,6 +118,25 @@ class HeroState(MapCharacterState, CombatCharacterState):
             ret_val += 1
         return ret_val
 
+    def get_item(self, item_name: str, unequipped_only: bool=False) -> Optional[ItemType]:
+        for item in self.unequipped_items:
+            if item_name == item.name:
+                return item
+        if not unequipped_only:
+            if self.weapon is not None and item_name == self.weapon.name:
+                return self.weapon
+            elif self.helm is not None and item_name == self.helm.name:
+                return self.helm
+            elif self.armor is not None and item_name == self.armor.name:
+                return self.armor
+            elif self.shield is not None and item_name == self.shield.name:
+                return self.shield
+            else:
+                for item in self.other_equipped_items:
+                    if item_name == item.name:
+                        return item
+        return None
+
     def get_item_options(self, item_name: str) -> List[str]:
         item_options = []
         is_equipped = False
@@ -144,7 +163,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
             for unequipped_item in self.unequipped_items:
                 if unequipped_item.name == item_name:
                     item = unequipped_item
-                    self.lose_item(item)
+                    self.lose_item(item_name)
                     break
 
             # Attempt to equip the item
@@ -203,34 +222,38 @@ class HeroState(MapCharacterState, CombatCharacterState):
         else:
             self.unequipped_items[item] = count
 
-    def lose_item(self, item: ItemType, count: int=1, unequipped_only: bool=False) -> None:
+    def lose_item(self, item_name: str, count: int=1, unequipped_only: bool=False) -> None:
         # Lost items are taken from unequippedItems where possible, else equipped items
         remaining_items_to_lose = count
-        if item in self.unequipped_items:
-            self.unequipped_items[item] -= count
-            remaining_items_to_lose = -self.unequipped_items[item]
-            if self.unequipped_items[item] <= 0:
-                del self.unequipped_items[item]
+        for item in self.unequipped_items:
+            if item_name == item.name:
+                self.unequipped_items[item] -= count
+                remaining_items_to_lose = -self.unequipped_items[item]
+                if self.unequipped_items[item] <= 0:
+                    del self.unequipped_items[item]
         if remaining_items_to_lose > 0 and not unequipped_only:
-            if self.weapon is not None and item == self.weapon:
+            if self.weapon is not None and item_name == self.weapon.name:
                 self.weapon = None
                 remaining_items_to_lose -= 1
-            elif self.helm is not None and item == self.helm:
+            elif self.helm is not None and item_name == self.helm.name:
                 self.helm = None
                 remaining_items_to_lose -= 1
-            elif self.armor is not None and item == self.armor:
+            elif self.armor is not None and item_name == self.armor.name:
                 self.armor = None
                 remaining_items_to_lose -= 1
-            elif self.shield is not None and item == self.shield:
+            elif self.shield is not None and item_name == self.shield.name:
                 self.shield = None
                 remaining_items_to_lose -= 1
-            elif isinstance(item, Tool):
-                while item in self.other_equipped_items and 0 < remaining_items_to_lose:
+            for item in self.other_equipped_items:
+                if item_name == item.name and 0 < remaining_items_to_lose:
                     self.other_equipped_items.remove(item)
                     remaining_items_to_lose -= 1
 
     def get_name(self) -> str:
         return self.name
+
+    def get_type_name(self) -> str:
+        return self.character_type.name
 
     def is_still_asleep(self) -> bool:
         ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 0.5)
@@ -270,6 +293,9 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def allows_critical_hits(self) -> bool:
         return False
 
+    def is_dodging_attack(self) -> bool:
+        return False
+
     # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.STOPSPELL == action and self.armor is not None:
@@ -290,7 +316,9 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 self.armor.fire_dmg_modifier
         return 1.0
 
-    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+    def get_attack_damage(self,
+                          target: CombatCharacterState,
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
         is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
         if is_critical_hit:
             min_damage = self.get_attack_strength() // 2
@@ -302,7 +330,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
             min_damage,
             max_damage,
             target,
-            ActionCategoryTypeEnum.PHYSICAL)
+            damage_type)
         return damage, is_critical_hit
 
     # TODO: Add spell checks and damage calc methods

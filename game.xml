@@ -1674,15 +1674,38 @@ All part members gain # experience points.  You obtain X pieces of gold.
    </Spells>
 
    <Items>
-      <Weapons>
-         <!-- TODO: Add usage dialog defining the attack behavior of the weapon as dialog -->
-         <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"/>
-         <Weapon name="Club"             attackBonus="4"   gp="60"/>
-         <Weapon name="Copper Sword"     attackBonus="10"  gp="180"/>
-         <Weapon name="Hand Axe"         attackBonus="15"  gp="560"/>
-         <Weapon name="Broad Sword"      attackBonus="20"  gp="1500"/>
-         <Weapon name="Flame Sword"      attackBonus="28"  gp="9800"/>
-         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"/>
+      <Weapons default="Hands">
+         <Weapon name="Hands"            attackBonus="0"   gp="0"   target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"   target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Club"             attackBonus="4"   gp="60"   target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Copper Sword"     attackBonus="10"  gp="180"  target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Hand Axe"         attackBonus="15"  gp="560"  target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Broad Sword"      attackBonus="20"  gp="1500" target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Flame Sword"      attackBonus="28"  gp="9800" target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"    target="SINGLE_ENEMY">
+            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
       </Weapons>
       <Armors>
          <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
@@ -1705,14 +1728,14 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no"  availableInCombat="no">
             <DialogAction type="REPEL_MONSTERS" decay="128"/>
             <DialogAction type="LOSE_ITEM" name="Fairy Water"/>
-            <Dialog>[NAME] drank the vial of Fairy Water.</Dialog></Tool>
+            <Dialog>[ACTOR] drank the vial of Fairy Water.</Dialog></Tool>
 
          <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
 
-         <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes">
+         <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes" target="SINGLE_ALLY">
             <DialogAction type="HEALTH_RESTORE" count="23-30"/>
             <DialogAction type="LOSE_ITEM" name="Herb"/>
-            <Dialog>[NAME] ate the herb.</Dialog></Tool>
+            <Dialog>[ACTOR] ate the herb.</Dialog></Tool>
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
             <DialogCheck type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogCheck>
@@ -1729,45 +1752,44 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogCheck type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogCheck>
             <DialogAction type="LOSE_ITEM" name="Torch"/>
             <DialogAction type="SET_LIGHT_DIAMETER" count="3" decay="unlimited"/>
-            <Dialog>[NAME] lit a torch.</Dialog></Tool>
+            <Dialog>[ACTOR] lit a torch.</Dialog></Tool>
 
          <Tool name="Lantern"                              gp="125"  droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
             <DialogCheck type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogCheck>
             <DialogAction type="SET_LIGHT_DIAMETER" count="5" decay="unlimited"/>
-            <Dialog>[NAME] lit a lattern.</Dialog></Tool>
+            <Dialog>[ACTOR] lit a lattern.</Dialog></Tool>
 
          <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no">
-            <Dialog>[NAME] threw the Wings of the Wyvern up into the sky.</Dialog>
+            <Dialog>[ACTOR] threw the Wings of the Wyvern up into the sky.</Dialog>
             <DialogCheck type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogCheck>
             <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogCheck>
             <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
             <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
             <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
-            <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Tool>
+            <Dialog>[ACTOR] was transported to Tantegel Castle.</Dialog></Tool>
 
          <Tool name="Ball of Light"                                  droppable="no"  equippable="no">
             <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog></Tool>
 
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
-            <Dialog>[NAME] blew the Fairy Flute.</Dialog>
-            <DialogCheck type="IS_IN_COMBAT" target="Golem"><DialogAction type="SLEEP"/></DialogCheck>
-            <DialogAction type="SLEEP" bypass="yes"/></Tool> 
+            <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
+            <DialogAction type="SLEEP" name="Golem" bypass="yes"/></Tool> 
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
-            <Dialog>[NAME] held Erdrick's Token tightly.</Dialog>
+            <Dialog>[ACTOR] held Erdrick's Token tightly.</Dialog>
             <Dialog>But nothing happened.</Dialog></Tool>
 
          <Tool name="Staff of Rain"                                  droppable="no"  equippable="no">
-            <Dialog>[NAME] held the Staff of Rain tightly.</Dialog>
+            <Dialog>[ACTOR] held the Staff of Rain tightly.</Dialog>
             <Dialog>But nothing happened.</Dialog></Tool>
 
          <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no">
-            <Dialog>[NAME] held the Stones of Sunlight tightly.</Dialog>
+            <Dialog>[ACTOR] held the Stones of Sunlight tightly.</Dialog>
             <Dialog>But nothing happened.</Dialog></Tool>
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
-            <Dialog>[NAME] held the Rainbow Drop toward the sky.</Dialog>
+            <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
             <DialogCheck type="IS_AT_COORDINATES" map="overworld" x="66" y="50"><Dialog>But no rainbow appeared here.</Dialog></DialogCheck>
             <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogCheck>
             <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
@@ -1779,17 +1801,17 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Silver Harp"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
-            <Dialog>[NAME] played a sweet melody on the harp.</Dialog>
+            <Dialog>[ACTOR] played a sweet melody on the harp.</Dialog>
             <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogCheck>
             <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool> <!-- TODO: Should only start an encounter where monsters reside -->
 
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
-            <Dialog>[NAME] held the Gwaelin's Love tightly.</Dialog>
-            <Dialog>"Heed my voice, [NAME], for this is Gwaelin."</Dialog>
+            <Dialog>[ACTOR] held the Gwaelin's Love tightly.</Dialog>
+            <Dialog>"Heed my voice, [ACTOR], for this is Gwaelin."</Dialog>
             <Dialog>"To reach the next level thou must raise thy experience points by [NEXT_LEVEL_XP].  My hope is with thee."</Dialog>
-            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
+            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"I love thee, [ACTOR]."</Dialog></DialogCheck>
             <Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog>
-            <Dialog>"I love thee, [NAME]."</Dialog></Tool>
+            <Dialog>"I love thee, [ACTOR]."</Dialog></Tool>
 
          <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
          <Tool name="Death Necklace"                       gp="1200" droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->

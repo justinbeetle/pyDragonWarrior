@@ -14,6 +14,7 @@ from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, Di
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
+from HeroState import HeroState
 from Point import Point
 import SurfaceEffects
 
@@ -156,7 +157,8 @@ class GameDialogEvaluator:
     def traverse_dialog(self,
                         message_dialog: GameDialog,
                         dialog: Union[DialogType, str],
-                        depth: int = 0) -> None:
+                        depth: int = 0,
+                        add_spacing: bool = True) -> None:
 
         if depth == 0:
             self.wait_before_new_text = False
@@ -197,7 +199,7 @@ class GameDialogEvaluator:
                 if orig_item != item:
                     item = GameDialog.fix_capitalization(item)
 
-                if not message_dialog.is_empty():
+                if add_spacing and not message_dialog.is_last_row_blank():
                     message_dialog.add_message('')
                 message_dialog.add_message(item)
 
@@ -354,8 +356,6 @@ class GameDialogEvaluator:
                                          or item.map_pos == self.hero_party.get_curr_pos_dat_tile()))
 
                 elif item.type == DialogCheckEnum.IS_IN_COMBAT:
-                    print('ERROR: DialogCheckEnum.IS_IN_COMBAT is not implemented to check the monster type',
-                          flush=True)
                     check_result = self.game_state.is_in_combat()
 
                 elif item.type == DialogCheckEnum.IS_NOT_IN_COMBAT:
@@ -432,7 +432,7 @@ class GameDialogEvaluator:
                     elif item.type == DialogActionEnum.LOSE_ITEM:
                         item_to_lose = self.game_state.get_item(item_name)
                         if item_to_lose is not None:
-                            self.hero_party.lose_item(item_to_lose, item_count)
+                            self.hero_party.lose_item(item_name, item_count)
                         else:
                             self.hero_party.lose_progress_marker(item_name)
 
@@ -503,9 +503,9 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.SLEEP:
                     worked = False
                     for target in self.targets:
-                        if self.actor.does_action_work(item.type, item.category, target):
+                        if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             target.is_asleep = True
-                            worked = False
+                            worked = True
                             message_dialog.add_message(target.get_name() + ' is asleep.')
                     if not worked:
                         message_dialog.add_message('But that spell did not work.')
@@ -513,9 +513,9 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.STOPSPELL:
                     worked = False
                     for target in self.targets:
-                        if self.actor.does_action_work(item.type, item.category, target):
+                        if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             target.are_spells_blocked = True
-                            worked = False
+                            worked = True
                             message_dialog.add_message(target.get_name() + "'s spells are blocked.")
                     if not worked:
                         message_dialog.add_message('But that spell did not work.')
@@ -524,13 +524,44 @@ class GameDialogEvaluator:
                     worked = False
                     damagedTargets = []
                     for target in self.targets:
-                        if self.actor.does_action_work(item.type, item.category, target):
+                        if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             worked = True
-                            # TODO: Need to address visualization of damage to target
-                            damage = round(GameTypes.get_int_value(item.count) * target.get_damage_modifier(item.category))
+                            is_critical_hit = False
+                            if item.count != 'default':
+                                damage = round(GameTypes.get_int_value(item.count)
+                                               * target.get_damage_modifier(item.category))
+                            else:
+                                (damage, is_critical_hit) = self.actor.get_attack_damage(target, item.category)
+
+                            print('DAMAGE_TARGET: ' + self.actor.get_name() + ' damages ' + target.get_name() + ' by '
+                                  + str(damage) + ' - item.count =', item.count, flush=True)
                             if 0 < damage:
-                                damagedTargets.append(target)
-                                target.hp = max(0, target.hp - damage)
+                                if is_critical_hit:
+                                    # TODO: Play sound?
+                                    message_dialog.add_message('Excellent move!')
+
+                                # Check for a dodge
+                                if target.is_dodging_attack():
+                                    AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
+                                    self.message_dialog.add_message(
+                                        target.get_name() + ' dodges ' + hero.get_name() + "'s strike.")
+                                else:
+                                    # TODO: Play different sound based on damage of attack
+                                    AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
+
+                                    damagedTargets.append(target)
+
+                                    target.hp = max(0, target.hp - damage)
+                                    if target == self.hero_party.main_character:
+                                        message_dialog.add_message('Thy hit points reduced by ' + str(damage) + '.')
+                                    else:
+                                        message_dialog.add_message(target.get_name() + "'s hit points reduced by "
+                                                                   + str(damage) + '.')
+                            else:
+                                if isinstance(target, HeroState):
+                                    message_dialog.add_message(target.get_name() + ' dodges the strike.')
+                                else:
+                                    message_dialog.add_message('A miss! No damage hath been scored!')
                     if not worked:
                         # TODO: May not have been a spell - handle that as well
                         message_dialog.add_message('But that spell did not work.')

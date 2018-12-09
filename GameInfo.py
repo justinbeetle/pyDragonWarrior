@@ -58,11 +58,30 @@ class GameInfo:
         self.weapons: Dict[str, Weapon] = {}
         for element in xml_root.findall("./Items/Weapons/Weapon"):
             item_name = element.attrib['name']
+            use_dialog = self.parse_dialog(element)
+            if use_dialog is None:
+                print('ERROR: No use dialog for weapon', item_name, flush=True)
+                continue
+            target_type = TargetTypeEnum.SINGLE_ENEMY
+            if 'target' in element.attrib:
+                target_type = TargetTypeEnum[element.attrib['target']]
             self.weapons[item_name] = Weapon(
                 item_name,
                 int(element.attrib['attackBonus']),
-                int(element.attrib['gp']))
+                int(element.attrib['gp']),
+                target_type,
+                use_dialog)
             self.items[item_name] = self.weapons[item_name]
+
+        # Get default weapon
+        weapons_element = xml_root.find('Weapon')
+        if weapons_element is not None and 'default' in weapons_element.attrib:
+            self.default_weapon = self.weapons[weapons_element.attrib['default']]
+        else:
+            self.default_weapon = next(iter(self.weapons.values()))
+        # The default weapon isn't actually an item so remove it from the weapon and item lists
+        del self.weapons[self.default_weapon.name]
+        del self.items[self.default_weapon.name]
          
         # Parse armors
         self.armors: Dict[str, Armor] = {}
@@ -217,7 +236,7 @@ class GameInfo:
             available_outside_combat = True
             available_inside = True
             available_outside = True
-            target_type = None
+            target_type = TargetTypeEnum.SELF
             if 'availableInCombat' in element.attrib:
                 available_in_combat = element.attrib['availableInCombat'] == 'yes'
             if 'availableOutsideCombat' in element.attrib:
@@ -342,7 +361,7 @@ class GameInfo:
 
         # Get default monster action
         monster_actions_element = xml_root.find('MonsterActions')
-        if monster_actions_element is not None and 'default' in monster_actions_element:
+        if monster_actions_element is not None and 'default' in monster_actions_element.attrib:
             self.default_monster_action = monster_actions[monster_actions_element.attrib['default']]
         else:
             self.default_monster_action = next(iter(monster_actions.values()))
@@ -814,9 +833,19 @@ class GameInfo:
                 if 'encounterMusic' in element.attrib:
                     encounter_music = element.attrib['encounterMusic']
 
+                bypass = False
+                if 'bypass' in element.attrib:
+                    bypass = element.attrib['bypass'] == 'yes'
+
+                # TODO: For DAMAGE_TARGET count should NOT default to 1
+                if (DialogActionEnum[element.attrib['type']] == DialogActionEnum.DAMAGE_TARGET
+                        and 'count' not in element.attrib):
+                    count = 'default'
+
                 dialog.append(DialogAction(DialogActionEnum[element.attrib['type']],
                                            name=name,
                                            count=count,
+                                           bypass=bypass,
                                            map_name=map_name,
                                            map_pos=map_pos,
                                            map_dir=map_dir,

@@ -90,6 +90,13 @@ class HeroParty:
             ret_val += 1
         return ret_val
 
+    def get_item(self, item_name: str) -> Optional[ItemType]:
+        for member in self.members:
+            item = member.get_item(item_name)
+            if item is not None:
+                return item
+        return None
+
     # TODO: Should gained items instead go into a communal party stash?
     def gain_item(self, item: ItemType, count: int = 1) -> None:
         self.main_character.gain_item(item, count)
@@ -97,29 +104,29 @@ class HeroParty:
     # Lose items
     # For lost items, first lose unequipped items then equipped items.
     # Start at the back of the party and move forward while skipping the main character then processing them last
-    def lose_item(self, item: ItemType, count: int = 1) -> None:
+    def lose_item(self, item_name: str, count: int = 1) -> None:
         traversal_list = self.members.copy()
         traversal_list.reverse()
         traversal_list.remove(self.main_character)
         traversal_list.append(self.main_character)
         remaining_count = count
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item.name, unequipped_only=True), remaining_count)
+            member_lose_count = min(member.get_item_count(item_name, unequipped_only=True), remaining_count)
             if 0 < member_lose_count:
-                member.lose_item(item, member_lose_count, unequipped_only=True)
+                member.lose_item(item_name, member_lose_count, unequipped_only=True)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
                 return
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item.name, unequipped_only=False), remaining_count)
+            member_lose_count = min(member.get_item_count(item_name, unequipped_only=False), remaining_count)
             if 0 < member_lose_count:
-                member.lose_item(item, member_lose_count, unequipped_only=False)
+                member.lose_item(item_name, member_lose_count, unequipped_only=False)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
                 return
         if 0 < remaining_count:
             print('ERROR: Remaining count of ' + str(remaining_count) + ' on attempt to lose ' + str(count) + ' of '
-                  + item.name, flush=True)
+                  + item_name, flush=True)
 
     def gain_progress_marker(self, progress_marker: str) -> None:
         if progress_marker not in self.progress_markers:

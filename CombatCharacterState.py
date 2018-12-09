@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import annotations
-from typing import Tuple
+from typing import Optional, Tuple
 
 import abc
 import math
@@ -47,7 +47,16 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
                          action: DialogActionEnum,
                          category: ActionCategoryTypeEnum,
                          target: CombatCharacterState,
-                         bypass_resistance: bool = False) -> bool:
+                         bypass_resistance: bool = False,
+                         bypass_type_name: Optional[str] = None) -> bool:
+        # Factor in the bypass_type_name
+        # If bypass_resistance is True and bypass_type_name is None, bypass_resistance applies to all target types
+        # If bypass_resistance is True and bypass_type_name is not None, the bypass_resistance only applies to the
+        # target type with the name bypass_type_name.
+        # TODO: Probably want to refine this mechanic
+        if bypass_resistance and bypass_type_name is not None:
+            bypass_resistance = target.get_type_name() == bypass_type_name
+
         if ActionCategoryTypeEnum.MAGICAL == category and self.are_spells_blocked:
             return False
         if DialogActionEnum.SLEEP == action and target.is_asleep:
@@ -71,6 +80,10 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_name(self) -> str:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_type_name(self) -> str:
         raise NotImplementedError
 
     # Determine if character should remain asleep.  Should maintain turnsAsleep.
@@ -98,6 +111,10 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def allows_critical_hits(self) -> bool:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def is_dodging_attack(self) -> bool:
+        raise NotImplementedError
+
     # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     @abc.abstractmethod
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
@@ -112,12 +129,18 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     # Return damage along with a bool indicating whether the attack was a critical hit
+    # Accounts for and applies the damage modifier
     @abc.abstractmethod
-    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+    def get_attack_damage(self,
+                          target: CombatCharacterState,
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
         raise NotImplementedError
 
     @staticmethod
-    def calc_damage(min_damage: int, max_damage: int, target: CombatCharacterState, damage_type: ActionCategoryTypeEnum) -> int:
+    def calc_damage(min_damage: int,
+                    max_damage: int,
+                    target: CombatCharacterState,
+                    damage_type: ActionCategoryTypeEnum) -> int:
         # print('min_damage =', min_damage, flush=True)
         # print('max_damage =', max_damage, flush=True)
         modifier = target.get_damage_modifier(damage_type)

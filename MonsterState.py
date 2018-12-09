@@ -24,6 +24,9 @@ class MonsterState(CombatCharacterState):
     def get_name(self) -> str:
         return self.name
 
+    def get_type_name(self) -> str:
+        return self.monster_info.name
+
     def set_name(self, name: str) -> None:
         self.name = name
 
@@ -51,6 +54,11 @@ class MonsterState(CombatCharacterState):
     def allows_critical_hits(self) -> bool:
         return not self.monster_info.allows_critical_hits
 
+    # Determine if the monster dodges an attack
+    def is_dodging_attack(self) -> bool:
+        return (not self.is_asleep
+                and random.uniform(0, 1) < self.monster_info.dodge)
+
     # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.SLEEP == action:
@@ -73,7 +81,9 @@ class MonsterState(CombatCharacterState):
     def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
         return 1.0
 
-    def get_attack_damage(self, target: CombatCharacterState) -> Tuple[int, bool]:
+    def get_attack_damage(self,
+                          target: CombatCharacterState,
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
         is_critical_hit = False
         if target.get_defense_strength() < self.get_strength():
             min_damage = (self.get_strength() - target.get_defense_strength() // 2) // 4
@@ -85,7 +95,7 @@ class MonsterState(CombatCharacterState):
             min_damage,
             max_damage,
             target,
-            ActionCategoryTypeEnum.PHYSICAL)
+            damage_type)
         return damage, is_critical_hit
 
     # Determine if the monster has the initiative and attacks first in an encounter
@@ -98,11 +108,6 @@ class MonsterState(CombatCharacterState):
     def should_run_away(self, hero_state: CombatCharacterState) -> bool:
         return (self.special_monster_info is None
                 and hero_state.get_strength() > self.get_strength() * 2 and random.uniform(0, 1) < 0.25)
-
-    # Determine if the monster dodges an attack
-    def is_dodging_attack(self) -> bool:
-        return (not self.is_asleep
-                and random.uniform(0, 1) < self.monster_info.dodge)
 
     # Determine if the monster blocks an attempt by the hero to run away
     def is_blocking_escape(self, hero_state: CombatCharacterState) -> bool:

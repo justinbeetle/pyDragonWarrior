@@ -8,12 +8,12 @@ import random
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
 from CombatEncounterInterface import CombatEncounterInterface
-from GameDialog import GameDialog
+from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
-from GameTypes import DialogType, MonsterInfo, SpecialMonster, TargetTypeEnum
+from GameTypes import DialogType, MonsterInfo, SpecialMonster, TargetTypeEnum, Tool
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
@@ -85,7 +85,6 @@ class CombatEncounter(CombatEncounterInterface):
             self.gde.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
         else:
             self.message_dialog.add_message(self.monster_party.get_default_approach_dialog())
-            self.message_dialog.add_message('')
         self.message_dialog.blit(self.game_state.screen, True)
 
         # Check if monsters run away at the start of the encounter
@@ -97,7 +96,8 @@ class CombatEncounter(CombatEncounterInterface):
                         self.gde.wait_for_acknowledgement(self.message_dialog)
                     else:
                         # Pause to allow time to see the monsters before they run away
-                        pygame.time.Clock().tick(1000)
+                        for pauseTicks in range(10):
+                            pygame.time.Clock().tick(30)
                     last_turn_was_monster_turn = True
                     monster.has_run_away = True
                     self.message_dialog.add_message(monster.get_name() + ' is running away.')
@@ -290,7 +290,7 @@ class CombatEncounter(CombatEncounterInterface):
             self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
 
         # Perform the monster action
-        self.gde.traverse_dialog(self.message_dialog, chosen_monster_action.use_dialog, depth=1)
+        self.gde.traverse_dialog(self.message_dialog, chosen_monster_action.use_dialog, depth=1, add_spacing=False)
 
     def execute_player_turn(self, hero: HeroState) -> None:
         self.message_dialog.add_message('')
@@ -298,6 +298,7 @@ class CombatEncounter(CombatEncounterInterface):
         # Check if the hero wakes up
         self.check_wake_up(hero)
         if hero.is_asleep:
+            self.gde.wait_for_acknowledgement(self.message_dialog)
             return
 
         while self.game_state.is_running:
@@ -311,36 +312,15 @@ class CombatEncounter(CombatEncounterInterface):
             if not self.game_state.is_running:
                 return
 
-            # Process encounter menu selection
+            # Process encounter menu selection to set use_dialog and target_type
+            use_dialog = None
+            target_type = None
             if menu_result == 'FIGHT':
-                # Determine the target
-                # TODO: Allow user to select the monster
-                target = random.choice(self.monster_party.get_still_in_combat_members())
-
-                self.message_dialog.add_message(hero.get_name() + ' attacks!')
-
-                # Check for damage and a critical strike
-                (damage, is_critical_hit) = hero.get_attack_damage(target)
-                if 0 == damage:
-                    # TODO: Play sound?
-                    self.message_dialog.add_message('A miss! No damage hath been scored!')
-                else:
-                    if is_critical_hit:
-                        # TODO: Play sound?
-                        self.message_dialog.add_message('Excellent move!')
-
-                    # Check for a monster dodge
-                    if target.is_dodging_attack():
-                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
-                        self.message_dialog.add_message(
-                            target.get_name() + ' dodges ' + hero.get_name() + "'s strike.")
-                    else:
-                        # TODO: Play different sound based on damage of attack
-                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
-                        self.message_dialog.add_message(
-                            target.get_name() + "'s hit points reduced by " + str(damage) + '.')
-                        target.hp -= damage
-                        self.render_damage_to_targets([target])
+                weapon = self.game_info.default_weapon
+                if hero.weapon is not None:
+                    weapon = hero.weapon
+                use_dialog = weapon.use_dialog
+                target_type = weapon.target_type
 
             elif menu_result == 'RUN':
                 target = random.choice(self.monster_party.get_still_in_combat_members())
@@ -352,7 +332,7 @@ class CombatEncounter(CombatEncounterInterface):
                     AudioPlayer().play_sound('runAway.wav')
                     self.message_dialog.add_message(hero.get_name() + ' started to run away.')
                     hero.has_run_away = True
-                    break
+                return
 
             elif menu_result == 'SPELL':
                 available_spell_names = hero.get_available_spell_names()
@@ -373,63 +353,71 @@ class CombatEncounter(CombatEncounterInterface):
                         spell = hero.get_spell(menu_result)
                         if spell is not None and hero.mp >= spell.mp:
                             hero.mp -= spell.mp
-
-                            AudioPlayer().play_sound('castSpell.wav')
-                            SurfaceEffects.flickering(self.game_state.screen)
-
-                            # Determine the target
-                            # TODO: Allow user to select the monster
-                            target = random.choice(self.monster_party.get_still_in_combat_members())
-
-                            spell_worked = True
-                            if hero.does_spell_work(spell, target):
-                                if spell.max_hp_recover > 0:
-                                    hp_recover = random.randint(spell.min_hp_recover, spell.max_hp_recover)
-                                    hero.hp = min(hero.max_hp, hero.hp + hp_recover)
-                                elif spell.max_damage_by_hero > 0:
-                                    damage = random.randint(spell.min_damage_by_hero,
-                                                            spell.max_damage_by_hero)
-                                    self.message_dialog.add_message(target.get_name()
-                                                               + "'s hit points reduced by "
-                                                               + str(damage) + '.')
-                                    target.hp -= damage
-                                elif 'SLEEP' == spell.name.upper():
-                                    target.is_asleep = True
-                                elif 'STOPSPELL' == spell.name.upper():
-                                    target.are_spells_blocked = True
-                                else:
-                                    spell_worked = False
-                            else:
-                                spell_worked = False
-
-                            if spell_worked:
-                                self.message_dialog.add_message(
-                                    hero.get_name() + ' cast the spell of ' + spell.name.lower() + '.')
-                            else:
-                                self.message_dialog.add_message(
-                                    hero.get_name() + ' cast the spell of ' + spell.name.lower()
-                                    + ' but the spell did not work.')
-
-                            GameDialog.create_encounter_status_dialog(self.hero_party).blit(
-                                self.game_state.screen, False)
-
+                            use_dialog = spell.use_dialog
+                            target_type = spell.target_type
                         else:
                             self.message_dialog.add_message('Thou dost not have enough magic to cast the spell.')
                             continue
                     menu_dialog.erase(self.game_state.screen, self.background_image, True)
             elif menu_result == 'ITEM':
-                print('Items are not implemented', flush=True)
-                continue
+                item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
+                if len(item_row_data) == 0:
+                    self.message_dialog.add_message('Thou dost not have any tools.')
+                    continue
+                else:
+                    menu_dialog = GameDialog.create_menu_dialog(
+                        Point(-1, 1),
+                        None,
+                        'ITEMS',
+                        item_row_data,
+                        2,
+                        GameDialogSpacing.OUTSIDE_JUSTIFIED)
+                    menu_dialog.blit(self.game_state.screen, True)
+                    item_result = self.gde.get_menu_result(menu_dialog)
+                    # print( 'item_result =', item_result, flush=True )
+
+                    if item_result is None:
+                        continue
+                    item = hero.get_item(item_result)
+                    if item is None or not isinstance(item, Tool):
+                        continue
+                    if item.use_dialog is not None:
+                        use_dialog = item.use_dialog
+                        target_type = item.target_type
+                    else:
+                        self.message_dialog.add_message(hero.get_name()
+                                                        + ' studied the object and was confounded by it.')
             else:
                 continue
 
             # If here the turn was successfully completed
             break
 
-        # Check for ran away death or monster death
-        if self.still_in_encounter():
-            self.message_dialog.blit(self.game_state.screen, True)
-            self.gde.wait_for_acknowledgement(self.message_dialog)
+        # Select the target for the selected action
+        self.gde.set_actor(hero)
+        if TargetTypeEnum.SELF == target_type:
+            self.gde.set_targets([hero])
+        if TargetTypeEnum.SINGLE_ALLY == target_type:
+            still_in_combat_members = self.hero_party.get_still_in_combat_members()
+            if 1 == len(still_in_combat_members):
+                self.gde.set_targets(still_in_combat_members)
+            else:
+                # TODO: Prompt for selection of which ally to target
+                self.gde.set_targets([still_in_combat_members[0]])
+        elif TargetTypeEnum.ALL_ALLIES == target_type:
+            self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
+        elif TargetTypeEnum.SINGLE_ENEMY == target_type:
+            still_in_combat_members = self.monster_party.get_still_in_combat_members()
+            if 1 == len(still_in_combat_members):
+                self.gde.set_targets(still_in_combat_members)
+            else:
+                # TODO: Prompt for selection of which enemey to target
+                self.gde.set_targets([still_in_combat_members[0]])
+        else:  # TargetTypeEnum.ALL_ENEMIES
+            self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
+
+        # Perform the action
+        self.gde.traverse_dialog(self.message_dialog, use_dialog, depth=1)
 
     def handle_victory(self) -> None:
         if 0 < self.monster_party.get_defeated_count():
@@ -509,6 +497,8 @@ def main() -> None:
         monster_party.add_monster(list(game_info.monsters.values())[0])
         combat_parties.append((hero_party, monster_party))
     for monster_name in ['Golem', 'Knight', 'Magiwyvern', 'Starwyvern', 'Red Dragon']:
+        hero_party = HeroParty(HeroState(game_info.character_types['hero'], Point(), Direction.NORTH, 'Camden', 20000))
+        hero_party.main_character.gain_item(game_info.items['Fairy Flute'])
         monster_party = MonsterParty([game_info.monsters[monster_name]])
         combat_parties.append((hero_party, monster_party))
 

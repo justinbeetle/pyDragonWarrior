@@ -110,7 +110,7 @@ class DialogCheckEnum(Enum):
     IS_INSIDE = 5                      # attributes: count (number, range, or unlimited)
     IS_DARK = 6                        # attributes: <none>
     IS_AT_COORDINATES = 7              # attributes: map, x, y
-    IS_IN_COMBAT = 8                   # attributes: name (optional name of monster)
+    IS_IN_COMBAT = 8                   # attributes: name
     IS_NOT_IN_COMBAT = 9               # attributes: <none>
 
 
@@ -152,6 +152,7 @@ class TargetTypeEnum(Enum):
     ALL_ALLIES = 2
     SINGLE_ENEMY = 3
     ALL_ENEMIES = 4
+    SELF = 5
 
 
 # Alternate options to attacking (or attempting to run away) which may be attempted by a monster
@@ -284,6 +285,7 @@ class DialogAction:
     type: DialogActionEnum
     name: Optional[str] = None
     count: Union[int, str] = 1
+    bypass: bool = False
     decay_steps: Optional[int] = None
     map_name: Optional[str] = None
     map_pos: Optional[Point] = None
@@ -488,7 +490,7 @@ class Spell(NamedTuple):
     available_outside_combat: bool
     available_inside: bool
     available_outside: bool
-    target_type: Optional[TargetTypeEnum]
+    target_type: TargetTypeEnum
     use_dialog: DialogType
     # TODO: Eventually replacing the following with use_dialog
     min_hp_recover: int
@@ -503,6 +505,8 @@ class Weapon(NamedTuple):
     name: str
     attack_bonus: int
     gp: int
+    target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ENEMY
+    use_dialog: DialogType = ['[ACTOR] attacks!', DialogAction(DialogActionEnum.DAMAGE_TARGET, count='default')]
 
 
 class Helm(NamedTuple):
@@ -537,6 +541,7 @@ class Tool:
     droppable: bool = True
     equippable: bool = False
     use_dialog: Optional[DialogType] = None
+    target_type: TargetTypeEnum = TargetTypeEnum.SELF
 
     def __hash__(self) -> int:
         return hash('Tool:' + self.name)
