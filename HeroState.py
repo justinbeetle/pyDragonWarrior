@@ -231,6 +231,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 remaining_items_to_lose = -self.unequipped_items[item]
                 if self.unequipped_items[item] <= 0:
                     del self.unequipped_items[item]
+                break
         if remaining_items_to_lose > 0 and not unequipped_only:
             if self.weapon is not None and item_name == self.weapon.name:
                 self.weapon = None

@@ -117,8 +117,10 @@ class DialogCheckEnum(Enum):
 # Actions that can be triggered from dialog
 class DialogActionEnum(Enum):
     SAVE_GAME = 1                      # attributes: <none>
-    MAGIC_RESTORE = 2                  # attributes: count (number, range, or unlimited), category
-    HEALTH_RESTORE = 3                 # attributes: count (number, range, or unlimited), category
+    MAGIC_RESTORE = 2                  # attributes: count (number, range, or unlimited), category,
+    #                                                bypass (to bypass any dialog or updating the screen)
+    HEALTH_RESTORE = 3                 # attributes: count (number, range, or unlimited), category,
+    #                                                bypass (to bypass any dialog or updating the screen)
     LOSE_ITEM = 4                      # attributes: item (if unknown name, treated as a progress marker),
     #                                                count (defaults to 1)
     GAIN_ITEM = 5                      # attributes: item (if unknown name, treated as a progress marker),
@@ -295,6 +297,7 @@ class DialogAction:
     run_away_dialog: Optional[DialogType] = None
     encounter_music: Optional[str] = None
     category: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL  # TODO: Change to list of categories?
+    target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ALLY
 
 
 # Type to aggregate all the different dialog replacement variables
@@ -508,6 +511,9 @@ class Weapon(NamedTuple):
     target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ENEMY
     use_dialog: DialogType = ['[ACTOR] attacks!', DialogAction(DialogActionEnum.DAMAGE_TARGET, count='default')]
 
+    def __hash__(self) -> int:
+        return hash('Weapon:' + self.name)
+
 
 class Helm(NamedTuple):
     name: str
@@ -532,8 +538,7 @@ class Shield(NamedTuple):
     gp: int
 
 
-@dataclass
-class Tool:
+class Tool(NamedTuple):
     name: str
     attack_bonus: int = 0
     defense_bonus: int = 0

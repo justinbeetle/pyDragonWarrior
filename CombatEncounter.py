@@ -19,7 +19,6 @@ from HeroState import HeroState
 from MonsterParty import MonsterParty
 from MonsterState import MonsterState
 from Point import Point
-import SurfaceEffects
 
 
 class CombatEncounter(CombatEncounterInterface):
@@ -118,6 +117,9 @@ class CombatEncounter(CombatEncounterInterface):
                     if not self.still_in_encounter():
                         break
 
+        # Clear combat status effects now that combat is over
+        self.hero_party.clear_combat_status_affects()
+
         # Handle the outcome of the encounter
         AudioPlayer().stop_music()
         if self.hero_party.has_surviving_members():
@@ -126,7 +128,7 @@ class CombatEncounter(CombatEncounterInterface):
             else:
                 self.handle_running_away()
         else:
-            self.handle_death()
+            self.game_state.handle_death(self.message_dialog)
 
         # Wait for final acknowledgement
         self.gde.wait_for_acknowledgement(self.message_dialog)
@@ -313,8 +315,6 @@ class CombatEncounter(CombatEncounterInterface):
                 return
 
             # Process encounter menu selection to set use_dialog and target_type
-            use_dialog = None
-            target_type = None
             if menu_result == 'FIGHT':
                 weapon = self.game_info.default_weapon
                 if hero.weapon is not None:
@@ -402,21 +402,21 @@ class CombatEncounter(CombatEncounterInterface):
         if TargetTypeEnum.SELF == target_type:
             self.gde.set_targets([hero])
         if TargetTypeEnum.SINGLE_ALLY == target_type:
-            still_in_combat_members = self.hero_party.get_still_in_combat_members()
-            if 1 == len(still_in_combat_members):
-                self.gde.set_targets(still_in_combat_members)
+            still_in_combat_heros = self.hero_party.get_still_in_combat_members()
+            if 1 == len(still_in_combat_heros):
+                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_heros))
             else:
                 # TODO: Prompt for selection of which ally to target
-                self.gde.set_targets([still_in_combat_members[0]])
+                self.gde.set_targets([still_in_combat_heros[0]])
         elif TargetTypeEnum.ALL_ALLIES == target_type:
             self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
         elif TargetTypeEnum.SINGLE_ENEMY == target_type:
-            still_in_combat_members = self.monster_party.get_still_in_combat_members()
-            if 1 == len(still_in_combat_members):
-                self.gde.set_targets(still_in_combat_members)
+            still_in_combat_monsters = self.monster_party.get_still_in_combat_members()
+            if 1 == len(still_in_combat_monsters):
+                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_monsters))
             else:
                 # TODO: Prompt for selection of which enemey to target
-                self.gde.set_targets([still_in_combat_members[0]])
+                self.gde.set_targets([still_in_combat_monsters[0]])
         else:  # TargetTypeEnum.ALL_ENEMIES
             self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
 
@@ -451,9 +451,6 @@ class CombatEncounter(CombatEncounterInterface):
     def handle_running_away(self) -> None:
         if self.run_away_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.run_away_dialog)
-
-    def handle_death(self) -> None:
-        self.game_state.handle_death()
 
 
 def main() -> None:
@@ -515,7 +512,7 @@ def main() -> None:
                                            monster_party,
                                            encounter_image)
         combat_encounter.encounter_loop()
-        clock.tick(1000)
+        clock.tick(30)
 
     # Terminate pygame
     AudioPlayer().terminate()

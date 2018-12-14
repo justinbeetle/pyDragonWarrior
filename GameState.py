@@ -2,16 +2,16 @@
 
 from typing import Dict, List, Optional, Union
 
-from enum import Enum
 import os
 import pygame
+import random
 import xml.etree.ElementTree
 import xml.dom.minidom
-import random
 
-
-# from CombatEncounter import CombatEncounter
+from AudioPlayer import AudioPlayer
+from CombatEncounter import CombatEncounter
 from GameDialog import GameDialog
+from GameDialogEvaluator import GameDialogEvaluator
 from GameTypes import DialogReplacementVariables, DialogType, Direction, ItemType, LeavingTransition, Level, \
     MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Spell, Tile
 from GameInfo import GameInfo
@@ -19,14 +19,10 @@ from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
 from HeroParty import HeroParty
 from HeroState import HeroState
+from MonsterParty import MonsterParty
+from MonsterState import MonsterState
 from NpcState import NpcState
 from Point import Point
-
-
-class GameMode(Enum):
-    TITLE_SCREEN = 1
-    EXPLORING = 2
-    ENCOUNTER = 3  # TODO: Remove
 
 
 class GameState(GameStateInterface):
@@ -66,7 +62,7 @@ class GameState(GameStateInterface):
 
         # Set character state for new game
         self.pending_dialog = self.game_info.initial_state_dialog
-        pc = HeroState(self.game_info.character_types['hero_sword_and_shield'],
+        pc = HeroState(self.game_info.character_types['hero'],
                        self.game_info.initial_hero_pos_dat_tile,
                        self.game_info.initial_hero_pos_dir,
                        self.game_info.pc_name,
@@ -85,14 +81,12 @@ class GameState(GameStateInterface):
         self.hero_party.progress_markers = self.game_info.pc_progressMarkers
 
         # TODO: Remove Mocha from party
-        '''
-        mocha = HeroState('mocha',
+        mocha = HeroState(self.game_info.character_types['mocha'],
                           self.game_info.initial_hero_pos_dat_tile,
                           self.game_info.initial_hero_pos_dir,
                           'Mocha',
-                          self.game_info.levels[0])
+                          0)
         self.hero_party.add_member(mocha)
-        '''
 
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
@@ -105,10 +99,7 @@ class GameState(GameStateInterface):
 
         # TODO: Migrate these to here
         # self.message_dialog: Optional[GameDialog] = None
-        # self.combat_encounter: Optional[CombatEncounter] = None
-
-        self.last_game_mode: Optional[GameMode] = None
-        self.game_mode = GameMode.TITLE_SCREEN
+        self.combat_encounter: Optional[CombatEncounter] = None
 
     def set_map(self,
                 new_map_name: str,
@@ -469,21 +460,24 @@ class GameState(GameStateInterface):
 
     def draw_character(self, character: MapCharacterState) -> None:
         pc = self.hero_party.members[0]
-        if character == pc or self.is_interior(pc.curr_pos_dat_tile) == self.is_interior(
-                character.curr_pos_dat_tile):
-            if character == self.hero_party.main_character:
-                # TODO: Configurable way to handle the PC image mappings
-                if self.hero_party.main_character.has_item('PM_Carrying_Princess'):
-                    character_images = self.game_info.character_types['hero_carrying_princess'].images
-                elif (self.hero_party.main_character.weapon is not None
-                      and self.hero_party.main_character.shield is not None):
-                    character_images = self.game_info.character_types['hero_sword_and_shield'].images
-                elif self.hero_party.main_character.weapon is not None:
-                    character_images = self.game_info.character_types['hero_sword'].images
-                elif self.hero_party.main_character.shield is not None:
-                    character_images = self.game_info.character_types['hero_shield'].images
+        if character == pc or self.is_interior(pc.curr_pos_dat_tile) == self.is_interior(character.curr_pos_dat_tile):
+            if isinstance(character, HeroState):
+                if character.hp <= 0:
+                    character_images = self.game_info.character_types['ghost'].images
+                elif character.character_type.name == 'hero':
+                    # TODO: Configurable way to handle the PC image mappings
+                    if character == self.hero_party.main_character and self.hero_party.has_item('PM_Carrying_Princess'):
+                        character_images = self.game_info.character_types['hero_carrying_princess'].images
+                    elif character.weapon is not None and character.shield is not None:
+                        character_images = self.game_info.character_types['hero_sword_and_shield'].images
+                    elif character.weapon is not None:
+                        character_images = self.game_info.character_types['hero_sword'].images
+                    elif character.shield is not None:
+                        character_images = self.game_info.character_types['hero_shield'].images
+                    else:
+                        character_images = self.game_info.character_types['hero'].images
                 else:
-                    character_images = self.game_info.character_types['hero'].images
+                    character_images = character.character_type.images
             else:
                 character_images = character.character_type.images
             self.screen.blit(
@@ -723,7 +717,7 @@ class GameState(GameStateInterface):
         return self.game_info.tiles[name]
 
     def is_in_combat(self) -> bool:
-        return GameMode.ENCOUNTER == self.game_mode
+        return self.combat_encounter is not None
 
     def get_light_diameter(self) -> Optional[float]:
         return self.light_diameter
@@ -742,18 +736,68 @@ class GameState(GameStateInterface):
         return self.game_info.tile_size_pixels
 
     def initiate_encounter(self,
-                           monster_info: MonsterInfo,
-                           approach_dialog: Optional[DialogType],
-                           victory_dialog: Optional[DialogType],
-                           run_away_dialog: Optional[DialogType],
-                           encounter_music: Optional[str],
-                           message_dialog: Optional[GameDialog]) -> None:
-        # TODO: Restore support for this
-        print('ERROR: initiate_encounter is not currently implemented', flush=True)
+                           monster_info: Optional[MonsterInfo] = None,
+                           approach_dialog: Optional[DialogType] = None,
+                           victory_dialog: Optional[DialogType] = None,
+                           run_away_dialog: Optional[DialogType] = None,
+                           encounter_music: Optional[str] = None,
+                           message_dialog: Optional[GameDialog] = None) -> None:
+        # Determine the monster party for the encounter
+        if monster_info is None:
+            # Check for special monsters
+            special_monster_info = self.get_special_monster()
+            if special_monster_info is not None:
+                monster_party = MonsterParty([MonsterState(special_monster_info)])
+                approach_dialog = special_monster_info.approach_dialog
+                victory_dialog = special_monster_info.victory_dialog
+                run_away_dialog = special_monster_info.run_away_dialog
+            else:
+                monster_info = self.game_info.monsters[random.choice(self.get_tile_monsters())]
+                monster_party = MonsterParty([MonsterState(monster_info)])
 
-    def handle_death(self) -> None:
-        # TODO: Restore support for this
-        print('ERROR: handle_death is not currently implemented', flush=True)
+        # Perform the combat encounter
+        CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
+        self.combat_encounter = CombatEncounter(
+            game_info=self.game_info,
+            game_state=self,
+            monster_party=monster_party,
+            encounter_image=self.game_info.maps[self.map_state.name].encounter_image,
+            message_dialog=message_dialog,
+            approach_dialog=approach_dialog,
+            victory_dialog=victory_dialog,
+            run_away_dialog=run_away_dialog,
+            encounter_music=encounter_music)
+        self.combat_encounter.encounter_loop()
+        self.combat_encounter = None
+
+        # Play the music for the current map
+        AudioPlayer().play_music(self.game_info.maps[self.map_state.name].music)
+
+    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
+        if not self.hero_party.has_surviving_members():
+            # Player death
+            self.hero_party.main_character.hp = 0
+            AudioPlayer().stop_music()
+            AudioPlayer().play_sound('20_-_Dragon_Warrior_-_NES_-_Dead.ogg')
+            GameDialog.create_exploring_status_dialog(
+                self.hero_party).blit(self.screen, False)
+            if message_dialog is None:
+                message_dialog = GameDialog.create_message_dialog()
+            else:
+                message_dialog.add_message('')
+            message_dialog.add_message('Thou art dead.')
+            gde = GameDialogEvaluator(self.game_info, self)
+            gde.wait_for_acknowledgement(message_dialog)
+            for hero in self.hero_party.members:
+                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_info.death_hero_pos_dat_tile
+                hero.curr_pos_offset_img_px = Point(0, 0)
+                hero.direction = self.game_info.death_hero_pos_dir
+                hero.hp = hero.level.hp
+                hero.mp = hero.level.mp
+            gde.update_default_dialog_font_color()
+            self.pending_dialog = self.game_info.death_dialog
+            self.hero_party.gp = self.hero_party.gp // 2
+            self.set_map(self.game_info.death_map, respawn_decorations=True)
 
 
 def main() -> None:

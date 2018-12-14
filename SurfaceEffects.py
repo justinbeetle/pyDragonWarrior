@@ -10,14 +10,21 @@ def fade_to_black_and_back(screen: pygame.Surface) -> None:
     fade_surface = pygame.Surface(screen.get_size())
     fade_surface.fill(pygame.Color('black'))
     fade_out(screen, background_surface, fade_surface)
-    fade_in(screen, background_surface, fade_surface)
+    fade_out(screen, fade_surface, background_surface)
 
 
-def fade_to_black(screen: pygame.Surface) -> None:
+def fade_out_to_black(screen: pygame.Surface) -> None:
     background_surface = screen.copy()
     fade_surface = pygame.Surface(screen.get_size())
     fade_surface.fill(pygame.Color('black'))
     fade_out(screen, background_surface, fade_surface)
+
+
+def fade_in_from_black(screen: pygame.Surface) -> None:
+    background_surface = screen.copy()
+    fade_surface = pygame.Surface(screen.get_size())
+    fade_surface.fill(pygame.Color('black'))
+    fade_out(screen, fade_surface, background_surface)
 
 
 def fade_out(screen: pygame.Surface,
@@ -31,7 +38,7 @@ def fade_out(screen: pygame.Surface,
         pygame.time.Clock().tick(30)
 
 
-def fade_in(screen: pygame.Surface,
+'''def fade_in(screen: pygame.Surface,
             background_surface: pygame.Surface,
             fade_surface: pygame.Surface) -> None:
     for i in range(240, -1, -16):
@@ -40,6 +47,7 @@ def fade_in(screen: pygame.Surface,
         screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
         pygame.time.Clock().tick(30)
+'''
 
 
 def flickering(screen: pygame.Surface) -> None:

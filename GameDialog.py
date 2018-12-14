@@ -548,21 +548,21 @@ class GameDialog:
 
     def blit(self,
              surface: pygame.Surface,
-             display: bool = False,
+             flip_buffer: bool = False,
              offset_pixels: Point = Point(0, 0)) -> None:
         surface.blit(self.image, self.pos_tile * GameDialog.tile_size_pixels + offset_pixels)
-        if display:
+        if flip_buffer:
             pygame.display.flip()
 
     def erase(self,
               surface: pygame.Surface,
               background: pygame.Surface,
-              display: bool = False,
+              flip_buffer: bool = False,
               offset_pixels: Point = Point(0, 0)) -> None:
         surface.blit(background.subsurface(pygame.Rect(self.pos_tile * GameDialog.tile_size_pixels + offset_pixels,
                                                        self.image.get_size())),
                      self.pos_tile * GameDialog.tile_size_pixels + offset_pixels)
-        if display:
+        if flip_buffer:
             pygame.display.flip()
 
     def get_selected_menu_option(self) -> Optional[str]:

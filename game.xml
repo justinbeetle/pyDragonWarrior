@@ -89,14 +89,20 @@
          <Level name="29" xp="65000" strength="136" agility="121" hp="200" mp="190"/>
          <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
       </CharacterLevels>
+
+      <CharacterLevels type="cat">
+         <Level name="Kitten" xp="0"  strength="2"  agility="10"  hp="5"   mp="0"/>
+         <Level name="Cat"    xp="50" strength="6"  agility="20"  hp="10"  mp="0"/>
+      </CharacterLevels>
    </Levels>
 
    <CharacterTypes>
       <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
-      <CharacterType type="hero_sword"             image="hero_sword.png"             levels="hero"/>
-      <CharacterType type="hero_shield"            image="hero_shield.png"            levels="hero"/>
-      <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"  levels="hero"/>
-      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png" levels="hero"/>
+      <CharacterType type="hero_sword"             image="hero_sword.png"/>
+      <CharacterType type="hero_shield"            image="hero_shield.png"/>
+      <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
+      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png"/>
+      <CharacterType type="ghost"                  image="ghost.png"/>
       <CharacterType type="king"                   image="king.png"/>
       <CharacterType type="princess"               image="princess.png"/>
       <CharacterType type="guard"                  image="guard.png"/>
@@ -108,8 +114,8 @@
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
 
-      <CharacterType type="cat"                    image="cat.png"/>
-      <CharacterType type="mocha"                  image="mocha.png"/>
+      <CharacterType type="cat"                    image="cat.png"                    levels="cat"/>
+      <CharacterType type="mocha"                  image="mocha.png"                  levels="cat"/>
       <CharacterType type="little_boy"             image="little_boy.png"/>
    </CharacterTypes>
 
@@ -1230,13 +1236,14 @@
                <DialogCheck type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
                <Dialog>Have a great night!</Dialog>
                <DialogAction type="PLAY_MUSIC" name="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"/>
-               <DialogAction type="VISUAL_EFFECT" name="fadeToBlackAndBack"/>
-               <DialogAction type="MAGIC_RESTORE" count="unlimited"/>
-               <DialogAction type="HEALTH_RESTORE" count="unlimited"/>
-               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
+               <DialogAction type="VISUAL_EFFECT" name="fadeOutToBlack"/>
+               <DialogAction type="MAGIC_RESTORE" count="unlimited" bypass="yes"/>
+               <DialogAction type="HEALTH_RESTORE" count="unlimited" bypass="yes"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]" bypass="yes"/>
+               <DialogAction type="VISUAL_EFFECT" name="fadeInFromBlack"/>
                <Dialog>"Good morning!  Thou seems to have spent a good night.  I shall see thee again."</Dialog></DialogOption>
             <DialogOption name="No">
-               <Dialog>"Okay.  Good-bye, traveler."</Dialog></DialogOption></DialogOptions></DialogScript>
+               <Dialog>"Okay.  Goodbye, traveler."</Dialog></DialogOption></DialogOptions></DialogScript>
 
       <DialogScript label="found_nothing">
          <Dialog>[NAME] searched the ground and found nothing.</Dialog></DialogScript>

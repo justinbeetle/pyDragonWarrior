@@ -34,6 +34,7 @@ class GameDialogEvaluator:
         self.actor: CombatCharacterState = self.hero_party.main_character
         self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
 
+
     # Set the source - the source may be called out for performing an action
     # The target may be called out in the dialog associated with the action
     def set_actor(self, actor: CombatCharacterState) -> None:
@@ -46,10 +47,10 @@ class GameDialogEvaluator:
         self.targets = targets
         if 1 == len(targets):
             self.replacement_variables.generic['[TARGET]'] = targets[0].get_name()
-        else:
+        elif '[TARGET]' in self.replacement_variables.generic:
             del self.replacement_variables.generic['[TARGET]']
 
-    def restore_default_source_and_target(self) -> None:
+    def restore_default_actor_and_targets(self) -> None:
         self.set_actor(self.hero_party.main_character)
         self.set_targets(cast(List[CombatCharacterState], self.hero_party.members))
 
@@ -140,24 +141,27 @@ class GameDialogEvaluator:
 
         return menu_result
 
-    def update_status_dialog(self, update_display: bool = False, message_dialog: Optional[GameDialog] = None) -> None:
-        # TODO: Store off the message_dialog and ensure it is using the correct font color too
+    def update_default_dialog_font_color(self) -> None:
         if self.hero_party.get_lowest_health_ratio() >= 0.25:
             font_color = GameDialog.NOMINAL_HEALTH_FONT_COLOR
         else:
             font_color = GameDialog.LOW_HEALTH_FONT_COLOR
-
         GameDialog.set_default_font_color(font_color)
-        if message_dialog is not None:
-            message_dialog.set_font_color(font_color)
-            message_dialog.blit(self.game_state.screen)
+
+    def update_status_dialog(self, flip_buffer: bool = False, message_dialog: Optional[GameDialog] = None) -> None:
+        self.update_default_dialog_font_color()
+
+        # TODO: Store off the message_dialog and ensure it is using the correct font color too
+        if message_dialog is not None and message_dialog.font_color != GameDialog.font_color:
+            message_dialog.set_font_color(GameDialog.font_color)
+            message_dialog.blit(self.game_state.screen, flip_buffer=False)
 
         if self.game_state.is_in_combat():
             GameDialog.create_encounter_status_dialog(
-                self.hero_party).blit(self.game_state.screen, update_display)
+                self.hero_party).blit(self.game_state.screen, flip_buffer)
         else:
             GameDialog.create_exploring_status_dialog(
-                self.hero_party).blit(self.game_state.screen, update_display)
+                self.hero_party).blit(self.game_state.screen, flip_buffer)
 
     def traverse_dialog(self,
                         message_dialog: GameDialog,
@@ -173,7 +177,7 @@ class GameDialogEvaluator:
             self.replacement_variables.generic['[ACTOR]'] = self.actor.get_name()
             if 1 == len(self.targets):
                 self.replacement_variables.generic['[TARGET]'] = self.targets[0].get_name()
-            else:
+            elif '[TARGET]' in self.replacement_variables.generic:
                 del self.replacement_variables.generic['[TARGET]']
 
         # Ensure dialog is a list and not a str to allow iteration
@@ -320,7 +324,7 @@ class GameDialogEvaluator:
                     for variable in self.replacement_variables.generic:
                         if isinstance(item_name, str):
                             item_name = item_name.replace(variable, self.replacement_variables.generic[variable])
-                        if isinstance(item.count, str):
+                        if isinstance(item.count, str) and -1 != item.count.find(variable):
                             try:
                                 item_count = int(item.count.replace(variable,
                                                                     self.replacement_variables.generic[variable]))
@@ -410,7 +414,7 @@ class GameDialogEvaluator:
                             self.hero_party.gp -= item_count
                             if self.hero_party.gp < 0:
                                 self.hero_party.gp = 0
-                        self.update_status_dialog(True, message_dialog)
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         item_to_gain = self.game_state.get_item(item_name)
                         if item_to_gain is not None:
@@ -463,8 +467,18 @@ class GameDialogEvaluator:
                         AudioPlayer().play_music(item.name, interrupt=True)
 
                 elif item.type == DialogActionEnum.VISUAL_EFFECT:
+                    # Update the screen but don't flip the buffers
+                    self.game_state.draw_map(flip_buffer=False)
+                    message_dialog.blit(self.game_state.screen, flip_buffer=False)
+                    self.update_status_dialog(flip_buffer=False, message_dialog=message_dialog)
+
+                    # TODO: Can this be done via reflection?
                     if item.name == 'fadeToBlackAndBack':
                         SurfaceEffects.fade_to_black_and_back(self.game_state.screen)
+                    elif item.name == 'fadeOutToBlack':
+                        SurfaceEffects.fade_out_to_black(self.game_state.screen)
+                    elif item.name == 'fadeInFromBlack':
+                        SurfaceEffects.fade_in_from_black(self.game_state.screen)
                     elif item.name == 'flickering':
                         SurfaceEffects.flickering(self.game_state.screen)
                     elif item.name == 'rainbowEffect':
@@ -497,13 +511,13 @@ class GameDialogEvaluator:
                             else:
                                 target.mp = min(target.max_mp, target.mp + GameTypes.get_int_value(item.count))
                             worked = True
-                    if not worked:
+                    if not item.bypass and not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
                             message_dialog.add_message('But that spell did not work.')
                         else:
                             message_dialog.add_message('But it did nothing.')
                     else:
-                        self.update_status_dialog(True, message_dialog)
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.HEALTH_RESTORE:
                     worked = False
@@ -514,14 +528,15 @@ class GameDialogEvaluator:
                             else:
                                 target.hp = min(target.max_hp, target.hp + GameTypes.get_int_value(item.count))
                             worked = True
-                            message_dialog.add_message(target.get_name() + ' hath recovered.')
-                    if not worked:
+                            if not item.bypass:
+                                message_dialog.add_message(target.get_name() + ' hath recovered.')
+                    if not item.bypass and not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
                             message_dialog.add_message('But that spell did not work.')
                         else:
                             message_dialog.add_message('But it did nothing.')
                     else:
-                        self.update_status_dialog(True, message_dialog)
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.SLEEP:
                     worked = False
@@ -530,7 +545,7 @@ class GameDialogEvaluator:
                             target.is_asleep = True
                             worked = True
                             message_dialog.add_message(target.get_name() + ' is asleep.')
-                    if not worked:
+                    if not item.bypass and not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
                             message_dialog.add_message('But that spell did not work.')
                         else:
@@ -551,7 +566,7 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
-                    damagedTargets = []
+                    damaged_targets = []
                     for target in self.targets:
                         if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             worked = True
@@ -576,7 +591,7 @@ class GameDialogEvaluator:
                                     # TODO: Play different sound based on damage of attack
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
 
-                                    damagedTargets.append(target)
+                                    damaged_targets.append(target)
 
                                     target.hp = max(0, target.hp - damage)
                                     if target == self.hero_party.main_character:
@@ -592,9 +607,9 @@ class GameDialogEvaluator:
                     if not worked:
                         # TODO: May not have been a spell - handle that as well
                         message_dialog.add_message('But that spell did not work.')
-                    elif 0 < len(damagedTargets) and self.combat_encounter is not None:
+                    elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
-                        self.combat_encounter.render_damage_to_targets(damagedTargets)
+                        self.combat_encounter.render_damage_to_targets(damaged_targets)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

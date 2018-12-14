@@ -682,7 +682,7 @@ class GameInfo:
                 self.pc_armor = self.armors[item_name]
             elif item_name in self.shields:
                 self.pc_shield = self.shields[item_name]
-            elif item_name in self.items:
+            elif item_name in self.tools:
                 self.pc_otherEquippedItems.append(self.tools[item_name])
             else:
                 print('ERROR: Unsupported item', item_name, flush=True)

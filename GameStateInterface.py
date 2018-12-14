@@ -107,14 +107,14 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def initiate_encounter(self,
-                           monster_info: MonsterInfo,
-                           approach_dialog: Optional[DialogType],
-                           victory_dialog: Optional[DialogType],
-                           run_away_dialog: Optional[DialogType],
-                           encounter_music: Optional[str],
-                           message_dialog: Optional[GameDialog]) -> None:
+                           monster_info: Optional[MonsterInfo] = None,
+                           approach_dialog: Optional[DialogType] = None,
+                           victory_dialog: Optional[DialogType] = None,
+                           run_away_dialog: Optional[DialogType] = None,
+                           encounter_music: Optional[str] = None,
+                           message_dialog: Optional[GameDialog] = None) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def handle_death(self) -> None:
+    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         raise NotImplementedError
