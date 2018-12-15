@@ -16,6 +16,10 @@ class HeroParty:
         self.gp = 0
         self.progress_markers: List[str] = []
 
+        self.last_outside_map_name = ''
+        self.last_outside_pos_dat_tile = Point()
+        self.last_outside_dir = Direction.SOUTH
+
     def add_member(self, member: HeroState, order: Optional[int]=None, is_main_character: bool=False) -> None:
         if is_main_character:
             self.main_character = member
@@ -187,6 +191,11 @@ class HeroParty:
         for member in self.members:
             member.curr_pos_dat_tile = member.dest_pos_dat_tile = pos
             member.direction = direction
+
+    def set_last_outside_pos(self, map_name: str, pos: Point, direction: Direction) -> None:
+        self.last_outside_map_name = map_name
+        self.last_outside_pos_dat_tile = pos
+        self.last_outside_dir = direction
 
     def get_lowest_health_ratio(self) -> float:
         lowest_health_ratio = 1.0

@@ -10,7 +10,7 @@ from CombatEncounterInterface import CombatEncounterInterface
 from GameDialog import GameDialog, GameDialogSpacing
 from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
     DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, \
-    DialogVendorSellOptions, DialogVendorSellOptionsVariable, GameTypes
+    DialogVendorSellOptions, DialogVendorSellOptionsVariable, Direction, GameTypes
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
@@ -34,14 +34,13 @@ class GameDialogEvaluator:
         self.actor: CombatCharacterState = self.hero_party.main_character
         self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
 
-
-    # Set the source - the source may be called out for performing an action
-    # The target may be called out in the dialog associated with the action
+    # Set the actor - the character performing the action
+    # The actor may be called out in the dialog associated with the action
     def set_actor(self, actor: CombatCharacterState) -> None:
         self.actor = actor
         self.replacement_variables.generic['[ACTOR]'] = actor.get_name()
 
-    # Set the targets on which actions will be performed
+    # Set the targets - the character(s) on which actions will be performed
     # When the target is singular, it may be called out in the dialog associated with the action
     def set_targets(self, targets: List[CombatCharacterState]) -> None:
         self.targets = targets
@@ -399,7 +398,7 @@ class GameDialogEvaluator:
                     item_count = 1
                     for variable in self.replacement_variables.generic:
                         item_name = item_name.replace(variable, self.replacement_variables.generic[variable])
-                        if isinstance(item.count, str):
+                        if isinstance(item.count, str) and -1 != item.count.find(variable):
                             try:
                                 item_count = int(item.count.replace(variable,
                                                                     self.replacement_variables.generic[variable]))
@@ -454,6 +453,9 @@ class GameDialogEvaluator:
                         message_dialog.blit(self.game_state.screen, True)
 
                 elif item.type == DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES:
+                    self.hero_party.set_pos(self.hero_party.last_outside_pos_dat_tile,
+                                            Direction.get_opposite(self.hero_party.last_outside_dir))
+                    self.game_state.set_map(self.hero_party.last_outside_map_name)
                     print('ERROR: DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES is not implemented', flush=True)
 
                 elif item.type == DialogActionEnum.PLAY_SOUND:

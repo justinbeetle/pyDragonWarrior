@@ -43,19 +43,24 @@ class CombatEncounter(CombatEncounterInterface):
         self.is_first_turn = True
         self.game_info = game_info
         self.game_state = game_state
-        self.gde = GameDialogEvaluator(game_info, game_state, self)
         self.hero_party = game_state.get_hero_party()
         self.monster_party = monster_party
-        self.background_image = game_state.screen.copy()
         self.encounter_image = encounter_image
         self.approach_dialog = approach_dialog
         self.victory_dialog = victory_dialog
         self.run_away_dialog = run_away_dialog
+
+        self.game_state.draw_map(flip_buffer=False)
+        self.background_image = game_state.screen.copy()
+
         if message_dialog is not None:
             self.message_dialog = message_dialog
             self.message_dialog.add_message('')
         else:
             self.message_dialog = GameDialog.create_message_dialog()
+        self.gde = GameDialogEvaluator(game_info, game_state, self)
+        self.gde.update_status_dialog(message_dialog=self.message_dialog)
+
         if encounter_music is not None:
             self.encounter_music = encounter_music
         else:
@@ -117,18 +122,18 @@ class CombatEncounter(CombatEncounterInterface):
                     if not self.still_in_encounter():
                         break
 
-        # Clear combat status effects now that combat is over
-        self.hero_party.clear_combat_status_affects()
-
         # Handle the outcome of the encounter
         AudioPlayer().stop_music()
         if self.hero_party.has_surviving_members():
             if self.hero_party.is_still_in_combat():
                 self.handle_victory()
-            else:
-                self.handle_running_away()
+            elif self.run_away_dialog is not None:
+                self.gde.traverse_dialog(self.message_dialog, self.run_away_dialog)
         else:
             self.game_state.handle_death(self.message_dialog)
+
+        # Clear combat status effects now that combat is over
+        self.hero_party.clear_combat_status_affects()
 
         # Wait for final acknowledgement
         self.gde.wait_for_acknowledgement(self.message_dialog)
@@ -142,14 +147,21 @@ class CombatEncounter(CombatEncounterInterface):
         pygame.display.flip()
 
     def render_monsters(self,
-                        damage_image_monsters: List[CombatCharacterState] = [],
-                        force_display_monsters: List[CombatCharacterState] = []) -> None:
+                        damage_image_monsters: Optional[List[CombatCharacterState]] = None,
+                        force_display_monsters: Optional[List[CombatCharacterState]] = None,
+                        render_dialogs: bool = True) -> None:
+        if damage_image_monsters is None:
+            damage_image_monsters = []
+        if force_display_monsters is None:
+            force_display_monsters = []
+
         # Render the encounter background
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
             (self.game_state.get_win_size_pixels().w - encounter_image_size_px.w) / 2,
             self.message_dialog.pos_tile.y * self.game_info.tile_size_pixels
             - encounter_image_size_px.h + CombatEncounter.DAMAGE_FLICKER_PIXELS)
+        self.game_state.screen.blit(self.background_image, (0, 0))
         self.game_state.screen.blit(self.encounter_image, encounter_image_dest_px)
 
         # Render the monsters
@@ -170,6 +182,11 @@ class CombatEncounter(CombatEncounterInterface):
                 self.game_state.screen.blit(monster_image, monster_image_dest_px)
 
             monster_pos_x += CombatEncounter.MONSTER_SPACING_PIXELS + monster.monster_info.image.get_width()
+
+        # Render the dialogs
+        if render_dialogs:
+            self.message_dialog.blit(self.game_state.screen)
+            self.gde.update_status_dialog()
 
     def render_damage_to_targets(self, targets: List[CombatCharacterState]) -> None:
         # Determine if rendering damage to the hero party or monster party.
@@ -198,16 +215,17 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_damage_to_hero_party(self) -> None:
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
+        # TODO: Flicker red on a death blow
         for flickerTimes in range(10):
             offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
             self.game_state.screen.blit(self.background_image, (0, 0))
-            self.render_monsters()
+            self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen, False, offset_pixels)
             self.message_dialog.blit(self.game_state.screen, True, offset_pixels)
 
             pygame.time.Clock().tick(30)
             self.game_state.screen.blit(self.background_image, (0, 0))
-            self.render_monsters()
+            self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen, False)
             self.message_dialog.blit(self.game_state.screen, True)
             pygame.time.Clock().tick(30)
@@ -306,7 +324,15 @@ class CombatEncounter(CombatEncounterInterface):
         while self.game_state.is_running:
 
             # Get selected action for turn
-            self.message_dialog.add_encounter_prompt()
+            options = ['FIGHT', 'RUN']
+            if 0 < len(hero.get_available_spells()):
+                options.append('SPELL')
+            if 0 < len(hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])):
+                options.append('ITEM')
+            prompt = 'Command?'
+            if 1 < len(self.hero_party.members):
+                prompt = 'Command ' + hero.get_name() + '?'
+            self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)
             self.message_dialog.blit(self.game_state.screen, True)
             menu_result = None
             while self.game_state.is_running and menu_result is None:
@@ -315,6 +341,8 @@ class CombatEncounter(CombatEncounterInterface):
                 return
 
             # Process encounter menu selection to set use_dialog and target_type
+            use_dialog = None
+            target_type = None
             if menu_result == 'FIGHT':
                 weapon = self.game_info.default_weapon
                 if hero.weapon is not None:
@@ -397,17 +425,21 @@ class CombatEncounter(CombatEncounterInterface):
             # If here the turn was successfully completed
             break
 
+        if use_dialog is None or target_type is None:
+            self.message_dialog.add_message('Thou held back in defense.')
+            return
+
         # Select the target for the selected action
         self.gde.set_actor(hero)
         if TargetTypeEnum.SELF == target_type:
             self.gde.set_targets([hero])
         if TargetTypeEnum.SINGLE_ALLY == target_type:
-            still_in_combat_heros = self.hero_party.get_still_in_combat_members()
-            if 1 == len(still_in_combat_heros):
-                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_heros))
+            still_in_combat_heroes = self.hero_party.get_still_in_combat_members()
+            if 1 == len(still_in_combat_heroes):
+                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_heroes))
             else:
                 # TODO: Prompt for selection of which ally to target
-                self.gde.set_targets([still_in_combat_heros[0]])
+                self.gde.set_targets([still_in_combat_heroes[0]])
         elif TargetTypeEnum.ALL_ALLIES == target_type:
             self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
         elif TargetTypeEnum.SINGLE_ENEMY == target_type:
@@ -447,10 +479,6 @@ class CombatEncounter(CombatEncounterInterface):
 
         if self.victory_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.victory_dialog)
-
-    def handle_running_away(self) -> None:
-        if self.run_away_dialog is not None:
-            self.gde.traverse_dialog(self.message_dialog, self.run_away_dialog)
 
 
 def main() -> None:

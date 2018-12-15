@@ -81,12 +81,14 @@ class GameState(GameStateInterface):
         self.hero_party.progress_markers = self.game_info.pc_progressMarkers
 
         # TODO: Remove Mocha from party
+        '''
         mocha = HeroState(self.game_info.character_types['mocha'],
                           self.game_info.initial_hero_pos_dat_tile,
                           self.game_info.initial_hero_pos_dir,
                           'Mocha',
                           0)
         self.hero_party.add_member(mocha)
+        '''
 
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
@@ -239,6 +241,18 @@ class GameState(GameStateInterface):
         xml_string = xml.dom.minidom.parseString(xml.etree.ElementTree.tostring(xml_root)).toprettyxml(indent="   ")
 
         save_game_file_path = os.path.join(self.game_info.saves_path, self.hero_party.main_character.name + '.xml')
+        if os.path.isfile(save_game_file_path):
+            # Archive old save game files
+            archive_dir = os.path.join(self.game_info.saves_path, 'archive')
+            from datetime import datetime
+            timestamp = datetime.fromtimestamp(os.path.getmtime(save_game_file_path)).strftime("%Y%m%d%H%M%S")
+            rename_file_path = os.path.join(archive_dir, self.hero_party.main_character.name + '_' + timestamp + '.xml')
+            if not os.path.isdir(archive_dir):
+                os.makedirs(archive_dir)
+            if not os.path.isfile(rename_file_path):
+                os.rename(save_game_file_path, rename_file_path)
+            else:
+                print ('ERROR: File already exists: ', rename_file_path, flush=True)
         save_game_file = open(save_game_file_path, 'w')
         save_game_file.write(xml_string)
         save_game_file.close()
@@ -505,8 +519,13 @@ class GameState(GameStateInterface):
     def make_map_transition(self,
                             transition: Optional[Union[LeavingTransition, PointTransition]]) -> bool:
         if transition is not None:
-            self.hero_party.set_pos(transition.dest_point, transition.dest_dir)
             map_changing = transition.dest_map != self.map_state.name
+            if (self.game_info.maps[self.map_state.name].is_outside
+                    and not self.game_info.maps[transition.dest_map].is_outside):
+                self.hero_party.set_last_outside_pos(self.map_state.name,
+                                                     self.hero_party.get_curr_pos_dat_tile(),
+                                                     self.hero_party.get_direction())
+            self.hero_party.set_pos(transition.dest_point, transition.dest_dir)
             self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
             if not map_changing:
                 self.draw_map(True)
@@ -742,6 +761,10 @@ class GameState(GameStateInterface):
                            run_away_dialog: Optional[DialogType] = None,
                            encounter_music: Optional[str] = None,
                            message_dialog: Optional[GameDialog] = None) -> None:
+        # TODO: Make the conditions for no monsters configurable
+        if self.hero_party.has_item('Ball of Light'):
+            return
+
         # Determine the monster party for the encounter
         if monster_info is None:
             # Check for special monsters
@@ -754,6 +777,8 @@ class GameState(GameStateInterface):
             else:
                 monster_info = self.game_info.monsters[random.choice(self.get_tile_monsters())]
                 monster_party = MonsterParty([MonsterState(monster_info)])
+        else:
+            monster_party = MonsterParty([MonsterState(monster_info)])
 
         # Perform the combat encounter
         CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')

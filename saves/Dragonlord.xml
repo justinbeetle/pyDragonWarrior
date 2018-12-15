@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<SaveState dir="WEST" gp="100000" map="charlock_lvl8" name="Wallace" x="17" xp="30000" y="24">
+   <EquippedItems>
+      <Item name="Erdrick's Sword"/>
+      <Item name="Erdrick's Armor"/>
+      <Item name="Erdrick's Shield"/>
+      <Item name="Dragon's Scale"/>
+      <Item name="Fighter's Ring"/>
+   </EquippedItems>
+   <UnequippedItems>
+      <Item count="10" name="Fairy Water"/>
+      <Item count="10" name="Herb"/>
+      <Item count="11" name="Key"/>
+      <Item count="11" name="Torch"/>
+      <Item count="10" name="Wings"/>
+      <Item count="1" name="Flame Sword"/>
+      <Item count="1" name="Leather Armor"/>
+      <Item count="1" name="Rainbow Drop"/>
+   </UnequippedItems>
+   <ProgressMarkers>
+      <ProgressMarker name="PM_Taken_Initial_Chest_3"/>
+      <ProgressMarker name="PM_Taken_Initial_Chest_2"/>
+      <ProgressMarker name="PM_Taken_Initial_Chest_1"/>
+   </ProgressMarkers>
+</SaveState>

@@ -355,8 +355,10 @@ class GameDialog:
         self.refresh_image()
         self.acknowledged = False
 
-    def add_encounter_prompt(self) -> None:
-        self.add_menu_prompt(['FIGHT', 'RUN', 'SPELL', 'ITEM'], 4, GameDialogSpacing.SPACERS, 'Command?')
+    def add_encounter_prompt(self,
+                             options: List[str] = ['FIGHT', 'RUN', 'SPELL', 'ITEM'],
+                             prompt: str = 'Command?') -> None:
+        self.add_menu_prompt(options, len(options), GameDialogSpacing.SPACERS, prompt)
 
     def add_yes_no_prompt(self,
                           prompt: Optional[str] = None) -> None:

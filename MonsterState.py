@@ -52,7 +52,7 @@ class MonsterState(CombatCharacterState):
         return self.get_agility()
 
     def allows_critical_hits(self) -> bool:
-        return not self.monster_info.allows_critical_hits
+        return self.monster_info.allows_critical_hits
 
     # Determine if the monster dodges an attack
     def is_dodging_attack(self) -> bool:

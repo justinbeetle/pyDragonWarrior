@@ -358,15 +358,15 @@
                    <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
                    <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
-         <MapDecoration type="chest" x="6" y="2" inverseProgressMarker="PM_Taken_Initial_Chest_1">
-            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_1"/>
+         <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
+            <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
             <DialogGoTo label="key_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="8" y="2" inverseProgressMarker="PM_Taken_Initial_Chest_2">
-            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_2"/>
+         <MapDecoration type="chest" x="8" y="2" progressMarker="PM_Not_Taken_Initial_Chest_2">
+            <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_2"/>
             <DialogVariable name="[CHEST_GOLD]" value="120"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="6" y="5" inverseProgressMarker="PM_Taken_Initial_Chest_3">
-            <DialogAction type="GAIN_ITEM" name="PM_Taken_Initial_Chest_3"/>
+         <MapDecoration type="chest" x="6" y="5" progressMarker="PM_Not_Taken_Initial_Chest_3">
+            <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_3"/>
             <DialogGoTo label="torch_chest"/></MapDecoration>
 
          <MapDecoration type="None" x="2" y="2">
@@ -1503,7 +1503,7 @@
 
    <MonsterActions default="Attack">
       <MonsterAction name="Attack"           target="SINGLE_ENEMY">
-         <Dialog>[ACTOR] attacks!</Dialog>
+         <Dialog>[ACTOR] attacks!</Dialog> <!--In future, say who the monster is attacking <Dialog>[ACTOR] attacks [TARGET]!</Dialog> -->
          <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
 
       <MonsterAction name="Heal"             spell="Heal"/>
@@ -1518,12 +1518,12 @@
 
       <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
 
-      <MonsterAction name="BreathFire"       target="SINGLE_ENEMY">
+      <MonsterAction name="BreathFire"       target="ALL_ENEMIES">
          <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
 
-      <MonsterAction name="BreathStrongFire" target="SINGLE_ENEMY">
+      <MonsterAction name="BreathStrongFire" target="ALL_ENEMIES">
          <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
@@ -1820,8 +1820,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog>
             <Dialog>"I love thee, [ACTOR]."</Dialog></Tool>
 
-         <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
-         <Tool name="Death Necklace"                       gp="1200" droppable="no"  equippable="yes"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
+         <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes" unequippable="no"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
+         <Tool name="Death Necklace"                       gp="1200" droppable="no"  equippable="yes" unequippable="no"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
       </Tools>
    </Items>
 
@@ -1830,6 +1830,12 @@ All part members gain # experience points.  You obtain X pieces of gold.
       <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
       <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>
       <Dialog>"May the light shine upon thee, [NAME]."</Dialog>
+
+      <ProgressMarkers>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_1"/>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_2"/>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_3"/>
+      </ProgressMarkers>
 
       <MapDecoration type="door" x="5" y="8"/>
    </InitialState>
