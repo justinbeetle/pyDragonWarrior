@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union
 
 import os
 import pygame
+import numpy
 import xml.etree.ElementTree
 
 from AudioPlayer import AudioPlayer
@@ -136,6 +137,7 @@ class GameInfo:
         # Parse tiles
         self.tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
         self.tiles: Dict[str, Tile] = {}
+        max_tile_variants = 1
         for element in xml_root.findall("./Tiles/Tile"):
             tile_name = element.attrib['name']
             tile_symbol = element.attrib['symbol']
@@ -146,7 +148,6 @@ class GameInfo:
             mp_penalty = 0
             speed = 1.0
             spawn_rate = 1.0
-            special_edges = False
             if 'walkable' in element.attrib:
                 tile_walkable = element.attrib['walkable'] == 'yes'
             if 'canTalkOver' in element.attrib:
@@ -159,38 +160,57 @@ class GameInfo:
                 speed = GameTypes.parse_float(element.attrib['speed'])
             if 'spawnRate' in element.attrib:
                 spawn_rate = GameTypes.parse_float(element.attrib['spawnRate'])
-            if 'specialEdges' in element.attrib:
-                special_edges = element.attrib['specialEdges'] == 'yes'
             
             # print('Loading image', tileImageFileName, flush=True)
             tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
-            if special_edges:
-                tile_image_scaled = []
-                unscaled_height = tile_image_unscaled.get_height()
+            if tile_image_unscaled.get_height() > self.tile_size_pixels:
+                image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
+                tile_images_scaled = []
                 for x in range(16):
-                    temp = pygame.Surface((self.tile_size_pixels, self.tile_size_pixels))
-                    pygame.transform.scale(tile_image_unscaled.subsurface(
-                        pygame.Rect(x*unscaled_height, 0, unscaled_height, unscaled_height)),
-                        (self.tile_size_pixels, self.tile_size_pixels),
-                        temp)
-                    tile_image_scaled.append(temp)
+                    tile_images_scaled.append([])
+                unscaled_size = tile_image_unscaled.get_height()/4
+                tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
+                max_tile_variants = max(max_tile_variants, tile_variants)
+                for y in range(4):
+                    for x in range(4):
+                        for z in range(tile_variants):
+                            temp = pygame.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                            pygame.transform.scale(tile_image_unscaled.subsurface(
+                                pygame.Rect(x*unscaled_size + z*tile_image_unscaled.get_height(),
+                                            y*unscaled_size, unscaled_size, unscaled_size)),
+                                (self.tile_size_pixels, self.tile_size_pixels),
+                                temp)
+                            tile_images_scaled[image_index_translation[y][x]].append(temp)
             else:
-                tile_image_scaled = pygame.Surface((self.tile_size_pixels, self.tile_size_pixels))
-                pygame.transform.scale(tile_image_unscaled,
-                                       (self.tile_size_pixels, self.tile_size_pixels),
-                                       tile_image_scaled)
+                tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
+                max_tile_variants = max(max_tile_variants, tile_variants)
+                temp = []
+                for z in range(tile_variants):
+                    temp.append(pygame.Surface((self.tile_size_pixels, self.tile_size_pixels)))
+                    pygame.transform.scale(tile_image_unscaled.subsurface(
+                        pygame.Rect(z*tile_image_unscaled.get_height(), 0, unscaled_size, unscaled_size)),
+                        (self.tile_size_pixels, self.tile_size_pixels),
+                        temp[-1])
+                tile_images_scaled = [temp] * 16
          
             self.tile_symbols[tile_symbol] = tile_name
             self.tiles[tile_name] = Tile(tile_name,
                                          tile_symbol,
-                                         tile_image_scaled,
+                                         tile_images_scaled,
                                          tile_walkable,
                                          can_talk_over,
                                          hp_penalty,
                                          mp_penalty,
                                          speed,
-                                         spawn_rate,
-                                         special_edges)
+                                         spawn_rate)
+        self.tile_probabilities: List[List[float]] = [[1.0]]
+        for x in range(2, max_tile_variants + 1):
+            w = numpy.arange(x, 0, -1)
+            w = w * numpy.transpose(w)
+            w = w * numpy.transpose(w)
+            p = w / sum(w)
+            self.tile_probabilities.append(p)
+        print('self.tile_probabilities', self.tile_probabilities, flush=True)
 
         # Parse decorations
         self.decorations: Dict[str, Decoration] = {}
@@ -932,6 +952,7 @@ class GameInfo:
         map_image.fill(fill_color)
 
         # Blit the padded portions of the image
+        numpy.random.seed(hash(map_name) % (2**32 - 1))
         last_c = self.maps[map_name].size[0] - 1
         last_r = self.maps[map_name].size[1] - 1
         for x in range(int(image_pad_tiles.x)):
@@ -943,43 +964,25 @@ class GameInfo:
                 y_s_px = (y + image_pad_tiles.y + self.maps[map_name].size[1]) * self.tile_size_pixels
                 # NW pad
                 if dat[0][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][0]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][0]]].image[0], (x_w_px, y_n_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][0]]].image,    (x_w_px, y_n_px))
+                    map_image.blit(self.random_tile_image(dat[0][0]), (x_w_px, y_n_px))
                 # NE pad
                 if dat[0][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][last_c]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][last_c]]].image[0], (x_e_px, y_n_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][last_c]]].image,    (x_e_px, y_n_px))
+                    map_image.blit(self.random_tile_image(dat[0][last_c]), (x_e_px, y_n_px))
                 # SW pad
                 if dat[last_r][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][0]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][0]]].image[0], (x_w_px, y_s_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][0]]].image,    (x_w_px, y_s_px))
+                    map_image.blit(self.random_tile_image(dat[last_r][0]), (x_w_px, y_s_px))
                 # SE pad
                 if dat[last_r][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][last_c]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][last_c]]].image[0], (x_e_px, y_s_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][last_c]]].image,    (x_e_px, y_s_px))
+                    map_image.blit(self.random_tile_image(dat[last_r][last_c]), (x_e_px, y_s_px))
             for y in range(self.maps[map_name].size[1]):
                 # Blit sides
                 y_px = int((y + image_pad_tiles.y) * self.tile_size_pixels)
                 # W pad
                 if dat[y][0] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[y][0]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[y][0]]].image[0], (x_w_px, y_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[y][0]]].image,    (x_w_px, y_px))
+                    map_image.blit(self.random_tile_image(dat[y][0]), (x_w_px, y_px))
                 # E pad
                 if dat[y][last_c] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[y][last_c]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[y][last_c]]].image[0], (x_e_px, y_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[y][last_c]]].image,    (x_e_px, y_px))
+                    map_image.blit(self.random_tile_image(dat[y][last_c]), (x_e_px, y_px))
         for y in range(int(image_pad_tiles.y)):
             y_n_px = int(y * self.tile_size_pixels)
             y_s_px = int((y + image_pad_tiles.y + self.maps[map_name].size[1]) * self.tile_size_pixels)
@@ -988,16 +991,10 @@ class GameInfo:
                 x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
                 # N pad
                 if dat[0][x] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[0][x]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][x]]].image[0], (x_px, y_n_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[0][x]]].image,    (x_px, y_n_px))
+                    map_image.blit(self.random_tile_image(dat[0][x]), (x_px, y_n_px))
                 # S pad
                 if dat[last_r][x] in self.tile_symbols:
-                    if self.tiles[self.tile_symbols[dat[last_r][x]]].special_edges:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][x]]].image[0], (x_px, y_s_px))
-                    else:
-                        map_image.blit(self.tiles[self.tile_symbols[dat[last_r][x]]].image,    (x_px, y_s_px))
+                    map_image.blit(self.random_tile_image(dat[last_r][x]), (x_px, y_s_px))
 
         # Blit the map data portion of the image
         for y, row_data in enumerate(dat):
@@ -1006,21 +1003,18 @@ class GameInfo:
                 if tile_symbol not in self.tile_symbols:
                     continue
                 x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
-                if self.tiles[self.tile_symbols[tile_symbol]].special_edges:
-                    # Determine which image to use
-                    image_idx = 0
-                    # TODO: Fix hardcoded exception for the bridge tile_symbol of 'b'
-                    if y > 0 and dat[y-1][x] != tile_symbol and dat[y-1][x] != 'b':
-                        image_idx += 8
-                    if y < len(dat)-1 and dat[y+1][x] != tile_symbol and dat[y+1][x] != 'b':
-                        image_idx += 2
-                    if x > 0 and row_data[x-1] != tile_symbol and row_data[x-1] != 'b':
-                        image_idx += 1
-                    if x < len(row_data)-1 and row_data[x+1] != tile_symbol and row_data[x+1] != 'b':
-                        image_idx += 4
-                    map_image.blit(self.tiles[self.tile_symbols[tile_symbol]].image[image_idx], (x_px, y_px))
-                else:
-                    map_image.blit(self.tiles[self.tile_symbols[tile_symbol]].image,            (x_px, y_px))
+                # Determine which image to use
+                image_idx = 0
+                # TODO: Fix hardcoded exception for the bridge tile_symbol of 'b'
+                if y > 0 and dat[y-1][x] != tile_symbol and dat[y-1][x] != 'b':
+                    image_idx += 8
+                if y < len(dat)-1 and dat[y+1][x] != tile_symbol and dat[y+1][x] != 'b':
+                    image_idx += 2
+                if x > 0 and row_data[x-1] != tile_symbol and row_data[x-1] != 'b':
+                    image_idx += 1
+                if x < len(row_data)-1 and row_data[x+1] != tile_symbol and row_data[x+1] != 'b':
+                    image_idx += 4
+                map_image.blit(self.random_tile_image(tile_symbol, image_idx), (x_px, y_px))
 
         # Blit the decoration on the image
         if map_decorations is not None:
@@ -1034,6 +1028,12 @@ class GameInfo:
                 map_image.blit(decoration.image, (x_px, y_px))
 
         return map_image
+
+    def random_tile_image(self, symbol: str, idx: int = 0) -> pygame.Surface:
+        images = self.tiles[self.tile_symbols[symbol]].images[idx]
+        if 1 == len(images):
+            return images[0]
+        return numpy.random.choice(images, p=self.tile_probabilities[len(images)-1])
 
     @staticmethod
     def get_exterior_image(map_image_info: MapImageInfo) -> pygame.Surface:
@@ -1056,6 +1056,7 @@ class GameInfo:
 
 
 def main() -> None:
+
     import SurfaceEffects
 
     # Initialize pygame

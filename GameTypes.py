@@ -311,14 +311,13 @@ class DialogReplacementVariables:
 class Tile(NamedTuple):
     name: str
     symbol: str
-    image: Union[pygame.Surface, List[pygame.Surface]]
+    images: List[List[pygame.Surface]]
     walkable: bool
     can_talk_over: bool
     hp_penalty: int
     mp_penalty: int
     speed: float
     spawn_rate: float
-    special_edges: bool
 
 
 class Decoration(NamedTuple):

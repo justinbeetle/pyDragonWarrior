@@ -52,6 +52,7 @@ python -m pip install --upgrade pip
 python -m pip install --upgrade pygame
 python -m pip install --upgrade pyinstaller
 python -m pip install --upgrade mypy
+python -m pip install --upgrade numpy
 
 python -m mypy Point.py --strict --ignore-missing-imports
 

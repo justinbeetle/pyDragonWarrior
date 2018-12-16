@@ -485,7 +485,7 @@ class GameDialogEvaluator:
                         SurfaceEffects.flickering(self.game_state.screen)
                     elif item.name == 'rainbowEffect':
                         SurfaceEffects.rainbow_effect(self.game_state.screen,
-                                                      self.game_state.get_tile('water').image[0])
+                                                      self.game_state.get_tile('water').images[0][0])
                     else:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)

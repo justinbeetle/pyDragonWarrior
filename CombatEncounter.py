@@ -321,6 +321,8 @@ class CombatEncounter(CombatEncounterInterface):
             self.gde.wait_for_acknowledgement(self.message_dialog)
             return
 
+        use_dialog = None
+        target_type = None
         while self.game_state.is_running:
 
             # Get selected action for turn
@@ -341,8 +343,6 @@ class CombatEncounter(CombatEncounterInterface):
                 return
 
             # Process encounter menu selection to set use_dialog and target_type
-            use_dialog = None
-            target_type = None
             if menu_result == 'FIGHT':
                 weapon = self.game_info.default_weapon
                 if hero.weapon is not None:

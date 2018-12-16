@@ -1,6 +1,6 @@
 <Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no" hpPenalty="0" speed="1.0" spawnRate="0" specialEdges="yes"/>
+      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
       <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"/>
       <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/24"/>
       <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0" speed="0.9" spawnRate="1/16"/>
@@ -15,14 +15,6 @@
       <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"/>
       <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"/>
       <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" spawnRate="1/16"/>
-
-      <!-- The following are deprecated in favor of decorations -->
-      <Tile name="cave" image="cave.png" symbol="o" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/8"/>
-      <Tile name="city" image="city.png" symbol="c" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
-      <Tile name="town" image="town.png" symbol="t" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
-      <Tile name="downstairs" image="downstairs.png" symbol="d" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
-      <Tile name="upstairs" image="upstairs.png" symbol="u" walkable="yes" boatable="no" hpPenalty="0" speed="1.0" spawnRate="1/24"/>
-      <Tile name="door" image="door.png" symbol="D" walkable="yes" boatable="no"/>
    </Tiles>
 
    <Decorations>
