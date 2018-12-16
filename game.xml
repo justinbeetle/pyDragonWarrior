@@ -28,7 +28,9 @@
       <Decoration name="stoneCastleC" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="tallStoneCastle" image="tallStoneCastle.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="largeStoneTownA" image="largeStoneTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="largeStoneTownB" image="largeStoneTownB.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="largeWoodTownA" image="largeWoodTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="largeWoodTownB" image="largeWoodTownB.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="stoneTownA" image="stoneTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="stoneTownB" image="stoneTownB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="stoneTownC" image="stoneTownC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -114,9 +116,9 @@
    <Maps>
       <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
          <PointTransition decoration="stoneCastleA"    fromX="44"  fromY="44"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="largeStoneTownA" fromX="49"  fromY="42"  toMap="brecconary"         toX="1"  toY="15" toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="largeStoneTownB" fromX="49"  fromY="42"  toMap="brecconary"         toX="1"  toY="15" toDir="EAST"  respawnDecorations="yes"/>
          <PointTransition decoration="stoneTownC"      fromX="3"   fromY="3"   toMap="garinham"           toX="20" toY="13" toDir="WEST"  respawnDecorations="yes"/>
-         <PointTransition decoration="woodTownE"       fromX="105" fromY="11"  toMap="kol"                toX="20" toY="24" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="largeWoodTownB"  fromX="105" fromY="11"  toMap="kol"                toX="20" toY="24" toDir="NORTH" respawnDecorations="yes"/>
          <PointTransition decoration="stoneTownA"      fromX="103" fromY="73"  toMap="rimuldar"           toX="30" toY="15" toDir="WEST"  respawnDecorations="yes"/>
          <PointTransition decoration="woodTownB"       fromX="26"  fromY="90"  toMap="hauksness"          toX="1"  toY="11" toDir="EAST"  respawnDecorations="yes"/>
          <PointTransition decoration="stoneTownB"      fromX="74"  fromY="103" toMap="cantlin"            toX="15" toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
