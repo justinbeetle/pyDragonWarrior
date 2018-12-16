@@ -34,6 +34,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.other_equipped_items: List[Tool] = []
         self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
 
+        self.hp_regen_tiles_remaining: Optional[int] = None
+
     @staticmethod
     def create_null(name: str = 'null') -> HeroState:
         return HeroState(CharacterType.create_null(), Point(), Direction.SOUTH, name)
@@ -408,6 +410,15 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 if level.xp > self.level.xp:
                     return level.xp - self.xp
         return 0
+
+    def inc_step_counter(self) -> None:
+        if self.armor is not None and self.armor.hp_regen_tiles is not None:
+            if self.hp_regen_tiles_remaining is None:
+                self.hp_regen_tiles_remaining = self.armor.hp_regen_tiles
+            self.hp_regen_tiles_remaining -= 1
+            if 0 >= self.hp_regen_tiles_remaining:
+                self.hp = min(self.max_hp, self.hp + 1)
+                self.hp_regen_tiles_remaining = self.armor.hp_regen_tiles
 
     def __str__(self) -> str:
         return "%s(%s, %s, %s, %s, %s)" % (

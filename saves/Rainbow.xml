@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" x="66" xp="22000" y="50">
+<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" x="66" xp="22000" y="50" hp="15">
    <EquippedItems>
       <Item name="Flame Sword"/>
       <Item name="Magic Armor"/>
@@ -16,9 +16,4 @@
       <Item count="1" name="Leather Armor"/>
       <Item count="1" name="Rainbow Drop"/>
    </UnequippedItems>
-   <ProgressMarkers>
-      <ProgressMarker name="PM_Taken_Initial_Chest_3"/>
-      <ProgressMarker name="PM_Taken_Initial_Chest_2"/>
-      <ProgressMarker name="PM_Taken_Initial_Chest_1"/>
-   </ProgressMarkers>
 </SaveState>

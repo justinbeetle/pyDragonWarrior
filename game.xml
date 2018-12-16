@@ -1,4 +1,4 @@
-<Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+<Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid_new" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Tiles>
       <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no" hpPenalty="0" speed="1.0" spawnRate="0"/>
       <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"/>
@@ -1707,11 +1707,11 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
       </Weapons>
       <Armors>
-         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
-         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
-         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
-         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
-         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="1000000"/>
+         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
          <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="0"   hpRegenTiles="3"/>
          <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="1.0" hpRegenTiles="1"/>
       </Armors>

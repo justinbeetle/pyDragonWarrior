@@ -226,9 +226,9 @@ class GameDialogEvaluator:
 
             elif isinstance(item, DialogGoTo):
                 # print( 'Dialog Go To =', item, flush=True )
-                if item.label in self.game_state.get_dialog_sequences():
+                if item.label in self.game_info.dialog_sequences:
                     if self.game_state.is_running:
-                        self.traverse_dialog(message_dialog, self.game_state.get_dialog_sequences()[item.label],
+                        self.traverse_dialog(message_dialog, self.game_info.dialog_sequences[item.label],
                                              depth + 1)
                 else:
                     print('ERROR: ' + item.label + ' not found in dialogSequences', flush=True)
@@ -309,7 +309,7 @@ class GameDialogEvaluator:
                 if menu_result is not None:
                     # print( 'menu_result =', menu_result, flush=True )
                     self.replacement_variables.generic['[ITEM]'] = menu_result
-                    self.replacement_variables.generic['[COST]'] = str(self.game_state.get_item(menu_result).gp // 2)
+                    self.replacement_variables.generic['[COST]'] = str(self.game_info.get_item(menu_result).gp // 2)
 
             elif isinstance(item, DialogCheck):
                 # print( 'Dialog Check =', item, flush=True )
@@ -415,13 +415,13 @@ class GameDialogEvaluator:
                                 self.hero_party.gp = 0
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
-                        item_to_gain = self.game_state.get_item(item_name)
+                        item_to_gain = self.game_info.get_item(item_name)
                         if item_to_gain is not None:
                             self.hero_party.gain_item(item_to_gain, item_count)
                         else:
                             self.hero_party.gain_progress_marker(item_name)
                     elif item.type == DialogActionEnum.LOSE_ITEM:
-                        item_to_lose = self.game_state.get_item(item_name)
+                        item_to_lose = self.game_info.get_item(item_name)
                         if item_to_lose is not None:
                             self.hero_party.lose_item(item_name, item_count)
                         else:
@@ -429,9 +429,11 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
                     if isinstance(item.count, int):
-                        self.game_state.set_light_diameter(item.count)
+                        self.hero_party.light_diameter = item.count
+                        self.hero_party.light_diameter_decay_steps = item.decay_steps
+                        self.hero_party.light_diameter_decay_steps_remaining = item.decay_steps
                     else:
-                        self.game_state.set_light_diameter(None)
+                        self.hero_party.light_diameter = None
                     self.game_state.draw_map()
 
                 elif item.type == DialogActionEnum.REPEL_MONSTERS:
@@ -485,7 +487,7 @@ class GameDialogEvaluator:
                         SurfaceEffects.flickering(self.game_state.screen)
                     elif item.name == 'rainbowEffect':
                         SurfaceEffects.rainbow_effect(self.game_state.screen,
-                                                      self.game_state.get_tile('water').images[0][0])
+                                                      self.game_info.tiles['water'].images[0][0])
                     else:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)

@@ -494,13 +494,6 @@ class Spell(NamedTuple):
     available_outside: bool
     target_type: TargetTypeEnum
     use_dialog: DialogType
-    # TODO: Eventually replacing the following with use_dialog
-    min_hp_recover: int
-    max_hp_recover: int
-    min_damage_by_hero: int
-    max_damage_by_hero: int
-    min_damage_by_monster: int
-    max_damage_by_monster: int
 
 
 class Weapon(NamedTuple):
@@ -528,7 +521,7 @@ class Armor(NamedTuple):
     hurt_dmg_modifier: float
     fire_dmg_modifier: float
     stopspell_resistance: float
-    hp_regen_tiles: int
+    hp_regen_tiles: Optional[int]
 
 
 class Shield(NamedTuple):
@@ -563,7 +556,7 @@ class MapImageInfo(NamedTuple):
 
     @staticmethod
     def create_null() -> MapImageInfo:
-        return MapImageInfo('null',
+        return MapImageInfo('',
                             pygame.Surface((0, 0)),
                             Point(),
                             Point())

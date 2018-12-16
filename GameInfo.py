@@ -89,6 +89,11 @@ class GameInfo:
         self.armors: Dict[str, Armor] = {}
         for element in xml_root.findall("./Items/Armors/Armor"):
             item_name = element.attrib['name']
+
+            hp_regen_tiles = None
+            if 'hpRegenTiles' in element.attrib and 'none' != element.attrib['hpRegenTiles']:
+                hp_regen_tiles = int(element.attrib['hpRegenTiles'])
+
             self.armors[item_name] = Armor(
                 item_name,
                 int(element.attrib['defenseBonus']),
@@ -97,7 +102,7 @@ class GameInfo:
                 float(element.attrib['hurtDmgModifier']),
                 float(element.attrib['fireDmgModifier']),
                 float(element.attrib['stopspellResistance']),
-                int(element.attrib['hpRegenTiles']))
+                hp_regen_tiles)
             self.items[item_name] = self.armors[item_name]
          
         # Parse shields
@@ -165,7 +170,7 @@ class GameInfo:
             tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
             if tile_image_unscaled.get_height() > self.tile_size_pixels:
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
-                tile_images_scaled = []
+                tile_images_scaled: List[List[pygame.Surface]] = []
                 for x in range(16):
                     tile_images_scaled.append([])
                 unscaled_size = tile_image_unscaled.get_height()/4
@@ -210,7 +215,6 @@ class GameInfo:
             w = w * numpy.transpose(w)
             p = w / sum(w)
             self.tile_probabilities.append(p)
-        print('self.tile_probabilities', self.tile_probabilities, flush=True)
 
         # Parse decorations
         self.decorations: Dict[str, Decoration] = {}
@@ -273,20 +277,6 @@ class GameInfo:
                 print('ERROR: No use dialog for spell', spell_name, flush=True)
                 continue
 
-            min_hp_recover = 0
-            max_hp_recover = 0
-            min_damage_by_hero = 0
-            max_damage_by_hero = 0
-            min_damage_by_monster = 0
-            max_damage_by_monster = 0
-            if 'hpRecover' in element.attrib:
-                (min_hp_recover, max_hp_recover) = GameTypes.parse_int_range(element.attrib['hpRecover'])
-            if 'damageByHero' in element.attrib:
-                (min_damage_by_hero, max_damage_by_hero) = GameTypes.parse_int_range(element.attrib['damageByHero'])
-            if 'damageByMonster' in element.attrib:
-                (min_damage_by_monster, max_damage_by_monster) = GameTypes.parse_int_range(
-                    element.attrib['damageByMonster'])
-
             self.spells[spell_name] = Spell(
                 spell_name,
                 int(element.attrib['mp']),
@@ -295,13 +285,7 @@ class GameInfo:
                 available_inside,
                 available_outside,
                 target_type,
-                use_dialog,
-                min_hp_recover,
-                max_hp_recover,
-                min_damage_by_hero,
-                max_damage_by_hero,
-                min_damage_by_monster,
-                max_damage_by_monster)
+                use_dialog)
 
         # Parse levels
         levels: Dict[str, List[Level]] = {}
@@ -554,6 +538,10 @@ class GameInfo:
             for monster_element in element.findall('Monster'):
                 # print( 'monster_element =', monster_element, flush=True )
                 # print( 'monster_element.attrib =', monster_element.attrib, flush=True )
+                approach_dialog = None
+                approach_dialog_element = monster_element.find('ApproachDialog')
+                if approach_dialog_element is not None:
+                    approach_dialog = self.parse_dialog(approach_dialog_element)
                 victory_dialog = None
                 victory_dialog_element = monster_element.find('VictoryDialog')
                 if victory_dialog_element is not None:
@@ -572,6 +560,7 @@ class GameInfo:
                     self.monsters[monster_element.attrib['name']],
                     Point(int(monster_element.attrib['x']),
                           int(monster_element.attrib['y'])),
+                    approach_dialog,
                     victory_dialog,
                     run_away_dialog,
                     progress_marker,
@@ -752,7 +741,7 @@ class GameInfo:
             return None
         dialog: DialogType = []
         for element in dialog_root_element:
-            # print( 'in parseDialog: element =', element, flush=True )
+            # print('in parseDialog: element =', element, flush=True)
          
             label = None
             if 'label' in element.attrib and element.attrib['label'] != 'None':
@@ -858,6 +847,10 @@ class GameInfo:
                 if 'bypass' in element.attrib:
                     bypass = element.attrib['bypass'] == 'yes'
 
+                decay_steps = None
+                if 'decay' in element.attrib and 'unlimited' != element.attrib['decay']:
+                    decay_steps = int(element.attrib['decay'])
+
                 category = ActionCategoryTypeEnum.PHYSICAL
                 if 'category' in element.attrib:
                     category = ActionCategoryTypeEnum[element.attrib['category']]
@@ -871,6 +864,7 @@ class GameInfo:
                                            name=name,
                                            count=count,
                                            bypass=bypass,
+                                           decay_steps=decay_steps,
                                            category=category,
                                            map_name=map_name,
                                            map_pos=map_pos,
@@ -902,6 +896,11 @@ class GameInfo:
         if len(dialog) > 0:
             return dialog
       
+        return None
+
+    def get_item(self, name: str) -> Optional[ItemType]:
+        if name in self.items:
+            return self.items[name]
         return None
 
     def get_map_image_info(self,

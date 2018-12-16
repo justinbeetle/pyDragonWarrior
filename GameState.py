@@ -92,7 +92,6 @@ class GameState(GameStateInterface):
 
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
-        self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
 
         # map_state, exterior_map_image, and interior_map_image are initialized with meaningful values in set_map
         self.map_state = MapImageInfo.create_null()
@@ -116,12 +115,12 @@ class GameState(GameStateInterface):
         # diameters was unlimited or the current diameter is less than the default light diameter of the
         # new map.
         new_map_light_diameter = self.game_info.maps[new_map_name].light_diameter
-        if (old_map_name is None or new_map_light_diameter is None or
+        if (not old_map_name or new_map_light_diameter is None or
                 (new_map_light_diameter != self.game_info.maps[old_map_name].light_diameter
                  and (self.game_info.maps[old_map_name].light_diameter is None
-                      or (self.light_diameter is not None
-                          and self.light_diameter < new_map_light_diameter)))):
-            self.light_diameter = new_map_light_diameter
+                      or (self.hero_party.light_diameter is not None
+                          and self.hero_party.light_diameter < new_map_light_diameter)))):
+            self.hero_party.light_diameter = new_map_light_diameter
 
         # If changing maps and set to respawn decorations, clear the history of removed decorations
         if respawn_decorations:
@@ -345,16 +344,16 @@ class GameState(GameStateInterface):
     def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for specialMonster in self.game_info.maps[self.map_state.name].special_monsters:
-            if specialMonster.point == tile:
-                if (specialMonster.progress_marker is not None
-                        and specialMonster.progress_marker not in self.hero_party.progress_markers):
+        for special_monster in self.game_info.maps[self.map_state.name].special_monsters:
+            if special_monster.point == tile:
+                if (special_monster.progress_marker is not None
+                        and special_monster.progress_marker not in self.hero_party.progress_markers):
                     continue
-                if (specialMonster.inverse_progress_marker is not None
-                        and specialMonster.inverse_progress_marker in self.hero_party.progress_markers):
+                if (special_monster.inverse_progress_marker is not None
+                        and special_monster.inverse_progress_marker in self.hero_party.progress_markers):
                     continue
-                # print ('Found monster at point: ', tile, flush=True)
-                return specialMonster
+                print('Found monster at point: ', tile, flush=True)
+                return special_monster
         return None
 
     def get_tile_degrees_of_freedom(self,
@@ -506,9 +505,9 @@ class GameState(GameStateInterface):
                 self.get_tile_screen_rect(pc.dest_pos_dat_tile))
 
     def is_light_restricted(self) -> bool:
-        return (self.light_diameter is not None
-                and self.light_diameter <= self.win_size_tiles.w
-                and self.light_diameter <= self.win_size_tiles.h)
+        return (self.hero_party.light_diameter is not None
+                and self.hero_party.light_diameter <= self.win_size_tiles.w
+                and self.hero_party.light_diameter <= self.win_size_tiles.h)
 
     def is_outside(self) -> bool:
         return self.game_info.maps[self.map_state.name].is_outside
@@ -596,11 +595,11 @@ class GameState(GameStateInterface):
 
     def set_clipping_for_light_diameter(self) -> None:
         # TODO: Rework for parties
-        if self.is_light_restricted() and self.light_diameter is not None:
+        if self.is_light_restricted() and self.hero_party.light_diameter is not None:
             self.screen.set_clip(
                 self.get_tile_region_screen_rect(
                     self.hero_party.get_curr_pos_dat_tile(),
-                    self.light_diameter / 2,
+                    self.hero_party.light_diameter / 2,
                     self.hero_party.get_curr_pos_offset_img_px()))
         else:
             self.set_clipping_for_window()
@@ -721,38 +720,14 @@ class GameState(GameStateInterface):
                 variables.generic['[Y_DIR]'] = 'South'
         return variables
 
-    def get_item(self, name: str) -> Optional[ItemType]:
-        if name in self.game_info.items:
-            return self.game_info.items[name]
-        return None
-
-    def get_spells(self) -> Dict[str, Spell]:
-        return self.game_info.spells
-
-    def get_dialog_sequences(self) -> Dict[str, DialogType]:
-        return self.game_info.dialog_sequences
-
-    def get_tile(self, name: str) -> Tile:
-        return self.game_info.tiles[name]
-
     def is_in_combat(self) -> bool:
         return self.combat_encounter is not None
-
-    def get_light_diameter(self) -> Optional[float]:
-        return self.light_diameter
-
-    def set_light_diameter(self, light_diameter: Optional[float]) -> None:
-        self.light_diameter = light_diameter
-        self.draw_map()
 
     def get_map_name(self) -> str:
         return self.map_state.name
 
     def get_win_size_pixels(self) -> Point:
         return self.win_size_pixels
-
-    def get_tile_size_pixels(self) -> int:
-        return self.game_info.tile_size_pixels
 
     def initiate_encounter(self,
                            monster_info: Optional[MonsterInfo] = None,

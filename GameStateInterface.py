@@ -21,24 +21,8 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def get_hero_party(self) -> HeroParty:
         raise NotImplementedError
 
-    # TODO: Remove and instead get from GameInfo
     @abc.abstractmethod
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
-        raise NotImplementedError
-
-    # TODO: Remove and instead get from GameInfo
-    @abc.abstractmethod
-    def get_item(self, name: str) -> Optional[ItemType]:
-        raise NotImplementedError
-
-    # TODO: Remove and instead get from GameInfo
-    @abc.abstractmethod
-    def get_dialog_sequences(self) -> Dict[str, DialogType]:
-        raise NotImplementedError
-
-    # TODO: Remove and instead get from GameInfo
-    @abc.abstractmethod
-    def get_tile(self, name: str) -> Tile:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -57,14 +41,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def is_light_restricted(self) -> bool:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def get_light_diameter(self) -> Optional[float]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def set_light_diameter(self, light_diameter: Optional[float]) -> None:
-        raise NotImplementedError
-
+    # TODO: Move this into the HeroParty
     @abc.abstractmethod
     def get_map_name(self) -> str:
         raise NotImplementedError
@@ -98,11 +75,6 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_win_size_pixels(self) -> Point:
-        raise NotImplementedError
-
-    # TODO: Remove and instead get from GameInfo
-    @abc.abstractmethod
-    def get_tile_size_pixels(self) -> int:
         raise NotImplementedError
 
     @abc.abstractmethod

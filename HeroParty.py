@@ -16,6 +16,10 @@ class HeroParty:
         self.gp = 0
         self.progress_markers: List[str] = []
 
+        self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
+        self.light_diameter_decay_steps: Optional[int] = None
+        self.light_diameter_decay_steps_remaining: Optional[int] = None
+
         self.last_outside_map_name = ''
         self.last_outside_pos_dat_tile = Point()
         self.last_outside_dir = Direction.SOUTH
@@ -196,6 +200,21 @@ class HeroParty:
         self.last_outside_map_name = map_name
         self.last_outside_pos_dat_tile = pos
         self.last_outside_dir = direction
+
+    def inc_step_counter(self) -> None:
+        # Decay the light radius effect over time
+        if self.light_diameter is not None and self.light_diameter_decay_steps_remaining is not None:
+            self.light_diameter_decay_steps_remaining -= 1
+            if 0 >= self.light_diameter_decay_steps_remaining:
+                self.light_diameter = max(0.5, self.light_diameter-2)
+                self.light_diameter_decay_steps_remaining = self.light_diameter_decay_steps
+
+        # TODO: Track and decay the repel effect
+
+        # Depending on equipment heal party members over time
+        for member in self.members:
+            if member.is_alive():
+                member.inc_step_counter()
 
     def get_lowest_health_ratio(self) -> float:
         lowest_health_ratio = 1.0
