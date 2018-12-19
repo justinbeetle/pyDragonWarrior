@@ -132,7 +132,7 @@
          <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
 
          <MapDecoration type="None" x="84" y="114">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
@@ -239,48 +239,129 @@
             <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
 
-         <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no">
+         <NonPlayerCharacter type="king" x="12" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord">
+            <DialogAssert type="LACKS_ITEM" name="PM_Offered_The_Realm">
+               <Dialog>"Thou will forever be a hero of the realm, [NAME]!"</Dialog>
+               <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
+               <DialogAction type="WAIT" count="250"/>
+               <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
+               <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call -->
+               <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
+               <DialogAction type="PLAY_MUSIC" name="16_-_Dragon_Warrior_-_NES_-_Finale.ogg"/></DialogAssert>
+            <Dialog>"The legends have proven true.  Thou art indeed of the line of Erdrick.  It is thy right to rule over this land.  Will thou take my place?"</Dialog>
+            <Dialog>[NAME] thought carefully before answering.  "I cannot," said [NAME].  "If ever I am to rule a country, it must be a land that I myself find."</Dialog>
+            <DialogCheck type="HAS_ITEM" name="PM_Rescued_Princess">
+               <Dialog>Gwaelin said "Please, wait.  I wish to go with thee on thy journey.  May I travel as thy companion?"</Dialog>
+               <DialogOptions label="but_thou_must_take_me_with_you">
+                  <DialogOption name="Yes">
+                     <Dialog>"I'm so happy!"</Dialog>
+                     <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
+                     <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call -->
+                  <DialogOption name="No">
+                      <Dialog>"But thou must."</Dialog>
+                      <Dialog>"May I travel as thy companion?"</Dialog>
+                      <DialogGoTo label="but_thou_must_take_me_with_you"/></DialogOption></DialogOptions></DialogCheck>
+            <Dialog>CONGRATULATIONS!</Dialog>
+            <Dialog>THOU HAST RESTORED PEACE UNTO THE WORLD BUT THERE ARE MANY ROADS YET TO TRAVEL.</Dialog>
+            <Dialog>MAY THE LIGHT SHINE UPON THEE.</Dialog>
+            <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
+            <DialogAction type="WAIT" count="250"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Offered_The_Realm"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
+            <DialogAction type="GOTO_COORDINATES" dir="SOUTH"/> <!-- The GOTO_COORDINATES forces a setMap call -->
+            <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
+            <DialogAction type="PLAY_MUSIC" name="16_-_Dragon_Warrior_-_NES_-_Finale.ogg"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="princess" x="11" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord and PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Carrying_Princess">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="10" y="10" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="10" y="12" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="10" y="14" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="13" y="10" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="13" y="12" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="13" y="14" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="10" y="10" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="10" y="12" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="10" y="14" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="13" y="10" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="13" y="12" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="trumpeter" x="13" y="14" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
+            <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
             <Dialog>"King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="guard" x="9" y="9" dir="NORTH" walking="no">
+         <NonPlayerCharacter type="guard" x="9" y="9" dir="NORTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
             <Dialog>"If thou art planning to take a rest, first see King Lorik."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="boy" x="12" y="12" dir="SOUTH" walking="yes">
+         <NonPlayerCharacter type="boy" x="12" y="12" dir="SOUTH" walking="yes" inverseProgressMarker="PM_Defeated_Dragonlord">
             <Dialog>"There was a time when Brecconary was a paradise.  Then the Dragonlord's minions came."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogCheck>
+         <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes" inverseProgressMarker="PM_Defeated_Dragonlord">
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogAssert>
             <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="3" y="22" dir="EAST" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"We are merchants who have traveled much in this land.  Many of our colleagues have been killed by servants of the Dragonlord."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="7" y="24" dir="NORTH" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"Rumor has it that entire towns have been destroyed by the Dragonlord's servants."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="3" y="13" dir="NORTH" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"Never does a brave person steal."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="20" y="14" dir="SOUTH" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"Let us wish the warrior well!  May the light be thy strength!"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="27" y="16" dir="NORTH" walking="no">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"If thy hit points are high enough, by all means, enter."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="3" y="9" dir="EAST" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"To become strong enough to face future trials thou must first battle many foes."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="28" y="6" dir="WEST" walking="no">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"When the sun and rain meet, a Rainbow Bridge shall appear.  It's a legend."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="10" y="28" dir="EAST" walking="no">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="13" y="28" dir="WEST" walking="no">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="16" y="21" dir="EAST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogAssert>
             <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
@@ -289,6 +370,7 @@
             <DialogAction type="MAGIC_RESTORE" count="unlimited"/></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="25" y="22" dir="NORTH" walking="yes">
+            <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
             <Dialog>"In Garinham, look for the grave of Garin.  Thou must push on a wall of darkness there."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="merchant" x="25" y="2" dir="SOUTH" walking="no">
@@ -299,8 +381,8 @@
       <Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <PointTransition decoration="downstairs" fromX="9" fromY="9" toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
 
-         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Carrying_Princess">
+         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
+            <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess">
                <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
                <Dialog>"Now, Gwaelin, come to my side."</Dialog>
                <Dialog>Gwaelin then whispers: "Wait a moment, please. I would give a present to [NAME]."</Dialog>
@@ -310,7 +392,7 @@
                <DialogAction type="GAIN_ITEM" name="Gwaelin's Love"/>
                <DialogAction type="LOSE_ITEM" name="PM_Carrying_Princess"/>
                <DialogAction type="GAIN_ITEM" name="PM_Princess_Returned_To_Castle"/>
-               <DialogAction type="GOTO_COORDINATES"/></DialogCheck> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
+               <DialogAction type="GOTO_COORDINATES"/></DialogAssert> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
             <Dialog>"I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points."</Dialog>
             <Dialog>"Will thou tell me now of thy deeds so they won't be forgotten?"</Dialog>
             <DialogOptions>
@@ -320,8 +402,8 @@
                <DialogOption name="No"/></DialogOptions>
                <Dialog>"Goodbye now, [NAME].  Take care and tempt not the Fates."</Dialog></NonPlayerCharacter>
 
-         <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="PM_Princess_Returned_To_Castle">
-            <DialogCheck type="LACKS_ITEM" name="PM_Given_Princess_Love"><Dialog>"I love thee, [NAME]."</Dialog></DialogCheck>
+         <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Defeated_Dragonlord">
+            <DialogAssert type="LACKS_ITEM" name="PM_Given_Princess_Love"><Dialog>"I love thee, [NAME]."</Dialog></DialogAssert>
             <Dialog>"Dost thou love me, [NAME]?"</Dialog>
             <DialogOptions label="but_thou_must_love_me">
                <DialogOption name="Yes">
@@ -334,17 +416,17 @@
                    <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogAssert>
             <Dialog>"East of this castle is a town where armor, weapons, and many other items may be purchased."</Dialog>
             <Dialog>"Return to the Inn for a rest if thou art wounded in battle, [NAME].  Sleep heals all."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="6" y="7" dir="WEST" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogAssert>
             <Dialog>"If thou hast collected all the treasure chests, a key will be found."</Dialog>
             <Dialog>"Once used, the key will disappear, but the door will be open and thou may pass through."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="8" y="6" dir="WEST" walking="yes">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogAssert>
             <Dialog>"Dost thou know about Princess Gwaelin?"</Dialog>
             <DialogOptions>
                <DialogOption name="Yes">
@@ -372,11 +454,11 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5"  toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="7" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><Dialog>"Be gone with you!!!"</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><Dialog>"Be gone with you!!!"</Dialog></DialogAssert>
             <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="5"  y="6">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Stones_of_Sunlight"/>
             <DialogAction type="GAIN_ITEM" name="Stones of Sunlight"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
@@ -394,7 +476,7 @@
             <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="11" y="27" dir="NORTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogAssert>
             <Dialog>"Tell King Lorik that the search for his daughter hath failed.  I am almost gone..."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="guard" x="29" y="14" dir="SOUTH" walking="no">
@@ -525,7 +607,7 @@
          <MapDecoration type="chest" x="16" y="23"/>
 
          <MapDecoration type="None" x="10" y="7">
-            <DialogCheck type="LACKS_ITEM" name="Fairy Flute" count="1"><DialogGoTo label="found_nothing"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="Fairy Flute" count="1"><DialogGoTo label="found_nothing"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Fairy Flute"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Fairy Flute.</Dialog></MapDecoration>
 
@@ -568,7 +650,7 @@
             <Dialog>"Hast thou seen Nester?  I think he may need help."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="sage" x="2" y="2" dir="SOUTH" walking="no">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Sword"><Dialog>"Finally thou hast obtained it, [NAME]."</Dialog></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Sword"><Dialog>"Finally thou hast obtained it, [NAME]."</Dialog></DialogAssert>
             <Dialog>"Though thou art as brave as thy ancestor, [NAME], thou cannot defeat the great Dragonlord with such weapons.  Thou shouldst come here again."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="boy" x="6" y="13" dir="SOUTH" walking="yes">
@@ -651,7 +733,7 @@
             <Dialog>"Thou shalt find the Stones of Sunlight in Tantegel Castle, if thou has not found them yet."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="warrior" x="16" y="27" dir="SOUTH" walking="yes">
-            <DialogCheck type="HAS_ITEM" name="Fighter's Ring" count="1"><Dialog>"All true warriors wear a ring."</Dialog></DialogCheck>
+            <DialogAssert type="HAS_ITEM" name="Fighter's Ring" count="1"><Dialog>"All true warriors wear a ring."</Dialog></DialogAssert>
             <Dialog>"Is that a wedding ring?  Thou seems too young to be married."</Dialog></NonPlayerCharacter>
 
          <NonPlayerCharacter type="girl" x="5" y="22" dir="SOUTH" walking="yes">
@@ -695,7 +777,7 @@
             <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="18" y="13"/></RunAwayDialog></Monster>
 
          <MapDecoration type="None" x="19" y="13">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Armor"><DialogGoTo label="found_nothing"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Armor"><DialogGoTo label="found_nothing"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Armor"/>
             <Dialog>[NAME] searched the ground all about.</Dialog>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Armor.</Dialog></MapDecoration>
@@ -878,11 +960,11 @@
          <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Silver_Harp">
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Silver_Harp">
                <Dialog>"Thy bravery must be proven.  Thus, I propose a test."</Dialog>
                <Dialog>"There is a Silver Harp that beckons to the creatures of the Dragonlord."</Dialog>
-               <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogCheck>
+               <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogAssert>
             <Dialog>"Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Silver Harp"/>
             <DialogAction type="GAIN_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/>
@@ -890,7 +972,7 @@
             <DialogAction type="LOSE_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="4" y="5">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Staff_of_Rain"/>
             <DialogAction type="GAIN_ITEM" name="Staff of Rain"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
@@ -900,16 +982,16 @@
          <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight">
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain">
+               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
-            <DialogCheck type="HAS_ITEM" name="Erdrick's Token">
+               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="Erdrick's Token">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogCheck>
+               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
             <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
             <DialogAction type="LOSE_ITEM" name="Stones of Sunlight"/>
             <DialogAction type="LOSE_ITEM" name="Staff of Rain"/>
@@ -918,7 +1000,7 @@
             <DialogAction type="LOSE_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="6" y="6">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Rainbow_Drop"/>
             <DialogAction type="GAIN_ITEM" name="Rainbow Drop"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
@@ -957,7 +1039,7 @@
 
          <MapDecoration type="chest" x="2"  y="2"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
          <MapDecoration type="chest" x="14" y="7">
-            <DialogCheck type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Silver_Harp"/>
             <DialogAction type="GAIN_ITEM" name="Silver Harp"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
@@ -1014,7 +1096,7 @@
          <PointTransition decoration="downstairs" fromX="2"  fromY="10" toMap="charlock_lvl4"  toX="1"  toY="10" toDir="EAST"/><!--N-->
 
          <MapDecoration type="chest" x="6" y="6">
-            <DialogCheck type="LACKS_ITEM" name="Erdrick's Sword"><DialogGoTo label="empty_chest"/></DialogCheck>
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Sword"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Sword"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
@@ -1117,10 +1199,10 @@
             <DialogOption name="Buy">
                <Dialog>"What dost thou wish to buy?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
                   <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
-                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogCheck>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
                <Dialog>"The [ITEM]?  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
@@ -1152,10 +1234,10 @@
             <DialogOption name="Buy">
                <Dialog>"What dost thou want?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
                   <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
-                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogCheck>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
                <Dialog>The [ITEM]?  Is that okay?</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
@@ -1183,9 +1265,9 @@
          <Dialog>"Magic keys!  They will unlock any door.  Dost thou wish to purchase one for [COST] gold peices?"</Dialog>
          <DialogOptions label="key_buy_option">
             <DialogOption name="Yes">
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
-                  <Dialog>"I will see thee later."</Dialog></DialogCheck>
+                  <Dialog>"I will see thee later."</Dialog></DialogAssert>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
@@ -1199,9 +1281,9 @@
          <Dialog>"Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?"</Dialog>
          <DialogOptions label="fairy_water_buy_option">
             <DialogOption name="Yes">
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
-                  <Dialog>"All the best to thee."</Dialog></DialogCheck>
+                  <Dialog>"All the best to thee."</Dialog></DialogAssert>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
@@ -1213,9 +1295,9 @@
       <DialogScript label="single_item_vendor_buy_option">
          <DialogOptions>
             <DialogOption name="Yes">
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
-                  <Dialog>"Please come again when you have more gold!"</Dialog></DialogCheck>
+                  <Dialog>"Please come again when you have more gold!"</Dialog></DialogAssert>
                <Dialog>Here you go.</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
@@ -1228,7 +1310,7 @@
          <Dialog>"Welcome to the Traveler's Inn.  Room and board is [COST] gold pieces per night.  Dost thou want a room?"</Dialog>
          <DialogOptions>
             <DialogOption name="Yes">
-               <DialogCheck type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogCheck>
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogAssert>
                <Dialog>Have a great night!</Dialog>
                <DialogAction type="PLAY_MUSIC" name="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"/>
                <DialogAction type="VISUAL_EFFECT" name="fadeOutToBlack"/>
@@ -1617,43 +1699,43 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></Spell>
       <Spell name="Monster Hurt" mp="2" availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></Spell>
 
       <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="SLEEP" category="MAGICAL"/></Spell>
 
       <Spell name="Radiant"   mp="3"  availableInCombat="no"  availableOutsideCombat="yes">
          <Dialog>[ACTOR] cast the spell of radiant.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
-         <DialogCheck type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogCheck>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogAssert>
          <DialogAction type="SET_LIGHT_DIAMETER" count="7" decay="70"/></Spell>
 
       <Spell name="Stopspell" mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of stopspell.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="STOPSPELL" category="MAGICAL"/></Spell>
 
       <Spell name="Outside"   mp="6"  availableInCombat="no"  availableOutsideCombat="yes" availableOutside="no">
          <Dialog>[ACTOR] cast the spell of outside.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_INSIDE"><Dialog>But that spell will not work.</Dialog></DialogCheck>
-         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_INSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
          <DialogAction type="GOTO_LAST_OUTSIDE_COORDINATES"/>
          <Dialog>[NAME] was transported outside.</Dialog></Spell>
@@ -1662,8 +1744,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of return.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogCheck>
-         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
          <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
          <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Spell>
@@ -1672,7 +1754,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of repel.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="REPEL_MONSTERS" decay="128"/></Spell>
 
       <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
@@ -1686,13 +1768,13 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></Spell>
       <Spell name="Monster Hurtmore" mp="5" availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogCheck type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogCheck>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="20-30" category="MAGICAL"/></Spell>
    </Spells>
 
@@ -1761,31 +1843,31 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>[ACTOR] ate the herb.</Dialog></Tool>
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
-            <DialogCheck type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogCheck>
+            <DialogAssert type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
             <DialogAction type="LOSE_ITEM" name="Key"/>
             <DialogAction type="OPEN_DOOR"/></Tool>
 
          <Tool name="Key Ring"                             gp="1000" droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
-            <DialogCheck type="IS_FACING_DOOR"><Dialog>A key ring will open a locked door.  Unlike a key it is reusable.</Dialog></DialogCheck>
+            <DialogAssert type="IS_FACING_DOOR"><Dialog>A key ring will open a locked door.  Unlike a key it is reusable.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
             <DialogAction type="OPEN_DOOR"/></Tool>
 
          <Tool name="Torch"                                gp="8"    droppable="yes" equippable="no"  availableInCombat="no">
-            <DialogCheck type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogCheck>
+            <DialogAssert type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogAssert>
             <DialogAction type="LOSE_ITEM" name="Torch"/>
             <DialogAction type="SET_LIGHT_DIAMETER" count="3" decay="unlimited"/>
             <Dialog>[ACTOR] lit a torch.</Dialog></Tool>
 
          <Tool name="Lantern"                              gp="125"  droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
-            <DialogCheck type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogCheck>
+            <DialogAssert type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogAssert>
             <DialogAction type="SET_LIGHT_DIAMETER" count="5" decay="unlimited"/>
             <Dialog>[ACTOR] lit a lattern.</Dialog></Tool>
 
          <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no">
             <Dialog>[ACTOR] threw the Wings of the Wyvern up into the sky.</Dialog>
-            <DialogCheck type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogCheck>
-            <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogCheck>
+            <DialogAssert type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
             <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
             <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
@@ -1813,8 +1895,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
-            <DialogCheck type="IS_AT_COORDINATES" map="overworld" x="66" y="50"><Dialog>But no rainbow appeared here.</Dialog></DialogCheck>
-            <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogCheck>
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" x="66" y="50"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>
             <DialogAction type="GAIN_ITEM" name="PM_Created_Rainbow_Bridge"/>
@@ -1825,15 +1907,15 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Silver Harp"                                    droppable="no"  equippable="no">
             <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
             <Dialog>[ACTOR] played a sweet melody on the harp.</Dialog>
-            <DialogCheck type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogCheck>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool> <!-- TODO: Should only start an encounter where monsters reside -->
 
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
-            <Dialog>[ACTOR] held the Gwaelin's Love tightly.</Dialog>
+            <Dialog>[ACTOR] held Gwaelin's Love tightly.</Dialog>
+            <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess"><Dialog>"[ACTOR], I'm right here!  You are so silly!"</Dialog></DialogAssert>
             <Dialog>"Heed my voice, [ACTOR], for this is Gwaelin."</Dialog>
             <Dialog>"To reach the next level thou must raise thy experience points by [NEXT_LEVEL_XP].  My hope is with thee."</Dialog>
-            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"I love thee, [ACTOR]."</Dialog></DialogCheck>
-            <Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog>
+            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog></DialogCheck>
             <Dialog>"I love thee, [ACTOR]."</Dialog></Tool>
 
          <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes" unequippable="no"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->

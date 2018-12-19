@@ -825,13 +825,14 @@ class GameInfo:
                         dialog_vendor_sell_options.append(option_element.attrib['type'])
                 dialog.append(DialogVendorSellOptions(dialog_vendor_sell_options))
 
-            elif element.tag == 'DialogCheck':
+            elif element.tag == 'DialogAssert' or element.tag == 'DialogCheck':
                 dialog.append(DialogCheck(DialogCheckEnum[element.attrib['type']],
                                           self.parse_dialog(element),
                                           name=name,
                                           count=count,
                                           map_name=map_name,
-                                          map_pos=map_pos))
+                                          map_pos=map_pos,
+                                          is_assert=element.tag == 'DialogAssert'))
 
             elif element.tag == 'DialogAction':
                 victory_dialog: Optional[DialogType] = None

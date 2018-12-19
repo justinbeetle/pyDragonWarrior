@@ -93,6 +93,8 @@ class Game:
                     elif event.key == pygame.K_RIGHT:
                         self.game_state.hero_party.members[0].direction = Direction.EAST
                         moving = True
+                    elif event.key == pygame.K_F1:
+                        self.game_state.save(quick_save=True)
 
                 # Allow a change of direction without moving
                 if pc_dir_old != self.game_state.hero_party.members[0].direction:

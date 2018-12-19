@@ -522,7 +522,7 @@ def main() -> None:
     mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
 
-    def handle_quit_side_effect():
+    def handle_quit_side_effect() -> None:
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 

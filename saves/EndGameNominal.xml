@@ -1,0 +1,26 @@
+<SaveState dir="SOUTH" gp="1000000" map="overworld" name="Wallace" x="43" xp="55000" y="44">
+   <EquippedItems>
+      <Item name="Erdrick's Sword"/>
+      <Item name="Erdrick's Armor"/>
+      <Item name="Erdrick's Shield"/>
+      <Item name="Dragon's Scale"/>
+      <Item name="Fighter's Ring"/>
+   </EquippedItems>
+   <UnequippedItems>
+      <Item name="Fairy Water"   count="10"/>
+      <Item name="Herb"          count="10"/>
+      <Item name="Key"           count="10"/>
+      <Item name="Torch"         count="10"/>
+      <Item name="Wings"         count="10"/>
+      <Item name="Flame Sword"   count="1"/>
+      <Item name="Leather Armor" count="1"/>
+      <Item name="Ball Of Light" count="1"/>
+      <Item name="Gwaelin's Love" count="1"/>
+   </UnequippedItems>
+   <ProgressMarkers>
+      <ProgressMarker name="PM_Rescued_Princess"/>
+      <ProgressMarker name="PM_Princess_Returned_To_Castle"/>
+      <ProgressMarker name="PM_Created_Rainbow_Bridge"/>
+      <ProgressMarker name="PM_Defeated_Dragonlord"/>
+   </ProgressMarkers>
+</SaveState>

@@ -392,6 +392,11 @@ class GameDialog:
     def is_empty(self) -> bool:
         return len(self.displayed_message_lines) + len(self.remaining_message_lines) == 0
 
+    def clear(self) -> None:
+        self.displayed_message_lines = []
+        self.remaining_message_lines = []
+        self.row_data = None
+
     def is_last_row_blank(self) -> bool:
         if self.is_empty():
             return True

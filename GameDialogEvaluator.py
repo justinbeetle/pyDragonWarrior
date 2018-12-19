@@ -372,10 +372,14 @@ class GameDialogEvaluator:
                 else:
                     print('ERROR: Unsupported DialogCheckEnum of', item.type, flush=True)
 
-                if not check_result:
-                    if item.failed_check_dialog is not None:
-                        self.traverse_dialog(message_dialog, item.failed_check_dialog, depth + 1)
+                # On an assert, evaluate the dialog on a failure and then break out.
+                if item.is_assert and not check_result:
+                    if item.dialog is not None:
+                        self.traverse_dialog(message_dialog, item.dialog, depth + 1)
                     break
+                # On a check, evaluate the dialog on a success and do NOT break out.
+                elif not item.is_assert and check_result and item.dialog is not None:
+                    self.traverse_dialog(message_dialog, item.dialog, depth + 1)
 
             elif isinstance(item, DialogAction):
                 # print( 'Dialog Action =', item, flush=True )
@@ -455,10 +459,12 @@ class GameDialogEvaluator:
                         message_dialog.blit(self.game_state.screen, True)
 
                 elif item.type == DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES:
-                    self.hero_party.set_pos(self.hero_party.last_outside_pos_dat_tile,
-                                            Direction.get_opposite(self.hero_party.last_outside_dir))
-                    self.game_state.set_map(self.hero_party.last_outside_map_name)
-                    print('ERROR: DialogActionEnum.GOTO_LAST_OUTSIDE_COORDINATES is not implemented', flush=True)
+                    if self.hero_party.last_outside_map_name in self.game_info.maps:
+                        self.hero_party.set_pos(self.hero_party.last_outside_pos_dat_tile,
+                                                Direction.get_opposite(self.hero_party.last_outside_dir))
+                        self.game_state.set_map(self.hero_party.last_outside_map_name)
+                    else:
+                        message_dialog.add_message('But it did not work.')
 
                 elif item.type == DialogActionEnum.PLAY_SOUND:
                     # print( 'Play sound', item.name, flush=True )
@@ -490,6 +496,11 @@ class GameDialogEvaluator:
                     elif item.name == 'rainbowEffect':
                         SurfaceEffects.rainbow_effect(self.game_state.screen,
                                                       self.game_info.tiles['water'].images[0][0])
+                    elif item.name == 'hideDialog':
+                        # Before hiding the dialog first ensure the contents are acknowledged then clear them
+                        self.wait_for_acknowledgement(message_dialog)
+                        message_dialog.clear()
+                        self.game_state.draw_map(flip_buffer=True)
                     else:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)
@@ -616,6 +627,9 @@ class GameDialogEvaluator:
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
+
+                elif item.type == DialogActionEnum.WAIT:
+                    pygame.time.wait(item.count)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

@@ -131,11 +131,7 @@ class GameState(GameStateInterface):
             self.map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
         for decoration in self.map_decorations[:]:
-            if (decoration.progress_marker is not None
-                    and decoration.progress_marker not in self.hero_party.progress_markers):
-                self.map_decorations.remove(decoration)
-            elif (decoration.inverse_progress_marker is not None
-                  and decoration.inverse_progress_marker in self.hero_party.progress_markers):
+            if not self.check_progress_markers(decoration.progress_marker, decoration.inverse_progress_marker):
                 self.map_decorations.remove(decoration)
         # Prune out previously removed decorations
         if new_map_name in self.removed_decorations_by_map:
@@ -149,21 +145,13 @@ class GameState(GameStateInterface):
 
             # Remove any current NPCs which should be missing
             for npc_char in self.npcs[:]:
-                if (npc_char.npc_info is not None
-                        and npc_char.npc_info.progress_marker is not None
-                        and npc_char.npc_info.progress_marker not in self.hero_party.progress_markers):
-                    self.npcs.remove(npc_char)
-                elif (npc_char.npc_info is not None
-                      and npc_char.npc_info.inverse_progress_marker is not None
-                      and npc_char.npc_info.inverse_progress_marker in self.hero_party.progress_markers):
+                if not self.check_progress_markers(npc_char.npc_info.progress_marker,
+                                                   npc_char.npc_info.inverse_progress_marker):
                     self.npcs.remove(npc_char)
 
             # Add missing NPCs
             for npc in self.game_info.maps[new_map_name].npcs:
-                if npc.progress_marker is not None and npc.progress_marker not in self.hero_party.progress_markers:
-                    continue
-                if (npc.inverse_progress_marker is not None
-                        and npc.inverse_progress_marker in self.hero_party.progress_markers):
+                if not self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     continue
                 is_missing = True
                 for npc_char in self.npcs:
@@ -176,12 +164,8 @@ class GameState(GameStateInterface):
             # On a map change load NPCs from scratch
             self.npcs = []
             for npc in self.game_info.maps[new_map_name].npcs:
-                if npc.progress_marker is not None and npc.progress_marker not in self.hero_party.progress_markers:
-                    continue
-                if (npc.inverse_progress_marker is not None
-                        and npc.inverse_progress_marker in self.hero_party.progress_markers):
-                    continue
-                self.npcs.append(NpcState(npc))
+                if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
+                    self.npcs.append(NpcState(npc))
 
         # Bounds checking to ensure a valid hero/center position
         self.bounds_check_pc_position()
@@ -190,7 +174,7 @@ class GameState(GameStateInterface):
         self.exterior_map_image = GameInfo.get_exterior_image(self.map_state)
         self.interior_map_image = GameInfo.get_interior_image(self.map_state)
 
-    def save(self) -> None:
+    def save(self, quick_save: bool=False) -> None:
         # TODO: Save data for multiple party members
         xml_root = xml.etree.ElementTree.Element('SaveState')
         xml_root.attrib['name'] = self.hero_party.main_character.name
@@ -229,6 +213,7 @@ class GameState(GameStateInterface):
             progress_marker_element = xml.etree.ElementTree.SubElement(progress_markers_element, 'ProgressMarker')
             progress_marker_element.attrib['name'] = progress_marker
 
+        # TODO: This should all  be captured in game.xml
         dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
         dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
         dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
@@ -313,16 +298,10 @@ class GameState(GameStateInterface):
     def get_point_transition(self, tile: Optional[Point] = None) -> Optional[PointTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for pointTransition in self.game_info.maps[self.map_state.name].point_transitions:
-            if pointTransition.src_point == tile:
-                if (pointTransition.progress_marker is not None
-                        and pointTransition.progress_marker not in self.hero_party.progress_markers):
-                    continue
-                if (pointTransition.inverse_progress_marker is not None
-                        and pointTransition.inverse_progress_marker in self.hero_party.progress_markers):
-                    continue
-                # print ('Found transition at point: ', tile, flush=True)
-                return pointTransition
+        for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
+            if point_transition.src_point == tile and self.check_progress_markers(
+                    point_transition.progress_marker, point_transition.inverse_progress_marker):
+                return point_transition
         return None
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
@@ -330,14 +309,8 @@ class GameState(GameStateInterface):
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for decoration in self.map_decorations:
-            if decoration.point == tile:
-                if (decoration.progress_marker is not None
-                        and decoration.progress_marker not in self.hero_party.progress_markers):
-                    continue
-                if (decoration.inverse_progress_marker is not None
-                        and decoration.inverse_progress_marker in self.hero_party.progress_markers):
-                    continue
-                # print ('Found decoration at point: ', tile, flush=True)
+            if decoration.point == tile and self.check_progress_markers(
+                    decoration.progress_marker, decoration.inverse_progress_marker):
                 decorations.append(decoration)
         return decorations
 
@@ -345,16 +318,35 @@ class GameState(GameStateInterface):
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for special_monster in self.game_info.maps[self.map_state.name].special_monsters:
-            if special_monster.point == tile:
-                if (special_monster.progress_marker is not None
-                        and special_monster.progress_marker not in self.hero_party.progress_markers):
-                    continue
-                if (special_monster.inverse_progress_marker is not None
-                        and special_monster.inverse_progress_marker in self.hero_party.progress_markers):
-                    continue
+            if special_monster.point == tile and self.check_progress_markers(
+                    special_monster.progress_marker, special_monster.inverse_progress_marker):
                 print('Found monster at point: ', tile, flush=True)
                 return special_monster
         return None
+
+    # Return True if progress_markers satisfied, else False
+    def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
+        if progress_marker is None:
+            progress_marker_eval = True
+        else:
+            progress_marker_eval = self.evaluate_progress_marker_string(progress_marker)
+
+        if inverse_progress_marker is None:
+            inverse_progress_marker_eval = False
+        else:
+            inverse_progress_marker_eval = self.evaluate_progress_marker_string(inverse_progress_marker)
+
+        return progress_marker_eval and not inverse_progress_marker_eval
+
+    def evaluate_progress_marker_string(self, progress_marker_string: str) -> bool:
+        progress_marker_term_string = progress_marker_string
+        for strip_term in ['(', ')', ' and ', ' or ', ' not ', '&', '|', '!']:
+            progress_marker_term_string = progress_marker_term_string.replace(strip_term, ' ')
+        for term in filter(None, progress_marker_term_string.split(' ')):
+            progress_marker_string = progress_marker_string.replace(term, str(term in self.hero_party.progress_markers))
+        if eval(progress_marker_string):
+            return True
+        return False
 
     def get_tile_degrees_of_freedom(self,
                                     tile: Point,

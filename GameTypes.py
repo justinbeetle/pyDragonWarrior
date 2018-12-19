@@ -140,6 +140,7 @@ class DialogActionEnum(Enum):
     STOPSPELL = 16                     # attributes: bypass (to bypass resistances), category
     DAMAGE_TARGET = 17                 # attributes: count (number, range, unlimited, or default), category
     #                                                bypass (to bypass resistances and damage modifiers)
+    WAIT = 18                          # attributes: count (number of milliseconds to wait)
 
 
 class ActionCategoryTypeEnum(Enum):
@@ -274,11 +275,12 @@ class DialogVendorSellOptionsVariable:
 @dataclass
 class DialogCheck:
     type: DialogCheckEnum
-    failed_check_dialog: Optional[DialogType]
+    dialog: Optional[DialogType]
     name: Optional[str] = None
     count: Union[int, str] = 1
     map_name: Optional[str] = None
     map_pos: Optional[Point] = None
+    is_assert: bool = True
 
 
 # Conditionally branch dialog if the check condition is not met
