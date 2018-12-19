@@ -103,11 +103,11 @@ class GameDialogEvaluator:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.game_state.is_running = False
+                        self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                         is_awaiting_acknowledgement = False
                 elif event.type == pygame.QUIT:
-                    self.game_state.is_running = False
+                    self.game_state.handle_quit()
 
         if self.game_state.is_running:
             if message_dialog is not None:
@@ -125,15 +125,15 @@ class GameDialogEvaluator:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.game_state.is_running = False
+                        self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu_result = menu_dialog.get_selected_menu_option()
                     elif event.key == pygame.K_SPACE:
-                        menu_result = None
+                        menu_result = ""
                     else:
                         menu_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
-                    self.game_state.is_running = False
+                    self.game_state.handle_quit()
 
         if menu_result == "":
             menu_result = None
@@ -473,6 +473,8 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.VISUAL_EFFECT:
                     # Update the screen but don't flip the buffers
                     self.game_state.draw_map(flip_buffer=False)
+                    if self.combat_encounter is not None:
+                        self.combat_encounter.render_monsters()
                     message_dialog.blit(self.game_state.screen, flip_buffer=False)
                     self.update_status_dialog(flip_buffer=False, message_dialog=message_dialog)
 

@@ -90,3 +90,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def handle_quit(self) -> None:
+        raise NotImplementedError

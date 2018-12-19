@@ -321,26 +321,31 @@ class CombatEncounter(CombatEncounterInterface):
             self.gde.wait_for_acknowledgement(self.message_dialog)
             return
 
+        # Setup for the encounter prompt
+        options = ['FIGHT', 'RUN']
+        if 0 < len(hero.get_available_spells()):
+            options.append('SPELL')
+        if 0 < len(hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])):
+            options.append('ITEM')
+        prompt = 'Command?'
+        if 1 < len(self.hero_party.members):
+            prompt = 'Command ' + hero.get_name() + '?'
+
         use_dialog = None
         target_type = None
+        prev_menu_result = None
         while self.game_state.is_running:
-
             # Get selected action for turn
-            options = ['FIGHT', 'RUN']
-            if 0 < len(hero.get_available_spells()):
-                options.append('SPELL')
-            if 0 < len(hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])):
-                options.append('ITEM')
-            prompt = 'Command?'
-            if 1 < len(self.hero_party.members):
-                prompt = 'Command ' + hero.get_name() + '?'
             self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)
+            if prev_menu_result is not None:
+                self.message_dialog.set_selected_menu_option(prev_menu_result)
             self.message_dialog.blit(self.game_state.screen, True)
             menu_result = None
             while self.game_state.is_running and menu_result is None:
                 menu_result = self.gde.get_menu_result(self.message_dialog)
             if not self.game_state.is_running:
                 return
+            prev_menu_result = menu_result
 
             # Process encounter menu selection to set use_dialog and target_type
             if menu_result == 'FIGHT':
@@ -379,15 +384,16 @@ class CombatEncounter(CombatEncounterInterface):
                     menu_dialog.erase(self.game_state.screen, self.background_image)
 
                     # print( 'menu_result =', menu_result, flush=True )
-                    if menu_result is not None:
-                        spell = hero.get_spell(menu_result)
-                        if spell is not None and hero.mp >= spell.mp:
-                            hero.mp -= spell.mp
-                            use_dialog = spell.use_dialog
-                            target_type = spell.target_type
-                        else:
-                            self.message_dialog.add_message('Thou dost not have enough magic to cast the spell.')
-                            continue
+                    if menu_result is None:
+                        continue
+                    spell = hero.get_spell(menu_result)
+                    if spell is not None and hero.mp >= spell.mp:
+                        hero.mp -= spell.mp
+                        use_dialog = spell.use_dialog
+                        target_type = spell.target_type
+                    else:
+                        self.message_dialog.add_message('Thou dost not have enough magic to cast the spell.')
+                        continue
                     menu_dialog.erase(self.game_state.screen, self.background_image, True)
             elif menu_result == 'ITEM':
                 item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
@@ -515,6 +521,10 @@ def main() -> None:
     mock_game_state.is_running = True
     mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
+
+    def handle_quit_side_effect():
+        mock_game_state.is_running = False
+    mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 
     # Create a series of hero party and monster party tuples for encounters
     from GameTypes import Direction

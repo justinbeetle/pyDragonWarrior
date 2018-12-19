@@ -193,7 +193,10 @@ class GameInfo:
                 for z in range(tile_variants):
                     temp.append(pygame.Surface((self.tile_size_pixels, self.tile_size_pixels)))
                     pygame.transform.scale(tile_image_unscaled.subsurface(
-                        pygame.Rect(z*tile_image_unscaled.get_height(), 0, unscaled_size, unscaled_size)),
+                        pygame.Rect(z*tile_image_unscaled.get_height(),
+                                    0,
+                                    tile_image_unscaled.get_height(),
+                                    tile_image_unscaled.get_height())),
                         (self.tile_size_pixels, self.tile_size_pixels),
                         temp[-1])
                 tile_images_scaled = [temp] * 16
@@ -951,7 +954,8 @@ class GameInfo:
         map_image.fill(fill_color)
 
         # Blit the padded portions of the image
-        numpy.random.seed(hash(map_name) % (2**32 - 1))
+        import zlib
+        numpy.random.seed(zlib.crc32(map_name.encode()) % (2**32 - 1))
         last_c = self.maps[map_name].size[0] - 1
         last_r = self.maps[map_name].size[1] - 1
         for x in range(int(image_pad_tiles.x)):

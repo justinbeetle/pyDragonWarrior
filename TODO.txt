@@ -39,15 +39,15 @@ Current Efforts:
 22) Add magic restore NPC - DONE!
 23) Add moving NPCs - DONE!
 24) Add a cave with limited visibility - DONE!
-25) Add spells - Partially implemented
+25) Add spells - Partially implemented - Waiting on REPEL
 26) Add item control (equip, unequip, drop, use) - DONE!
-27) Improved monster AI (running, spells, different attack types) - Partially implemented
+27) Improved monster AI (running, spells, different attack types) - DONE!
 28) game.xml changes to make it easier to specify chest contents - Partially implemented
 29) game.xml changes to make it easier to specify transitions
-30) Add special monsters - Partially implemented
-31) Door, chest, hidden item, and special monster respawn control - Partially implemented
-32) Add armor healing
-33) Add roofs to cities - Partially implemented
+30) Add special monsters - DONE!
+31) Door, chest, hidden item, and special monster respawn control - DONE!
+32) Add armor healing - DONE!
+33) Add roofs to cities - Partially implemented - Shouldn't be able to see between areas
 34) Add title screen and create/load/delete menu on start
 35) Add more cities - DONE!
 36) Add more caves - DONE!

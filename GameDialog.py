@@ -54,12 +54,11 @@ class GameDialog:
                              num_rows: int,
                              title: Optional[str]) -> Point:
         width_pixels = 2 * GameDialog.outside_spacing_pixels + GameDialog.font.size(longest_string)[0]
+        height_pixels = 2 * GameDialog.outside_spacing_pixels + num_rows * GameDialog.font.get_height() + (
+                num_rows - 1) * GameDialog.internal_spacing_pixels
         if title is not None:
-            height_pixels = GameDialog.outside_spacing_pixels + (
-                    num_rows + 1) * GameDialog.font.get_height() + num_rows * GameDialog.internal_spacing_pixels
-        else:
-            height_pixels = 2 * GameDialog.outside_spacing_pixels + num_rows * GameDialog.font.get_height() + (
-                    num_rows - 1) * GameDialog.internal_spacing_pixels
+            width_pixels = max(width_pixels, 2 * GameDialog.outside_spacing_pixels + GameDialog.font.size(title)[0])
+            height_pixels += GameDialog.font.get_height()
         return Point(math.ceil(width_pixels / GameDialog.tile_size_pixels), height_pixels / GameDialog.tile_size_pixels)
 
     @staticmethod
@@ -187,6 +186,22 @@ class GameDialog:
             title,
             options,
             num_cols)
+
+    @staticmethod
+    def create_yes_no_menu(pos_tile: Point,
+                           prompt: Optional[str],
+                           title: Optional[str] = None) -> GameDialog:
+        size_tiles_menu = GameDialog.get_size_for_menu(['YES', 'NO'], 2, title)
+        if prompt is not None:
+            size_tiles_prompt = GameDialog.get_size_for_content(prompt, 2, title)
+            size_tiles = Point(max(size_tiles_prompt.w, size_tiles_menu.w), size_tiles_prompt.h)
+        else:
+            size_tiles = size_tiles_menu
+        dialog = GameDialog(pos_tile, size_tiles, title)
+        if prompt is not None:
+            dialog.add_message(prompt)
+        dialog.add_yes_no_prompt()
+        return dialog
 
     @staticmethod
     def create_status_dialog(pos_tile: Point,
@@ -329,7 +344,8 @@ class GameDialog:
         new_message_lines = GameDialog.convert_message_to_lines(new_message, self.image.get_width())
 
         # Determine the number of lines of text which can be displayed in the dialog
-        num_rows = self.get_num_rows()
+        # Subtract out 1 row to leave room for the waiting indicator
+        num_rows = self.get_num_rows() - 1
 
         # Merge new message content with old message content
         if append and len(self.displayed_message_lines) > 0:
@@ -472,9 +488,8 @@ class GameDialog:
 
     def get_num_rows(self) -> int:
         # Determine the number of lines of text which can be displayed in the dialog
-        num_rows = 0
-        while self.get_row_pos_y(
-                num_rows) + GameDialog.font.get_height() + GameDialog.internal_spacing_pixels < self.image.get_height():
+        num_rows = 2
+        while self.get_row_pos_y(num_rows) <= self.image.get_height():
             num_rows += 1
         return num_rows - 1
 
@@ -570,6 +585,18 @@ class GameDialog:
     def get_selected_menu_option(self) -> Optional[str]:
         if self.row_data is not None and self.menu_data is not None:
             return self.menu_data[self.menu_row][self.menu_col]
+        return None
+
+    def set_selected_menu_option(self, menu_item: str) -> None:
+        if self.row_data is not None and self.menu_data is not None:
+            for row in range(len(self.menu_data)):
+                for col in range(len(self.menu_data[row])):
+                    if menu_item == self.menu_data[row][col]:
+                        self.erase_menu_indicator()
+                        self.menu_row = row
+                        self.menu_col = col
+                        self.draw_menu_indicator()
+                        break
         return None
 
     def erase_menu_indicator(self) -> None:

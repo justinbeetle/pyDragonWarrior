@@ -799,6 +799,22 @@ class GameState(GameStateInterface):
             self.hero_party.gp = self.hero_party.gp // 2
             self.set_map(self.game_info.death_map, respawn_decorations=True)
 
+    def handle_quit(self) -> None:
+        # Save off initial background image and key repeat settings
+        background_surface = self.screen.copy()
+        (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
+        pygame.key.set_repeat()
+
+        menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), 'Do you really want to quit?')
+        menu_dialog.blit(self.screen, flip_buffer=True)
+        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(menu_dialog)
+        if menu_result is not None and menu_result == 'YES':
+            self.is_running = False
+
+        # Restore initial background image and key repeat settings
+        menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
+        pygame.key.set_repeat(orig_repeat1, orig_repeat2)
+
 
 def main() -> None:
     print('Not implemented', flush=True)

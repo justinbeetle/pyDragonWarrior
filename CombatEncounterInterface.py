@@ -10,5 +10,9 @@ from CombatCharacterState import CombatCharacterState
 
 class CombatEncounterInterface:
     @abc.abstractmethod
+    def render_monsters(self) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def render_damage_to_targets(self, targets: List[CombatCharacterState]) -> None:
         raise NotImplementedError

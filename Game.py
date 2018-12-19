@@ -75,10 +75,10 @@ class Game:
                 pc_dir_old = self.game_state.hero_party.members[0].direction
 
                 if event.type == pygame.QUIT:
-                    self.game_state.is_running = False
+                    self.game_state.handle_quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.game_state.is_running = False
+                        self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
                     elif event.key == pygame.K_DOWN:
