@@ -13,7 +13,7 @@ from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, Decoration, 
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
     DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, \
-    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterActionEnum, \
+    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, \
     MonsterInfo, MonsterZone, NpcInfo, Phase, PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, \
     Tool, Weapon
 from Point import Point
@@ -128,6 +128,9 @@ class GameInfo:
                 defense_bonus = int(element.attrib['defenseBonus'])
             if 'gp' in element.attrib:
                 gp = int(element.attrib['gp'])
+            target_type = TargetTypeEnum.SELF
+            if 'target' in element.attrib:
+                target_type = TargetTypeEnum[element.attrib['target']]
 
             self.tools[item_name] = Tool(
                 item_name,
@@ -136,7 +139,8 @@ class GameInfo:
                 gp,
                 element.attrib['droppable'] == 'yes',
                 element.attrib['equippable'] == 'yes',
-                self.parse_dialog(element))
+                self.parse_dialog(element),
+                target_type)
             self.items[item_name] = self.tools[item_name]
 
         # Parse tiles
@@ -228,6 +232,7 @@ class GameInfo:
             walkable = True
             remove_with_search = False
             remove_with_key = False
+            remove_sound = None
             if 'widthTiles' in element.attrib:
                 width_tiles = int(element.attrib['widthTiles'])
             if 'heightTiles' in element.attrib:
@@ -238,6 +243,8 @@ class GameInfo:
                 remove_with_search = element.attrib['removeWithSearch'] == 'yes'
             if 'removeWithKey' in element.attrib:
                 remove_with_key = element.attrib['removeWithKey'] == 'yes'
+            if 'removeSound' in element.attrib:
+                remove_sound = element.attrib['removeSound']
             
             decoration_image_filename = os.path.join(decoration_path, element.attrib['image'])
             # print('Loading image', decoration_image_filename, flush=True)
@@ -254,7 +261,8 @@ class GameInfo:
                                                            decoration_image_scaled,
                                                            walkable,
                                                            remove_with_search,
-                                                           remove_with_key)
+                                                           remove_with_key,
+                                                           remove_sound)
 
         # Parse spells
         self.spells: Dict[str, Spell] = {}
@@ -488,9 +496,8 @@ class GameInfo:
                                                          respawn_decorations,
                                                          progress_marker,
                                                          inverse_progress_marker))
-                if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] != 'None':
-                    decoration_type: Optional[str] = trans_element.attrib['decoration']
-                    map_decorations.append(MapDecoration(decoration_type,
+                if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
+                    map_decorations.append(MapDecoration(self.decorations[trans_element.attrib['decoration']],
                                                          from_point,
                                                          None,
                                                          progress_marker,
@@ -518,9 +525,9 @@ class GameInfo:
             # Parse standalone decorations
             # print( 'Parse standalone decorations', flush=True )
             for decoration_element in element.findall('MapDecoration'):
-                decoration_type = None
-                if 'type' in decoration_element.attrib and decoration_element.attrib['type'] != 'None':
-                    decoration_type = decoration_element.attrib['type']
+                decoration = None
+                if 'type' in decoration_element.attrib and decoration_element.attrib['type'] in self.decorations:
+                    decoration = self.decorations[decoration_element.attrib['type']]
                 progress_marker = None
                 if 'progressMarker' in decoration_element.attrib:
                     progress_marker = decoration_element.attrib['progressMarker']
@@ -528,7 +535,7 @@ class GameInfo:
                 if 'inverseProgressMarker' in decoration_element.attrib:
                     inverse_progress_marker = decoration_element.attrib['inverseProgressMarker']
                 map_decorations.append(MapDecoration(
-                    decoration_type,
+                    decoration,
                     Point(int(decoration_element.attrib['x']),
                           int(decoration_element.attrib['y'])),
                     self.parse_dialog(decoration_element),
@@ -656,7 +663,10 @@ class GameInfo:
         self.pc_name = ''
         initial_state_element = xml_root.find('InitialState')
         if saved_game_file is not None:
-            save_game_file_path = os.path.join(self.saves_path, saved_game_file + '.xml')
+            if os.path.isfile(saved_game_file):
+                save_game_file_path = saved_game_file
+            else:
+                save_game_file_path = os.path.join(self.saves_path, saved_game_file + '.xml')
             if os.path.isfile(save_game_file_path):
                 print('Loading save game from file ' + save_game_file_path, flush=True)
                 initial_state_element = xml.etree.ElementTree.parse(save_game_file_path).getroot()
@@ -717,11 +727,11 @@ class GameInfo:
       
         self.initial_map_decorations: List[MapDecoration] = []
         for decoration_element in initial_state_element.findall("./MapDecoration"):
-            decoration_type = None
-            if 'type' in decoration_element.attrib and decoration_element.attrib['type'] != 'None':
-                decoration_type = decoration_element.attrib['type']
+            decoration = None
+            if 'type' in decoration_element.attrib and decoration_element.attrib['type'] in self.decorations:
+                decoration = self.decorations[decoration_element.attrib['type']]
             self.initial_map_decorations.append(MapDecoration(
-                decoration_type,
+                decoration,
                 Point(int(decoration_element.attrib['x']),
                       int(decoration_element.attrib['y'])),
                 self.parse_dialog(decoration_element),
@@ -826,13 +836,16 @@ class GameInfo:
                 dialog.append(DialogVendorSellOptions(dialog_vendor_sell_options))
 
             elif element.tag == 'DialogAssert' or element.tag == 'DialogCheck':
+                conditional_dialog = self.parse_dialog(element)
                 dialog.append(DialogCheck(DialogCheckEnum[element.attrib['type']],
-                                          self.parse_dialog(element),
+                                          dialog=conditional_dialog,
                                           name=name,
                                           count=count,
                                           map_name=map_name,
                                           map_pos=map_pos,
                                           is_assert=element.tag == 'DialogAssert'))
+                if label is not None and conditional_dialog is not None:
+                    self.dialog_sequences[label] = conditional_dialog
 
             elif element.tag == 'DialogAction':
                 victory_dialog: Optional[DialogType] = None
@@ -1025,11 +1038,10 @@ class GameInfo:
             for map_decoration in map_decorations:
                 if map_decoration.type is None:
                     continue
-                decoration = self.decorations[map_decoration.type]
                 tile_position_px = (map_decoration.point + image_pad_tiles) * self.tile_size_pixels
-                x_px = int(tile_position_px.x + (self.tile_size_pixels - decoration.image.get_width()) / 2)
-                y_px = int(tile_position_px.y + self.tile_size_pixels - decoration.image.get_height())
-                map_image.blit(decoration.image, (x_px, y_px))
+                x_px = int(tile_position_px.x + (self.tile_size_pixels - map_decoration.type.image.get_width()) / 2)
+                y_px = int(tile_position_px.y + self.tile_size_pixels - map_decoration.type.image.get_height())
+                map_image.blit(map_decoration.type.image, (x_px, y_px))
 
         return map_image
 

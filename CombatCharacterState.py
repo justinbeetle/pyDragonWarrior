@@ -65,6 +65,11 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             return False
         if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
             return False
+        if type(self) == type(target) and (DialogActionEnum.SLEEP == action
+                                           or DialogActionEnum.STOPSPELL == action
+                                           or DialogActionEnum.DAMAGE_TARGET == action):
+            # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
+            return False
         return True
 
     def does_spell_work(self, spell: Spell, target: CombatCharacterState) -> bool:

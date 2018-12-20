@@ -257,10 +257,7 @@ class CombatEncounter(CombatEncounterInterface):
     def check_wake_up(self, combatant: CombatCharacterState) -> None:
         if combatant.is_asleep:
             if combatant.is_still_asleep():
-                if combatant.turns_asleep == 1:
-                    self.message_dialog.add_message(combatant.get_name() + ' is asleep.')
-                else:
-                    self.message_dialog.add_message(combatant.get_name() + ' is still asleep.')
+                self.message_dialog.add_message(combatant.get_name() + ' is still asleep.')
             else:
                 self.message_dialog.add_message(combatant.get_name() + ' awakes.')
 
@@ -455,8 +452,10 @@ class CombatEncounter(CombatEncounterInterface):
             else:
                 # TODO: Prompt for selection of which enemey to target
                 self.gde.set_targets([still_in_combat_monsters[0]])
-        else:  # TargetTypeEnum.ALL_ENEMIES
+        elif TargetTypeEnum.ALL_ENEMIES:
             self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
+        else:
+            print('ERROR: Unsupported target type', target_type, flush=True)
 
         # Perform the action
         self.gde.traverse_dialog(self.message_dialog, use_dialog, depth=1)

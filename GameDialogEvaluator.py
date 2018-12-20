@@ -3,6 +3,7 @@
 from typing import cast, Optional, List, Union
 
 import pygame
+import random
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
@@ -10,7 +11,7 @@ from CombatEncounterInterface import CombatEncounterInterface
 from GameDialog import GameDialog, GameDialogSpacing
 from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
     DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, \
-    DialogVendorSellOptions, DialogVendorSellOptionsVariable, Direction, GameTypes
+    DialogVendorSellOptions, DialogVendorSellOptionsVariable, Direction, GameTypes, Level
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
@@ -72,13 +73,14 @@ class GameDialogEvaluator:
 
         self.traverse_dialog(message_dialog, dialog)
 
-        # Restore initial background image and key repeat settings
-        self.game_state.screen.blit(background_image, (0, 0))
-        pygame.key.set_repeat(orig_repeat1, orig_repeat2)
+        if self.game_state.is_running:
+            # Restore initial background image and key repeat settings
+            self.game_state.screen.blit(background_image, (0, 0))
+            pygame.key.set_repeat(orig_repeat1, orig_repeat2)
 
-        # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
-        self.game_state.draw_map(False)
-        pygame.display.flip()
+            # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
+            self.game_state.draw_map(False)
+            pygame.display.flip()
 
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
@@ -107,7 +109,7 @@ class GameDialogEvaluator:
                     elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                         is_awaiting_acknowledgement = False
                 elif event.type == pygame.QUIT:
-                    self.game_state.handle_quit()
+                    self.game_state.handle_quit(force=True)
 
         if self.game_state.is_running:
             if message_dialog is not None:
@@ -116,7 +118,7 @@ class GameDialogEvaluator:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
 
-    def get_menu_result(self, menu_dialog: GameDialog) -> Optional[str]:
+    def get_menu_result(self, menu_dialog: GameDialog, allow_quit: bool = True) -> Optional[str]:
         menu_result = None
         while self.game_state.is_running and menu_result is None:
             events = GameEvents.get_events()
@@ -125,7 +127,10 @@ class GameDialogEvaluator:
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.game_state.handle_quit()
+                        if allow_quit:
+                            self.game_state.handle_quit()
+                        else:
+                            menu_result = ""
                     elif event.key == pygame.K_RETURN:
                         menu_result = menu_dialog.get_selected_menu_option()
                     elif event.key == pygame.K_SPACE:
@@ -133,7 +138,7 @@ class GameDialogEvaluator:
                     else:
                         menu_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
-                    self.game_state.handle_quit()
+                    self.game_state.handle_quit(force=True)
 
         if menu_result == "":
             menu_result = None
@@ -141,14 +146,22 @@ class GameDialogEvaluator:
         return menu_result
 
     def update_default_dialog_font_color(self) -> None:
-        if self.hero_party.get_lowest_health_ratio() >= 0.25:
-            font_color = GameDialog.NOMINAL_HEALTH_FONT_COLOR
+        old_default = GameDialog.font_color
+        if self.hero_party.has_low_heath():
+            new_default = GameDialog.LOW_HEALTH_FONT_COLOR
         else:
-            font_color = GameDialog.LOW_HEALTH_FONT_COLOR
-        GameDialog.set_default_font_color(font_color)
+            new_default = GameDialog.NOMINAL_HEALTH_FONT_COLOR
+        if old_default != new_default:
+            GameDialog.set_default_font_color(new_default)
 
     def update_status_dialog(self, flip_buffer: bool = False, message_dialog: Optional[GameDialog] = None) -> None:
+        old_default = GameDialog.font_color
         self.update_default_dialog_font_color()
+        if old_default != GameDialog.font_color:
+            self.game_state.draw_map(flip_buffer=False)
+            if message_dialog is not None:
+                message_dialog.set_font_color(GameDialog.font_color)
+                message_dialog.blit(self.game_state.screen, flip_buffer=False)
 
         # TODO: Store off the message_dialog and ensure it is using the correct font color too
         if message_dialog is not None and message_dialog.font_color != GameDialog.font_color:
@@ -369,6 +382,18 @@ class GameDialogEvaluator:
                 elif item.type == DialogCheckEnum.IS_NOT_IN_COMBAT:
                     check_result = not self.game_state.is_in_combat()
 
+                elif item.type == DialogCheckEnum.IS_COMBAT_ALLOWED:
+                    check_result = self.game_state.is_combat_allowed()
+
+                elif item.type == DialogCheckEnum.IS_COMBAT_DISALLOWED:
+                    check_result = not self.game_state.is_combat_allowed()
+
+                elif item.type == DialogCheckEnum.IS_TARGET_HERO:
+                    check_result = len(self.targets) > 0 and isinstance(self.targets[0], HeroState)
+
+                elif item.type == DialogCheckEnum.IS_TARGET_MONSTER:
+                    check_result = len(self.targets) > 0 and not isinstance(self.targets[0], HeroState)
+
                 else:
                     print('ERROR: Unsupported DialogCheckEnum of', item.type, flush=True)
 
@@ -410,13 +435,53 @@ class GameDialogEvaluator:
                                 print('ERROR: Failed to convert item.count to int so defaulting to 1:', item.count,
                                       flush=True)
 
-                    if item_name == 'gp':
+                    if item_name == 'hp':
+                        for hero in self.hero_party.members:
+                            if item.type == DialogActionEnum.GAIN_ITEM:
+                                hero.hp = min(hero.hp + item_count, hero.max_hp)
+                            elif item.type == DialogActionEnum.LOSE_ITEM:
+                                if item.count == 'unlimited':
+                                    hero.hp = 0
+                                else:
+                                    hero.hp -= item_count
+                                if hero.hp < 0:
+                                    hero.hp = 0
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
+                    elif item_name == 'gp':
                         if item.type == DialogActionEnum.GAIN_ITEM:
                             self.hero_party.gp += item_count
                         elif item.type == DialogActionEnum.LOSE_ITEM:
-                            self.hero_party.gp -= item_count
+                            if item.count == 'unlimited':
+                                self.hero_party.gp = 0
+                            else:
+                                self.hero_party.gp -= item_count
                             if self.hero_party.gp < 0:
                                 self.hero_party.gp = 0
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
+                    elif item_name == 'mp':
+                        for hero in self.hero_party.members:
+                            if item.type == DialogActionEnum.GAIN_ITEM:
+                                hero.mp = min(hero.mp + item_count, hero.max_mp)
+                            elif item.type == DialogActionEnum.LOSE_ITEM:
+                                if item.count == 'unlimited':
+                                    hero.mp = 0
+                                else:
+                                    hero.mp -= item_count
+                                if hero.mp < 0:
+                                    hero.mp = 0
+                        self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
+                    elif item_name == 'xp':
+                        for hero in self.hero_party.members:
+                            if item.type == DialogActionEnum.GAIN_ITEM:
+                                hero.xp += item_count
+                                hero.level_up_check()
+                            elif item.type == DialogActionEnum.LOSE_ITEM:
+                                if item.count == 'unlimited':
+                                    hero.xp = 0
+                                else:
+                                    hero.xp -= item_count
+                                if hero.xp < 0:
+                                    hero.xp = 0
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         item_to_gain = self.game_info.get_item(item_name)
@@ -501,15 +566,37 @@ class GameDialogEvaluator:
                         self.wait_for_acknowledgement(message_dialog)
                         message_dialog.clear()
                         self.game_state.draw_map(flip_buffer=True)
+                    elif item.name == 'evilDeathLoop':
+                        SurfaceEffects.black_red_monochrome_effect(self.game_state.screen, flip_buffer=False)
+                        self.game_state.draw_map(flip_buffer=True, draw_background=False)
+                        # Endless loop where quiting is the only exit
+                        while self.game_state.is_running:
+                            # Process events
+                            events = GameEvents.get_events()
+                            if 0 == len(events):
+                                pygame.time.Clock().tick(8)
+                            for event in events:
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_ESCAPE:
+                                        self.game_state.handle_quit()
+                                elif event.type == pygame.QUIT:
+                                    self.game_state.handle_quit(force=True)
+
                     else:
                         print('ERROR: DialogActionEnum.VISUAL_EFFECT is not implemented for effect', item.name,
                               flush=True)
 
                 elif item.type == DialogActionEnum.START_ENCOUNTER:
-                    if item.name is None or item.name not in self.game_info.monsters:
-                        print('ERROR: No defined monster with name', item.name, flush=True)
+                    monster_name = item.name
+                    if monster_name is not None:
+                        monster_name = random.choice(monster_name.split('|'))
+                    if monster_name not in self.game_info.monsters:
+                        print('ERROR: No defined monster with name', monster_name, flush=True)
                     else:
-                        self.game_state.initiate_encounter(monster_info=self.game_info.monsters[item.name],
+                        # Before initiating the combat encounter ensure the contents of the dialog are acknowledged
+                        self.wait_for_acknowledgement(message_dialog)
+
+                        self.game_state.initiate_encounter(monster_info=self.game_info.monsters[monster_name],
                                                            approach_dialog=item.approach_dialog,
                                                            victory_dialog=item.victory_dialog,
                                                            run_away_dialog=item.run_away_dialog,
@@ -562,7 +649,7 @@ class GameDialogEvaluator:
                             target.is_asleep = True
                             worked = True
                             message_dialog.add_message(target.get_name() + ' is asleep.')
-                    if not item.bypass and not worked:
+                    if not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
                             message_dialog.add_message('But that spell did not work.')
                         else:
@@ -600,7 +687,7 @@ class GameDialogEvaluator:
                                     message_dialog.add_message('Excellent move!')
 
                                 # Check for a dodge
-                                if target.is_dodging_attack():
+                                if ActionCategoryTypeEnum.PHYSICAL == item.category and target.is_dodging_attack():
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                                     message_dialog.add_message(
                                         target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
@@ -617,19 +704,31 @@ class GameDialogEvaluator:
                                         message_dialog.add_message(target.get_name() + "'s hit points reduced by "
                                                                    + str(damage) + '.')
                             else:
+                                # TODO: Play sound?
                                 if isinstance(target, HeroState):
                                     message_dialog.add_message(target.get_name() + ' dodges the strike.')
                                 else:
                                     message_dialog.add_message('A miss! No damage hath been scored!')
                     if not worked:
-                        # TODO: May not have been a spell - handle that as well
-                        message_dialog.add_message('But that spell did not work.')
+                        if ActionCategoryTypeEnum.MAGICAL == item.category:
+                            message_dialog.add_message('But that spell did not work.')
+                        else:
+                            message_dialog.add_message('But it did nothing.')
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
 
                 elif item.type == DialogActionEnum.WAIT:
                     pygame.time.wait(item.count)
+
+                elif item.type == DialogActionEnum.SET_LEVEL:
+                    for hero in self.hero_party.members:
+                        hero.level = Level.create_null(item.name)
+                        hero.max_hp = hero.level.hp
+                        hero.max_mp = hero.level.mp
+                        hero.hp = min(hero.hp, hero.max_hp)
+                        hero.mp = min(hero.mp, hero.max_mp)
+                    self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

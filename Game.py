@@ -29,6 +29,7 @@ class Game:
                                     tile_size_pixels,
                                     saved_game_file)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
+        self.gde.update_default_dialog_font_color()
         GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
 
     def run_game_loop(self) -> None:
@@ -47,12 +48,11 @@ class Game:
         while self.game_state.is_running:
 
             # Generate the map state a mode or map change
-            if (map_name != self.game_state.map_state.name):
+            if map_name != self.game_state.map_state.name:
                 map_name = self.game_state.map_state.name
 
                 # Play the music for the map
-                audio_player = AudioPlayer()
-                audio_player.play_music(self.game_state.game_info.maps[self.game_state.map_state.name].music)
+                AudioPlayer().play_music(self.game_state.game_info.maps[self.game_state.map_state.name].music)
 
                 # Bounds checking to ensure a valid hero/center position
                 self.game_state.bounds_check_pc_position()
@@ -75,7 +75,7 @@ class Game:
                 pc_dir_old = self.game_state.hero_party.members[0].direction
 
                 if event.type == pygame.QUIT:
-                    self.game_state.handle_quit()
+                    self.game_state.handle_quit(force=True)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
@@ -180,7 +180,7 @@ class Game:
                                 GameDialogSpacing.OUTSIDE_JUSTIFIED)
                             menu_dialog.blit(self.game_state.screen, True)
                             item_result = self.gde.get_menu_result(menu_dialog)
-                            # print( 'item_result =', item_result, flush=True )
+                            # print('item_result =', item_result, flush=True)
 
                             if item_result is not None:
                                 item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
@@ -195,7 +195,7 @@ class Game:
                                         len(item_options))
                                     menu_dialog.blit(self.game_state.screen, True)
                                     action_result = self.gde.get_menu_result(menu_dialog)
-                                    # print( 'action_result =', action_result, flush=True )
+                                    # print('action_result =', action_result, flush=True)
                                     if action_result == 'DROP':
                                         # TODO: Add an are you sure prompt here
                                         self.game_state.hero_party.lose_item(item_result)
@@ -256,7 +256,9 @@ class Game:
                     dialog = ['[NAME] searched the ground and found nothing.']
                     for decoration in self.game_state.get_decorations():
                         if (decoration.type is not None
-                                and self.game_state.game_info.decorations[decoration.type].remove_with_search):
+                                and decoration.type.remove_with_search):
+                            if decoration.type.remove_sound is not None:
+                                AudioPlayer().play_sound(decoration.type.remove_sound)
                             self.game_state.remove_decoration(decoration)
 
                         if decoration.dialog is not None:
@@ -324,6 +326,7 @@ class Game:
 
             # Check for any status effect changes or healing to occur as the party moves
             self.game_state.hero_party.inc_step_counter()
+            self.gde.update_default_dialog_font_color()
         else:
             audio_player.play_sound('bump.wav')
 
@@ -376,6 +379,7 @@ class Game:
             for hero in self.game_state.hero_party.members:
                 if not hero.is_ignoring_tile_penalties():
                     hero.hp -= movement_hp_penalty
+            self.gde.update_default_dialog_font_color()
             self.game_state.handle_death()
 
             # At destination - now determine if an encounter should start

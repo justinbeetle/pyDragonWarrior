@@ -67,14 +67,36 @@ def flickering(screen: pygame.Surface) -> None:
         pygame.time.Clock().tick(30)
 
 
-def pink_tinge(screen: pygame.Surface) -> None:
+def pink_tinge(screen: pygame.Surface, flip_buffer: bool = True) -> None:
+    color_tinge(screen, pygame.Color(252, 116, 96), flip_buffer)
+
+
+def color_tinge(screen: pygame.Surface, tinge_color: pygame.Color, flip_buffer: bool = True) -> None:
     pygame.transform.threshold(screen,
                                screen,
                                search_color=pygame.Color('white'),
                                threshold=pygame.Color(3, 3, 3),
-                               set_color=pygame.Color(252, 116, 96),
+                               set_color=tinge_color,
                                inverse_set=True)
-    pygame.display.flip()
+    if flip_buffer:
+        pygame.display.flip()
+
+
+def black_red_monochrome_effect(screen: pygame.Surface, flip_buffer: bool = True) -> None:
+    red = pygame.Color(255, 62, 24)
+    pygame.transform.threshold(screen,
+                               screen,
+                               search_color=pygame.Color('white'),
+                               threshold=pygame.Color(3, 3, 3),
+                               set_color=red,
+                               inverse_set=True)
+    pygame.transform.threshold(screen,
+                               screen,
+                               search_color=red,
+                               set_color=pygame.Color('black'),
+                               inverse_set=False)
+    if flip_buffer:
+        pygame.display.flip()
 
 
 def rainbow_effect(screen: pygame.Surface,

@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from typing import Dict, List, Optional
-from GameTypes import DialogReplacementVariables, DialogType, ItemType, Level, MapDecoration, MonsterInfo, Spell, Tile
+from GameTypes import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo
 
 import abc
 import pygame
@@ -38,6 +38,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def is_combat_allowed(self) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def is_light_restricted(self) -> bool:
         raise NotImplementedError
 
@@ -66,7 +70,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def draw_map(self, flip_buffer: bool = True) -> None:
+    def draw_map(self,
+                 flip_buffer: bool = True,
+                 draw_background: bool = True,
+                 draw_characters: bool = True) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -92,5 +99,5 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def handle_quit(self) -> None:
+    def handle_quit(self, force: bool = False) -> None:
         raise NotImplementedError

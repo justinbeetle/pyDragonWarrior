@@ -12,8 +12,8 @@ from AudioPlayer import AudioPlayer
 from CombatEncounter import CombatEncounter
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import DialogReplacementVariables, DialogType, Direction, ItemType, LeavingTransition, Level, \
-    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Spell, Tile
+from GameTypes import DialogReplacementVariables, DialogType, Direction, LeavingTransition, \
+    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
@@ -23,6 +23,7 @@ from MonsterParty import MonsterParty
 from MonsterState import MonsterState
 from NpcState import NpcState
 from Point import Point
+import SurfaceEffects
 
 
 class GameState(GameStateInterface):
@@ -95,7 +96,10 @@ class GameState(GameStateInterface):
 
         # map_state, exterior_map_image, and interior_map_image are initialized with meaningful values in set_map
         self.map_state = MapImageInfo.create_null()
-        self.exterior_map_image = self.interior_map_image = pygame.Surface((0, 0))
+        self.exterior_map_image = pygame.Surface((0, 0))
+        self.interior_map_image = pygame.Surface((0, 0))
+        self.exterior_map_dmg_image = pygame.Surface((0, 0))
+        self.interior_map_dmg_image = pygame.Surface((0, 0))
         self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations)
 
         # TODO: Migrate these to here
@@ -171,8 +175,20 @@ class GameState(GameStateInterface):
         self.bounds_check_pc_position()
 
         # Get exterior and interior map images
+        self.update_images()
+
+    def update_images(self):
         self.exterior_map_image = GameInfo.get_exterior_image(self.map_state)
         self.interior_map_image = GameInfo.get_interior_image(self.map_state)
+
+        self.exterior_map_dmg_image = self.exterior_map_image.copy()
+        SurfaceEffects.pink_tinge(self.exterior_map_dmg_image, flip_buffer=False)
+
+        if self.interior_map_image is not None:
+            self.interior_map_dmg_image = self.interior_map_image.copy()
+            SurfaceEffects.pink_tinge(self.interior_map_dmg_image, flip_buffer=False)
+        else:
+            self.interior_map_dmg_image = None
 
     def save(self, quick_save: bool=False) -> None:
         # TODO: Save data for multiple party members
@@ -214,13 +230,14 @@ class GameState(GameStateInterface):
             progress_marker_element.attrib['name'] = progress_marker
 
         # TODO: This should all  be captured in game.xml
-        dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
-        dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
-        dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
-        dialog_element.text = '"Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] ' \
-                              'experience points.  See me again when thy level has increased."'
-        dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
-        dialog_element.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'
+        if not quick_save:
+            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
+            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element.text = '"Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] ' \
+                                  'experience points.  See me again when thy level has increased."'
+            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'
 
         xml_string = xml.dom.minidom.parseString(xml.etree.ElementTree.tostring(xml_root)).toprettyxml(indent="   ")
 
@@ -340,9 +357,13 @@ class GameState(GameStateInterface):
 
     def evaluate_progress_marker_string(self, progress_marker_string: str) -> bool:
         progress_marker_term_string = progress_marker_string
-        for strip_term in ['(', ')', ' and ', ' or ', ' not ', '&', '|', '!']:
+        logical_tokens = ['(', ')', ' and ', ' or ', ' not ', '&', '|', '!']
+        for strip_term in logical_tokens:
             progress_marker_term_string = progress_marker_term_string.replace(strip_term, ' ')
+        stripped_logical_tokens = [x.strip() for x in logical_tokens]
         for term in filter(None, progress_marker_term_string.split(' ')):
+            if term in stripped_logical_tokens:
+                continue
             progress_marker_string = progress_marker_string.replace(term, str(term in self.hero_party.progress_markers))
         if eval(progress_marker_string):
             return True
@@ -379,17 +400,13 @@ class GameState(GameStateInterface):
         # Check if decoration changes the allowed movement of the native tile
         if movement_allowed:
             for decoration in self.map_decorations:
-                if (tile == decoration.point
-                        and decoration.type is not None
-                        and not self.game_info.decorations[decoration.type].walkable):
+                if tile == decoration.point and decoration.type is not None and not decoration.type.walkable:
                     movement_allowed = False
                     # print('Movement not allowed: decoration not walkable', decoration, flush=True)
                     break
         else:
             for decoration in self.map_decorations:
-                if (tile == decoration.point
-                        and decoration.type is not None
-                        and self.game_info.decorations[decoration.type].walkable):
+                if tile == decoration.point and decoration.type is not None and decoration.type.walkable:
                     movement_allowed = True
                     # print('Movement allowed: decoration walkable', decoration, flush=True)
                     break
@@ -510,6 +527,7 @@ class GameState(GameStateInterface):
     def make_map_transition(self,
                             transition: Optional[Union[LeavingTransition, PointTransition]]) -> bool:
         if transition is not None:
+            AudioPlayer().play_sound('stairs.wav')
             map_changing = transition.dest_map != self.map_state.name
             if (self.game_info.maps[self.map_state.name].is_outside
                     and not self.game_info.maps[transition.dest_map].is_outside):
@@ -545,8 +563,14 @@ class GameState(GameStateInterface):
 
     def get_map_image(self) -> pygame.Surface:
         if self.is_interior(self.hero_party.get_curr_pos_dat_tile()):
-            return self.interior_map_image
-        return self.exterior_map_image
+            if self.hero_party.has_low_heath():
+                return self.interior_map_dmg_image_image
+            else:
+                return self.interior_map_image
+        if self.hero_party.has_low_heath():
+            return self.exterior_map_dmg_image
+        else:
+            return self.exterior_map_image
 
     def is_facing_door(self) -> bool:
         door_open_dest_dat_tile = self.hero_party.get_curr_pos_dat_tile() \
@@ -554,7 +578,7 @@ class GameState(GameStateInterface):
         for decoration in self.map_decorations:
             if (door_open_dest_dat_tile == decoration.point
                     and decoration.type is not None
-                    and self.game_info.decorations[decoration.type].removeWithKey):
+                    and decoration.type.remove_with_key):
                 return True
         return False
 
@@ -564,7 +588,9 @@ class GameState(GameStateInterface):
         for decoration in self.map_decorations:
             if (door_open_dest_dat_tile == decoration.point
                     and decoration.type is not None
-                    and self.game_info.decorations[decoration.type].removeWithKey):
+                    and decoration.type.remove_with_key):
+                if decoration.type.remove_sound is not None:
+                    AudioPlayer().play_sound(decoration.type.remove_sound)
                 self.remove_decoration(decoration)
 
     def remove_decoration(self, decoration: MapDecoration) -> None:
@@ -579,8 +605,7 @@ class GameState(GameStateInterface):
                                                                self.map_decorations)
 
             # Get exterior and interior map images
-            self.exterior_map_image = GameInfo.get_exterior_image(self.map_state)
-            self.interior_map_image = GameInfo.get_interior_image(self.map_state)
+            self.update_images()
 
             # Draw the map to the screen
             self.draw_map()
@@ -602,17 +627,22 @@ class GameState(GameStateInterface):
                                          self.win_size_pixels.x,
                                          self.win_size_pixels.y))
 
-    def draw_map(self, flip_buffer: bool = True) -> None:
+    def draw_map(self,
+                 flip_buffer: bool = True,
+                 draw_background: bool = True,
+                 draw_characters: bool = True) -> None:
         # Implement light diameter via clipping
         if self.is_light_restricted():
             self.screen.fill(pygame.Color('black'))
         self.set_clipping_for_light_diameter()
 
         # Draw the map to the screen
-        self.screen.blit(self.get_map_image().subsurface(self.get_map_image_rect()), (0, 0))
+        if draw_background:
+            self.screen.blit(self.get_map_image().subsurface(self.get_map_image_rect()), (0, 0))
 
         # Draw the hero and NPCs to the screen
-        self.draw_characters()
+        if draw_characters:
+            self.draw_characters()
 
         # Restore clipping for entire window
         self.set_clipping_for_window()
@@ -715,6 +745,9 @@ class GameState(GameStateInterface):
     def is_in_combat(self) -> bool:
         return self.combat_encounter is not None
 
+    def is_combat_allowed(self) -> bool:
+        return len(self.get_tile_monsters()) > 0
+
     def get_map_name(self) -> str:
         return self.map_state.name
 
@@ -791,7 +824,10 @@ class GameState(GameStateInterface):
             self.hero_party.gp = self.hero_party.gp // 2
             self.set_map(self.game_info.death_map, respawn_decorations=True)
 
-    def handle_quit(self) -> None:
+    def handle_quit(self, force: bool = False) -> None:
+        if force:
+            self.is_running = False
+
         # Save off initial background image and key repeat settings
         background_surface = self.screen.copy()
         (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
@@ -799,7 +835,7 @@ class GameState(GameStateInterface):
 
         menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), 'Do you really want to quit?')
         menu_dialog.blit(self.screen, flip_buffer=True)
-        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(menu_dialog)
+        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(menu_dialog, allow_quit=False)
         if menu_result is not None and menu_result == 'YES':
             self.is_running = False
 

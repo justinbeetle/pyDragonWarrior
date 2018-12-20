@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<SaveState dir="SOUTH" gp="100009" map="kol" name="Wallace" x="10" xp="10000" y="7">
+<SaveState dir="SOUTH" gp="100000" map="garins_grave_lvl3" name="Wallace" x="14" xp="50000" y="7">
    <EquippedItems>
-      <Item name="Flame Sword"/>
-      <Item name="Magic Armor"/>
-      <Item name="Erdrick's Shield"/>
+      <Item name="Broad Sword"/>
+      <Item name="Full Plate"/>
+      <Item name="Iron Shield"/>
       <Item name="Dragon's Scale"/>
       <Item name="Fighter's Ring"/>
    </EquippedItems>
@@ -15,5 +15,4 @@
       <Item count="10" name="Wings"/>
       <Item count="1" name="Leather Armor"/>
    </UnequippedItems>
-   <ProgressMarkers/>
 </SaveState>

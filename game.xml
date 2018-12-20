@@ -19,8 +19,8 @@
    </Tiles>
 
    <Decorations>
-      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"/>
-      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes"/>
+      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeSound="openChest.wav"/>
+      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="downstairs" image="downstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="upstairs" image="upstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -217,9 +217,6 @@
          </MonsterZones>
       </Map>
 
-      <Map name="camden" tiles="camden_world.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" isOutside="yes">
-      </Map>
-
       <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="44" toY="44" toDir="SOUTH"/>
          <PointTransition decoration="upstairs" fromX="8" fromY="8"  toMap="tantegel_lvl2" toX="9" toY="9" toDir="WEST"/>
@@ -381,7 +378,10 @@
       <Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <PointTransition decoration="downstairs" fromX="9" fromY="9" toMap="tantegel_lvl1" toX="8" toY="8" toDir="EAST"/>
 
-         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
+         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" progressMarker="PM_Not_Finished_Preparing">
+            <Dialog>"When thou art finished preparing for thy departure, please see me.  I shall wait."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" progressMarker="not PM_Not_Finished_Preparing and not PM_Defeated_Dragonlord">
             <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess">
                <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
                <Dialog>"Now, Gwaelin, come to my side."</Dialog>
@@ -437,6 +437,7 @@
 
          <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
             <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
+            <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/>
             <DialogGoTo label="key_chest"/></MapDecoration>
          <MapDecoration type="chest" x="8" y="2" progressMarker="PM_Not_Taken_Initial_Chest_2">
             <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_2"/>
@@ -458,6 +459,7 @@
             <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="5"  y="6">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Stones_of_Sunlight"/>
             <DialogAction type="GAIN_ITEM" name="Stones of Sunlight"/>
@@ -966,12 +968,14 @@
                <Dialog>"There is a Silver Harp that beckons to the creatures of the Dragonlord."</Dialog>
                <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogAssert>
             <Dialog>"Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest."</Dialog>
+            <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
             <DialogAction type="LOSE_ITEM" name="Silver Harp"/>
             <DialogAction type="GAIN_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/>
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
             <DialogAction type="LOSE_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="4" y="5">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Staff_of_Rain"/>
             <DialogAction type="GAIN_ITEM" name="Staff of Rain"/>
@@ -983,16 +987,16 @@
 
          <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
-            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight">
-               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
-            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain">
-               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
-            <DialogAssert type="HAS_ITEM" name="Erdrick's Token">
-               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us.  Go now!"</Dialog>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight" label="southern_shrine_go_now">
+               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us."</Dialog>
+               <Dialog>"Go now!"</Dialog>
+               <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+               <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
+               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110" dir="SOUTH"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="Erdrick's Token"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
             <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
+            <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
             <DialogAction type="LOSE_ITEM" name="Stones of Sunlight"/>
             <DialogAction type="LOSE_ITEM" name="Staff of Rain"/>
             <DialogAction type="GAIN_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/>
@@ -1000,6 +1004,7 @@
             <DialogAction type="LOSE_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
          <MapDecoration type="chest" x="6" y="6">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Rainbow_Drop"/>
             <DialogAction type="GAIN_ITEM" name="Rainbow Drop"/>
@@ -1039,6 +1044,7 @@
 
          <MapDecoration type="chest" x="2"  y="2"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
          <MapDecoration type="chest" x="14" y="7">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Silver_Harp"/>
             <DialogAction type="GAIN_ITEM" name="Silver Harp"/>
@@ -1161,7 +1167,10 @@
                         <Dialog>"Then half of this world is thine, half of the darkness, and..."</Dialog>
                         <Dialog>"If thou dies I can bring thee back for another attempt without loss of thy deeds to date."</Dialog>
                         <Dialog>"Thy journey is over.  Take now a long, long rest.  Hahahaha..."</Dialog>
-                        <!-- TODO: Add death dialog option and screen effect --></DialogOption>
+                        <DialogAction type="LOSE_ITEM" name="gp" count="unlimited" bypass="yes"/>
+                        <DialogAction type="LOSE_ITEM" name="xp" count="unlimited" bypass="yes"/>
+                        <DialogAction type="SET_LEVEL" name="Weak Minion" bypass="yes"/>
+                        <DialogAction type="VISUAL_EFFECT" name="evilDeathLoop"/></DialogOption>
                      <DialogOption name="No">
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
                <DialogOption name="No" label="fight_dragon_lord">
@@ -1172,7 +1181,6 @@
 
    <DialogScripts>
       <DialogScript label="defeated_dragonlord_first_form">
-         <!-- TODO: Whole screen should go black, different combat music should play -->
          <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
          <Dialog>The Dragonlord revealed his true self!</Dialog>
          <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
@@ -1590,7 +1598,7 @@
 
       <MonsterAction name="Heal"             spell="Heal"/>
 
-      <MonsterAction name="Hurt"             spell="Monster Hurt"/>
+      <MonsterAction name="Hurt"             spell="Hurt"/>
 
       <MonsterAction name="Sleep"            spell="Sleep"/>
 
@@ -1598,7 +1606,7 @@
 
       <MonsterAction name="Healmore"         spell="Healmore"/>
 
-      <MonsterAction name="Hurtmore"         spell="Monster Hurtmore"/>
+      <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
 
       <MonsterAction name="BreathFire"       target="ALL_ENEMIES">
          <Dialog>[ACTOR] is breathing fire.</Dialog>
@@ -1694,19 +1702,13 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="HEALTH_RESTORE" count="10-17" category="MAGICAL"/></Spell>
 
-      <!-- TODO: Combine hurt spells with a dialog check on the target type -->
       <Spell name="Hurt"      mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></Spell>
-      <Spell name="Monster Hurt" mp="2" availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
-         <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
-         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></Spell>
 
       <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
@@ -1763,19 +1765,13 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="HEALTH_RESTORE" count="85-100"/></Spell>
 
-      <!-- TODO: Combine hurtmore spells with a dialog check on the target type -->
       <Spell name="Hurtmore"  mp="5"  availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="20-30" category="MAGICAL"/></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></Spell>
-      <Spell name="Monster Hurtmore" mp="5" availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
-         <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
-         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAction type="DAMAGE_TARGET" count="20-30" category="MAGICAL"/></Spell>
    </Spells>
 
    <Items>
@@ -1838,9 +1834,9 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
 
          <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes" target="SINGLE_ALLY">
+            <Dialog>[TARGET] ate the herb.</Dialog>
             <DialogAction type="HEALTH_RESTORE" count="23-30" category="PHYSICAL"/>
-            <DialogAction type="LOSE_ITEM" name="Herb"/>
-            <Dialog>[ACTOR] ate the herb.</Dialog></Tool>
+            <DialogAction type="LOSE_ITEM" name="Herb"/></Tool>
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
             <DialogAssert type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogAssert>
@@ -1876,9 +1872,10 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Ball of Light"                                  droppable="no"  equippable="no">
             <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog></Tool>
 
-         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no">
+         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no" target="ALL_ENEMIES">
             <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
             <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
+            <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happended.</Dialog></DialogAssert>
             <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
@@ -1908,7 +1905,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
             <Dialog>[ACTOR] played a sweet melody on the harp.</Dialog>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
-            <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool> <!-- TODO: Should only start an encounter where monsters reside -->
+            <DialogAssert type="IS_COMBAT_ALLOWED"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool>
 
          <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
             <Dialog>[ACTOR] held Gwaelin's Love tightly.</Dialog>
@@ -1930,6 +1928,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
       <Dialog>"May the light shine upon thee, [NAME]."</Dialog>
 
       <ProgressMarkers>
+         <ProgressMarker name="PM_Not_Finished_Preparing"/>
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_1"/>
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_2"/>
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_3"/>

@@ -219,8 +219,12 @@ class HeroParty:
     def get_lowest_health_ratio(self) -> float:
         lowest_health_ratio = 1.0
         for member in self.members:
-            lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
+            if member.max_hp > 0:
+                lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
         return lowest_health_ratio
+
+    def has_low_heath(self) -> bool:
+        return self.get_lowest_health_ratio() < 0.25
 
     # Get listing of all unequipped items for the party
     def get_item_row_data(self,

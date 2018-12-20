@@ -112,6 +112,10 @@ class DialogCheckEnum(Enum):
     IS_AT_COORDINATES = 7              # attributes: map, x, y
     IS_IN_COMBAT = 8                   # attributes: name
     IS_NOT_IN_COMBAT = 9               # attributes: <none>
+    IS_COMBAT_ALLOWED = 10             # attributes: <none>
+    IS_COMBAT_DISALLOWED = 11          # attributes: <none>
+    IS_TARGET_HERO = 12                # attributes: <none>
+    IS_TARGET_MONSTER = 13             # attributes: <none>
 
 
 # Actions that can be triggered from dialog
@@ -122,9 +126,9 @@ class DialogActionEnum(Enum):
     HEALTH_RESTORE = 3                 # attributes: count (number, range, or unlimited), category,
     #                                                bypass (to bypass any dialog or updating the screen)
     LOSE_ITEM = 4                      # attributes: item (if unknown name, treated as a progress marker),
-    #                                                count (defaults to 1)
+    #                                                count (defaults to 1), bypass (to bypass updating the screen)
     GAIN_ITEM = 5                      # attributes: item (if unknown name, treated as a progress marker),
-    #                                                count (defaults to 1)
+    #                                                count (defaults to 1), bypass (to bypass updating the screen)
     SET_LIGHT_DIAMETER = 6             # attributes: count, decay (number or unlimited)
     REPEL_MONSTERS = 7                 # attributes: decay
     GOTO_COORDINATES = 8               # attributes: map, x, y, dir
@@ -141,6 +145,7 @@ class DialogActionEnum(Enum):
     DAMAGE_TARGET = 17                 # attributes: count (number, range, unlimited, or default), category
     #                                                bypass (to bypass resistances and damage modifiers)
     WAIT = 18                          # attributes: count (number of milliseconds to wait)
+    SET_LEVEL = 19                     # attributes: name, bypass (to bypass updating the screen)
 
 
 class ActionCategoryTypeEnum(Enum):
@@ -325,9 +330,10 @@ class Tile(NamedTuple):
 class Decoration(NamedTuple):
     name: str
     image: pygame.Surface
-    walkable: bool
-    remove_with_search: bool
-    removeWithKey: bool
+    walkable: bool = True
+    remove_with_search: bool = False
+    remove_with_key: bool = False
+    remove_sound: Optional[str] = None
 
 
 class CharacterType(NamedTuple):
@@ -372,7 +378,7 @@ class NpcInfo(NamedTuple):
 
 
 class MapDecoration(NamedTuple):
-    type: Optional[str]
+    type: Optional[Decoration]
     point: Point
     dialog: Optional[DialogType] = None
     progress_marker: Optional[str] = None
@@ -483,8 +489,8 @@ class Level(NamedTuple):
     spell: Optional[Spell] = None
 
     @staticmethod
-    def create_null() -> Level:
-        return Level(0, 'null', 0, 0, 0, 1, 0, None)
+    def create_null(name: str = 'null') -> Level:
+        return Level(0, name, 0, 0, 0, 1, 0, None)
 
 
 class Spell(NamedTuple):
