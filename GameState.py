@@ -242,6 +242,8 @@ class GameState(GameStateInterface):
         xml_string = xml.dom.minidom.parseString(xml.etree.ElementTree.tostring(xml_root)).toprettyxml(indent="   ")
 
         save_game_file_path = os.path.join(self.game_info.saves_path, self.hero_party.main_character.name + '.xml')
+        if not os.path.isdir(self.game_info.saves_path):
+            os.makedirs(self.game_info.saves_path)
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
             archive_dir = os.path.join(self.game_info.saves_path, 'archive')

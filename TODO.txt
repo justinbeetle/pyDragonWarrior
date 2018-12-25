@@ -1,10 +1,10 @@
 Current Efforts:
-   Dialog scripting of items, spells, and monster actions
-   Allow dialog evaluation to trigger monster and player damage effects
+   Dialog scripting of items, spells, and monster actions - DONE!
+   Allow dialog evaluation to trigger monster and player damage effects - DONE!
    Get standalone combat testing from CombatEncounter.py and test with both party sizes of 1 and greater
-   Drop CombatEncounter.py into Game.py
-   Get test saves for testing all quest encounters
-   Get fairy flute to work on Golum correctly
+   Drop CombatEncounter.py into Game.py - DONE!
+   Get test saves for testing all quest encounters - in progress
+   Get fairy flute to work on Golum correctly - DONE!
    Look into the damage calculations - seeming a little funky
    More sets of updates to GameDialog - add class for row data and allow multiple row data entries to support a nicer gold display at bottom.  More spacing types to fix the status display for larger party sizes.
    Add character selection from menu and target selection for spells, etc.

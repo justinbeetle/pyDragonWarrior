@@ -18,6 +18,16 @@ Images:
    http://www.realmofdarkness.net/dq/games/snes/dq3/maps
    https://www.spriters-resource.com/nes/D.html
    https://www.pinterest.com/pin/551339179352298400
+Tilesets:
+   https://opengameart.org/content/worldmapoverworld-tileset
+   https://opengameart.org/content/cave-tileset-1
+   https://opengameart.org/content/16x16-tileset-water-dirt-forest
+   Other sites:
+      http://letsmakegames.org/resources/art-assets-for-game-developers/
+      http://www.pixelprospector.com/the-big-list-of-royalty-free-graphics/
+Tiled:
+   https://doc.mapeditor.org/en/stable/manual/introduction/
+   https://www.pygame.org/project-Tiled+TMX+Loader-2036-.html
 
 Formulas:     https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/61640
 Item Info:    https://strategywiki.org/wiki/Dragon_Warrior/Items_and_Equipment
@@ -55,10 +65,14 @@ python -m pip install --upgrade pyinstaller
 python -m pip install --upgrade mypy
 python -m pip install --upgrade numpy
 
-python -m mypy Point.py --strict --ignore-missing-imports
+python -m mypy Game.py --strict --ignore-missing-imports
+/c/users/justin/appdata/local/programs/python/python37/Scripts/pyinstaller.exe -n pyDragonWarrior --add-data "game.xml;./" --add-data "data;data" Game.py
+cd dist
+tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
 
 cd C:\Users\Justin\Desktop\Adventure\Adventure
 C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts\pyinstaller Game.py
 copy game.xml, data, and saves from C:\Users\Justin\Desktop\Adventure\Adventure to C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game
 run C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game\Game.exe
+
