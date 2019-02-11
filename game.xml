@@ -53,36 +53,46 @@
 
    <Levels>
       <CharacterLevels type="hero">
-         <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
-         <Level name="2"  xp="7"     strength="6"   agility="5"   hp="22"  mp="0"/>
-         <Level name="3"  xp="23"    strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
-         <Level name="4"  xp="47"    strength="8"   agility="9"   hp="31"  mp="16"  spell="Hurt"/>
-         <Level name="5"  xp="110"   strength="13"  agility="11"  hp="35"  mp="20"/>
-         <Level name="6"  xp="220"   strength="17"  agility="11"  hp="38"  mp="24"/>
-         <Level name="7"  xp="450"   strength="19"  agility="18"  hp="40"  mp="26"  spell="Sleep"/>
-         <Level name="8"  xp="800"   strength="23"  agility="21"  hp="46"  mp="29"/>
-         <Level name="9"  xp="1300"  strength="31"  agility="23"  hp="50"  mp="36"  spell="Radiant"/>
-         <Level name="10" xp="2000"  strength="36"  agility="32"  hp="54"  mp="40"  spell="Stopspell"/>
-         <Level name="11" xp="2900"  strength="41"  agility="36"  hp="62"  mp="50"/>
-         <Level name="12" xp="4000"  strength="49"  agility="41"  hp="63"  mp="58"  spell="Outside"/>
-         <Level name="13" xp="5500"  strength="53"  agility="49"  hp="70"  mp="64"  spell="Return"/>
-         <Level name="14" xp="7500"  strength="61"  agility="56"  hp="78"  mp="70"/>
-         <Level name="15" xp="10000" strength="69"  agility="65"  hp="86"  mp="72"  spell="Repel"/>
-         <Level name="16" xp="13000" strength="73"  agility="71"  hp="92"  mp="95"/>
-         <Level name="17" xp="17000" strength="73"  agility="79"  hp="100" mp="100" spell="Healmore"/>
-         <Level name="18" xp="21000" strength="86"  agility="85"  hp="115" mp="108"/>
-         <Level name="19" xp="25000" strength="88"  agility="87"  hp="130" mp="115" spell="Hurtmore"/>
-         <Level name="20" xp="29000" strength="93"  agility="89"  hp="138" mp="128"/>
-         <Level name="21" xp="33000" strength="96"  agility="91"  hp="149" mp="135"/>
-         <Level name="22" xp="37000" strength="98"  agility="91"  hp="158" mp="146"/>
-         <Level name="23" xp="41000" strength="100" agility="95"  hp="165" mp="153"/>
-         <Level name="24" xp="45000" strength="104" agility="99"  hp="170" mp="161"/>
-         <Level name="25" xp="49000" strength="114" agility="101" hp="174" mp="161"/>
-         <Level name="26" xp="53000" strength="118" agility="106" hp="180" mp="168"/>
-         <Level name="27" xp="57000" strength="126" agility="108" hp="189" mp="175"/>
-         <Level name="28" xp="61000" strength="131" agility="116" hp="195" mp="180"/>
-         <Level name="29" xp="65000" strength="136" agility="121" hp="200" mp="190"/>
-         <Level name="30" xp="69000" strength="141" agility="131" hp="210" mp="200"/>
+         <Level name="1"  xp="0"      strength="5"   agility="5"   hp="15"  mp="0"/>
+         <Level name="2"  xp="7"      strength="6"   agility="5"   hp="22"  mp="0"/>
+         <Level name="3"  xp="23"     strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
+         <Level name="4"  xp="47"     strength="8"   agility="9"   hp="31"  mp="16"  spell="Hurt"/>
+         <Level name="5"  xp="110"    strength="13"  agility="11"  hp="35"  mp="20"/>
+         <Level name="6"  xp="220"    strength="17"  agility="11"  hp="38"  mp="24"/>
+         <Level name="7"  xp="450"    strength="19"  agility="18"  hp="40"  mp="26"  spell="Sleep"/>
+         <Level name="8"  xp="800"    strength="23"  agility="21"  hp="46"  mp="29"/>
+         <Level name="9"  xp="1300"   strength="31"  agility="23"  hp="50"  mp="36"  spell="Radiant"/>
+         <Level name="10" xp="2000"   strength="36"  agility="32"  hp="54"  mp="40"  spell="Stopspell"/>
+         <Level name="11" xp="2900"   strength="41"  agility="36"  hp="62"  mp="50"/>
+         <Level name="12" xp="4000"   strength="49"  agility="41"  hp="63"  mp="58"  spell="Outside"/>
+         <Level name="13" xp="5500"   strength="53"  agility="49"  hp="70"  mp="64"  spell="Return"/>
+         <Level name="14" xp="7500"   strength="61"  agility="56"  hp="78"  mp="70"/>
+         <Level name="15" xp="10000"  strength="69"  agility="65"  hp="86"  mp="72"  spell="Repel"/>
+         <Level name="16" xp="13000"  strength="73"  agility="71"  hp="92"  mp="95"/>
+         <Level name="17" xp="17000"  strength="73"  agility="79"  hp="100" mp="100" spell="Healmore"/>
+         <Level name="18" xp="21000"  strength="86"  agility="85"  hp="115" mp="108"/>
+         <Level name="19" xp="25000"  strength="88"  agility="87"  hp="130" mp="115" spell="Hurtmore"/>
+         <Level name="20" xp="29000"  strength="93"  agility="89"  hp="138" mp="128"/>
+         <Level name="21" xp="33000"  strength="96"  agility="91"  hp="149" mp="135"/>
+         <Level name="22" xp="37000"  strength="98"  agility="91"  hp="158" mp="146"/>
+         <Level name="23" xp="41000"  strength="100" agility="95"  hp="165" mp="153"/>
+         <Level name="24" xp="45000"  strength="104" agility="99"  hp="170" mp="161"/>
+         <Level name="25" xp="49000"  strength="114" agility="101" hp="174" mp="161"/>
+         <Level name="26" xp="53000"  strength="118" agility="106" hp="180" mp="168"/>
+         <Level name="27" xp="57000"  strength="126" agility="108" hp="189" mp="175"/>
+         <Level name="28" xp="61000"  strength="131" agility="116" hp="195" mp="180"/>
+         <Level name="29" xp="65000"  strength="136" agility="121" hp="200" mp="190"/>
+         <Level name="30" xp="70000"  strength="141" agility="131" hp="210" mp="200"/>
+         <Level name="31" xp="75000"  strength="146" agility="140" hp="215" mp="210" spell="Healall"/>/>
+         <Level name="32" xp="80000"  strength="151" agility="150" hp="220" mp="220"/>
+         <Level name="33" xp="85000"  strength="156" agility="160" hp="225" mp="230"/>
+         <Level name="34" xp="90000"  strength="161" agility="170" hp="230" mp="240"/>
+         <Level name="35" xp="95000"  strength="166" agility="180" hp="235" mp="250"/>
+         <Level name="36" xp="100000" strength="171" agility="190" hp="240" mp="260"/>
+         <Level name="37" xp="105000" strength="176" agility="200" hp="245" mp="270"/>
+         <Level name="38" xp="110000" strength="181" agility="210" hp="250" mp="280"/>
+         <Level name="39" xp="115000" strength="186" agility="220" hp="255" mp="290"/>
+         <Level name="40" xp="120000" strength="191" agility="230" hp="260" mp="300"/>
       </CharacterLevels>
 
       <CharacterLevels type="cat">
@@ -598,6 +608,27 @@
          <NonPlayerCharacter type="merchant" x="18" y="16" dir="WEST" walking="no">
             <DialogVariable name="[COST]" value="25"/>
             <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="girl" x="13" y="6" dir="EAST" walking="yes">
+            <Dialog>"I hate people! Go! Leave me!"</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="boy" x="4" y="9" dir="WEST" walking="yes">
+            <Dialog>"Once there was a town called Hauksness far to the south, but I do not know if it still exists."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="14" y="9" dir="SOUTH" walking="yes">
+            <Dialog>"They say that Erdrick's armor was hidden long ago."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="merchant" x="10" y="7" dir="SOUTH" walking="no">
+            <Dialog>"I suggest making a map if thy path leads into the darkness."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="4" y="6" dir="EAST" walking="no">
+            <Dialog>"I'm too busy. Ask the other guard."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="guard" x="6" y="6" dir="WEST" walking="no">
+            <Dialog>"I'm too busy. Ask the other guard."</Dialog></NonPlayerCharacter>
+
+         <NonPlayerCharacter type="sage" x="15" y="2" dir="SOUTH" walking="no">
+            <Dialog>"The harp attracts enemies. Stay away from the grave in Garinham."</Dialog></NonPlayerCharacter>
       </Map>
 
       <Map name="kol" tiles="kol.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes">
@@ -901,7 +932,7 @@
          <PointTransition decoration="upstairs" fromX="9" fromY="10" toMap="erdricks_tomb_lvl1" toX="10" toY="10" toDir="SOUTH"/>
          <MapDecoration type="chest" x="10" y="4">
             <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
-            <Dialog>The tablet reads as follows:  'I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!'</Dialog></MapDecoration>
+            <Dialog>The tablet reads as follows:  "I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!"</Dialog></MapDecoration>
       </Map>
 
       <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
@@ -958,7 +989,7 @@
                    <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
-      <Map name="northern_shrine" tiles="northern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="no">
+      <Map name="northern_shrine" tiles="northern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
@@ -982,7 +1013,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="southern_shrine" tiles="southern_shrine.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="no">
+      <Map name="southern_shrine" tiles="southern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
 
          <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
@@ -1182,8 +1213,10 @@
    <DialogScripts>
       <DialogScript label="defeated_dragonlord_first_form">
          <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
-         <Dialog>The Dragonlord revealed his true self!</Dialog>
-         <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
+         <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" approachDialogScript="approach_dragonlord_second_form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
+
+      <DialogScript label="approach_dragonlord_second_form">
+         <Dialog>The Dragonlord revealed his true self!</Dialog></DialogScript>
 
       <DialogScript label="defeated_dragonlord_second_form">
          <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
@@ -1191,6 +1224,7 @@
          <Dialog>Thou hast found the Ball of Light.</Dialog>
          <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
          <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
          <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></DialogScript>
 
       <DialogScript label="runaway_dragonlord_second_form">
@@ -1207,6 +1241,9 @@
             <DialogOption name="Buy">
                <Dialog>"What dost thou wish to buy?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
                   <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
@@ -1222,6 +1259,9 @@
             <DialogOption name="Sell">
                <Dialog>"What dost thou wish to sell?"</Dialog>
                <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
                <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
@@ -1242,6 +1282,9 @@
             <DialogOption name="Buy">
                <Dialog>"What dost thou want?"</Dialog>
                <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
                   <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
@@ -1257,6 +1300,9 @@
             <DialogOption name="Sell">
                <Dialog>"What dost thou want to sell?"</Dialog>
                <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
                <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
@@ -1319,7 +1365,7 @@
          <DialogOptions>
             <DialogOption name="Yes">
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogAssert>
-               <Dialog>Have a great night!</Dialog>
+               <Dialog>"Have a great night!"</Dialog>
                <DialogAction type="PLAY_MUSIC" name="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"/>
                <DialogAction type="VISUAL_EFFECT" name="fadeOutToBlack"/>
                <DialogAction type="MAGIC_RESTORE" count="unlimited" bypass="yes"/>
@@ -1367,7 +1413,7 @@
       <Monster name="Stopper"                image="stopper.png"                strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
       <Monster name="Super Shooter"          image="super_shooter.png"          strength="11"  agility="1"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="3"/>
       <Monster name="Slime"                  image="slime.png"                  strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
-      <Monster name="Red Slime"              image="red_slime.png"              strength="7"   agility="3"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Red Slime"              image="red_slime.png"              strength="7"   agility="3"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="2"/>
       <Monster name="Drakee"                 image="drakee.png"                 strength="9"   agility="6"   hp="5-6"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="2"/>
       <Monster name="Ghost"                  image="ghost.png"                  strength="11"  agility="8"   hp="6-7"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="3"   gp="3-4"/>
       <Monster name="Magician"               image="magician.png"               strength="11"  agility="12"  hp="10-13"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="4"   gp="9-11">
@@ -1772,6 +1818,12 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="20-30" category="MAGICAL"/></DialogAssert>
          <DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></Spell>
+
+      <Spell name="Healall"  mp="20" availableInCombat="yes" availableOutsideCombat="yes" target="ALL_ALLIES">
+         <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="unlimited"/></Spell>
    </Spells>
 
    <Items>

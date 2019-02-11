@@ -800,6 +800,8 @@ class GameState(GameStateInterface):
         # Play the music for the current map
         AudioPlayer().play_music(self.game_info.maps[self.map_state.name].music)
 
+        pygame.event.get()  # Clear event queue
+
     def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         if not self.hero_party.has_surviving_members():
             # Player death

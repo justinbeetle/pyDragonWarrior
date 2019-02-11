@@ -331,6 +331,7 @@ class CombatEncounter(CombatEncounterInterface):
         use_dialog = None
         target_type = None
         prev_menu_result = None
+        pygame.event.get()  # Clear event queue
         while self.game_state.is_running:
             # Get selected action for turn
             self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)

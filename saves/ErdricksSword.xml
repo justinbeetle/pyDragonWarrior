@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<SaveState dir="WEST" gp="100000" map="swamp_cave" name="Wallace" x="5" xp="16000" y="14">
+   <EquippedItems>
+      <Item name="Broad Sword"/>
+      <Item name="Full Plate"/>
+      <Item name="Iron Shield"/>
+      <Item name="Dragon's Scale"/>
+      <Item name="Fighter's Ring"/>
+   </EquippedItems>
+   <UnequippedItems>
+      <Item count="10" name="Fairy Water"/>
+      <Item count="10" name="Herb"/>
+      <Item count="10" name="Key"/>
+      <Item count="10" name="Torch"/>
+      <Item count="10" name="Wings"/>
+   </UnequippedItems>
+   <ProgressMarkers>
+      <ProgressMarker name="PM_Created_Rainbow_Bridge"/>
+   </ProgressMarkers>
+</SaveState>

@@ -289,15 +289,16 @@ class GameDialogEvaluator:
                 # print('Set self.traverse_dialog_wait_before_new_text to False', flush=True)
                 message_dialog.add_menu_prompt(name_and_gp_row_data, 2, GameDialogSpacing.OUTSIDE_JUSTIFIED)
                 message_dialog.blit(self.game_state.screen, True)
-                menu_result = None
-                while self.game_state.is_running and menu_result is None:
-                    menu_result = self.get_menu_result(message_dialog)
+                menu_result = self.get_menu_result(message_dialog)
                 if menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
                     self.replacement_variables.generic['[ITEM]'] = menu_result
                     for itemNameAndGp in name_and_gp_row_data:
                         if itemNameAndGp[0] == menu_result:
                             self.replacement_variables.generic['[COST]'] = itemNameAndGp[1]
+                else:
+                    self.replacement_variables.generic.pop('[ITEM]', None)
+                    self.replacement_variables.generic.pop('[COST]', None)
 
             elif isinstance(item, DialogVendorSellOptions):
                 # print( 'Dialog Vendor Sell Options =', item, flush=True )
@@ -311,18 +312,19 @@ class GameDialogEvaluator:
                 item_row_data = self.hero_party.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
                     self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
-                    break
+                    continue
                 self.wait_before_new_text = False
                 # print( 'Set self.traverse_dialog_wait_before_new_text to False', flush=True )
                 message_dialog.add_menu_prompt(item_row_data, 2, GameDialogSpacing.OUTSIDE_JUSTIFIED)
                 message_dialog.blit(self.game_state.screen, True)
-                menu_result = None
-                while self.game_state.is_running and menu_result is None:
-                    menu_result = self.get_menu_result(message_dialog)
+                menu_result = self.get_menu_result(message_dialog)
                 if menu_result is not None:
                     # print( 'menu_result =', menu_result, flush=True )
                     self.replacement_variables.generic['[ITEM]'] = menu_result
                     self.replacement_variables.generic['[COST]'] = str(self.game_info.get_item(menu_result).gp // 2)
+                else:
+                    self.replacement_variables.generic.pop('[ITEM]', None)
+                    self.replacement_variables.generic.pop('[COST]', None)
 
             elif isinstance(item, DialogCheck):
                 # print( 'Dialog Check =', item, flush=True )
@@ -393,6 +395,17 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogCheckEnum.IS_TARGET_MONSTER:
                     check_result = len(self.targets) > 0 and not isinstance(self.targets[0], HeroState)
+
+                elif item.type == DialogCheckEnum.IS_DEFINED or item.type == DialogCheckEnum.IS_NOT_DEFINED:
+                    # Perform variable replacement
+                    item_name = str(item.name)
+                    for variable in self.replacement_variables.generic:
+                        if isinstance(item_name, str):
+                            item_name = item_name.replace(variable, self.replacement_variables.generic[variable])
+
+                    check_result = item_name != item.name
+                    if item.type == DialogCheckEnum.IS_NOT_DEFINED:
+                        check_result = not check_result
 
                 else:
                     print('ERROR: Unsupported DialogCheckEnum of', item.type, flush=True)

@@ -116,6 +116,8 @@ class DialogCheckEnum(Enum):
     IS_COMBAT_DISALLOWED = 11          # attributes: <none>
     IS_TARGET_HERO = 12                # attributes: <none>
     IS_TARGET_MONSTER = 13             # attributes: <none>
+    IS_DEFINED = 14                    # attributes: name - returns true if the name is a defined variable
+    IS_NOT_DEFINED = 15                # attributes: name - returns true if the name is NOT a defined variable
 
 
 # Actions that can be triggered from dialog
