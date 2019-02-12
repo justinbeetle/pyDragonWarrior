@@ -1,21 +1,21 @@
 <Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid_new" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0" speed="1.0" spawnRate="0"/>
-      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"/>
-      <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/24"/>
-      <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/24"/>
-      <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0" speed="0.9" spawnRate="1/16"/>
-      <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0" speed="0.7" spawnRate="1/8"/>
-      <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/8"/>
-      <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2" speed="1.0" spawnRate="1/16"/>
-      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/24"/>
-      <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="1"             spawnRate="0"/>
-      <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"/>
-      <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0" speed="1.0" spawnRate="1/16"/>
+      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16"/>
+      <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"/>
+      <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
+      <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16"/>
+      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
       <Tile name="counter"  image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"/>
-      <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"/>
-      <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"/>
-      <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" spawnRate="1/16"/>
+      <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16"/>
    </Tiles>
 
    <Decorations>
@@ -49,10 +49,53 @@
       <Decoration name="stoneShrineB" image="stoneShrineB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="stoneShrineC" image="stoneShrineC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="pass" image="clear.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
    </Decorations>
 
    <Levels>
       <CharacterLevels type="hero">
+         <!-- <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
+         <Level name="2"  xp="2"     strength="6"   agility="5"   hp="22"  mp="0"/>
+         <Level name="3"  xp="5"     strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
+         <Level name="4"  xp="8"     strength="8"   agility="9"   hp="31"  mp="16"  spell="Hurt"/>
+         <Level name="5"  xp="11"    strength="13"  agility="11"  hp="35"  mp="20"/>
+         <Level name="6"  xp="22"    strength="17"  agility="11"  hp="38"  mp="24"/>
+         <Level name="7"  xp="45"    strength="19"  agility="18"  hp="40"  mp="26"  spell="Sleep"/>
+         <Level name="8"  xp="80"    strength="23"  agility="21"  hp="46"  mp="29"/>
+         <Level name="9"  xp="130"   strength="31"  agility="23"  hp="50"  mp="36"  spell="Radiant"/>
+         <Level name="10" xp="200"   strength="36"  agility="32"  hp="54"  mp="40"  spell="Stopspell"/>
+         <Level name="11" xp="290"   strength="41"  agility="36"  hp="62"  mp="50"/>
+         <Level name="12" xp="400"   strength="49"  agility="41"  hp="63"  mp="58"  spell="Outside"/>
+         <Level name="13" xp="550"   strength="53"  agility="49"  hp="70"  mp="64"  spell="Return"/>
+         <Level name="14" xp="750"   strength="61"  agility="56"  hp="78"  mp="70"/>
+         <Level name="15" xp="1000"  strength="69"  agility="65"  hp="86"  mp="72"  spell="Repel"/>
+         <Level name="16" xp="1300"  strength="73"  agility="71"  hp="92"  mp="95"/>
+         <Level name="17" xp="1700"  strength="73"  agility="79"  hp="100" mp="100" spell="Healmore"/>
+         <Level name="18" xp="2100"  strength="86"  agility="85"  hp="115" mp="108"/>
+         <Level name="19" xp="2500"  strength="88"  agility="87"  hp="130" mp="115" spell="Hurtmore"/>
+         <Level name="20" xp="2900"  strength="93"  agility="89"  hp="138" mp="128"/>
+         <Level name="21" xp="3300"  strength="96"  agility="91"  hp="149" mp="135"/>
+         <Level name="22" xp="3700"  strength="98"  agility="91"  hp="158" mp="146"/>
+         <Level name="23" xp="4100"  strength="100" agility="95"  hp="165" mp="153"/>
+         <Level name="24" xp="4500"  strength="104" agility="99"  hp="170" mp="161"/>
+         <Level name="25" xp="4900"  strength="114" agility="101" hp="174" mp="161"/>
+         <Level name="26" xp="5300"  strength="118" agility="106" hp="180" mp="168"/>
+         <Level name="27" xp="5700"  strength="126" agility="108" hp="189" mp="175"/>
+         <Level name="28" xp="6100"  strength="131" agility="116" hp="195" mp="180"/>
+         <Level name="29" xp="6500"  strength="136" agility="121" hp="200" mp="190"/>
+         <Level name="30" xp="7000"  strength="141" agility="131" hp="210" mp="200"/>
+         <Level name="31" xp="7500"  strength="146" agility="140" hp="215" mp="210" spell="Healall"/>/>
+         <Level name="32" xp="8000"  strength="151" agility="150" hp="220" mp="220"/>
+         <Level name="33" xp="8500"  strength="156" agility="160" hp="225" mp="230"/>
+         <Level name="34" xp="9000"  strength="161" agility="170" hp="230" mp="240"/>
+         <Level name="35" xp="9500"  strength="166" agility="180" hp="235" mp="250"/>
+         <Level name="36" xp="10000" strength="171" agility="190" hp="240" mp="260"/>
+         <Level name="37" xp="10500" strength="176" agility="200" hp="245" mp="270"/>
+         <Level name="38" xp="11000" strength="181" agility="210" hp="250" mp="280"/>
+         <Level name="39" xp="11500" strength="186" agility="220" hp="255" mp="290"/>
+         <Level name="40" xp="12000" strength="191" agility="230" hp="260" mp="300"/> -->
+
          <Level name="1"  xp="0"      strength="5"   agility="5"   hp="15"  mp="0"/>
          <Level name="2"  xp="7"      strength="6"   agility="5"   hp="22"  mp="0"/>
          <Level name="3"  xp="23"     strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
@@ -140,6 +183,9 @@
          <PointTransition decoration="stoneShrineA"    fromX="82"  fromY="2"   toMap="northern_shrine"    toX="5"  toY="10" toDir="NORTH" respawnDecorations="yes"/>
          <PointTransition decoration="stoneShrineB"    fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"  respawnDecorations="yes"/>
          <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="pass"            fromX="72"  fromY="84"  toMap="bat_cave_lvl1"      toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
+
+         <MapDecoration type="cactus" x="73" y="84"/>
 
          <MapDecoration type="None" x="84" y="114">
             <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
@@ -1207,6 +1253,34 @@
                <DialogOption name="No" label="fight_dragon_lord">
                    <Dialog>"Thou art a fool!"</Dialog>
                    <DialogAction type="START_ENCOUNTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
+      </Map>
+
+      <Map name="bat_cave_lvl1" tiles="bat_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+         <PointTransition decoration="upstairs"   fromX="1"  fromY="8"  toMap="overworld"     toX="72" toY="84" toDir="EAST"/>
+         <PointTransition decoration="downstairs" fromX="1"  fromY="1"  toMap="bat_cave_lvl2" toX="1"  toY="1"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="7"  fromY="6"  toMap="bat_cave_lvl2" toX="7"  toY="6"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="13" fromY="13" toMap="bat_cave_lvl2" toX="13" toY="13" toDir="SOUTH"/>
+
+         <MapDecoration type="chest" x="14" y="6">
+            <DialogAction type="GAIN_ITEM" name="Herb"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="bat_cave_lvl2" tiles="bat_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+         <PointTransition decoration="upstairs" fromX="1"  fromY="1"  toMap="bat_cave_lvl1" toX="1"  toY="1"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="7"  fromY="6"  toMap="bat_cave_lvl1" toX="7"  toY="6"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="13" fromY="13" toMap="bat_cave_lvl1" toX="13" toY="13" toDir="SOUTH"/>
+
+         <MapDecoration type="chest" x="3" y="3"><DialogGoTo label="torch_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="4" y="3">
+            <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="2" y="7">
+            <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="10"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
+            <DialogVariable name="[CHEST_GOLD]" value="100-131"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
    </Maps>
 
