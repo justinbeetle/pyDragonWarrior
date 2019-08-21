@@ -157,6 +157,7 @@ class GameInfo:
             mp_penalty = 0
             speed = 1.0
             spawn_rate = 1.0
+            tile_type = 'simple'
             if 'walkable' in element.attrib:
                 tile_walkable = element.attrib['walkable'] == 'yes'
             if 'canTalkOver' in element.attrib:
@@ -169,10 +170,12 @@ class GameInfo:
                 speed = GameTypes.parse_float(element.attrib['speed'])
             if 'spawnRate' in element.attrib:
                 spawn_rate = GameTypes.parse_float(element.attrib['spawnRate'])
+            if 'type' in element.attrib:
+                tile_type = element.attrib['type']
             
             # print('Loading image', tileImageFileName, flush=True)
             tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
-            if tile_image_unscaled.get_height() > self.tile_size_pixels:
+            if tile_type == 'complex' or tile_image_unscaled.get_height() > self.tile_size_pixels:
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
                 tile_images_scaled: List[List[pygame.Surface]] = []
                 for x in range(16):
