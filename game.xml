@@ -1,56 +1,48 @@
-<Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid_new" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+<Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_hybrid_new" decorationPath="decorations_16" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16"/>
-      <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"/>
-      <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
-      <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16"/>
-      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
-      <Tile name="counter"  image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"/>
-      <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16"/>
+      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
+      <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
+      <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16" type="complex"/>
+      <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
+      <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
+      <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
+      <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="counter"  image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                           type="simple"/>
+      <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
    </Tiles>
 
    <Decorations>
-      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeSound="openChest.wav"/>
-      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
-      <Decoration name="downstairs" image="downstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="upstairs" image="upstairs.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneCastleA" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneCastleB" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneCastleC" image="stoneCastleA.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="tallStoneCastle" image="tallStoneCastle.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="largeStoneTownA" image="largeStoneTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="largeStoneTownB" image="largeStoneTownB.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="largeWoodTownA" image="largeWoodTownA.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="largeWoodTownB" image="largeWoodTownB.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTownA" image="stoneTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTownB" image="stoneTownB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTownC" image="stoneTownC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTownD" image="stoneTownD.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="woodTownA" image="woodTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="woodTownB" image="woodTownB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="woodTownC" image="woodTownC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="woodTownD" image="woodTownD.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="woodTownE" image="woodTownE.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="smallTownA" image="smallTownA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="smallStoneTower" image="smallStoneTower.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTowerA" image="stoneTowerA.png" widthTiles="1" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneTowerB" image="stoneTowerA.png" widthTiles="1" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneShrineA" image="stoneShrineA.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneShrineB" image="stoneShrineB.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="stoneShrineC" image="stoneShrineC.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="pass" image="clear.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="castle_stone_A" image="castle_stone_A.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="castle_stone_B" image="castle_stone_B.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <!--<Decoration name="castle_stone_tall_B" image="castle_stone_tall_B.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
+      <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeSound="openChest.wav"/>
+      <Decoration name="pass" image="clear.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="shrine_stone_A" image="shrine_stone_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="shrine_stone_B" image="shrine_stone_B.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="downstairs" image="stairs_down.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="upstairs" image="stairs_up.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="throne" image="throne.png" widthTiles="3" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="throne_evil" image="throne_evil.png" widthTiles="3" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <!--<Decoration name="town_stone_large_A" image="town_stone_large_A.png" widthTiles="3" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="town_stone_large_B" image="town_stone_large_B.png" widthTiles="3" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
+      <Decoration name="town_stone_med_A" image="town_stone_med_A.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="town_stone_med_B" image="town_stone_med_B.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="town_wood_med_A" image="town_wood_med_A.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="town_wood_med_B" image="town_wood_med_B.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <!--<Decoration name="town_wood_med_C" image="town_wood_med_C.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
+      <Decoration name="town_wood_small_A" image="town_wood_small_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
    </Decorations>
 
    <Levels>
@@ -169,21 +161,21 @@
 
    <Maps>
       <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
-         <PointTransition decoration="stoneCastleA"    fromX="44"  fromY="44"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="largeStoneTownB" fromX="49"  fromY="42"  toMap="brecconary"         toX="1"  toY="15" toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="stoneTownC"      fromX="3"   fromY="3"   toMap="garinham"           toX="20" toY="13" toDir="WEST"  respawnDecorations="yes"/>
-         <PointTransition decoration="largeWoodTownB"  fromX="105" fromY="11"  toMap="kol"                toX="20" toY="24" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="stoneTownA"      fromX="103" fromY="73"  toMap="rimuldar"           toX="30" toY="15" toDir="WEST"  respawnDecorations="yes"/>
-         <PointTransition decoration="woodTownB"       fromX="26"  fromY="90"  toMap="hauksness"          toX="1"  toY="11" toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="stoneTownB"      fromX="74"  fromY="103" toMap="cantlin"            toX="15" toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
-         <PointTransition decoration="cave"            fromX="29"  fromY="13"  toMap="erdricks_tomb_lvl1" toX="1"  toY="1"  toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="cave"            fromX="30"  fromY="58"  toMap="mountain_cave_lvl1" toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="cave"            fromX="105" fromY="45"  toMap="swamp_cave"         toX="1"  toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
-         <PointTransition decoration="cave"            fromX="105" fromY="50"  toMap="swamp_cave"         toX="1"  toY="31" toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="stoneShrineA"    fromX="82"  fromY="2"   toMap="northern_shrine"    toX="5"  toY="10" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="stoneShrineB"    fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="tallStoneCastle" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="pass"            fromX="72"  fromY="84"  toMap="bat_cave_lvl1"      toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="castle_stone_A"      fromX="44"  fromY="44"  toMap="tantegel_lvl1"      toX="11" toY="30" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="town_stone_med_B"    fromX="49"  fromY="42"  toMap="brecconary"         toX="1"  toY="15" toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="town_stone_med_A"    fromX="3"   fromY="3"   toMap="garinham"           toX="20" toY="13" toDir="WEST"  respawnDecorations="yes"/>
+         <PointTransition decoration="town_wood_med_B"     fromX="105" fromY="11"  toMap="kol"                toX="20" toY="24" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="town_stone_med_A"    fromX="103" fromY="73"  toMap="rimuldar"           toX="30" toY="15" toDir="WEST"  respawnDecorations="yes"/>
+         <PointTransition decoration="town_wood_med_A"     fromX="26"  fromY="90"  toMap="hauksness"          toX="1"  toY="11" toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="town_stone_med_A"    fromX="74"  fromY="103" toMap="cantlin"            toX="15" toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="29"  fromY="13"  toMap="erdricks_tomb_lvl1" toX="1"  toY="1"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="30"  fromY="58"  toMap="mountain_cave_lvl1" toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="105" fromY="45"  toMap="swamp_cave"         toX="1"  toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="105" fromY="50"  toMap="swamp_cave"         toX="1"  toY="31" toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="shrine_stone_A"      fromX="82"  fromY="2"   toMap="northern_shrine"    toX="5"  toY="10" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="shrine_stone_B"      fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="castle_stone_tall_A" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                fromX="72"  fromY="84"  toMap="bat_cave_lvl1"      toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
 
          <MapDecoration type="cactus" x="73" y="84"/>
 
@@ -491,6 +483,8 @@
                    <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
                    <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
+         <MapDecoration type="throne" x="4" y="4"/>
+         <MapDecoration type="throne" x="7" y="4"/>
          <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
             <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
             <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/>

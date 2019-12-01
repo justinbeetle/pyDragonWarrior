@@ -175,7 +175,7 @@ class GameInfo:
             
             # print('Loading image', tileImageFileName, flush=True)
             tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
-            if tile_type == 'complex' or tile_image_unscaled.get_height() > self.tile_size_pixels:
+            if tile_type == 'complex':
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
                 tile_images_scaled: List[List[pygame.Surface]] = []
                 for x in range(16):
@@ -254,9 +254,9 @@ class GameInfo:
             decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert()
             unscaled_size_pixels = Point(decoration_image_unscaled.get_size())
             max_scaled_size_pixels = Point(width_tiles, height_tiles) * self.tile_size_pixels
-            scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels).floor()
+            scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
             scale_factor = max(scale_factor_point.w, scale_factor_point.h)
-            scaled_size_pixels = unscaled_size_pixels * scale_factor
+            scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
             decoration_image_scaled = pygame.Surface(scaled_size_pixels)
             pygame.transform.scale(decoration_image_unscaled, scaled_size_pixels, decoration_image_scaled)
             decoration_image_scaled.set_colorkey(GameInfo.TRANSPARENT_COLOR)
@@ -1076,6 +1076,7 @@ class GameInfo:
 
 def main() -> None:
 
+    import math
     import SurfaceEffects
 
     # Initialize pygame
@@ -1114,9 +1115,16 @@ def main() -> None:
             
             # Always rendering to the entire window but need to determine the
             # rectangle from the image which is to be scaled to the screen
-            map_image_rect = pygame.Rect(0, 0, win_size_pixels.x, win_size_pixels.y)
+            zoom_factor = 2
+            map_image_size = Point(map_image.get_width(), map_image.get_height())
+            map_image_center_pos = map_image_size // 2
+            map_image_rect_size = win_size_pixels // zoom_factor
+            map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
+            map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
             screen.set_clip(pygame.Rect(0, 0, win_size_pixels.x, win_size_pixels.y))
-            screen.blit(map_image.subsurface(map_image_rect), (0, 0))
+            pygame.transform.scale(map_image.subsurface(map_image_rect),
+                                   win_size_pixels,
+                                   screen)
             pygame.display.flip()
 
             pygame.key.set_repeat(10, 10)
@@ -1131,20 +1139,41 @@ def main() -> None:
                             done_with_map = True
                         elif event.key == pygame.K_DOWN:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.SOUTH, map_image_rect, 1, tile_size_pixels, True)
+                                screen, map_image, Direction.SOUTH, map_image_rect, zoom_factor, tile_size_pixels, True)
                         elif event.key == pygame.K_UP:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.NORTH, map_image_rect, 1, tile_size_pixels, True)
+                                screen, map_image, Direction.NORTH, map_image_rect, zoom_factor, tile_size_pixels, True)
                         elif event.key == pygame.K_LEFT:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.WEST,  map_image_rect, 1, tile_size_pixels, True)
+                                screen, map_image, Direction.WEST,  map_image_rect, zoom_factor, tile_size_pixels, True)
                         elif event.key == pygame.K_RIGHT:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.EAST,  map_image_rect, 1, tile_size_pixels, True)
+                                screen, map_image, Direction.EAST,  map_image_rect, zoom_factor, tile_size_pixels, True)
+                        elif event.key == pygame.K_EQUALS or event.key == pygame.K_MINUS:
+                            map_image_center_pos = Point(map_image_rect.x, map_image_rect.y) + map_image_rect_size // 2
+                            if event.key == pygame.K_EQUALS:
+                                zoom_factor = math.ceil(zoom_factor*1.25)
+                            else:
+                                zoom_factor = math.floor(zoom_factor*0.75)
+                            if zoom_factor < 1:
+                                zoom_factor = 1
+
+                            map_image_rect_size = win_size_pixels // zoom_factor
+                            map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
+                            map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
+                            screen.set_clip(pygame.Rect(0, 0, win_size_pixels.x, win_size_pixels.y))
+                            pygame.transform.scale(map_image.subsurface(map_image_rect),
+                                                   win_size_pixels,
+                                                   screen)
+                            pygame.display.flip()
+                        else:
+                            # print('event.key =', event.key, flush=True)
+                            pass
                     elif event.type == pygame.QUIT:
                         is_running = False
                     else:
-                        print('event.type =', event.type, flush=True)
+                        # print('event.type =', event.type, flush=True)
+                        pass
                 clock.tick(30)
 
     # Terminate pygame

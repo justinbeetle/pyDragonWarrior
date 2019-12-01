@@ -145,7 +145,7 @@ def scroll_view(screen: pygame.Surface,
     image_w, image_h = image.get_size()
 
     if direction == Direction.NORTH:
-        if view_rect.top > 0:
+        if view_rect.top >= image_px_step_size:
             screen.scroll(dy=image_px_step_size * zoom_factor)
             view_rect.move_ip(0, -image_px_step_size)
             src_rect = view_rect.copy()
@@ -153,7 +153,7 @@ def scroll_view(screen: pygame.Surface,
             dst_rect = zoom_view_rect.copy()
             dst_rect.h = image_px_step_size * zoom_factor
     elif direction == Direction.SOUTH:
-        if view_rect.bottom < image_h:
+        if view_rect.bottom <= image_h - image_px_step_size:
             screen.scroll(dy=-image_px_step_size * zoom_factor)
             view_rect.move_ip(0, image_px_step_size)
             src_rect = view_rect.copy()
@@ -163,7 +163,7 @@ def scroll_view(screen: pygame.Surface,
             dst_rect.h = image_px_step_size * zoom_factor
             dst_rect.bottom = zoom_view_rect.bottom
     elif direction == Direction.WEST:
-        if view_rect.left > 0:
+        if view_rect.left >= image_px_step_size:
             screen.scroll(dx=image_px_step_size * zoom_factor)
             view_rect.move_ip(-image_px_step_size, 0)
             src_rect = view_rect.copy()
@@ -171,7 +171,7 @@ def scroll_view(screen: pygame.Surface,
             dst_rect = zoom_view_rect.copy()
             dst_rect.w = image_px_step_size * zoom_factor
     elif direction == Direction.EAST:
-        if view_rect.right < image_w:
+        if view_rect.right <= image_w - image_px_step_size:
             screen.scroll(dx=-image_px_step_size * zoom_factor)
             view_rect.move_ip(image_px_step_size, 0)
             src_rect = view_rect.copy()
@@ -181,7 +181,8 @@ def scroll_view(screen: pygame.Surface,
             dst_rect.w = image_px_step_size * zoom_factor
             dst_rect.right = zoom_view_rect.right
     if src_rect is not None and dst_rect is not None:
-        pygame.transform.scale(image.subsurface(src_rect),
+        src = image.subsurface(src_rect)
+        pygame.transform.scale(src,
                                dst_rect.size,
                                screen.subsurface(dst_rect))
         if update:
