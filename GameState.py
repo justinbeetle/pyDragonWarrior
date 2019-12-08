@@ -673,8 +673,6 @@ class GameState(GameStateInterface):
         draw_all_characters = characters_erased
 
         # Move NPCs
-        # NOTE: tile_size_pixels must be divisible by image_px_step_size
-        image_px_step_size = self.game_info.tile_size_pixels // 8
         for npc in self.npcs:
             if npc.npc_info is None:
                 continue
@@ -694,7 +692,7 @@ class GameState(GameStateInterface):
                     if not characters_erased:
                         self.erase_character(npc)
                     direction_vector = npc.direction.get_vector()
-                    npc.curr_pos_offset_img_px += direction_vector * image_px_step_size
+                    npc.curr_pos_offset_img_px += direction_vector * self.game_info.image_px_step_size
                     if npc.curr_pos_offset_img_px / self.game_info.tile_size_pixels == direction_vector:
                         npc.curr_pos_dat_tile = npc.dest_pos_dat_tile
                         npc.curr_pos_offset_img_px = Point(0, 0)

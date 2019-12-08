@@ -278,9 +278,7 @@ class Game:
 
         map_image_rect = self.game_state.get_map_image_rect()
         orig_map_image_rect = self.game_state.get_map_image_rect()
-        # NOTE: tile_size_pixels must be divisible by image_px_step_size
-        image_px_step_size = self.game_state.game_info.tile_size_pixels // 8
-        tile_move_steps = self.game_state.game_info.tile_size_pixels // image_px_step_size
+        tile_move_steps = self.game_state.game_info.tile_size_pixels // self.game_state.game_info.image_px_step_size
 
         # Determine the destination tile and pixel count for the scroll
         hero_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
@@ -342,12 +340,13 @@ class Game:
                                            self.game_state.hero_party.members[0].direction,
                                            map_image_rect,
                                            1,
-                                           image_px_step_size)
+                                           self.game_state.game_info.image_px_step_size)
                 self.game_state.hero_party.members[0].curr_pos_offset_img_px = Point(
                     map_image_rect.x - orig_map_image_rect.x, map_image_rect.y - orig_map_image_rect.y)
                 for hero in self.game_state.hero_party.members[1:]:
                     if hero.curr_pos_dat_tile != hero.dest_pos_dat_tile:
-                        hero.curr_pos_offset_img_px = hero.direction.get_vector() * image_px_step_size * (x+1)
+                        hero.curr_pos_offset_img_px = hero.direction.get_vector() * \
+                                                      self.game_state.game_info.image_px_step_size * (x+1)
 
                 if self.game_state.is_light_restricted():
                     self.game_state.draw_map(False)
@@ -416,8 +415,8 @@ def main() -> None:
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
-    win_size_pixels = None  # Point(1280, 960) # TODO: Get good size for system from OS or switch to full screen
-    tile_size_pixels = 16 * 3
+    win_size_pixels = None
+    tile_size_pixels = 20 * 3
     game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels, saved_game_file)
 
     # Run the game

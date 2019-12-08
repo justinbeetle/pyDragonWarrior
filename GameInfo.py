@@ -31,6 +31,18 @@ class GameInfo:
         self.tile_size_pixels = tile_size_pixels
         self.dialog_sequences: Dict[str, DialogType] = {}
 
+        # Find image_px_step_size.  Select step size nearest to 1/6 of a tile which yields a value where
+        # tile_size_pixels is divisible by image_px_step_size.
+        desired_tile_move_steps = 6
+        self.image_px_step_size = 1
+        for possible_step_size in range(2, self.tile_size_pixels):
+            if self.tile_size_pixels % possible_step_size == 0:
+                if abs(self.tile_size_pixels / possible_step_size - desired_tile_move_steps) < \
+                        abs(self.tile_size_pixels / self.image_px_step_size - desired_tile_move_steps):
+                    self.image_px_step_size = possible_step_size
+                else:
+                    break
+
         # TODO: Need to determine a method for determining how much to scale the monster images
         monster_scale_factor = 4
 
@@ -1085,7 +1097,7 @@ def main() -> None:
 
     # Setup to draw maps
     win_size_pixels = Point(1280, 960)
-    tile_size_pixels = 16
+    tile_size_pixels = 20
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     image_pad_tiles = win_size_tiles // 2
     win_size_pixels = win_size_tiles * tile_size_pixels
