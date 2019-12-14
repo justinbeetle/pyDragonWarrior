@@ -101,12 +101,12 @@ class MonsterState(CombatCharacterState):
     # Determine if the monster has the initiative and attacks first in an encounter
     def has_initiative(self, hero_state: CombatCharacterState) -> bool:
         # TODO: Verify that special monsters never take the initiative
-        return (self.special_monster_info is None
+        return (not self.monster_info.may_run_away and self.special_monster_info is None
                 and hero_state.get_agility() * random.uniform(0, 1) < self.get_agility() * random.uniform(0, 1) * 0.25)
 
     # Determine if the monster will attempt to run away
     def should_run_away(self, hero_state: CombatCharacterState) -> bool:
-        return (self.special_monster_info is None
+        return (not self.monster_info.may_run_away and self.special_monster_info is None
                 and hero_state.get_strength() > self.get_strength() * 2 and random.uniform(0, 1) < 0.25)
 
     # Determine if the monster blocks an attempt by the hero to run away

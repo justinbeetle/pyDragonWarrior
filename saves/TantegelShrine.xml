@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="NORTH" gp="100009" hp="86" map="tantegel_lvl0" mp="64" name="Wallace" x="5" xp="10000" y="8">
+<SaveState dir="NORTH" gp="100009" hp="86" map="tantegel_lvl0" mp="64" name="Wallace" x="6" xp="10000" y="9">
    <EquippedItems>
       <Item name="Flame Sword"/>
       <Item name="Magic Armor"/>

@@ -273,6 +273,8 @@ class GameInfo:
             pygame.transform.scale(decoration_image_unscaled, scaled_size_pixels, decoration_image_scaled)
             decoration_image_scaled.set_colorkey(GameInfo.TRANSPARENT_COLOR)
             self.decorations[decoration_name] = Decoration(decoration_name,
+                                                           width_tiles,
+                                                           height_tiles,
                                                            decoration_image_scaled,
                                                            walkable,
                                                            remove_with_search,
@@ -432,6 +434,10 @@ class GameInfo:
             if 'allowsCriticalHits' in element.attrib:
                 allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
 
+            may_run_away = True
+            if 'mayRunAway' in element.attrib:
+                may_run_away = element.attrib['mayRunAway'] == 'yes'
+
             self.monsters[monster_name] = MonsterInfo(
                 monster_name,
                 monster_image,
@@ -449,7 +455,8 @@ class GameInfo:
                 min_gp,
                 max_gp,
                 monster_action_rules,
-                allows_critical_hits)
+                allows_critical_hits,
+                may_run_away)
 
         # Parse monster sets
         self.monster_sets: Dict[str, List[str]] = {}
@@ -512,11 +519,11 @@ class GameInfo:
                                                          progress_marker,
                                                          inverse_progress_marker))
                 if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
-                    map_decorations.append(MapDecoration(self.decorations[trans_element.attrib['decoration']],
-                                                         from_point,
-                                                         None,
-                                                         progress_marker,
-                                                         inverse_progress_marker))
+                    map_decorations.append(MapDecoration.create(self.decorations[trans_element.attrib['decoration']],
+                                                                from_point,
+                                                                None,
+                                                                progress_marker,
+                                                                inverse_progress_marker))
 
             # Parse NPCs
             # print( 'Parse NPCs', flush=True )
@@ -549,7 +556,7 @@ class GameInfo:
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in decoration_element.attrib:
                     inverse_progress_marker = decoration_element.attrib['inverseProgressMarker']
-                map_decorations.append(MapDecoration(
+                map_decorations.append(MapDecoration.create(
                     decoration,
                     Point(int(decoration_element.attrib['x']),
                           int(decoration_element.attrib['y'])),
@@ -745,7 +752,7 @@ class GameInfo:
             decoration = None
             if 'type' in decoration_element.attrib and decoration_element.attrib['type'] in self.decorations:
                 decoration = self.decorations[decoration_element.attrib['type']]
-            self.initial_map_decorations.append(MapDecoration(
+            self.initial_map_decorations.append(MapDecoration.create(
                 decoration,
                 Point(int(decoration_element.attrib['x']),
                       int(decoration_element.attrib['y'])),

@@ -331,6 +331,8 @@ class Tile(NamedTuple):
 
 class Decoration(NamedTuple):
     name: str
+    width_tiles: int
+    height_tiles: int
     image: pygame.Surface
     walkable: bool = True
     remove_with_search: bool = False
@@ -381,10 +383,28 @@ class NpcInfo(NamedTuple):
 
 class MapDecoration(NamedTuple):
     type: Optional[Decoration]
-    point: Point
+    point: Point  # Specifies the bottom, center tile of the decoration
+    collision_rect: pygame.Rect
     dialog: Optional[DialogType] = None
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
+
+    @staticmethod
+    def create(type: Optional[Decoration],
+               point: Point,
+               dialog: Optional[DialogType] = None,
+               progress_marker: Optional[str] = None,
+               inverse_progress_marker: Optional[str] = None) -> MapDecoration:
+        width_tiles = 1
+        height_tiles = 1
+        if type is not None:
+            width_tiles = type.width_tiles
+            height_tiles = type.height_tiles
+        collision_rect = pygame.Rect(point.x-width_tiles//2, point.y-height_tiles+1, width_tiles, height_tiles)
+        return MapDecoration(type, point, collision_rect, dialog, progress_marker, inverse_progress_marker)
+
+    def overlaps(self, tile: Point) -> bool:
+        return self.collision_rect.collidepoint(tile)
 
 
 class SpecialMonster(NamedTuple):
@@ -470,6 +490,7 @@ class MonsterInfo(NamedTuple):
     max_gp: int
     monster_action_rules: List[MonsterActionRule]
     allows_critical_hits: bool
+    may_run_away: bool
 
 
 class MonsterZone(NamedTuple):

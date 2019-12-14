@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="charlock_lvl8" name="Wallace" x="17" xp="170000" y="24">
+<SaveState dir="NORTH" gp="100000" map="charlock_lvl8" name="Wallace" x="16" xp="170000" y="24">
    <EquippedItems>
       <Item name="Erdrick's Sword"/>
       <Item name="Erdrick's Armor"/>

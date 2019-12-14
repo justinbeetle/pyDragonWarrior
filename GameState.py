@@ -229,7 +229,7 @@ class GameState(GameStateInterface):
             progress_marker_element = xml.etree.ElementTree.SubElement(progress_markers_element, 'ProgressMarker')
             progress_marker_element.attrib['name'] = progress_marker
 
-        # TODO: This should all  be captured in game.xml
+        # TODO: This should all be captured in game.xml
         if not quick_save:
             dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
             dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
@@ -399,16 +399,17 @@ class GameState(GameStateInterface):
                 and self.get_tile_info(tile).walkable):
             movement_allowed = True
 
-        # Check if decoration changes the allowed movement of the native tile
+        # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
             for decoration in self.map_decorations:
-                if tile == decoration.point and decoration.type is not None and not decoration.type.walkable:
+                if decoration.type is not None and not decoration.type.walkable and decoration.overlaps(tile):
                     movement_allowed = False
                     # print('Movement not allowed: decoration not walkable', decoration, flush=True)
                     break
-        else:
+        # Check if a decoration allows movement to a tile to which movement was otherwise prevented
+        if not movement_allowed:
             for decoration in self.map_decorations:
-                if tile == decoration.point and decoration.type is not None and decoration.type.walkable:
+                if decoration.type is not None and decoration.type.walkable and decoration.overlaps(tile):
                     movement_allowed = True
                     # print('Movement allowed: decoration walkable', decoration, flush=True)
                     break

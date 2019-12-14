@@ -16,6 +16,7 @@
       <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
       <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
       <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="darkness" image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
    </Tiles>
 
    <Decorations>
@@ -168,14 +169,14 @@
          <PointTransition decoration="town_stone_med_A"    fromX="103" fromY="73"  toMap="rimuldar"           toX="30" toY="15" toDir="WEST"  respawnDecorations="yes"/>
          <PointTransition decoration="town_wood_med_A"     fromX="26"  fromY="90"  toMap="hauksness"          toX="1"  toY="11" toDir="EAST"  respawnDecorations="yes"/>
          <PointTransition decoration="town_stone_med_A"    fromX="74"  fromY="103" toMap="cantlin"            toX="15" toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
-         <PointTransition decoration="cave"                fromX="29"  fromY="13"  toMap="erdricks_tomb_lvl1" toX="1"  toY="1"  toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="cave"                fromX="30"  fromY="58"  toMap="mountain_cave_lvl1" toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="cave"                fromX="105" fromY="45"  toMap="swamp_cave"         toX="1"  toY="1"  toDir="SOUTH" respawnDecorations="yes"/>
-         <PointTransition decoration="cave"                fromX="105" fromY="50"  toMap="swamp_cave"         toX="1"  toY="31" toDir="EAST"  respawnDecorations="yes"/>
-         <PointTransition decoration="shrine_stone_A"      fromX="82"  fromY="2"   toMap="northern_shrine"    toX="5"  toY="10" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="shrine_stone_B"      fromX="109" fromY="110" toMap="southern_shrine"    toX="1"  toY="5"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="29"  fromY="13"  toMap="erdricks_tomb_lvl1" toX="2"  toY="2"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="30"  fromY="58"  toMap="mountain_cave_lvl1" toX="2"  toY="9"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="105" fromY="45"  toMap="swamp_cave"         toX="2"  toY="2"  toDir="SOUTH" respawnDecorations="yes"/>
+         <PointTransition decoration="cave"                fromX="105" fromY="50"  toMap="swamp_cave"         toX="2"  toY="32" toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="shrine_stone_A"      fromX="82"  fromY="2"   toMap="northern_shrine"    toX="6"  toY="11" toDir="NORTH" respawnDecorations="yes"/>
+         <PointTransition decoration="shrine_stone_B"      fromX="109" fromY="110" toMap="southern_shrine"    toX="2"  toY="6"  toDir="EAST"  respawnDecorations="yes"/>
          <PointTransition decoration="castle_stone_tall_A" fromX="49"  fromY="49"  toMap="charlock_lvl1"      toX="11" toY="20" toDir="NORTH" respawnDecorations="yes"/>
-         <PointTransition decoration="pass"                fromX="72"  fromY="84"  toMap="bat_cave_lvl1"      toX="1"  toY="8"  toDir="EAST"  respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                fromX="72"  fromY="84"  toMap="bat_cave_lvl1"      toX="2"  toY="9"  toDir="EAST"  respawnDecorations="yes"/>
 
          <MapDecoration type="cactus" x="73" y="84"/>
 
@@ -268,7 +269,7 @@
       <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="44" toY="44" toDir="SOUTH"/>
          <PointTransition decoration="upstairs" fromX="8" fromY="8"  toMap="tantegel_lvl2" toX="9" toY="9" toDir="WEST"/>
-         <PointTransition decoration="downstairs" fromX="30" fromY="30" toMap="tantegel_lvl0" toX="1" toY="5" toDir="EAST" />
+         <PointTransition decoration="downstairs" fromX="30" fromY="30" toMap="tantegel_lvl0" toX="2" toY="6" toDir="EAST" />
          <MapDecoration type="door"  x="5"  y="14"/>
          <MapDecoration type="door"  x="19" y="7"/>
          <MapDecoration type="chest" x="2"  y="14">
@@ -484,7 +485,11 @@
                    <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
          <MapDecoration type="throne" x="4" y="4"/>
+         <MapDecoration type="pass"   x="4" y="4"/>
+
          <MapDecoration type="throne" x="7" y="4"/>
+         <MapDecoration type="pass"   x="7" y="4"/>
+
          <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
             <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
             <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/>
@@ -502,13 +507,13 @@
       </Map>
 
       <Map name="tantegel_lvl0" tiles="tantegel_lvl0.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
-         <PointTransition decoration="upstairs" fromX="1" fromY="5"  toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="2" fromY="6" toMap="tantegel_lvl1" toX="30" toY="30" toDir="SOUTH"/>
 
-         <NonPlayerCharacter type="sage" x="5" y="7" dir="SOUTH" walking="no">
+         <NonPlayerCharacter type="sage" x="6" y="8" dir="SOUTH" walking="no">
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><Dialog>"Be gone with you!!!"</Dialog></DialogAssert>
             <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
 
-         <MapDecoration type="chest" x="5"  y="6">
+         <MapDecoration type="chest" x="6"  y="7">
             <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Stones_of_Sunlight"/>
@@ -599,7 +604,7 @@
 
       <Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition toMap="overworld" toX="3" toY="3" toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="garins_grave_lvl1" toX="7" toY="12" toDir="EAST"/>
+         <PointTransition decoration="downstairs" fromX="20" fromY="1" toMap="garins_grave_lvl1" toX="8" toY="13" toDir="EAST"/>
 
          <MapDecoration type="door"  x="18" y="11"/>
          <MapDecoration type="door"  x="5"  y="7"/>
@@ -964,54 +969,54 @@
       </Map>
 
       <Map name="erdricks_tomb_lvl1" tiles="erdricks_tomb_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="1" fromY="1" toMap="overworld" toX="29" toY="13" toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="10" fromY="10" toMap="erdricks_tomb_lvl2" toX="9" toY="10" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="2"  toMap="overworld"          toX="29" toY="13" toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="11" fromY="11" toMap="erdricks_tomb_lvl2" toX="10" toY="11" toDir="SOUTH"/>
       </Map>
 
       <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="9" fromY="10" toMap="erdricks_tomb_lvl1" toX="10" toY="10" toDir="SOUTH"/>
-         <MapDecoration type="chest" x="10" y="4">
+         <PointTransition decoration="upstairs" fromX="10" fromY="11" toMap="erdricks_tomb_lvl1" toX="11" toY="11" toDir="SOUTH"/>
+         <MapDecoration type="chest" x="11" y="5">
             <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
             <Dialog>The tablet reads as follows:  "I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!"</Dialog></MapDecoration>
       </Map>
 
       <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="1"    fromY="8"  toMap="overworld"          toX="30" toY="58" toDir="WEST"/>
-         <PointTransition decoration="downstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl2" toX="1"  toY="1"  toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl2" toX="7"  toY="6"  toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl2" toX="13" toY="13" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="9"  toMap="overworld"          toX="30" toY="58" toDir="WEST"/>
+         <PointTransition decoration="downstairs" fromX="2"  fromY="2"  toMap="mountain_cave_lvl2" toX="2"  toY="2"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="8"  fromY="7"  toMap="mountain_cave_lvl2" toX="8"  toY="7"  toDir="SOUTH"/>
+         <PointTransition decoration="downstairs" fromX="14" fromY="14" toMap="mountain_cave_lvl2" toX="14" toY="14" toDir="SOUTH"/>
 
-         <MapDecoration type="chest" x="14" y="6">
+         <MapDecoration type="chest" x="15" y="7">
             <DialogAction type="GAIN_ITEM" name="Herb"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
       <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="1"  fromY="1"  toMap="mountain_cave_lvl1" toX="1"  toY="1"  toDir="SOUTH"/>
-         <PointTransition decoration="upstairs" fromX="7"  fromY="6"  toMap="mountain_cave_lvl1" toX="7"  toY="6"  toDir="SOUTH"/>
-         <PointTransition decoration="upstairs" fromX="13" fromY="13" toMap="mountain_cave_lvl1" toX="13" toY="13" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="2"  fromY="2"  toMap="mountain_cave_lvl1" toX="2"  toY="2"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="8"  fromY="7"  toMap="mountain_cave_lvl1" toX="8"  toY="7"  toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="14" fromY="14" toMap="mountain_cave_lvl1" toX="14" toY="14" toDir="SOUTH"/>
 
-         <MapDecoration type="chest" x="3" y="3"><DialogGoTo label="torch_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="4" y="3">
+         <MapDecoration type="chest" x="4" y="4"><DialogGoTo label="torch_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="5" y="4">
             <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
-         <MapDecoration type="chest" x="2" y="7">
+         <MapDecoration type="chest" x="3" y="8">
             <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="11" y="10"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
+         <MapDecoration type="chest" x="12" y="11"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
             <DialogVariable name="[CHEST_GOLD]" value="100-131"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
 
       <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="1" fromY="1"  toMap="overworld" toX="105" toY="45" toDir="NORTH"/>
-         <PointTransition decoration="upstairs" fromX="1" fromY="31" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
-         <MapDecoration type="door"  x="6"  y="21"/>
+         <PointTransition decoration="upstairs" fromX="2" fromY="2"  toMap="overworld" toX="105" toY="45" toDir="NORTH"/>
+         <PointTransition decoration="upstairs" fromX="2" fromY="32" toMap="overworld" toX="105" toY="50" toDir="SOUTH"/>
+         <MapDecoration type="door"  x="7"  y="22"/>
 
-         <Monster name="Green Dragon" x="5" y="15" inverseProgressMarker="PM_Rescued_Princess">
-            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="5" y="14"/></RunAwayDialog></Monster>
+         <Monster name="Green Dragon" x="6" y="16" inverseProgressMarker="PM_Rescued_Princess">
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="6" y="15"/></RunAwayDialog></Monster>
 
-         <NonPlayerCharacter type="princess" x="6" y="19" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
+         <NonPlayerCharacter type="princess" x="7" y="20" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
             <Dialog>"Thou art brave indeed to rescue me, [NAME]."</Dialog>
             <Dialog>"I am Gwaelin, daughter of Lorik."</Dialog>
             <Dialog>"Will thou take me to the castle?"</Dialog>
@@ -1030,9 +1035,9 @@
       </Map>
 
       <Map name="northern_shrine" tiles="northern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="5" fromY="10" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="6" fromY="11" toMap="overworld" toX="82" toY="2" toDir="SOUTH"/>
 
-         <NonPlayerCharacter type="sage" x="5" y="5" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
+         <NonPlayerCharacter type="sage" x="6" y="6" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="PM_Acquired_Silver_Harp">
                <Dialog>"Thy bravery must be proven.  Thus, I propose a test."</Dialog>
@@ -1045,7 +1050,7 @@
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
             <DialogAction type="LOSE_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
-         <MapDecoration type="chest" x="4" y="5">
+         <MapDecoration type="chest" x="5" y="6">
             <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Staff_of_Rain"/>
@@ -1054,9 +1059,9 @@
       </Map>
 
       <Map name="southern_shrine" tiles="southern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
-         <PointTransition decoration="upstairs" fromX="1" fromY="5" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
+         <PointTransition decoration="upstairs" fromX="2" fromY="6" toMap="overworld" toX="109" toY="110" toDir="SOUTH"/>
 
-         <NonPlayerCharacter type="sage" x="5" y="6" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
+         <NonPlayerCharacter type="sage" x="6" y="7" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight" label="southern_shrine_go_now">
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us."</Dialog>
@@ -1074,7 +1079,7 @@
             <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
             <DialogAction type="LOSE_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
 
-         <MapDecoration type="chest" x="6" y="6">
+         <MapDecoration type="chest" x="7" y="7">
             <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Rainbow_Drop"/>
@@ -1083,38 +1088,38 @@
       </Map>
 
       <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="7"  fromY="12" toMap="garinham"          toX="20" toY="1"  toDir="WEST"/>
-         <PointTransition decoration="downstairs" fromX="2"  fromY="19" toMap="garins_grave_lvl2" toX="12" toY="3"  toDir="EAST"/><!--A-->
-         <MapDecoration type="door"  x="18" y="18"/>
-         <MapDecoration type="chest" x="12" y="1">
+         <PointTransition decoration="upstairs"   fromX="8"  fromY="13" toMap="garinham"          toX="20" toY="1"  toDir="WEST"/>
+         <PointTransition decoration="downstairs" fromX="3"  fromY="20" toMap="garins_grave_lvl2" toX="13" toY="4"  toDir="EAST"/><!--A-->
+         <MapDecoration type="door"  x="19" y="19"/>
+         <MapDecoration type="chest" x="13" y="2">
             <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="13" y="1">
+         <MapDecoration type="chest" x="14" y="2">
             <DialogVariable name="[CHEST_GOLD]" value="5-20"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="14" y="1"><DialogGoTo label="herb_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="15" y="2"><DialogGoTo label="herb_chest"/></MapDecoration>
       </Map>
 
       <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="12" fromY="3"  toMap="garins_grave_lvl1" toX="2"  toY="19" toDir="WEST"/><!--A-->
-         <PointTransition decoration="downstairs" fromX="2"  fromY="2"  toMap="garins_grave_lvl3" toX="17" toY="2"  toDir="EAST"/><!--C-->
-         <PointTransition decoration="downstairs" fromX="13" fromY="2"  toMap="garins_grave_lvl3" toX="19" toY="2"  toDir="EAST"/><!--B-->
-         <PointTransition decoration="downstairs" fromX="6"  fromY="7"  toMap="garins_grave_lvl3" toX="7"  toY="12" toDir="EAST"/><!--D-->
-         <PointTransition decoration="downstairs" fromX="2"  fromY="11" toMap="garins_grave_lvl3" toX="3"  toY="18" toDir="EAST"/><!--E-->
-         <PointTransition decoration="downstairs" fromX="13" fromY="11" toMap="garins_grave_lvl3" toX="19" toY="14" toDir="EAST"/><!--F-->
+         <PointTransition decoration="upstairs"   fromX="13" fromY="4"  toMap="garins_grave_lvl1" toX="3"  toY="20" toDir="WEST"/><!--A-->
+         <PointTransition decoration="downstairs" fromX="3"  fromY="3"  toMap="garins_grave_lvl3" toX="16" toY="3"  toDir="EAST"/><!--C-->
+         <PointTransition decoration="downstairs" fromX="14" fromY="3"  toMap="garins_grave_lvl3" toX="20" toY="3"  toDir="EAST"/><!--B-->
+         <PointTransition decoration="downstairs" fromX="7"  fromY="8"  toMap="garins_grave_lvl3" toX="8"  toY="13" toDir="EAST"/><!--D-->
+         <PointTransition decoration="downstairs" fromX="3"  fromY="12" toMap="garins_grave_lvl3" toX="4"  toY="19" toDir="EAST"/><!--E-->
+         <PointTransition decoration="downstairs" fromX="14" fromY="12" toMap="garins_grave_lvl3" toX="20" toY="15" toDir="EAST"/><!--F-->
       </Map>
 
       <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="15" fromY="2"  toMap="garins_grave_lvl2" toX="2"  toY="2"  toDir="WEST"/><!--C-->
-         <PointTransition decoration="upstairs"   fromX="19" fromY="2"  toMap="garins_grave_lvl2" toX="13" toY="2"  toDir="WEST"/><!--B-->
-         <PointTransition decoration="upstairs"   fromX="7"  fromY="12" toMap="garins_grave_lvl2" toX="6"  toY="7"  toDir="WEST"/><!--D-->
-         <PointTransition decoration="upstairs"   fromX="19" fromY="14" toMap="garins_grave_lvl2" toX="13" toY="11" toDir="WEST"/><!--F-->
-         <PointTransition decoration="upstairs"   fromX="3"  fromY="18" toMap="garins_grave_lvl2" toX="2"  toY="11" toDir="WEST"/><!--E-->
-         <PointTransition decoration="downstairs" fromX="10" fromY="6"  toMap="garins_grave_lvl4" toX="1"  toY="5"  toDir="EAST"/><!--G-->
-         <PointTransition decoration="downstairs" fromX="11" fromY="10" toMap="garins_grave_lvl4" toX="6"  toY="5"  toDir="EAST"/><!--H-->
+         <PointTransition decoration="upstairs"   fromX="16" fromY="3"  toMap="garins_grave_lvl2" toX="3"  toY="3"  toDir="WEST"/><!--C-->
+         <PointTransition decoration="upstairs"   fromX="20" fromY="3"  toMap="garins_grave_lvl2" toX="14" toY="3"  toDir="WEST"/><!--B-->
+         <PointTransition decoration="upstairs"   fromX="8"  fromY="13" toMap="garins_grave_lvl2" toX="7"  toY="8"  toDir="WEST"/><!--D-->
+         <PointTransition decoration="upstairs"   fromX="20" fromY="15" toMap="garins_grave_lvl2" toX="14" toY="12" toDir="WEST"/><!--F-->
+         <PointTransition decoration="upstairs"   fromX="4"  fromY="19" toMap="garins_grave_lvl2" toX="3"  toY="12" toDir="WEST"/><!--E-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="7"  toMap="garins_grave_lvl4" toX="2"  toY="6"  toDir="EAST"/><!--G-->
+         <PointTransition decoration="downstairs" fromX="12" fromY="11" toMap="garins_grave_lvl4" toX="7"  toY="6"  toDir="EAST"/><!--H-->
 
-         <MapDecoration type="chest" x="2"  y="2"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="14" y="7">
+         <MapDecoration type="chest" x="3"  y="3"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="15" y="8">
             <!-- Using a progress marker so that the quest item can only be obtained once. -->
             <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="PM_Acquired_Silver_Harp"/>
@@ -1123,20 +1128,21 @@
       </Map>
 
       <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="5"  toMap="garins_grave_lvl3" toX="10" toY="6"  toDir="WEST"/><!--G-->
-         <PointTransition decoration="upstairs"   fromX="6"  fromY="5"  toMap="garins_grave_lvl3" toX="11" toY="10" toDir="WEST"/><!--H-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="6"  toMap="garins_grave_lvl3" toX="11" toY="7"  toDir="WEST"/><!--G-->
+         <PointTransition decoration="upstairs"   fromX="7"  fromY="6"  toMap="garins_grave_lvl3" toX="12" toY="11" toDir="WEST"/><!--H-->
       </Map>
 
       <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
          <LeavingTransition toMap="overworld" toX="49" toY="49" toDir="SOUTH"/>
-         <PointTransition decoration="downstairs" fromX="11" fromY="2"  toMap="charlock_lvl2"  toX="10" toY="1"  toDir="EAST" progressMarker="PM_Found_Secret_Passage"/><!--A-->
-         <PointTransition decoration="downstairs" fromX="5"  fromY="15" toMap="charlock_lvl2"  toX="9"  toY="14" toDir="EAST"/><!--B-->
-         <PointTransition decoration="downstairs" fromX="16" fromY="15" toMap="charlock_lvl2"  toX="18" toY="16" toDir="EAST"/><!--C-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="2"  toMap="charlock_lvl2"  toX="11" toY="2"  toDir="EAST" progressMarker="PM_Found_Secret_Passage"/><!--A-->
+         <PointTransition decoration="downstairs" fromX="5"  fromY="15" toMap="charlock_lvl2"  toX="10" toY="15" toDir="EAST"/><!--B-->
+         <PointTransition decoration="downstairs" fromX="16" fromY="15" toMap="charlock_lvl2"  toX="19" toY="17" toDir="EAST"/><!--C-->
 
          <MapDecoration type="door"  x="5"  y="9"/>
          <MapDecoration type="door"  x="16" y="9"/>
 
-         <MapDecoration type="None" x="11" y="4">
+         <MapDecoration type="throne_evil" x="11" y="4"/>
+         <MapDecoration type="pass"        x="11" y="4">
             <Dialog>[NAME] searched the ground all about.</Dialog>
             <Dialog>Feel the wind blowing from behind the throne.</Dialog></MapDecoration>
          <MapDecoration type="None" x="11" y="2" inprogressMarker="PM_Found_Secret_Passage">
@@ -1147,72 +1153,72 @@
       </Map>
 
       <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="10" fromY="1"  toMap="charlock_lvl1"  toX="11" toY="2"  toDir="WEST"/><!--A-->
-         <PointTransition decoration="upstairs"   fromX="9"  fromY="14" toMap="charlock_lvl1"  toX="5"  toY="15" toDir="WEST"/><!--B-->
-         <PointTransition decoration="upstairs"   fromX="18" fromY="16" toMap="charlock_lvl1"  toX="16" toY="15" toDir="WEST"/><!--C-->
-         <PointTransition decoration="downstairs" fromX="16" fromY="2"  toMap="charlock_lvl3"  toX="9"  toY="1"  toDir="EAST"/><!--F-->
-         <PointTransition decoration="downstairs" fromX="3"  fromY="5"  toMap="charlock_lvl3"  toX="1"  toY="1"  toDir="EAST"/><!--D-->
-         <PointTransition decoration="downstairs" fromX="14" fromY="8"  toMap="charlock_lvl3"  toX="5"  toY="5"  toDir="EAST"/><!--G-->
-         <PointTransition decoration="downstairs" fromX="20" fromY="8"  toMap="charlock_lvl3"  toX="10" toY="9"  toDir="EAST"/><!--I-->
-         <PointTransition decoration="downstairs" fromX="15" fromY="10" toMap="charlock_lvl3"  toX="9"  toY="10" toDir="EAST"/><!--H-->
-         <PointTransition decoration="downstairs" fromX="3"  fromY="15" toMap="charlock_lvl3"  toX="1"  toY="2"  toDir="EAST"/><!--E-->
-         <PointTransition decoration="downstairs" fromX="9"  fromY="20" toMap="charlock_lvl3"  toX="6"  toY="1"  toDir="EAST"/><!--J-->
+         <PointTransition decoration="upstairs"   fromX="11" fromY="2"  toMap="charlock_lvl1"  toX="11" toY="2"  toDir="WEST"/><!--A-->
+         <PointTransition decoration="upstairs"   fromX="10" fromY="15" toMap="charlock_lvl1"  toX="5"  toY="15" toDir="WEST"/><!--B-->
+         <PointTransition decoration="upstairs"   fromX="19" fromY="17" toMap="charlock_lvl1"  toX="16" toY="15" toDir="WEST"/><!--C-->
+         <PointTransition decoration="downstairs" fromX="17" fromY="3"  toMap="charlock_lvl3"  toX="10" toY="2"  toDir="EAST"/><!--F-->
+         <PointTransition decoration="downstairs" fromX="4"  fromY="6"  toMap="charlock_lvl3"  toX="2"  toY="2"  toDir="EAST"/><!--D-->
+         <PointTransition decoration="downstairs" fromX="15" fromY="9"  toMap="charlock_lvl3"  toX="6"  toY="6"  toDir="EAST"/><!--G-->
+         <PointTransition decoration="downstairs" fromX="21" fromY="9"  toMap="charlock_lvl3"  toX="11" toY="10" toDir="EAST"/><!--I-->
+         <PointTransition decoration="downstairs" fromX="16" fromY="11" toMap="charlock_lvl3"  toX="10" toY="11" toDir="EAST"/><!--H-->
+         <PointTransition decoration="downstairs" fromX="4"  fromY="16" toMap="charlock_lvl3"  toX="2"  toY="3"  toDir="EAST"/><!--E-->
+         <PointTransition decoration="downstairs" fromX="10" fromY="21" toMap="charlock_lvl3"  toX="7"  toY="2"  toDir="EAST"/><!--J-->
       </Map>
 
       <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="9"  fromY="1"  toMap="charlock_lvl2"  toX="16" toY="2"  toDir="WEST"/><!--F-->
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="1"  toMap="charlock_lvl2"  toX="3"  toY="5"  toDir="WEST"/><!--D-->
-         <PointTransition decoration="upstairs"   fromX="5"  fromY="5"  toMap="charlock_lvl2"  toX="14" toY="8"  toDir="WEST"/><!--G-->
-         <PointTransition decoration="upstairs"   fromX="10" fromY="9"  toMap="charlock_lvl2"  toX="20" toY="8"  toDir="WEST"/><!--I-->
-         <PointTransition decoration="upstairs"   fromX="9"  fromY="10" toMap="charlock_lvl2"  toX="15" toY="10" toDir="WEST"/><!--H-->
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="2"  toMap="charlock_lvl2"  toX="3"  toY="15" toDir="WEST"/><!--E-->
-         <PointTransition decoration="upstairs"   fromX="6"  fromY="1"  toMap="charlock_lvl2"  toX="9"  toY="20" toDir="WEST"/><!--J-->
-         <PointTransition decoration="downstairs" fromX="4"  fromY="1"  toMap="charlock_lvl4"  toX="8"  toY="1"  toDir="EAST"/><!--K-->
-         <PointTransition decoration="downstairs" fromX="10" fromY="2"  toMap="charlock_lvl4"  toX="3"  toY="3"  toDir="EAST"/><!--L-->
-         <PointTransition decoration="downstairs" fromX="1"  fromY="9"  toMap="charlock_lvl4"  toX="6"  toY="5"  toDir="EAST"/><!--M-->
-         <PointTransition decoration="downstairs" fromX="2"  fromY="10" toMap="charlock_lvl4"  toX="1"  toY="10" toDir="EAST"/><!--N-->
+         <PointTransition decoration="upstairs"   fromX="10" fromY="2"  toMap="charlock_lvl2"  toX="17" toY="3"  toDir="WEST"/><!--F-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="2"  toMap="charlock_lvl2"  toX="4"  toY="6"  toDir="WEST"/><!--D-->
+         <PointTransition decoration="upstairs"   fromX="6"  fromY="6"  toMap="charlock_lvl2"  toX="15" toY="9"  toDir="WEST"/><!--G-->
+         <PointTransition decoration="upstairs"   fromX="11" fromY="10" toMap="charlock_lvl2"  toX="21" toY="9"  toDir="WEST"/><!--I-->
+         <PointTransition decoration="upstairs"   fromX="10" fromY="11" toMap="charlock_lvl2"  toX="16" toY="11" toDir="WEST"/><!--H-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="3"  toMap="charlock_lvl2"  toX="4"  toY="16" toDir="WEST"/><!--E-->
+         <PointTransition decoration="upstairs"   fromX="7"  fromY="2"  toMap="charlock_lvl2"  toX="10" toY="21" toDir="WEST"/><!--J-->
+         <PointTransition decoration="downstairs" fromX="5"  fromY="2"  toMap="charlock_lvl4"  toX="9"  toY="2"  toDir="EAST"/><!--K-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="3"  toMap="charlock_lvl4"  toX="4"  toY="4"  toDir="EAST"/><!--L-->
+         <PointTransition decoration="downstairs" fromX="2"  fromY="10" toMap="charlock_lvl4"  toX="7"  toY="6"  toDir="EAST"/><!--M-->
+         <PointTransition decoration="downstairs" fromX="3"  fromY="11" toMap="charlock_lvl4"  toX="2"  toY="11" toDir="EAST"/><!--N-->
 
-         <MapDecoration type="chest" x="6" y="6">
+         <MapDecoration type="chest" x="7" y="7">
             <DialogAssert type="LACKS_ITEM" name="Erdrick's Sword"><DialogGoTo label="empty_chest"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Sword"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
 
       <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="8"  fromY="1"  toMap="charlock_lvl3"  toX="4"  toY="1"  toDir="WEST"/><!--K-->
-         <PointTransition decoration="upstairs"   fromX="3"  fromY="3"  toMap="charlock_lvl3"  toX="10" toY="2"  toDir="WEST"/><!--L-->
-         <PointTransition decoration="upstairs"   fromX="6"  fromY="5"  toMap="charlock_lvl3"  toX="1"  toY="9"  toDir="WEST"/><!--M-->
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="10" toMap="charlock_lvl3"  toX="2"  toY="10" toDir="WEST"/><!--N-->
-         <PointTransition decoration="downstairs" fromX="2"  fromY="7"  toMap="charlock_lvl5"  toX="1"  toY="10" toDir="EAST"/><!--O-->
-         <PointTransition decoration="downstairs" fromX="8"  fromY="8"  toMap="charlock_lvl5"  toX="8"  toY="8"  toDir="EAST"/><!--P-->
+         <PointTransition decoration="upstairs"   fromX="9"  fromY="2"  toMap="charlock_lvl3"  toX="5"  toY="2"  toDir="WEST"/><!--K-->
+         <PointTransition decoration="upstairs"   fromX="4"  fromY="4"  toMap="charlock_lvl3"  toX="11" toY="3"  toDir="WEST"/><!--L-->
+         <PointTransition decoration="upstairs"   fromX="7"  fromY="6"  toMap="charlock_lvl3"  toX="2"  toY="10" toDir="WEST"/><!--M-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="11" toMap="charlock_lvl3"  toX="3"  toY="11" toDir="WEST"/><!--N-->
+         <PointTransition decoration="downstairs" fromX="3"  fromY="8"  toMap="charlock_lvl5"  toX="2"  toY="11" toDir="EAST"/><!--O-->
+         <PointTransition decoration="downstairs" fromX="9"  fromY="9"  toMap="charlock_lvl5"  toX="9"  toY="9"  toDir="EAST"/><!--P-->
       </Map>
 
       <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="11_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_5).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="10" toMap="charlock_lvl4"  toX="2"  toY="7"  toDir="WEST"/><!--O-->
-         <PointTransition decoration="upstairs"   fromX="8"  fromY="8"  toMap="charlock_lvl4"  toX="8"  toY="8"  toDir="WEST"/><!--P-->
-         <PointTransition decoration="downstairs" fromX="9"  fromY="2"  toMap="charlock_lvl6"  toX="5"  toY="1"  toDir="EAST"/><!--R-->
-         <PointTransition decoration="downstairs" fromX="3"  fromY="3"  toMap="charlock_lvl6"  toX="10" toY="1"  toDir="EAST"/><!--Q-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="11" toMap="charlock_lvl4"  toX="3"  toY="8"  toDir="WEST"/><!--O-->
+         <PointTransition decoration="upstairs"   fromX="9"  fromY="9"  toMap="charlock_lvl4"  toX="9"  toY="9"  toDir="WEST"/><!--P-->
+         <PointTransition decoration="downstairs" fromX="10" fromY="3"  toMap="charlock_lvl6"  toX="6"  toY="2"  toDir="EAST"/><!--R-->
+         <PointTransition decoration="downstairs" fromX="4"  fromY="4"  toMap="charlock_lvl6"  toX="11" toY="2"  toDir="EAST"/><!--Q-->
       </Map>
 
       <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="12_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_6).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="5"  fromY="1"  toMap="charlock_lvl5"  toX="9"  toY="2"  toDir="WEST"/><!--R-->
-         <PointTransition decoration="upstairs"   fromX="10" fromY="1"  toMap="charlock_lvl5"  toX="3"  toY="3"  toDir="WEST"/><!--Q-->
-         <PointTransition decoration="downstairs" fromX="1"  fromY="1"  toMap="charlock_lvl7a" toX="1"  toY="3"  toDir="EAST"/><!--T-->
-         <PointTransition decoration="downstairs" fromX="6"  fromY="6"  toMap="charlock_lvl7b" toX="1"  toY="1"  toDir="EAST"/><!--S-->
+         <PointTransition decoration="upstairs"   fromX="6"  fromY="2"  toMap="charlock_lvl5"  toX="10" toY="3"  toDir="WEST"/><!--R-->
+         <PointTransition decoration="upstairs"   fromX="11" fromY="2"  toMap="charlock_lvl5"  toX="4"  toY="4"  toDir="WEST"/><!--Q-->
+         <PointTransition decoration="downstairs" fromX="2"  fromY="2"  toMap="charlock_lvl7a" toX="2"  toY="4"  toDir="EAST"/><!--T-->
+         <PointTransition decoration="downstairs" fromX="7"  fromY="7"  toMap="charlock_lvl7b" toX="2"  toY="2"  toDir="EAST"/><!--S-->
       </Map>
 
       <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="3"  toMap="charlock_lvl6"  toX="1"  toY="1"  toDir="WEST"/><!--T-->
-         <PointTransition decoration="downstairs" fromX="10" fromY="3"  toMap="charlock_lvl8"  toX="10" toY="29" toDir="NORTH"/><!--U-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="4"  toMap="charlock_lvl6"  toX="2"  toY="2"  toDir="WEST"/><!--T-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="4"  toMap="charlock_lvl8"  toX="10" toY="29" toDir="NORTH"/><!--U-->
       </Map>
 
       <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="1"  fromY="1"  toMap="charlock_lvl6"  toX="6"  toY="6"  toDir="WEST"/><!--S-->
-         <PointTransition decoration="downstairs" fromX="10" fromY="1"  toMap="charlock_lvl7b" toX="1"  toY="1"  toDir="EAST"/><!--S-->
+         <PointTransition decoration="upstairs"   fromX="2"  fromY="2"  toMap="charlock_lvl6"  toX="7"  toY="7"  toDir="WEST"/><!--S-->
+         <PointTransition decoration="downstairs" fromX="11" fromY="2"  toMap="charlock_lvl7b" toX="2"  toY="2"  toDir="EAST"/><!--S-->
       </Map>
 
       <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
-         <PointTransition decoration="upstairs"   fromX="10" fromY="29" toMap="charlock_lvl7a" toX="10" toY="3"  toDir="WEST"/><!--U-->
+         <PointTransition decoration="upstairs"   fromX="10" fromY="29" toMap="charlock_lvl7a" toX="11" toY="4"  toDir="WEST"/><!--U-->
 
          <MapDecoration type="door"  x="17" y="12"/>
 
@@ -1225,7 +1231,10 @@
          <MapDecoration type="chest" x="12" y="13"><DialogGoTo label="wing_chest"/></MapDecoration>
          <MapDecoration type="chest" x="13" y="13"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
 
-         <NonPlayerCharacter type="dragonlord" x="16" y="24" dir="EAST" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
+         <MapDecoration type="throne_evil" x="16" y="23"/>
+         <MapDecoration type="pass"        x="16" y="23"/>
+
+         <NonPlayerCharacter type="dragonlord" x="16" y="23" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
             <Dialog>"Welcome, [NAME]. I am the Dragonlord--King of Kings."</Dialog>
             <Dialog>"I have been waiting long for one such as thee."</Dialog>
             <Dialog>"I give thee now a chance to share this world and to rule half of it if thou will now stand beside me."</Dialog>
@@ -1547,10 +1556,10 @@
       <Monster name="Red Dragon"             image="red_dragon.png"             strength="120" agility="90"  hp="76-100"  sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="1.0"   xp="100" gp="105-139">
          <MonsterActionRule type="Sleep" probability="0.25"/>
          <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
-      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no">
+      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
          <MonsterActionRule type="Stopspell" probability="0.25"/>
          <MonsterActionRule type="Hurtmore" probability="0.75"/></Monster>
-      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no">
+      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
          <MonsterActionRule type="BreathStrongFire" probability="0.5"/></Monster>
    </Monsters>
 

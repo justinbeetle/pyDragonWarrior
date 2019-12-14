@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="swamp_cave" name="Wallace" x="5" xp="16000" y="14">
+<SaveState dir="WEST" gp="100000" map="swamp_cave" name="Wallace" x="6" xp="16000" y="15">
    <EquippedItems>
       <Item name="Broad Sword"/>
       <Item name="Full Plate"/>

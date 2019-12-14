@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" x="66" xp="50000" y="50">
+<SaveState dir="EAST" gp="100000" map="erdricks_tomb_lvl2" name="Wallace" x="10" xp="50000" y="5">
    <EquippedItems>
       <Item name="Erdrick's Sword"/>
       <Item name="Erdrick's Armor"/>
