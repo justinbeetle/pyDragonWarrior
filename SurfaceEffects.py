@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import math
 import pygame
 
 from GameTypes import Direction
@@ -136,49 +137,50 @@ def scroll_view(screen: pygame.Surface,
                 image: pygame.Surface,
                 direction: Direction,
                 view_rect: pygame.Rect,
-                zoom_factor: int,
+                zoom_factor: float,
                 image_px_step_size: int,
                 update: bool = False) -> None:
     src_rect = None
     dst_rect = None
     zoom_view_rect = screen.get_clip()
     image_w, image_h = image.get_size()
+    dst_image_px_step_size = math.ceil(image_px_step_size * zoom_factor)
 
     if direction == Direction.NORTH:
         if view_rect.top >= image_px_step_size:
-            screen.scroll(dy=image_px_step_size * zoom_factor)
+            screen.scroll(dy=dst_image_px_step_size)
             view_rect.move_ip(0, -image_px_step_size)
             src_rect = view_rect.copy()
             src_rect.h = image_px_step_size
             dst_rect = zoom_view_rect.copy()
-            dst_rect.h = image_px_step_size * zoom_factor
+            dst_rect.h = dst_image_px_step_size
     elif direction == Direction.SOUTH:
         if view_rect.bottom <= image_h - image_px_step_size:
-            screen.scroll(dy=-image_px_step_size * zoom_factor)
+            screen.scroll(dy=-dst_image_px_step_size)
             view_rect.move_ip(0, image_px_step_size)
             src_rect = view_rect.copy()
             src_rect.h = image_px_step_size
             src_rect.bottom = view_rect.bottom
             dst_rect = zoom_view_rect.copy()
-            dst_rect.h = image_px_step_size * zoom_factor
+            dst_rect.h = dst_image_px_step_size
             dst_rect.bottom = zoom_view_rect.bottom
     elif direction == Direction.WEST:
         if view_rect.left >= image_px_step_size:
-            screen.scroll(dx=image_px_step_size * zoom_factor)
+            screen.scroll(dx=dst_image_px_step_size)
             view_rect.move_ip(-image_px_step_size, 0)
             src_rect = view_rect.copy()
             src_rect.w = image_px_step_size
             dst_rect = zoom_view_rect.copy()
-            dst_rect.w = image_px_step_size * zoom_factor
+            dst_rect.w = dst_image_px_step_size
     elif direction == Direction.EAST:
         if view_rect.right <= image_w - image_px_step_size:
-            screen.scroll(dx=-image_px_step_size * zoom_factor)
+            screen.scroll(dx=-dst_image_px_step_size)
             view_rect.move_ip(image_px_step_size, 0)
             src_rect = view_rect.copy()
             src_rect.w = image_px_step_size
             src_rect.right = view_rect.right
             dst_rect = zoom_view_rect.copy()
-            dst_rect.w = image_px_step_size * zoom_factor
+            dst_rect.w = dst_image_px_step_size
             dst_rect.right = zoom_view_rect.right
     if src_rect is not None and dst_rect is not None:
         src = image.subsurface(src_rect)

@@ -666,13 +666,13 @@ class GameDialog:
             new_col = self.menu_col
             num_rows = len(self.menu_data)
             new_row = self.menu_row
-            if event.key == pygame.K_DOWN:
+            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                 new_row = (self.menu_row + 1) % num_rows
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP or event.key == pygame.K_w:
                 new_row = (self.menu_row - 1) % num_rows
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 new_col = (self.menu_col - 1) % num_cols
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 new_col = (self.menu_col + 1) % num_cols
 
             # Skip over empty cells in menuOptions

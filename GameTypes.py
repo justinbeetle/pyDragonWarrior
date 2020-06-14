@@ -434,6 +434,26 @@ class Map(NamedTuple):
     is_outside: bool
     origin: Optional[Point] = None
 
+    @staticmethod
+    def create(name: str,
+               dat: List[str]) -> Map:
+        size = Point(len(dat[0]), len(dat))
+        return Map(name,
+                   dat,
+                   None,
+                   size,
+                   '',
+                   None,
+                   None,
+                   [],
+                   [],
+                   [],
+                   [],
+                   None,
+                   [],
+                   False,
+                   size/2)
+
 
 class MonsterAction(NamedTuple):
     name: str

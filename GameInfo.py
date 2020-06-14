@@ -1093,34 +1093,38 @@ class GameInfo:
         return map_image
 
 
-def main() -> None:
+class GameInfoMapViewer:
+    def __init__(self) -> None:
+        # Initialize pygame
+        pygame.init()
+        self.audio_player = AudioPlayer()
 
-    import math
-    import SurfaceEffects
+        # Setup to draw maps
+        self.win_size_pixels = Point(1280, 960)
+        self.tile_size_pixels = 20
+        self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).ceil()
+        self.image_pad_tiles = self.win_size_tiles // 2 * 4
+        win_size_pixels = self.win_size_tiles * self.tile_size_pixels
+        self.screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
+        self.clock = pygame.time.Clock()
 
-    # Initialize pygame
-    pygame.init()
-    audio_player = AudioPlayer()
+        # Initialize GameInfo
+        base_path = os.path.split(os.path.abspath(__file__))[0]
+        game_xml_path = os.path.join(base_path, 'game.xml')
+        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels)
 
-    # Setup to draw maps
-    win_size_pixels = Point(1280, 960)
-    tile_size_pixels = 20
-    win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
-    image_pad_tiles = win_size_tiles // 2
-    win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
-    clock = pygame.time.Clock()
-   
-    # Initialize GameInfo
-    base_path = os.path.split(os.path.abspath(__file__))[0]
-    game_xml_path = os.path.join(base_path, 'game.xml')
-    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
-   
-    # Iterate through and render the different maps
-    is_running = True
-    for map_name in game_info.maps:
-        audio_player.play_music(game_info.maps[map_name].music)
-        map_image_info = game_info.get_map_image_info(map_name, image_pad_tiles)
+        self.is_running = True
+
+    def __del__(self) -> None:
+        # Terminate pygame
+        self.audio_player.terminate()
+        pygame.quit()
+
+    def view_map(self, map_name : str) -> None:
+        import SurfaceEffects
+
+        self.audio_player.play_music(self.game_info.maps[map_name].music)
+        map_image_info = self.game_info.get_map_image_info(map_name, self.image_pad_tiles)
 
         render_types = ['exterior']
         if map_image_info.overlay_image is not None:
@@ -1131,73 +1135,100 @@ def main() -> None:
                 map_image = GameInfo.get_exterior_image(map_image_info)
             else:
                 map_image = GameInfo.get_interior_image(map_image_info)
-            
+
             # Always rendering to the entire window but need to determine the
             # rectangle from the image which is to be scaled to the screen
-            zoom_factor = 2
+            zoom_factor = 2.0
             map_image_size = Point(map_image.get_width(), map_image.get_height())
             map_image_center_pos = map_image_size // 2
-            map_image_rect_size = win_size_pixels // zoom_factor
+            map_image_rect_size = self.win_size_pixels // zoom_factor
             map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
             map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
-            screen.set_clip(pygame.Rect(0, 0, win_size_pixels.x, win_size_pixels.y))
+            self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
             pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                   win_size_pixels,
-                                   screen)
+                                   self.win_size_pixels,
+                                   self.screen)
             pygame.display.flip()
 
             pygame.key.set_repeat(10, 10)
 
             done_with_map = False
-            while is_running and not done_with_map:
+            while self.is_running and not done_with_map:
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
-                            is_running = False
+                            self.is_running = False
                         elif event.key == pygame.K_RETURN:
                             done_with_map = True
-                        elif event.key == pygame.K_DOWN:
+                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.SOUTH, map_image_rect, zoom_factor, tile_size_pixels, True)
-                        elif event.key == pygame.K_UP:
+                                self.screen,
+                                map_image,
+                                Direction.SOUTH,
+                                map_image_rect,
+                                zoom_factor,
+                                self.tile_size_pixels,
+                                True)
+                        elif event.key == pygame.K_UP or event.key == pygame.K_w:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.NORTH, map_image_rect, zoom_factor, tile_size_pixels, True)
-                        elif event.key == pygame.K_LEFT:
+                                self.screen,
+                                map_image,
+                                Direction.NORTH,
+                                map_image_rect,
+                                zoom_factor,
+                                self.tile_size_pixels,
+                                True)
+                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.WEST,  map_image_rect, zoom_factor, tile_size_pixels, True)
-                        elif event.key == pygame.K_RIGHT:
+                                self.screen,
+                                map_image,
+                                Direction.WEST,
+                                map_image_rect,
+                                zoom_factor,
+                                self.tile_size_pixels,
+                                True)
+                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                             SurfaceEffects.scroll_view(
-                                screen, map_image, Direction.EAST,  map_image_rect, zoom_factor, tile_size_pixels, True)
+                                self.screen,
+                                map_image,
+                                Direction.EAST,
+                                map_image_rect,
+                                zoom_factor,
+                                self.tile_size_pixels,
+                                True)
                         elif event.key == pygame.K_EQUALS or event.key == pygame.K_MINUS:
                             map_image_center_pos = Point(map_image_rect.x, map_image_rect.y) + map_image_rect_size // 2
                             if event.key == pygame.K_EQUALS:
-                                zoom_factor = math.ceil(zoom_factor*1.25)
+                                zoom_factor *= 2.0
                             else:
-                                zoom_factor = math.floor(zoom_factor*0.75)
-                            if zoom_factor < 1:
-                                zoom_factor = 1
+                                zoom_factor *= 0.5
+                            if zoom_factor < 0.25:
+                                zoom_factor = 0.25
 
-                            map_image_rect_size = win_size_pixels // zoom_factor
+                            map_image_rect_size = self.win_size_pixels // zoom_factor
                             map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
                             map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
-                            screen.set_clip(pygame.Rect(0, 0, win_size_pixels.x, win_size_pixels.y))
+                            self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
                             pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                                   win_size_pixels,
-                                                   screen)
+                                                   self.win_size_pixels,
+                                                   self.screen)
                             pygame.display.flip()
                         else:
                             # print('event.key =', event.key, flush=True)
                             pass
                     elif event.type == pygame.QUIT:
-                        is_running = False
+                        self.is_running = False
                     else:
                         # print('event.type =', event.type, flush=True)
                         pass
-                clock.tick(30)
+                self.clock.tick(30)
 
-    # Terminate pygame
-    audio_player.terminate()
-    pygame.quit()
+
+def main() -> None:
+    # Iterate through and render the different maps
+    viewer = GameInfoMapViewer()
+    for map_name in viewer.game_info.maps:
+        viewer.view_map(map_name)
 
 
 if __name__ == '__main__':

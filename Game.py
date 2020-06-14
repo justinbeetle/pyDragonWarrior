@@ -81,16 +81,16 @@ class Game:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
-                    elif event.key == pygame.K_DOWN:
+                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                         self.game_state.hero_party.members[0].direction = Direction.SOUTH
                         moving = True
-                    elif event.key == pygame.K_UP:
+                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
                         self.game_state.hero_party.members[0].direction = Direction.NORTH
                         moving = True
-                    elif event.key == pygame.K_LEFT:
+                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                         self.game_state.hero_party.members[0].direction = Direction.WEST
                         moving = True
-                    elif event.key == pygame.K_RIGHT:
+                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                         self.game_state.hero_party.members[0].direction = Direction.EAST
                         moving = True
                     elif event.key == pygame.K_F1:
@@ -339,7 +339,7 @@ class Game:
                                            self.game_state.get_map_image(),
                                            self.game_state.hero_party.members[0].direction,
                                            map_image_rect,
-                                           1,
+                                           1.0,
                                            self.game_state.game_info.image_px_step_size)
                 self.game_state.hero_party.members[0].curr_pos_offset_img_px = Point(
                     map_image_rect.x - orig_map_image_rect.x, map_image_rect.y - orig_map_image_rect.y)
