@@ -1100,7 +1100,7 @@ class GameInfoMapViewer:
         self.audio_player = AudioPlayer()
 
         # Setup to draw maps
-        self.win_size_pixels = Point(1280, 960)
+        self.win_size_pixels = Point(2560, 1340)
         self.tile_size_pixels = 20
         self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).ceil()
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
@@ -1138,7 +1138,7 @@ class GameInfoMapViewer:
 
             # Always rendering to the entire window but need to determine the
             # rectangle from the image which is to be scaled to the screen
-            zoom_factor = 2.0
+            zoom_factor = 1.0
             map_image_size = Point(map_image.get_width(), map_image.get_height())
             map_image_center_pos = map_image_size // 2
             map_image_rect_size = self.win_size_pixels // zoom_factor

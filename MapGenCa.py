@@ -4,7 +4,7 @@ from typing import List
 
 
 class MapGenCa:
-    staticmethod
+    @staticmethod
     def genMapDat(width: int,
                   height: int) -> List[str]:
         dat = []
