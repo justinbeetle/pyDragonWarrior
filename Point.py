@@ -7,7 +7,7 @@ from typing import Tuple, Union
 import math
 
 
-class Point(tuple):
+class Point(Tuple[Union[float, int], Union[float, int]]):
     PointTypeElemType = Union[float, int]
     PointTupleType = Union['Point', Tuple[PointTypeElemType, PointTypeElemType]]
     ScalarOrPointTupleType = Union[PointTypeElemType, PointTupleType]

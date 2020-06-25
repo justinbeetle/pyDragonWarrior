@@ -992,48 +992,49 @@ class GameInfo:
         # Blit the padded portions of the image
         import zlib
         numpy.random.seed(zlib.crc32(map_name.encode()) % (2**32 - 1))
-        last_c = self.maps[map_name].size[0] - 1
-        last_r = self.maps[map_name].size[1] - 1
+        map_size = (int(self.maps[map_name].size[0]), int(self.maps[map_name].size[1]))
+        last_col = map_size[0] - 1
+        last_row = map_size[1] - 1
         for x in range(int(image_pad_tiles.x)):
             x_w_px = int(x * self.tile_size_pixels)
-            x_e_px = int((x + image_pad_tiles.x + self.maps[map_name].size[0]) * self.tile_size_pixels)
+            x_e_px = int((x + image_pad_tiles.x + map_size[0]) * self.tile_size_pixels)
             for y in range(int(image_pad_tiles.y)):
                 # Blit corners
                 y_n_px = y * self.tile_size_pixels
-                y_s_px = (y + image_pad_tiles.y + self.maps[map_name].size[1]) * self.tile_size_pixels
+                y_s_px = (y + image_pad_tiles.y + map_size[1]) * self.tile_size_pixels
                 # NW pad
                 if dat[0][0] in self.tile_symbols:
                     map_image.blit(self.random_tile_image(dat[0][0]), (x_w_px, y_n_px))
                 # NE pad
-                if dat[0][last_c] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[0][last_c]), (x_e_px, y_n_px))
+                if dat[0][last_col] in self.tile_symbols:
+                    map_image.blit(self.random_tile_image(dat[0][last_col]), (x_e_px, y_n_px))
                 # SW pad
-                if dat[last_r][0] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_r][0]), (x_w_px, y_s_px))
+                if dat[last_row][0] in self.tile_symbols:
+                    map_image.blit(self.random_tile_image(dat[last_row][0]), (x_w_px, y_s_px))
                 # SE pad
-                if dat[last_r][last_c] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_r][last_c]), (x_e_px, y_s_px))
-            for y in range(self.maps[map_name].size[1]):
+                if dat[last_row][last_col] in self.tile_symbols:
+                    map_image.blit(self.random_tile_image(dat[last_row][last_col]), (x_e_px, y_s_px))
+            for y in range(map_size[1]):
                 # Blit sides
                 y_px = int((y + image_pad_tiles.y) * self.tile_size_pixels)
                 # W pad
                 if dat[y][0] in self.tile_symbols:
                     map_image.blit(self.random_tile_image(dat[y][0]), (x_w_px, y_px))
                 # E pad
-                if dat[y][last_c] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[y][last_c]), (x_e_px, y_px))
+                if dat[y][last_col] in self.tile_symbols:
+                    map_image.blit(self.random_tile_image(dat[y][last_col]), (x_e_px, y_px))
         for y in range(int(image_pad_tiles.y)):
             y_n_px = int(y * self.tile_size_pixels)
-            y_s_px = int((y + image_pad_tiles.y + self.maps[map_name].size[1]) * self.tile_size_pixels)
-            for x in range(self.maps[map_name].size[0]):
+            y_s_px = int((y + image_pad_tiles.y + map_size[1]) * self.tile_size_pixels)
+            for x in range(map_size[0]):
                 # Blit the top and bottom
                 x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
                 # N pad
                 if dat[0][x] in self.tile_symbols:
                     map_image.blit(self.random_tile_image(dat[0][x]), (x_px, y_n_px))
                 # S pad
-                if dat[last_r][x] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_r][x]), (x_px, y_s_px))
+                if dat[last_row][x] in self.tile_symbols:
+                    map_image.blit(self.random_tile_image(dat[last_row][x]), (x_px, y_s_px))
 
         # Blit the map data portion of the image
         for y, row_data in enumerate(dat):

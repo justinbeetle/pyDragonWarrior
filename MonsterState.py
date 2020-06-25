@@ -276,7 +276,8 @@ def main() -> None:
         min_gp=11,
         max_gp=12,
         monster_action_rules=[],
-        allows_critical_hits=False)
+        allows_critical_hits=False,
+        may_run_away=True)
     monster = MonsterState(monster_info)
     print(monster, flush=True)
     while monster.is_alive():

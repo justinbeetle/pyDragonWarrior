@@ -207,8 +207,10 @@ class MonsterActionEnum(Enum):
 
 
 # Dialog type
+# The correct type for the branching dialog is Dict[str, 'DialogType'] but the type of Dict[str, Any] is used instead
+# since mypy does not yet support recursive types and cannot handle the correct type.
 DialogType = List[Union[str,  # a string of dialog
-                        Dict[str, 'DialogType'],  # branching dialog
+                        Dict[str, Any],  # branching dialog, actual type is Dict[str, 'DialogType']
                         'DialogVariable',
                         'DialogGoTo',
                         'DialogVendorBuyOptions',
@@ -404,7 +406,7 @@ class MapDecoration(NamedTuple):
         return MapDecoration(type, point, collision_rect, dialog, progress_marker, inverse_progress_marker)
 
     def overlaps(self, tile: Point) -> bool:
-        return self.collision_rect.collidepoint(tile)
+        return self.collision_rect.collidepoint(tile) is True
 
 
 class SpecialMonster(NamedTuple):

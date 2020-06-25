@@ -177,7 +177,7 @@ class GameState(GameStateInterface):
         # Get exterior and interior map images
         self.update_images()
 
-    def update_images(self):
+    def update_images(self) -> None:
         self.exterior_map_image = GameInfo.get_exterior_image(self.map_state)
         self.interior_map_image = GameInfo.get_interior_image(self.map_state)
 
@@ -567,7 +567,7 @@ class GameState(GameStateInterface):
     def get_map_image(self) -> pygame.Surface:
         if self.is_interior(self.hero_party.get_curr_pos_dat_tile()):
             if self.hero_party.has_low_heath():
-                return self.interior_map_dmg_image_image
+                return self.interior_map_dmg_image
             else:
                 return self.interior_map_image
         if self.hero_party.has_low_heath():

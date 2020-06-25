@@ -320,8 +320,14 @@ class GameDialogEvaluator:
                 menu_result = self.get_menu_result(message_dialog)
                 if menu_result is not None:
                     # print( 'menu_result =', menu_result, flush=True )
-                    self.replacement_variables.generic['[ITEM]'] = menu_result
-                    self.replacement_variables.generic['[COST]'] = str(self.game_info.get_item(menu_result).gp // 2)
+                    menu_result_item = self.game_info.get_item(menu_result)
+                    if menu_result_item is not None:
+                        self.replacement_variables.generic['[ITEM]'] = menu_result
+                        self.replacement_variables.generic['[COST]'] = str(menu_result_item.gp // 2)
+                    else:
+                        print('ERROR: Failed to find item for menu_result =', menu_result, flush=True)
+                        self.replacement_variables.generic.pop('[ITEM]', None)
+                        self.replacement_variables.generic.pop('[COST]', None)
                 else:
                     self.replacement_variables.generic.pop('[ITEM]', None)
                     self.replacement_variables.generic.pop('[COST]', None)
@@ -735,8 +741,11 @@ class GameDialogEvaluator:
                     pygame.time.wait(item.count)
 
                 elif item.type == DialogActionEnum.SET_LEVEL:
+                    level_name = ''
+                    if item.name is not None:
+                        level_name = item.name
                     for hero in self.hero_party.members:
-                        hero.level = Level.create_null(item.name)
+                        hero.level = Level.create_null(level_name)
                         hero.max_hp = hero.level.hp
                         hero.max_mp = hero.level.mp
                         hero.hp = min(hero.hp, hero.max_hp)
