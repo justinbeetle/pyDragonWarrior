@@ -103,6 +103,12 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
     def __repr__(self) -> str:
         return "%s(%r, %r)" % (self.__class__.__name__, self.x, self.y)
 
+    def getAsIntTuple(self) -> Tuple[int, int]:
+        return int(round(self.x)), int(round(self.y))
+
+    def getAsFloatTuple(self) -> Tuple[float, float]:
+        return float(self.x), float(self.y)
+
 
 def main() -> None:
     p1 = Point()

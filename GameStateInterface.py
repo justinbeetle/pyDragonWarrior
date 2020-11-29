@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import Dict, List, Optional
+from typing import List, Optional
 from GameTypes import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo
 
 import abc
@@ -14,7 +14,7 @@ from Point import Point
 
 
 class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.surface.Surface) -> None:
         super().__init__(screen)
 
     @abc.abstractmethod

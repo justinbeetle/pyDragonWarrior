@@ -58,14 +58,11 @@ class GameDialogEvaluator:
         self.combat_encounter = combat_encounter
 
     def dialog_loop(self, dialog: Union[DialogType, str]) -> None:
-        # Save off initial background image and key repeat settings
+        # Save off initial background image
         background_image = self.game_state.screen.copy()
-        (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
-        pygame.key.set_repeat()
-        # print( 'Disabled key repeat', flush=True )
 
         # Clear event queue
-        GameEvents.get_events()
+        GameEvents.clear_events()
 
         # Create the status and message dialogs
         GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
@@ -74,9 +71,8 @@ class GameDialogEvaluator:
         self.traverse_dialog(message_dialog, dialog)
 
         if self.game_state.is_running:
-            # Restore initial background image and key repeat settings
+            # Restore initial background image
             self.game_state.screen.blit(background_image, (0, 0))
-            pygame.key.set_repeat(orig_repeat1, orig_repeat2)
 
             # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
             self.game_state.draw_map(False)
@@ -147,7 +143,7 @@ class GameDialogEvaluator:
 
     def update_default_dialog_font_color(self) -> None:
         old_default = GameDialog.font_color
-        if self.hero_party.has_low_heath():
+        if self.hero_party.has_low_health():
             new_default = GameDialog.LOW_HEALTH_FONT_COLOR
         else:
             new_default = GameDialog.NOMINAL_HEALTH_FONT_COLOR
@@ -738,7 +734,10 @@ class GameDialogEvaluator:
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
 
                 elif item.type == DialogActionEnum.WAIT:
-                    pygame.time.wait(item.count)
+                    if isinstance(item.count, int):
+                        pygame.time.wait(item.count)
+                    else:
+                        print('ERROR: Wait not supported for item.count of', item.count, flush=True)
 
                 elif item.type == DialogActionEnum.SET_LEVEL:
                     level_name = ''

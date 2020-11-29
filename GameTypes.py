@@ -322,7 +322,7 @@ class DialogReplacementVariables:
 class Tile(NamedTuple):
     name: str
     symbol: str
-    images: List[List[pygame.Surface]]
+    images: List[List[pygame.surface.Surface]]
     walkable: bool
     can_talk_over: bool
     hp_penalty: int
@@ -335,7 +335,7 @@ class Decoration(NamedTuple):
     name: str
     width_tiles: int
     height_tiles: int
-    image: pygame.Surface
+    image: pygame.surface.Surface
     walkable: bool = True
     remove_with_search: bool = False
     remove_with_key: bool = False
@@ -344,7 +344,7 @@ class Decoration(NamedTuple):
 
 class CharacterType(NamedTuple):
     name: str
-    images: Dict[Direction, Dict[Phase, pygame.Surface]]
+    images: Dict[Direction, Dict[Phase, pygame.surface.Surface]]
     levels: List[Level] = []
 
     @staticmethod
@@ -406,7 +406,7 @@ class MapDecoration(NamedTuple):
         return MapDecoration(type, point, collision_rect, dialog, progress_marker, inverse_progress_marker)
 
     def overlaps(self, tile: Point) -> bool:
-        return self.collision_rect.collidepoint(tile) is True
+        return bool(self.collision_rect.collidepoint(tile.getAsIntTuple()))
 
 
 class SpecialMonster(NamedTuple):
@@ -431,7 +431,7 @@ class Map(NamedTuple):
     npcs: List[NpcInfo]
     map_decorations: List[MapDecoration]
     monster_zones: List[MonsterZone]
-    encounter_image: Optional[pygame.Surface]
+    encounter_image: Optional[pygame.surface.Surface]
     special_monsters: List[SpecialMonster]
     is_outside: bool
     origin: Optional[Point] = None
@@ -496,8 +496,8 @@ class MonsterActionRule(NamedTuple):
 
 class MonsterInfo(NamedTuple):
     name: str
-    image: pygame.Surface
-    dmg_image: pygame.Surface
+    image: pygame.surface.Surface
+    dmg_image: pygame.surface.Surface
     strength: int
     agility: int
     min_hp: int
@@ -602,15 +602,15 @@ ItemType = Union[Weapon, Helm, Armor, Shield, Tool]
 
 class MapImageInfo(NamedTuple):
     name: str
-    image: pygame.Surface
+    image: pygame.surface.Surface
     size_tiles: Point
     size_pixels: Point
-    overlay_image: Optional[pygame.Surface] = None
+    overlay_image: Optional[pygame.surface.Surface] = None
 
     @staticmethod
     def create_null() -> MapImageInfo:
         return MapImageInfo('',
-                            pygame.Surface((0, 0)),
+                            pygame.surface.Surface((0, 0)),
                             Point(),
                             Point())
 

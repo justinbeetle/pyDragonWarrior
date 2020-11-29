@@ -17,7 +17,7 @@ def main():
             joystick.init()
             joysticks.append(joystick)
 
-            # Setup to draw maps
+    # Setup to draw maps
     win_size_pixels = (1280, 960)
     pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
 

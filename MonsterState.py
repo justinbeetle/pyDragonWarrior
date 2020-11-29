@@ -261,8 +261,8 @@ def main() -> None:
     import pygame
     monster_info = MonsterInfo(
         name='MonsterName',
-        image=pygame.Surface((0, 0)),
-        dmg_image=pygame.Surface((0, 0)),
+        image=pygame.surface.Surface((0, 0)),
+        dmg_image=pygame.surface.Surface((0, 0)),
         strength=1,
         agility=2,
         min_hp=3,

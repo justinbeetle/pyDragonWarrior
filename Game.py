@@ -2,16 +2,17 @@
 
 from typing import cast, List, Optional, Union
 
+import datetime
 import pygame
 import random
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
+import GameEvents
 from GameState import GameState
 from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
 from GameTypes import Direction, DialogType, LeavingTransition, PointTransition, Tool
-import GameEvents
 from Point import Point
 import SurfaceEffects
 
@@ -42,7 +43,6 @@ class Game:
         pass
 
     def exploring_loop(self) -> None:
-        pygame.key.set_repeat(10, 10)
         map_name = ''
 
         while self.game_state.is_running:
@@ -65,9 +65,11 @@ class Game:
                 self.game_state.pending_dialog = None
 
             # Process events
-            events = GameEvents.get_events()
+            # print(datetime.datetime.now(), 'exploring_loop:  Getting events...', flush=True)
+            events = GameEvents.get_events(True)
 
             for event in events:
+                # print('exploring_loop:  Processing event', event, flush=True)
                 moving = False
                 menu = False
                 talking = False
@@ -81,24 +83,33 @@ class Game:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
-                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    elif event.key == pygame.K_DOWN:
                         self.game_state.hero_party.members[0].direction = Direction.SOUTH
                         moving = True
-                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                    elif event.key == pygame.K_UP:
                         self.game_state.hero_party.members[0].direction = Direction.NORTH
                         moving = True
-                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    elif event.key == pygame.K_LEFT:
                         self.game_state.hero_party.members[0].direction = Direction.WEST
                         moving = True
-                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    elif event.key == pygame.K_RIGHT:
                         self.game_state.hero_party.members[0].direction = Direction.EAST
                         moving = True
                     elif event.key == pygame.K_F1:
                         self.game_state.save(quick_save=True)
+                else:
+                    # print('exploring_loop:  Ignoring event', event, flush=True)
+                    continue
+
+                # print(datetime.datetime.now(), 'exploring_loop:  Processed event', event, flush=True)
+
+                # Clear queued events upon launching the menu
+                GameEvents.clear_events()
+                events = []
 
                 # Allow a change of direction without moving
                 if pc_dir_old != self.game_state.hero_party.members[0].direction:
-                    # print('Change of direction detected', flush=True)
+                    # print('Change of direction detected (advancing four ticks)', flush=True)
                     moving = False
                     self.game_state.advance_tick()
                     self.game_state.advance_tick()
@@ -106,18 +117,13 @@ class Game:
                     self.game_state.advance_tick()
 
                 if menu:
-                    # Save off initial screen and key repeat settings
-                    (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
-                    pygame.key.set_repeat()
-                    # print( 'Disabled key repeat', flush=True )
-                    pygame.event.get()  # Clear event queue
 
                     GameDialog.create_exploring_status_dialog(
                         self.game_state.hero_party).blit(self.game_state.screen, False)
                     menu_dialog = GameDialog.create_exploring_menu()
                     menu_dialog.blit(self.game_state.screen, True)
                     menu_result = self.gde.get_menu_result(menu_dialog)
-                    # print( 'menu_result =', menu_result, flush=True )
+                    print('menu_result =', menu_result, flush=True)
                     if menu_result == 'TALK':
                         talking = True
                     elif menu_result == 'STAIRS':
@@ -185,7 +191,7 @@ class Game:
                             if item_result is not None:
                                 item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
                                 if len(item_row_data) == 0:
-                                    self.gde.dialog_loop('[ACTOR] studied the object and was confounded by it.')
+                                    self.gde.dialog_loop("The item vanished in [ACTOR]'s hands.")
                                 else:
                                     menu_dialog = GameDialog.create_menu_dialog(
                                         Point(-1, menu_dialog.pos_tile.y + menu_dialog.size_tiles.h + 1),
@@ -211,7 +217,7 @@ class Game:
                                             self.gde.set_targets(cast(List[CombatCharacterState], targets))
                                             self.gde.dialog_loop(item.use_dialog)
                                         else:
-                                            self.gde.dialog_loop('[ACTOR] struggled with the object before giving up.')
+                                            self.gde.dialog_loop('[ACTOR] studied the object and was confounded by it.')
 
                         # Restore the default actor and targets after using the item
                         self.gde.restore_default_actor_and_targets()
@@ -219,8 +225,7 @@ class Game:
                     elif menu_result is not None:
                         print('ERROR: Unsupported menu_result =', menu_result, flush=True)
 
-                    # Erase menu and restore initial key repeat settings
-                    pygame.key.set_repeat(orig_repeat1, orig_repeat2)
+                    # Erase menu
                     self.game_state.draw_map()
                     pygame.display.flip()
 
@@ -270,6 +275,7 @@ class Game:
                 if moving:
                     self.scroll_tile()
 
+            # print('advancing one tick in exploring_loop', flush=True)
             self.game_state.advance_tick()
 
     def scroll_tile(self) -> None:
@@ -323,8 +329,15 @@ class Game:
                 movement_hp_penalty = dest_tile_type.hp_penalty
 
             # Check for any status effect changes or healing to occur as the party moves
+            has_low_health = self.game_state.hero_party.has_low_health()
             self.game_state.hero_party.inc_step_counter()
-            self.gde.update_default_dialog_font_color()
+            if has_low_health != self.game_state.hero_party.has_low_health():
+                # Change default dialog font color
+                self.gde.update_default_dialog_font_color()
+
+                # Redraw the map
+                self.game_state.draw_map(True)
+
         else:
             audio_player.play_sound('bump.wav')
 
@@ -353,7 +366,7 @@ class Game:
 
                 if movement_hp_penalty > 0:
                     if x == tile_move_steps - 2:
-                        flicker_surface = pygame.Surface(self.game_state.screen.get_size())
+                        flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
                         flicker_surface.fill(pygame.Color('red'))
                         flicker_surface.set_alpha(128)
                         self.game_state.screen.blit(flicker_surface, (0, 0))
@@ -361,6 +374,7 @@ class Game:
                         self.game_state.draw_map(False)
 
             # Redraws the characters when movement_allowed is True
+            # print('advancing one tick in scroll_tile', flush=True)
             self.game_state.advance_tick(movement_allowed)
 
         if movement_allowed:
@@ -396,17 +410,7 @@ def main() -> None:
 
     pygame.init()
     pygame.mouse.set_visible(False)
-
-    joysticks = []
-    print('pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True)
-    for joystickId in range(pygame.joystick.get_count()):
-        joystick = pygame.joystick.Joystick(joystickId)
-        print('joystick.get_id() =', joystick.get_id(), flush=True)
-        print('joystick.get_name() =', joystick.get_name(), flush=True)
-        # if joystick.get_name() == 'Controller (Xbox One For Windows)':
-        print('Initializing joystick...', flush=True)
-        joystick.init()
-        joysticks.append(joystick)
+    GameEvents.setup_joystick()
 
     saved_game_file = None
     if len(sys.argv) > 1:
@@ -415,7 +419,7 @@ def main() -> None:
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
-    win_size_pixels = None
+    win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 20 * 3
     game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels, saved_game_file)
 

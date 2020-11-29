@@ -52,10 +52,10 @@ http://www.pyinstaller.org/
 
 
 
-cd C:\Users\Justin\AppData\Local\Programs\Python\Python36-32
+cd C:\Users\Justin\AppData\Local\Programs\Python\Python39
 python -m ensurepip
 python -m ensurepip --upgrade
-cd C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts
+cd C:\Users\Justin\AppData\Local\Programs\Python\Python39\Scripts
 pip install pygame
 pip install pyinstaller
 pip install opensimplex
@@ -65,6 +65,9 @@ python -m pip install --upgrade pygame
 python -m pip install --upgrade pyinstaller
 python -m pip install --upgrade mypy
 python -m pip install --upgrade numpy
+
+# Due to an issue with numpy 1.19.4
+python -m pip install numpy==1.19.3
 
 python -m mypy Game.py --strict --ignore-missing-imports
 /c/users/justin/appdata/local/programs/python/python37/Scripts/pyinstaller.exe -n pyDragonWarrior --add-data "game.xml;./" --add-data "data;data" Game.py

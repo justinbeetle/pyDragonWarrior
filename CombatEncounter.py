@@ -34,7 +34,7 @@ class CombatEncounter(CombatEncounterInterface):
                  game_info: GameInfo,
                  game_state: GameStateInterface,
                  monster_party: MonsterParty,
-                 encounter_image: pygame.Surface,
+                 encounter_image: pygame.surface.Surface,
                  message_dialog: Optional[GameDialog] = None,
                  approach_dialog: Optional[DialogType] = None,
                  victory_dialog: Optional[DialogType] = None,
@@ -74,13 +74,8 @@ class CombatEncounter(CombatEncounterInterface):
         # AudioPlayer().playMusic('14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3',
         #                         '24_Dragon_Quest_1_-_Monster_Battle.mp3')
 
-        # Save off initial key repeat settings
-        (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
-        pygame.key.set_repeat()
-        # print('Disabled key repeat', flush=True)
-
         # Clear event queue
-        GameEvents.get_events()
+        GameEvents.clear_events()
 
         # Render the status dialog, monsters, and approach dialog
         GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
@@ -138,9 +133,8 @@ class CombatEncounter(CombatEncounterInterface):
         # Wait for final acknowledgement
         self.gde.wait_for_acknowledgement(self.message_dialog)
 
-        # Restore initial background image and key repeat settings
+        # Restore initial background image
         self.game_state.screen.blit(self.background_image, (0, 0))
-        pygame.key.set_repeat(orig_repeat1, orig_repeat2)
 
         # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
         self.game_state.draw_map(False)
@@ -331,7 +325,7 @@ class CombatEncounter(CombatEncounterInterface):
         use_dialog = None
         target_type = None
         prev_menu_result = None
-        pygame.event.get()  # Clear event queue
+        GameEvents.clear_events()  # Clear event queue
         while self.game_state.is_running:
             # Get selected action for turn
             self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)
@@ -498,7 +492,7 @@ def main() -> None:
     tile_size_pixels = 48
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
+    screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.HWSURFACE)
     screen.fill(pygame.Color('pink'))
     GameDialog.static_init(win_size_tiles, tile_size_pixels)
 
@@ -508,9 +502,18 @@ def main() -> None:
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
+
+    # Find an encounter image to use
     for map in game_info.maps:
         if game_info.maps[map].encounter_image is not None:
             encounter_image = game_info.maps[map].encounter_image
+
+    # Verify an encounter image was found
+    if encounter_image is None:
+        print('Failed to find an encounter image', flush=True)
+        AudioPlayer().terminate()
+        pygame.quit()
+        return
 
     # Setup a mock game state
     from unittest import mock

@@ -10,6 +10,7 @@ import xml.dom.minidom
 
 from AudioPlayer import AudioPlayer
 from CombatEncounter import CombatEncounter
+import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
 from GameTypes import DialogReplacementVariables, DialogType, Direction, LeavingTransition, \
@@ -40,7 +41,7 @@ class GameState(GameStateInterface):
         if desired_win_size_pixels is None:
             screen = pygame.display.set_mode(
                 (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
             win_size_pixels = Point(screen.get_size())
             self.win_size_tiles = (win_size_pixels / tile_size_pixels).floor()
         else:
@@ -51,8 +52,8 @@ class GameState(GameStateInterface):
 
         if desired_win_size_pixels is not None:
             screen = pygame.display.set_mode(
-                self.win_size_pixels,
-                pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
+                self.win_size_pixels.getAsIntTuple(),
+                pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
 
         super().__init__(screen)
 
@@ -96,10 +97,10 @@ class GameState(GameStateInterface):
 
         # map_state, exterior_map_image, and interior_map_image are initialized with meaningful values in set_map
         self.map_state = MapImageInfo.create_null()
-        self.exterior_map_image = pygame.Surface((0, 0))
-        self.interior_map_image = pygame.Surface((0, 0))
-        self.exterior_map_dmg_image = pygame.Surface((0, 0))
-        self.interior_map_dmg_image = pygame.Surface((0, 0))
+        self.exterior_map_image = pygame.surface.Surface((0, 0))
+        self.interior_map_image: Optional[pygame.surface.Surface] = None
+        self.exterior_map_dmg_image = pygame.surface.Surface((0, 0))
+        self.interior_map_dmg_image: Optional[pygame.surface.Surface] = None
         self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations)
 
         # TODO: Migrate these to here
@@ -564,13 +565,15 @@ class GameState(GameStateInterface):
     def is_exterior(self, pos_dat_tile: Point) -> bool:
         return not self.is_interior(pos_dat_tile)
 
-    def get_map_image(self) -> pygame.Surface:
-        if self.is_interior(self.hero_party.get_curr_pos_dat_tile()):
-            if self.hero_party.has_low_heath():
+    def get_map_image(self) -> pygame.surface.Surface:
+        if (self.is_interior(self.hero_party.get_curr_pos_dat_tile()) and
+                self.interior_map_image is not None
+                and self.interior_map_dmg_image is not None):
+            if self.hero_party.has_low_health():
                 return self.interior_map_dmg_image
             else:
                 return self.interior_map_image
-        if self.hero_party.has_low_heath():
+        if self.hero_party.has_low_health():
             return self.exterior_map_dmg_image
         else:
             return self.exterior_map_image
@@ -781,13 +784,20 @@ class GameState(GameStateInterface):
         else:
             monster_party = MonsterParty([MonsterState(monster_info)])
 
+        # A combat encounter requires an encounter image
+        encounter_image = self.game_info.maps[self.map_state.name].encounter_image
+        if encounter_image is None:
+            print('Failed to initiate combat encounter due to lack of encounter image in map ' + self.map_state.name,
+                  flush=True)
+            return
+
         # Perform the combat encounter
         CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
         self.combat_encounter = CombatEncounter(
             game_info=self.game_info,
             game_state=self,
             monster_party=monster_party,
-            encounter_image=self.game_info.maps[self.map_state.name].encounter_image,
+            encounter_image=encounter_image,
             message_dialog=message_dialog,
             approach_dialog=approach_dialog,
             victory_dialog=victory_dialog,
@@ -799,7 +809,8 @@ class GameState(GameStateInterface):
         # Play the music for the current map
         AudioPlayer().play_music(self.game_info.maps[self.map_state.name].music)
 
-        pygame.event.get()  # Clear event queue
+        # Clear event queue
+        GameEvents.clear_events()
 
     def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         if not self.hero_party.has_surviving_members():
@@ -831,10 +842,8 @@ class GameState(GameStateInterface):
         if force:
             self.is_running = False
 
-        # Save off initial background image and key repeat settings
+        # Save off initial background image
         background_surface = self.screen.copy()
-        (orig_repeat1, orig_repeat2) = pygame.key.get_repeat()
-        pygame.key.set_repeat()
 
         menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), 'Do you really want to quit?')
         menu_dialog.blit(self.screen, flip_buffer=True)
@@ -842,9 +851,8 @@ class GameState(GameStateInterface):
         if menu_result is not None and menu_result == 'YES':
             self.is_running = False
 
-        # Restore initial background image and key repeat settings
+        # Restore initial background image
         menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
-        pygame.key.set_repeat(orig_repeat1, orig_repeat2)
 
 
 def main() -> None:

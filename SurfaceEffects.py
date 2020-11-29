@@ -6,31 +6,31 @@ import pygame
 from GameTypes import Direction
 
 
-def fade_to_black_and_back(screen: pygame.Surface) -> None:
+def fade_to_black_and_back(screen: pygame.surface.Surface) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.Surface(screen.get_size())
+    fade_surface = pygame.surface.Surface(screen.get_size())
     fade_surface.fill(pygame.Color('black'))
     fade_out(screen, background_surface, fade_surface)
     fade_out(screen, fade_surface, background_surface)
 
 
-def fade_out_to_black(screen: pygame.Surface) -> None:
+def fade_out_to_black(screen: pygame.surface.Surface) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.Surface(screen.get_size())
+    fade_surface = pygame.surface.Surface(screen.get_size())
     fade_surface.fill(pygame.Color('black'))
     fade_out(screen, background_surface, fade_surface)
 
 
-def fade_in_from_black(screen: pygame.Surface) -> None:
+def fade_in_from_black(screen: pygame.surface.Surface) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.Surface(screen.get_size())
+    fade_surface = pygame.surface.Surface(screen.get_size())
     fade_surface.fill(pygame.Color('black'))
     fade_out(screen, fade_surface, background_surface)
 
 
-def fade_out(screen: pygame.Surface,
-             background_surface: pygame.Surface,
-             fade_surface: pygame.Surface) -> None:
+def fade_out(screen: pygame.surface.Surface,
+             background_surface: pygame.surface.Surface,
+             fade_surface: pygame.surface.Surface) -> None:
     for i in range(15, 256, 16):
         fade_surface.set_alpha(i)
         screen.blit(background_surface, (0, 0))
@@ -39,9 +39,9 @@ def fade_out(screen: pygame.Surface,
         pygame.time.Clock().tick(30)
 
 
-'''def fade_in(screen: pygame.Surface,
-            background_surface: pygame.Surface,
-            fade_surface: pygame.Surface) -> None:
+'''def fade_in(screen: pygame.surface.Surface,
+            background_surface: pygame.surface.Surface,
+            fade_surface: pygame.surface.Surface) -> None:
     for i in range(240, -1, -16):
         fade_surface.set_alpha(i)
         screen.blit(background_surface, (0, 0))
@@ -51,9 +51,9 @@ def fade_out(screen: pygame.Surface,
 '''
 
 
-def flickering(screen: pygame.Surface) -> None:
+def flickering(screen: pygame.surface.Surface) -> None:
     background_surface = screen.copy()
-    flicker_surface = pygame.Surface(screen.get_size())
+    flicker_surface = pygame.surface.Surface(screen.get_size())
     flicker_surface.fill(pygame.Color('white'))
     flicker_surface.set_alpha(128)
 
@@ -68,11 +68,14 @@ def flickering(screen: pygame.Surface) -> None:
         pygame.time.Clock().tick(30)
 
 
-def pink_tinge(screen: pygame.Surface, flip_buffer: bool = True) -> None:
+def pink_tinge(screen: pygame.surface.Surface,
+               flip_buffer: bool = True) -> None:
     color_tinge(screen, pygame.Color(252, 116, 96), flip_buffer)
 
 
-def color_tinge(screen: pygame.Surface, tinge_color: pygame.Color, flip_buffer: bool = True) -> None:
+def color_tinge(screen: pygame.surface.Surface,
+                tinge_color: pygame.Color,
+                flip_buffer: bool = True) -> None:
     pygame.transform.threshold(screen,
                                screen,
                                search_color=pygame.Color('white'),
@@ -83,7 +86,8 @@ def color_tinge(screen: pygame.Surface, tinge_color: pygame.Color, flip_buffer: 
         pygame.display.flip()
 
 
-def black_red_monochrome_effect(screen: pygame.Surface, flip_buffer: bool = True) -> None:
+def black_red_monochrome_effect(screen: pygame.surface.Surface,
+                                flip_buffer: bool = True) -> None:
     red = pygame.Color(255, 62, 24)
     pygame.transform.threshold(screen,
                                screen,
@@ -100,8 +104,8 @@ def black_red_monochrome_effect(screen: pygame.Surface, flip_buffer: bool = True
         pygame.display.flip()
 
 
-def rainbow_effect(screen: pygame.Surface,
-                   water_tile: pygame.Surface) -> None:
+def rainbow_effect(screen: pygame.surface.Surface,
+                   water_tile: pygame.surface.Surface) -> None:
     orig_screen = screen.copy()
     water_color = pygame.transform.average_color(water_tile)
     rainbow_colors = [pygame.Color('red'),
@@ -133,8 +137,8 @@ def rainbow_effect(screen: pygame.Surface,
     pygame.display.flip()
 
 
-def scroll_view(screen: pygame.Surface,
-                image: pygame.Surface,
+def scroll_view(screen: pygame.surface.Surface,
+                image: pygame.surface.Surface,
                 direction: Direction,
                 view_rect: pygame.Rect,
                 zoom_factor: float,

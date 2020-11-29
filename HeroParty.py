@@ -223,7 +223,7 @@ class HeroParty:
                 lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
         return lowest_health_ratio
 
-    def has_low_heath(self) -> bool:
+    def has_low_health(self) -> bool:
         return self.get_lowest_health_ratio() < 0.25
 
     # Get listing of all unequipped items for the party

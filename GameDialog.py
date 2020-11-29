@@ -8,6 +8,7 @@ from enum import Enum
 import math
 import pygame
 
+import GameEvents
 from HeroParty import HeroParty
 from Point import Point
 
@@ -109,7 +110,7 @@ class GameDialog:
         self.font_color = GameDialog.font_color
 
         # Initialize the image
-        self.image = pygame.Surface((0, 0))
+        self.image = pygame.surface.Surface((0, 0))
         self.intitialize_image()
 
         self.displayed_message_lines: List[str] = []
@@ -126,7 +127,7 @@ class GameDialog:
         self.menu_data: Optional[List[List[Optional[str]]]] = None
 
     def intitialize_image(self) -> None:
-        self.image = pygame.Surface(self.size_tiles * GameDialog.tile_size_pixels)
+        self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
         self.image.fill(pygame.Color('black'))
         pygame.draw.rect(self.image, self.font_color,
                          pygame.Rect(8, 8, self.image.get_width() - 16, self.image.get_height() - 16), 7)
@@ -569,7 +570,7 @@ class GameDialog:
         self.refresh_image()
 
     def blit(self,
-             surface: pygame.Surface,
+             surface: pygame.surface.Surface,
              flip_buffer: bool = False,
              offset_pixels: Point = Point(0, 0)) -> None:
         surface.blit(self.image, self.pos_tile * GameDialog.tile_size_pixels + offset_pixels)
@@ -577,8 +578,8 @@ class GameDialog:
             pygame.display.flip()
 
     def erase(self,
-              surface: pygame.Surface,
-              background: pygame.Surface,
+              surface: pygame.surface.Surface,
+              background: pygame.surface.Surface,
               flip_buffer: bool = False,
               offset_pixels: Point = Point(0, 0)) -> None:
         surface.blit(background.subsurface(pygame.Rect(self.pos_tile * GameDialog.tile_size_pixels + offset_pixels,
@@ -607,7 +608,7 @@ class GameDialog:
     def erase_menu_indicator(self) -> None:
         self.draw_menu_indicator(pygame.Color('black'))
 
-    def draw_menu_indicator(self, color: pygame.Color = None) -> None:
+    def draw_menu_indicator(self, color: Optional[pygame.Color] = None) -> None:
         if self.row_data is None or self.menu_data is None or len(self.menu_data) == 0:
             return
 
@@ -657,7 +658,7 @@ class GameDialog:
              row_pos_y + 3 / 4 * GameDialog.selection_indicator_pixels))
         pygame.draw.polygon(self.image, color, pointlist)
 
-    def process_event(self, event: pygame.Event, screen: pygame.Surface) -> None:
+    def process_event(self, event: pygame.Event, screen: pygame.surface.Surface) -> None:
         if self.row_data is None or self.menu_data is None:
             return
 
@@ -666,13 +667,13 @@ class GameDialog:
             new_col = self.menu_col
             num_rows = len(self.menu_data)
             new_row = self.menu_row
-            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+            if event.key == pygame.K_DOWN:
                 new_row = (self.menu_row + 1) % num_rows
-            elif event.key == pygame.K_UP or event.key == pygame.K_w:
+            elif event.key == pygame.K_UP:
                 new_row = (self.menu_row - 1) % num_rows
-            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+            elif event.key == pygame.K_LEFT:
                 new_col = (self.menu_col - 1) % num_cols
-            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+            elif event.key == pygame.K_RIGHT:
                 new_col = (self.menu_col + 1) % num_cols
 
             # Skip over empty cells in menuOptions
@@ -724,9 +725,9 @@ def main() -> None:
     tile_size_pixels = 48
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
+    screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(),
+                                     pygame.SRCALPHA | pygame.HWSURFACE)
     clock = pygame.time.Clock()
-    pygame.key.set_repeat()
 
     # Test out game dialog
     GameDialog.static_init(win_size_tiles, tile_size_pixels)
@@ -743,7 +744,7 @@ def main() -> None:
 
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for event in pygame.event.get():
+        for event in GameEvents.get_events():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False
@@ -766,7 +767,7 @@ def main() -> None:
 
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for event in pygame.event.get():
+        for event in GameEvents.get_events():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False
@@ -796,7 +797,7 @@ def main() -> None:
     message_dialog.blit(screen, True)
     is_awaiting_selection = True
     while is_awaiting_selection:
-        for event in pygame.event.get():
+        for event in GameEvents.get_events():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     is_awaiting_selection = False

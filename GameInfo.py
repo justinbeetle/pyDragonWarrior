@@ -8,6 +8,7 @@ import numpy
 import xml.etree.ElementTree
 
 from AudioPlayer import AudioPlayer
+import GameEvents
 from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, Decoration, DialogAction, DialogActionEnum, \
     DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
@@ -189,7 +190,7 @@ class GameInfo:
             tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
             if tile_type == 'complex':
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
-                tile_images_scaled: List[List[pygame.Surface]] = []
+                tile_images_scaled: List[List[pygame.surface.Surface]] = []
                 for x in range(16):
                     tile_images_scaled.append([])
                 unscaled_size = tile_image_unscaled.get_height()/4
@@ -198,27 +199,27 @@ class GameInfo:
                 for y in range(4):
                     for x in range(4):
                         for z in range(tile_variants):
-                            temp = pygame.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                            temp_surface = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
                             pygame.transform.scale(tile_image_unscaled.subsurface(
                                 pygame.Rect(x*unscaled_size + z*tile_image_unscaled.get_height(),
                                             y*unscaled_size, unscaled_size, unscaled_size)),
                                 (self.tile_size_pixels, self.tile_size_pixels),
-                                temp)
-                            tile_images_scaled[image_index_translation[y][x]].append(temp)
+                                temp_surface)
+                            tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
             else:
                 tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
                 max_tile_variants = max(max_tile_variants, tile_variants)
-                temp = []
+                temp_surface_list: List[pygame.surface.Surface] = []
                 for z in range(tile_variants):
-                    temp.append(pygame.Surface((self.tile_size_pixels, self.tile_size_pixels)))
+                    temp_surface_list.append(pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels)))
                     pygame.transform.scale(tile_image_unscaled.subsurface(
                         pygame.Rect(z*tile_image_unscaled.get_height(),
                                     0,
                                     tile_image_unscaled.get_height(),
                                     tile_image_unscaled.get_height())),
                         (self.tile_size_pixels, self.tile_size_pixels),
-                        temp[-1])
-                tile_images_scaled = [temp] * 16
+                        temp_surface_list[-1])
+                tile_images_scaled = [temp_surface_list] * 16
          
             self.tile_symbols[tile_symbol] = tile_name
             self.tiles[tile_name] = Tile(tile_name,
@@ -269,8 +270,10 @@ class GameInfo:
             scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
             scale_factor = max(scale_factor_point.w, scale_factor_point.h)
             scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
-            decoration_image_scaled = pygame.Surface(scaled_size_pixels)
-            pygame.transform.scale(decoration_image_unscaled, scaled_size_pixels, decoration_image_scaled)
+            decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels)
+            pygame.transform.scale(decoration_image_unscaled,
+                                   scaled_size_pixels.getAsIntTuple(),
+                                   decoration_image_scaled)
             decoration_image_scaled.set_colorkey(GameInfo.TRANSPARENT_COLOR)
             self.decorations[decoration_name] = Decoration(decoration_name,
                                                            width_tiles,
@@ -352,7 +355,7 @@ class GameInfo:
             for direction in [Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST]:
                 direction_character_type_images = {}
                 for phase in [Phase.A, Phase.B]:
-                    image = pygame.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                    image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
                     pygame.transform.scale(character_type_image.subsurface(x_px,
                                                                            0,
                                                                            character_type_image.get_height(),
@@ -963,6 +966,7 @@ class GameInfo:
             self.maps[map_name].dat,
             pygame.Color('pink'))  # Fill with a color to make is easier to identify any gaps
 
+        map_overlay_image: Optional[pygame.surface.Surface] = None
         overlay_dat = self.maps[map_name].overlay_dat
         if overlay_dat is not None:
             map_overlay_image = self.get_map_image(
@@ -973,8 +977,6 @@ class GameInfo:
                 overlay_dat,
                 GameInfo.TRANSPARENT_COLOR)
             map_overlay_image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
-        else:
-            map_overlay_image = None
          
         # Return the map image info
         return MapImageInfo(map_name, map_image, map_image_size_tiles, map_image_size_pixels, map_overlay_image)
@@ -985,8 +987,8 @@ class GameInfo:
                       map_decorations: Optional[List[MapDecoration]],
                       map_image_size_pixels: Point,
                       dat: List[str],
-                      fill_color: pygame.Color) -> pygame.Surface:
-        map_image = pygame.Surface(map_image_size_pixels)
+                      fill_color: pygame.Color) -> pygame.surface.Surface:
+        map_image = pygame.surface.Surface(map_image_size_pixels)
         map_image.fill(fill_color)
 
         # Blit the padded portions of the image
@@ -1068,21 +1070,21 @@ class GameInfo:
 
         return map_image
 
-    def random_tile_image(self, symbol: str, idx: int = 0) -> pygame.Surface:
+    def random_tile_image(self, symbol: str, idx: int = 0) -> pygame.surface.Surface:
         images = self.tiles[self.tile_symbols[symbol]].images[idx]
         if 1 == len(images):
             return images[0]
         return numpy.random.choice(images, p=self.tile_probabilities[len(images)-1])
 
     @staticmethod
-    def get_exterior_image(map_image_info: MapImageInfo) -> pygame.Surface:
+    def get_exterior_image(map_image_info: MapImageInfo) -> pygame.surface.Surface:
         map_image = map_image_info.image.copy()
         if map_image_info.overlay_image is not None:
             map_image.blit(map_image_info.overlay_image, (0, 0))
         return map_image
 
     @staticmethod
-    def get_interior_image(map_image_info: MapImageInfo) -> pygame.Surface:
+    def get_interior_image(map_image_info: MapImageInfo) -> Optional[pygame.surface.Surface]:
         map_image = None
         if map_image_info.overlay_image is not None:
             map_image = map_image_info.image.copy()
@@ -1101,12 +1103,19 @@ class GameInfoMapViewer:
         self.audio_player = AudioPlayer()
 
         # Setup to draw maps
-        self.win_size_pixels = Point(2560, 1340)
         self.tile_size_pixels = 20
-        self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).ceil()
+        desired_win_size_pixels = Point(2560, 1340)
+        if desired_win_size_pixels is None:
+            self.screen = pygame.display.set_mode(
+                (0, 0),
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
+            self.win_size_pixels = Point(self.screen.get_size())
+            self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).floor()
+        else:
+            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).ceil()
+            self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
+            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
-        win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-        self.screen = pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
         self.clock = pygame.time.Clock()
 
         # Initialize GameInfo
@@ -1122,6 +1131,9 @@ class GameInfoMapViewer:
         pygame.quit()
 
     def view_map(self, map_name : str) -> None:
+        if not self.is_running:
+            return
+
         import SurfaceEffects
 
         self.audio_player.play_music(self.game_info.maps[map_name].music)
@@ -1135,7 +1147,11 @@ class GameInfoMapViewer:
             if render_type == 'exterior':
                 map_image = GameInfo.get_exterior_image(map_image_info)
             else:
-                map_image = GameInfo.get_interior_image(map_image_info)
+                interior_map_image = GameInfo.get_interior_image(map_image_info)
+                if interior_map_image is None:
+                    print('ERROR: No interior image for map', map_name, flush=True)
+                    continue
+                map_image = interior_map_image
 
             # Always rendering to the entire window but need to determine the
             # rectangle from the image which is to be scaled to the screen
@@ -1147,21 +1163,19 @@ class GameInfoMapViewer:
             map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
             self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
             pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                   self.win_size_pixels,
+                                   self.win_size_pixels.getAsIntTuple(),
                                    self.screen)
             pygame.display.flip()
 
-            pygame.key.set_repeat(10, 10)
-
             done_with_map = False
             while self.is_running and not done_with_map:
-                for event in pygame.event.get():
+                for event in GameEvents.get_events(True):
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             self.is_running = False
                         elif event.key == pygame.K_RETURN:
                             done_with_map = True
-                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        elif event.key == pygame.K_DOWN:
                             SurfaceEffects.scroll_view(
                                 self.screen,
                                 map_image,
@@ -1170,7 +1184,7 @@ class GameInfoMapViewer:
                                 zoom_factor,
                                 self.tile_size_pixels,
                                 True)
-                        elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                        elif event.key == pygame.K_UP:
                             SurfaceEffects.scroll_view(
                                 self.screen,
                                 map_image,
@@ -1179,7 +1193,7 @@ class GameInfoMapViewer:
                                 zoom_factor,
                                 self.tile_size_pixels,
                                 True)
-                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        elif event.key == pygame.K_LEFT:
                             SurfaceEffects.scroll_view(
                                 self.screen,
                                 map_image,
@@ -1188,7 +1202,7 @@ class GameInfoMapViewer:
                                 zoom_factor,
                                 self.tile_size_pixels,
                                 True)
-                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        elif event.key == pygame.K_RIGHT:
                             SurfaceEffects.scroll_view(
                                 self.screen,
                                 map_image,
@@ -1211,7 +1225,7 @@ class GameInfoMapViewer:
                             map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
                             self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
                             pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                                   self.win_size_pixels,
+                                                   self.win_size_pixels.getAsIntTuple(),
                                                    self.screen)
                             pygame.display.flip()
                         else:
