@@ -126,6 +126,10 @@ class GameDialog:
         self.menu_col = 0
         self.menu_data: Optional[List[List[Optional[str]]]] = None
 
+        self.allow_user_typing = False
+        self.user_text_prompt = ''
+        self.user_text = ''
+
     def intitialize_image(self) -> None:
         self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
         self.image.fill(pygame.Color('black'))
@@ -659,9 +663,25 @@ class GameDialog:
         pygame.draw.polygon(self.image, color, pointlist)
 
     def process_event(self, event: pygame.Event, screen: pygame.surface.Surface) -> None:
+        if self.allow_user_typing:
+            # Process as an update to user_text
+            if event.type == pygame.KEYDOWN:
+                orig_user_text = self.user_text
+                if pygame.K_BACKSPACE == event.key:
+                    self.user_text = self.user_text[:-1]
+                elif 1 == len(event.unicode):
+                    self.user_text += event.unicode
+
+                # Refresh image if the user text has changed
+                if orig_user_text != self.user_text:
+                    self.displayed_message_lines[-1] = self.user_text_prompt + ' ' + self.user_text
+                    self.refresh_image()
+                    self.blit(screen, True)
+
         if self.row_data is None or self.menu_data is None:
             return
 
+        # Process as an update to menu navigation or selection
         if event.type == pygame.KEYDOWN:
             num_cols = len(self.menu_data[0])
             new_col = self.menu_col
@@ -699,6 +719,16 @@ class GameDialog:
 
     def is_acknowledged(self) -> bool:
         return self.acknowledged
+
+    def prompt_for_user_text(self, prompt: str = '') -> None:
+        self.allow_user_typing = True
+        self.add_message(prompt)
+        self.user_text_prompt = prompt[prompt.rfind('\n')+1:]
+        self.user_text = ''
+
+    def get_user_text(self) -> str:
+        self.allow_user_typing = False
+        return self.user_text
 
     @staticmethod
     def fix_capitalization(message: str) -> str:
@@ -791,7 +821,6 @@ def main() -> None:
         message_dialog.advance_content()
     message_dialog.blit(screen, True)
 
-    # messageDialog.addEncounterPrompt()
     message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
     message_dialog.set_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
     message_dialog.blit(screen, True)
@@ -811,7 +840,23 @@ def main() -> None:
         clock.tick(30)
     message_dialog.add_message('\nLexie attacks!')
     message_dialog.blit(screen, True)
-    pygame.time.wait(1000)
+
+    message_dialog.prompt_for_user_text('\n1 + 15 =')
+    message_dialog.blit(screen, True)
+    is_awaiting_selection = True
+    while is_awaiting_selection:
+        for event in GameEvents.get_events():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    is_awaiting_selection = False
+                elif event.key == pygame.K_RETURN:
+                    is_awaiting_selection = False
+                    print('Selection made =', message_dialog.get_user_text(), flush=True)
+                else:
+                    message_dialog.process_event(event, screen)
+            elif event.type == pygame.QUIT:
+                is_awaiting_selection = False
+        clock.tick(30)
 
     # Terminate pygame
     pygame.font.quit()

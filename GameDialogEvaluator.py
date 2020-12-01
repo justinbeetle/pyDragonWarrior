@@ -4,6 +4,7 @@ from typing import cast, Optional, List, Union
 
 import pygame
 import random
+import time
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
@@ -113,6 +114,29 @@ class GameDialogEvaluator:
                 if is_waiting_indicator_drawn:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
+
+    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str) -> str:
+        message_dialog.prompt_for_user_text(prompt)
+        message_dialog.blit(self.game_state.screen, True)
+
+        is_waiting_for_user_input = True
+        start_time = time.time()
+        while self.game_state.is_running and is_waiting_for_user_input:
+            # Process events
+            events = GameEvents.get_events()
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.game_state.handle_quit()
+                    elif event.key == pygame.K_RETURN:
+                        is_waiting_for_user_input = False
+                    else:
+                        message_dialog.process_event(event, self.game_state.screen)
+                elif event.type == pygame.QUIT:
+                    self.game_state.handle_quit(force=True)
+        stop_time = time.time()
+
+        return message_dialog.get_user_text(), stop_time - start_time
 
     def get_menu_result(self, menu_dialog: GameDialog, allow_quit: bool = True) -> Optional[str]:
         menu_result = None
@@ -686,29 +710,66 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
                     damaged_targets = []
+
+                    if item.problem is not None:
+                        # Prompt user for problem and get their answer
+                        user_answer, seconds_waiting = self.wait_for_user_input(message_dialog, item.problem.problem)
+                        # print('User answer to problem', item.problem.problem, 'was', user_answer, 'in',
+                        #      round(seconds_waiting, 2), 'seconds; expected answer', item.problem.answer, flush=True)
+
                     for target in self.targets:
                         if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             worked = True
-                            is_critical_hit = False
+                            is_critical_hit = None
+                            if item.problem is not None and user_answer == item.problem.answer:
+                                # TODO: Make 5 second time threshold configurable
+                                is_critical_hit = seconds_waiting < 5.0
+
                             if item.count != 'default':
+                                if is_critical_hit is None:
+                                    is_critical_hit = False
                                 damage = round(GameTypes.get_int_value(item.count)
                                                * target.get_damage_modifier(item.category))
+                                # print('Using item damage', flush=True)
                             else:
-                                (damage, is_critical_hit) = self.actor.get_attack_damage(target, item.category)
+                                # If is_critical_hit is None, then this method determines is_critical_hit.
+                                # Else it respects the value of is_critical_hit which is provided.
+                                (damage, is_critical_hit) = self.actor.get_attack_damage(target,
+                                                                                         item.category,
+                                                                                         is_critical_hit)
+                                # print('Using self.actor.get_attack_damage(...) damage', flush=True)
+
+                            # Ensure their is damage if the user was correct and no damage if the user was wrong
+                            if item.problem is not None:
+                                if user_answer == item.problem.answer:
+                                    damage = max(1, damage)
+                                    allow_dodge = False
+                                else:
+                                    damage = 0
+                            else:
+                                allow_dodge = ActionCategoryTypeEnum.PHYSICAL == item.category
 
                             if 0 < damage:
                                 if is_critical_hit:
-                                    # TODO: Play sound?
                                     message_dialog.add_message('Excellent move!')
 
                                 # Check for a dodge
-                                if ActionCategoryTypeEnum.PHYSICAL == item.category and target.is_dodging_attack():
+                                if allow_dodge and target.is_dodging_attack():
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                                     message_dialog.add_message(
                                         target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
                                 else:
                                     # TODO: Play different sound based on damage of attack
-                                    AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
+                                    if is_critical_hit:
+                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (16).wav')
+                                    elif damage > 32:
+                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (12).wav')
+                                    elif damage > 16:
+                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (11).wav')
+                                    elif damage > 8:
+                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (6).wav')
+                                    else:
+                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
 
                                     damaged_targets.append(target)
 
@@ -720,6 +781,7 @@ class GameDialogEvaluator:
                                                                    + str(damage) + '.')
                             else:
                                 # TODO: Play sound?
+                                AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                                 if isinstance(target, HeroState):
                                     message_dialog.add_message(target.get_name() + ' dodges the strike.')
                                 else:
@@ -732,6 +794,9 @@ class GameDialogEvaluator:
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
+
+                    # Slight pause between turns
+                    pygame.time.wait(250)
 
                 elif item.type == DialogActionEnum.WAIT:
                     if isinstance(item.count, int):

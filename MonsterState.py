@@ -83,19 +83,31 @@ class MonsterState(CombatCharacterState):
 
     def get_attack_damage(self,
                           target: CombatCharacterState,
-                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
-        is_critical_hit = False
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
+                          is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
+        if is_critical_hit is None:
+            is_critical_hit = False
         if target.get_defense_strength() < self.get_strength():
             min_damage = (self.get_strength() - target.get_defense_strength() // 2) // 4
             max_damage = (self.get_strength() - target.get_defense_strength() // 2) // 2
         else:
             min_damage = 0
-            max_damage = (self.get_strength() + 4) // 6
+            max_damage = (self.get_strength() + 4) // 3
         damage = CombatCharacterState.calc_damage(
             min_damage,
             max_damage,
             target,
             damage_type)
+
+        # For critical hits from monsters, perform a second damage calculation and use the higher of the two damage
+        # values.
+        if is_critical_hit:
+            damage = max(damage, CombatCharacterState.calc_damage(
+                min_damage,
+                max_damage,
+                target,
+                damage_type))
+
         return damage, is_critical_hit
 
     # Determine if the monster has the initiative and attacks first in an encounter

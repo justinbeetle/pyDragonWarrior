@@ -13,7 +13,8 @@ from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
-from GameTypes import DialogType, MonsterInfo, SpecialMonster, TargetTypeEnum, Tool
+from GameTypes import DialogAction, DialogActionEnum, DialogType, GameTypes, MonsterInfo, Problem, SpecialMonster, \
+    TargetTypeEnum, Tool
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
@@ -347,6 +348,9 @@ class CombatEncounter(CombatEncounterInterface):
                 use_dialog = weapon.use_dialog
                 target_type = weapon.target_type
 
+                # TODO: Comment out this line of code to disable the math problems.
+                CombatEncounter.add_problem_to_use_dialog(use_dialog)
+
             elif menu_result == 'RUN':
                 target = random.choice(self.monster_party.get_still_in_combat_members())
                 if target.is_blocking_escape(hero):
@@ -387,6 +391,7 @@ class CombatEncounter(CombatEncounterInterface):
                         self.message_dialog.add_message('Thou dost not have enough magic to cast the spell.')
                         continue
                     menu_dialog.erase(self.game_state.screen, self.background_image, True)
+
             elif menu_result == 'ITEM':
                 item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
                 if len(item_row_data) == 0:
@@ -445,7 +450,7 @@ class CombatEncounter(CombatEncounterInterface):
             if 1 == len(still_in_combat_monsters):
                 self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_monsters))
             else:
-                # TODO: Prompt for selection of which enemey to target
+                # TODO: Prompt for selection of which enemy to target
                 self.gde.set_targets([still_in_combat_monsters[0]])
         elif TargetTypeEnum.ALL_ENEMIES:
             self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
@@ -479,6 +484,78 @@ class CombatEncounter(CombatEncounterInterface):
 
         if self.victory_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.victory_dialog)
+
+    @staticmethod
+    def add_problem_to_use_dialog(dialog: DialogType, problem: Optional[Problem] = None) -> None:
+        damage_action = GameTypes.get_dialog_action(dialog, DialogActionEnum.DAMAGE_TARGET)
+        if damage_action is not None and isinstance(damage_action, DialogAction):
+            if problem is None:
+                #problem = CombatEncounter.gen_any_problem()
+                problem = CombatEncounter.gen_cam_problem()
+            damage_action.problem = problem
+
+    @staticmethod
+    def gen_addition_problem(min_term=0, max_term=12) -> Problem:
+        addend_1 = random.randrange(min_term, max_term)
+        addend_2 = random.randrange(min_term, max_term)
+        sum = addend_1 + addend_2
+        return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum))
+
+    @staticmethod
+    def gen_subtraction_problem(min_term=0,
+                                max_term=12,
+                                minuend_min: Optional[int]=None,
+                                minuend_max: Optional[int]=None) -> Problem:
+        if minuend_min is not None and minuend_max is not None:
+            minuend = random.randrange(12, 16)
+            subtrahend = random.randrange(min(min_term, minuend), min(max_term, minuend))
+        else:
+            a = random.randrange(min_term, max_term)
+            b = random.randrange(min_term, max_term)
+            minuend = a+b
+            subtrahend = random.choice((a, b))
+        difference = minuend - subtrahend
+        return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference))
+
+    @staticmethod
+    def gen_multiplication_problem(min_term=0, max_term=12) -> Problem:
+        multiplicand_1 = random.randrange(min_term, max_term)
+        multiplicand_2 = random.randrange(min_term, max_term)
+        product = multiplicand_1 * multiplicand_2
+        return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product))
+
+    @staticmethod
+    def gen_division_problem(min_term=0, max_term=12) -> Problem:
+        a = random.randrange(min_term, max_term)
+        b = random.randrange(min_term, max_term)
+        dividend = a*b
+        divisor = random.choice((a, b))
+        if divisor == 0:
+            divisor = 1
+        quotient = dividend // divisor
+        return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient))
+
+    @staticmethod
+    def gen_any_problem(min_term=0, max_term=12) -> Problem:
+        a = random.randrange(0, 3)
+        if 0 == a:
+            return CombatEncounter.gen_addition_problem(min_term, max_term)
+        elif 1 == a:
+            return CombatEncounter.gen_subtraction_problem(min_term, max_term)
+        elif 2 == a:
+            return CombatEncounter.gen_multiplication_problem(min_term, max_term)
+        else:
+            return CombatEncounter.gen_division_problem(min_term, max_term)
+
+    @staticmethod
+    def gen_cam_problem() -> Problem:
+        a = random.randrange(0, 3)
+        if 0 == a:
+            return CombatEncounter.gen_addition_problem()
+        elif 1 == a:
+            return CombatEncounter.gen_subtraction_problem()
+        else:
+            return CombatEncounter.gen_subtraction_problem(min_term=5, max_term=9, minuend_min=12, minuend_max=16)
 
 
 def main() -> None:

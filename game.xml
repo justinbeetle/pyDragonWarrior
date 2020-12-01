@@ -1830,8 +1830,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></DialogAssert>
-         <DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></Spell>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></DialogAssert>
+         <DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></Spell>
 
       <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
@@ -1893,8 +1893,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="20-30" category="MAGICAL"/></DialogAssert>
-         <DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></Spell>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></DialogAssert>
+         <DialogAction type="DAMAGE_TARGET" count="30-45" category="MAGICAL"/></Spell>
 
       <Spell name="Healall"  mp="20" availableInCombat="yes" availableOutsideCombat="yes" target="ALL_ALLIES">
          <Dialog>[ACTOR] cast the spell of healmore.</Dialog>

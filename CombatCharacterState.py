@@ -138,7 +138,8 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_attack_damage(self,
                           target: CombatCharacterState,
-                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
+                          is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
         raise NotImplementedError
 
     @staticmethod

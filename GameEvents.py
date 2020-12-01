@@ -21,19 +21,20 @@ def setup_joystick() -> None:
         joystick.init()
         joysticks.append(joystick)
 
-def get_events(is_keyboard_repeat_enabled = False) -> List[pygame.event.Event]:
+def get_events(is_keyboard_repeat_enabled = False, translate_WASD_to_ULDR = True) -> List[pygame.event.Event]:
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             # Convert WASD to Up/Left/Down/Right
-            if pygame.K_w == event.key:
-                event.key = pygame.K_UP
-            elif pygame.K_a == event.key:
-                event.key = pygame.K_LEFT
-            elif pygame.K_s == event.key:
-                event.key = pygame.K_DOWN
-            elif pygame.K_d == event.key:
-                event.key = pygame.K_RIGHT
+            if translate_WASD_to_ULDR:
+                if pygame.K_w == event.key:
+                    event.key = pygame.K_UP
+                elif pygame.K_a == event.key:
+                    event.key = pygame.K_LEFT
+                elif pygame.K_s == event.key:
+                    event.key = pygame.K_DOWN
+                elif pygame.K_d == event.key:
+                    event.key = pygame.K_RIGHT
 
             # Populate scancode_to_key_dict from KEYDOWN events
             scancode_to_key_dict[event.scancode] = event.key

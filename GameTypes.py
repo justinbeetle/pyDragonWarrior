@@ -309,6 +309,7 @@ class DialogAction:
     encounter_music: Optional[str] = None
     category: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL  # TODO: Change to list of categories?
     target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ALLY
+    problem: Optional[Problem] = None
 
 
 # Type to aggregate all the different dialog replacement variables
@@ -613,6 +614,11 @@ class MapImageInfo(NamedTuple):
                             pygame.surface.Surface((0, 0)),
                             Point(),
                             Point())
+
+
+class Problem(NamedTuple):
+    problem: str
+    answer: str
 
 
 '''

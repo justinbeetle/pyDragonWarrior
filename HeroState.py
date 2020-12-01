@@ -321,9 +321,11 @@ class HeroState(MapCharacterState, CombatCharacterState):
 
     def get_attack_damage(self,
                           target: CombatCharacterState,
-                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL) -> Tuple[int, bool]:
-        is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
-        if is_critical_hit:
+                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
+                          is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
+        if is_critical_hit is None:
+            is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
+        if is_critical_hit and target.allows_critical_hits():
             min_damage = self.get_attack_strength() // 2
             max_damage = self.get_attack_strength()
         else:
@@ -334,6 +336,16 @@ class HeroState(MapCharacterState, CombatCharacterState):
             max_damage,
             target,
             damage_type)
+
+        # For critical hits to targets which don't allow them, perform a second damage calculation and use the higher
+        # of the two damage values.
+        if is_critical_hit and not target.allows_critical_hits():
+            damage = max(damage, CombatCharacterState.calc_damage(
+                min_damage,
+                max_damage,
+                target,
+                damage_type))
+
         return damage, is_critical_hit
 
     # TODO: Add spell checks and damage calc methods
