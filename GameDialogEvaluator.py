@@ -115,8 +115,8 @@ class GameDialogEvaluator:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
 
-    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str) -> str:
-        message_dialog.prompt_for_user_text(prompt)
+    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, input_regex: Optional[str]) -> str:
+        message_dialog.prompt_for_user_text(prompt, input_regex)
         message_dialog.blit(self.game_state.screen, True)
 
         is_waiting_for_user_input = True
@@ -713,7 +713,9 @@ class GameDialogEvaluator:
 
                     if item.problem is not None:
                         # Prompt user for problem and get their answer
-                        user_answer, seconds_waiting = self.wait_for_user_input(message_dialog, item.problem.problem)
+                        user_answer, seconds_waiting = self.wait_for_user_input(message_dialog,
+                                                                                item.problem.problem,
+                                                                                item.problem.answer_regex)
                         # print('User answer to problem', item.problem.problem, 'was', user_answer, 'in',
                         #      round(seconds_waiting, 2), 'seconds; expected answer', item.problem.answer, flush=True)
 

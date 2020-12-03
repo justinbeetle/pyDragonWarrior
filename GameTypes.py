@@ -619,6 +619,7 @@ class MapImageInfo(NamedTuple):
 class Problem(NamedTuple):
     problem: str
     answer: str
+    answer_regex: Optional[str] = None
 
 
 '''

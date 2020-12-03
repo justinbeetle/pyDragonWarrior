@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from enum import Enum
 import math
 import pygame
+import re
 
 import GameEvents
 from HeroParty import HeroParty
@@ -129,6 +130,7 @@ class GameDialog:
         self.allow_user_typing = False
         self.user_text_prompt = ''
         self.user_text = ''
+        self.input_regex: Optional[str] = None
 
     def intitialize_image(self) -> None:
         self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
@@ -670,7 +672,8 @@ class GameDialog:
                 if pygame.K_BACKSPACE == event.key:
                     self.user_text = self.user_text[:-1]
                 elif 1 == len(event.unicode):
-                    self.user_text += event.unicode
+                    if self.input_regex is None or re.match(self.input_regex, event.unicode):
+                        self.user_text += event.unicode
 
                 # Refresh image if the user text has changed
                 if orig_user_text != self.user_text:
@@ -720,11 +723,12 @@ class GameDialog:
     def is_acknowledged(self) -> bool:
         return self.acknowledged
 
-    def prompt_for_user_text(self, prompt: str = '') -> None:
+    def prompt_for_user_text(self, prompt: str = '', input_regex: Optional[str] = None) -> None:
         self.allow_user_typing = True
         self.add_message(prompt)
         self.user_text_prompt = prompt[prompt.rfind('\n')+1:]
         self.user_text = ''
+        self.input_regex = input_regex
 
     def get_user_text(self) -> str:
         self.allow_user_typing = False
@@ -841,7 +845,7 @@ def main() -> None:
     message_dialog.add_message('\nLexie attacks!')
     message_dialog.blit(screen, True)
 
-    message_dialog.prompt_for_user_text('\n1 + 15 =')
+    message_dialog.prompt_for_user_text('\n1 + 15 =', '[0-9]')
     message_dialog.blit(screen, True)
     is_awaiting_selection = True
     while is_awaiting_selection:

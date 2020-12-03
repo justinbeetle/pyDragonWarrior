@@ -123,7 +123,7 @@ class Game:
                     menu_dialog = GameDialog.create_exploring_menu()
                     menu_dialog.blit(self.game_state.screen, True)
                     menu_result = self.gde.get_menu_result(menu_dialog)
-                    print('menu_result =', menu_result, flush=True)
+                    # print('menu_result =', menu_result, flush=True)
                     if menu_result == 'TALK':
                         talking = True
                     elif menu_result == 'STAIRS':
