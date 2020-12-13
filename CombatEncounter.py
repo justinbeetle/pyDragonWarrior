@@ -573,7 +573,7 @@ class CombatEncounter(CombatEncounterInterface):
             return CombatEncounter.gen_subtraction_problem(min_term=5, max_term=9, minuend_min=12, minuend_max=16)
         else:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=10,
-                                                              multiplicand_1_range=[0, 1, 2, 10])
+                                                              multiplicand_1_range=[0, 1, 2, 9, 10, 11])
 
 
 def main() -> None:

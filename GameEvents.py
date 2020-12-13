@@ -35,6 +35,8 @@ def get_events(is_keyboard_repeat_enabled = False, translate_WASD_to_ULDR = True
                     event.key = pygame.K_DOWN
                 elif pygame.K_d == event.key:
                     event.key = pygame.K_RIGHT
+            if pygame.K_KP_ENTER == event.key:
+                event.key = pygame.K_RETURN
 
             # Populate scancode_to_key_dict from KEYDOWN events
             scancode_to_key_dict[event.scancode] = event.key
