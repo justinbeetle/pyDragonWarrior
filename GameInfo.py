@@ -26,9 +26,9 @@ class GameInfo:
     def __init__(self,
                  base_path: str,
                  game_xml_path: str,
-                 tile_size_pixels: int,
-                 saved_game_file: Optional[str] = None) -> None:
+                 tile_size_pixels: int) -> None:
 
+        self.game_xml_path = game_xml_path
         self.tile_size_pixels = tile_size_pixels
         self.dialog_sequences: Dict[str, DialogType] = {}
 
@@ -65,6 +65,12 @@ class GameInfo:
         audio_player = AudioPlayer()
         audio_player.set_music_path(music_path)
         audio_player.set_sound_path(sound_path)
+
+        # Parse title information
+        title_element = xml_root.find('Title')
+        self.title_music = title_element.attrib['music']
+        title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
+        self.title_image = pygame.image.load(title_image_file_name).convert()
 
         # Parse items
         self.items: Dict[str, ItemType] = {}
@@ -683,24 +689,41 @@ class GameInfo:
             dialog_script = self.parse_dialog(element)
             if dialog_script is not None:
                 self.dialog_sequences[element.attrib['label']] = dialog_script
-         
-        # Parse initial game state
+
+        # Parse death state
+        death_state_element = xml_root.find('DeathState')
+        if death_state_element is None:
+            print('ERROR: DeathState element is missing', flush=True)
+            raise Exception('Missing required DeathState element')
+        self.death_map = death_state_element.attrib['map']
+        self.death_hero_pos_dat_tile = Point(int(death_state_element.attrib['x']),
+                                             int(death_state_element.attrib['y']))
+        self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
+        self.death_dialog = self.parse_dialog(death_state_element)
+
+    def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
+        # TODO: Introduce a game type to hold this information
+
         self.pc_name = ''
-        initial_state_element = xml_root.find('InitialState')
-        if saved_game_file is not None:
-            if os.path.isfile(saved_game_file):
-                save_game_file_path = saved_game_file
+        save_game_file_path : Optional[str] = None
+        if pc_name_or_file_name is not None:
+            if os.path.isfile(pc_name_or_file_name):
+                save_game_file_path = pc_name_or_file_name
             else:
-                save_game_file_path = os.path.join(self.saves_path, saved_game_file + '.xml')
-            if os.path.isfile(save_game_file_path):
-                print('Loading save game from file ' + save_game_file_path, flush=True)
-                initial_state_element = xml.etree.ElementTree.parse(save_game_file_path).getroot()
-            else:
-                self.pc_name = saved_game_file
+                save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + '.xml')
+
+        if save_game_file_path is not None and os.path.isfile(save_game_file_path):
+            print('Loading save game from file ' + save_game_file_path, flush=True)
+            initial_state_element = xml.etree.ElementTree.parse(save_game_file_path).getroot()
+        else:
+            self.pc_name = pc_name_or_file_name
+            xml_root = xml.etree.ElementTree.parse(self.game_xml_path).getroot()
+            initial_state_element = xml_root.find('InitialState')
+
         if initial_state_element is None:
             print('ERROR: InitialState element is missing', flush=True)
             raise Exception('Missing required InitialState element')
-         
+
         self.initial_map = initial_state_element.attrib['map']
         self.initial_hero_pos_dat_tile = Point(int(initial_state_element.attrib['x']),
                                                int(initial_state_element.attrib['y']))
@@ -733,7 +756,7 @@ class GameInfo:
                 self.pc_otherEquippedItems.append(self.tools[item_name])
             else:
                 print('ERROR: Unsupported item', item_name, flush=True)
-            
+
         self.pc_unequippedItems: Dict[ItemType, int] = {}
         for item_element in initial_state_element.findall("./UnequippedItems/Item"):
             item_name = item_element.attrib['name']
@@ -749,7 +772,7 @@ class GameInfo:
         for progress_marker_element in initial_state_element.findall("./ProgressMarkers/ProgressMarker"):
             self.pc_progressMarkers.append(progress_marker_element.attrib['name'])
             # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
-      
+
         self.initial_map_decorations: List[MapDecoration] = []
         for decoration_element in initial_state_element.findall("./MapDecoration"):
             decoration = None
@@ -762,17 +785,6 @@ class GameInfo:
                 self.parse_dialog(decoration_element),
                 None,
                 None))
-
-        # Parse death state
-        death_state_element = xml_root.find('DeathState')
-        if death_state_element is None:
-            print('ERROR: DeathState element is missing', flush=True)
-            raise Exception('Missing required DeathState element')
-        self.death_map = death_state_element.attrib['map']
-        self.death_hero_pos_dat_tile = Point(int(death_state_element.attrib['x']),
-                                             int(death_state_element.attrib['y']))
-        self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
-        self.death_dialog = self.parse_dialog(death_state_element)
 
     def parse_dialog(self, dialog_root_element: Optional[xml.etree.ElementTree.Element]) -> Optional[DialogType]:
         if dialog_root_element is None:
@@ -1112,9 +1124,10 @@ class GameInfoMapViewer:
             self.win_size_pixels = Point(self.screen.get_size())
             self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).floor()
         else:
-            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).ceil()
+            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
+            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(),
+                                                  pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
         self.clock = pygame.time.Clock()
 

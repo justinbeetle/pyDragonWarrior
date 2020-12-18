@@ -2,7 +2,9 @@
 
 from typing import cast, List, Optional, Union
 
-import datetime
+# import datetime
+import glob
+import os
 import pygame
 import random
 
@@ -22,25 +24,99 @@ class Game:
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int,
-                 saved_game_file: Optional[str] = None) -> None:
+                 tile_size_pixels: int) -> None:
         self.game_state = GameState(base_path,
                                     game_xml_path,
                                     desired_win_size_pixels,
-                                    tile_size_pixels,
-                                    saved_game_file)
+                                    tile_size_pixels)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
         GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
 
-    def run_game_loop(self) -> None:
+    def run_game_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
         self.game_state.is_running = True
-        self.title_screen_loop()
+        self.title_screen_loop(pc_name_or_file_name)
         self.exploring_loop()
 
-    def title_screen_loop(self) -> None:
-        # TODO: Implement
-        pass
+    def title_screen_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
+        #self.game_state.load(pc_name_or_file_name)
+
+        # Play title music and display title screen
+        AudioPlayer().play_music(self.game_state.game_info.title_music)
+        title_image_size_px = Point(self.game_state.game_info.title_image.get_size())
+        title_image_size_px *= max(1, int(min(self.game_state.get_win_size_pixels().w * 0.8 / title_image_size_px.w,
+                                              self.game_state.get_win_size_pixels().h * 0.8 / title_image_size_px.h)))
+        title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px)
+        title_image_dest_px = Point(
+            (self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
+            self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
+        self.game_state.screen.fill(pygame.Color('black'))
+        self.game_state.screen.blit(title_image, title_image_dest_px)
+        pygame.display.flip()
+
+        # Wait for user input - any key press
+        while self.game_state.is_running:
+            waiting_for_user_input = True
+            for event in GameEvents.get_events():
+                if event.type == pygame.QUIT:
+                    self.game_state.handle_quit(force=True)
+                elif event.type == pygame.KEYDOWN:
+                    waiting_for_user_input = False
+                    break
+            if waiting_for_user_input:
+                pygame.time.Clock().tick(40)
+            else:
+                break
+
+        # Prompt user for new game or to load a saved game
+        if pc_name_or_file_name is None:
+            # Get a list of the saved games
+            saved_game_files = glob.glob(os.path.join(self.game_state.game_info.saves_path, '*.xml'))
+            saved_games = []
+            for saved_game_file in saved_game_files:
+                saved_games.append(os.path.basename(saved_game_file)[:-4])
+
+            menu_options = []
+            if 0 < len(saved_games):
+                menu_options.append('Continue a Quest')
+            menu_options.append('Begin a Quest')
+
+            while self.game_state.is_running:
+                message_dialog = GameDialog.create_message_dialog()
+                message_dialog.add_menu_prompt(menu_options, 1)
+                message_dialog.blit(self.game_state.screen, True)
+                menu_result = self.gde.get_menu_result(message_dialog)
+                print('menu_result =', menu_result, flush=True)
+                if menu_result == 'Continue a Quest':
+                    message_dialog.clear()
+                    message_dialog.add_menu_prompt(saved_games, 1)
+                    message_dialog.blit(self.game_state.screen, True)
+                    menu_result = self.gde.get_menu_result(message_dialog)
+                    if menu_result is not None:
+                        pc_name_or_file_name = menu_result
+                        break
+                elif menu_result == 'Begin a Quest':
+                    message_dialog.clear()
+                    pc_name_or_file_name = self.gde.wait_for_user_input(message_dialog,  'What is your name?')[0]
+
+                    if pc_name_or_file_name in saved_games:
+                        message_dialog.add_message('Thou hast already started a quest.  Dost thou desire to start over?')
+                        message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
+                        message_dialog.blit(self.game_state.screen, True)
+                        menu_result = self.gde.get_menu_result(message_dialog)
+                        if menu_result == 'Yes':
+                            # Delete the existing save game for this user after archiving it off
+                            saved_game_file = os.path.join(self.game_state.game_info.saves_path,
+                                                           pc_name_or_file_name + '.xml')
+                            self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
+                            os.remove(saved_game_file)
+                        elif menu_result != 'No':
+                            continue
+                    break
+
+        # Load the saved game
+        self.game_state.load(pc_name_or_file_name)
+        self.gde.refresh_game_state()
 
     def exploring_loop(self) -> None:
         map_name = ''
@@ -421,10 +497,10 @@ def main() -> None:
     game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 20 * 3
-    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels, saved_game_file)
+    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels)
 
     # Run the game
-    game.run_game_loop()
+    game.run_game_loop(saved_game_file)
 
     # Exit the game
     AudioPlayer().terminate()

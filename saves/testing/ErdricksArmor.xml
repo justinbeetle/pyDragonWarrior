@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="swamp_cave" name="Wallace" x="5" xp="16000" y="14">
+<SaveState dir="EAST" gp="100000" map="hauksness" name="Wallace" x="18" xp="24000" y="13">
    <EquippedItems>
-      <Item name="Broad Sword"/>
-      <Item name="Full Plate"/>
-      <Item name="Iron Shield"/>
+      <Item name="Flame Sword"/>
+      <Item name="Magic Armor"/>
+      <Item name="Silver Shield"/>
       <Item name="Dragon's Scale"/>
       <Item name="Fighter's Ring"/>
    </EquippedItems>

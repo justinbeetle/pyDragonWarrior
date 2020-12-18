@@ -16,6 +16,7 @@ from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, Di
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
+from HeroParty import HeroParty
 from HeroState import HeroState
 from Point import Point
 import SurfaceEffects
@@ -29,10 +30,16 @@ class GameDialogEvaluator:
         self.game_info = game_info
         self.game_state = game_state
         self.combat_encounter = combat_encounter
-        self.hero_party = game_state.get_hero_party()
-        self.replacement_variables = game_state.get_dialog_replacement_variables()
+        self.hero_party = self.game_state.get_hero_party()
+        self.replacement_variables = self.game_state.get_dialog_replacement_variables()
         self.wait_before_new_text = False
 
+        self.actor: CombatCharacterState = self.hero_party.main_character
+        self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
+
+    def refresh_game_state(self):
+        self.hero_party = self.game_state.get_hero_party()
+        self.replacement_variables = self.game_state.get_dialog_replacement_variables()
         self.actor: CombatCharacterState = self.hero_party.main_character
         self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
 
@@ -115,7 +122,7 @@ class GameDialogEvaluator:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
 
-    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, input_regex: Optional[str]) -> str:
+    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, input_regex: Optional[str] = None) -> str:
         message_dialog.prompt_for_user_text(prompt, input_regex)
         message_dialog.blit(self.game_state.screen, True)
 
@@ -725,7 +732,7 @@ class GameDialogEvaluator:
                             is_critical_hit = None
                             if item.problem is not None and user_answer == item.problem.answer:
                                 # TODO: Make 5 second time threshold configurable
-                                is_critical_hit = seconds_waiting < 5.0
+                                is_critical_hit = seconds_waiting < 5.0 and target.allows_critical_hits()
 
                             if item.count != 'default':
                                 if is_critical_hit is None:

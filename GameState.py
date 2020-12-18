@@ -59,38 +59,8 @@ class GameState(GameStateInterface):
 
         self.phase = Phase.A
         self.tick_count = 1
-        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, saved_game_file)
+        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
-
-        # Set character state for new game
-        self.pending_dialog = self.game_info.initial_state_dialog
-        pc = HeroState(self.game_info.character_types['hero'],
-                       self.game_info.initial_hero_pos_dat_tile,
-                       self.game_info.initial_hero_pos_dir,
-                       self.game_info.pc_name,
-                       self.game_info.pc_xp)
-        if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
-            pc.hp = self.game_info.pc_hp
-        if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
-            pc.mp = self.game_info.pc_mp
-        pc.weapon = self.game_info.pc_weapon
-        pc.armor = self.game_info.pc_armor
-        pc.shield = self.game_info.pc_shield
-        pc.other_equipped_items = self.game_info.pc_otherEquippedItems
-        pc.unequipped_items = self.game_info.pc_unequippedItems
-        self.hero_party = HeroParty(pc)
-        self.hero_party.gp = self.game_info.pc_gp
-        self.hero_party.progress_markers = self.game_info.pc_progressMarkers
-
-        # TODO: Remove Mocha from party
-        '''
-        mocha = HeroState(self.game_info.character_types['mocha'],
-                          self.game_info.initial_hero_pos_dat_tile,
-                          self.game_info.initial_hero_pos_dir,
-                          'Mocha',
-                          0)
-        self.hero_party.add_member(mocha)
-        '''
 
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
@@ -101,7 +71,8 @@ class GameState(GameStateInterface):
         self.interior_map_image: Optional[pygame.surface.Surface] = None
         self.exterior_map_dmg_image = pygame.surface.Surface((0, 0))
         self.interior_map_dmg_image: Optional[pygame.surface.Surface] = None
-        self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations)
+
+        self.load(saved_game_file)
 
         # TODO: Migrate these to here
         # self.message_dialog: Optional[GameDialog] = None
@@ -191,6 +162,41 @@ class GameState(GameStateInterface):
         else:
             self.interior_map_dmg_image = None
 
+    def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
+        # Set character state for new game
+        self.game_info.parse_initial_game_state(pc_name_or_file_name)
+
+        self.pending_dialog = self.game_info.initial_state_dialog
+        pc = HeroState(self.game_info.character_types['hero'],
+                       self.game_info.initial_hero_pos_dat_tile,
+                       self.game_info.initial_hero_pos_dir,
+                       self.game_info.pc_name,
+                       self.game_info.pc_xp)
+        if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
+            pc.hp = self.game_info.pc_hp
+        if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
+            pc.mp = self.game_info.pc_mp
+        pc.weapon = self.game_info.pc_weapon
+        pc.armor = self.game_info.pc_armor
+        pc.shield = self.game_info.pc_shield
+        pc.other_equipped_items = self.game_info.pc_otherEquippedItems
+        pc.unequipped_items = self.game_info.pc_unequippedItems
+        self.hero_party = HeroParty(pc)
+        self.hero_party.gp = self.game_info.pc_gp
+        self.hero_party.progress_markers = self.game_info.pc_progressMarkers
+
+        # TODO: Remove Mocha from party
+        '''
+        mocha = HeroState(self.game_info.character_types['mocha'],
+                          self.game_info.initial_hero_pos_dat_tile,
+                          self.game_info.initial_hero_pos_dir,
+                          'Mocha',
+                          0)
+        self.hero_party.add_member(mocha)
+        '''
+
+        self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations)
+
     def save(self, quick_save: bool=False) -> None:
         # TODO: Save data for multiple party members
         xml_root = xml.etree.ElementTree.Element('SaveState')
@@ -243,11 +249,21 @@ class GameState(GameStateInterface):
         xml_string = xml.dom.minidom.parseString(xml.etree.ElementTree.tostring(xml_root)).toprettyxml(indent="   ")
 
         save_game_file_path = os.path.join(self.game_info.saves_path, self.hero_party.main_character.name + '.xml')
+
+        # Archive off the old save, if one is present
+        self.archive_saved_game_file(save_game_file_path)
+
+        # Save the game
         if not os.path.isdir(self.game_info.saves_path):
             os.makedirs(self.game_info.saves_path)
+        save_game_file = open(save_game_file_path, 'w')
+        save_game_file.write(xml_string)
+        save_game_file.close()
+
+    def archive_saved_game_file(self, save_game_file_path, archive_dir_name='archive'):
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
-            archive_dir = os.path.join(self.game_info.saves_path, 'archive')
+            archive_dir = os.path.join(self.game_info.saves_path, archive_dir_name)
             from datetime import datetime
             timestamp = datetime.fromtimestamp(os.path.getmtime(save_game_file_path)).strftime("%Y%m%d%H%M%S")
             rename_file_path = os.path.join(archive_dir, self.hero_party.main_character.name + '_' + timestamp + '.xml')
@@ -256,10 +272,7 @@ class GameState(GameStateInterface):
             if not os.path.isfile(rename_file_path):
                 os.rename(save_game_file_path, rename_file_path)
             else:
-                print ('ERROR: File already exists: ', rename_file_path, flush=True)
-        save_game_file = open(save_game_file_path, 'w')
-        save_game_file.write(xml_string)
-        save_game_file.close()
+                print ('ERROR: File already exists:', rename_file_path, flush=True)
 
     def get_map_image_rect(self) -> pygame.Rect:
         # Always rendering to the entire screen but need to determine the

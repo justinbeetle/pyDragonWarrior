@@ -106,3 +106,8 @@ venv.bak/
 # Ignore large files
 data/music
 data/sounds
+
+# Ignore archived saves
+saves/archive
+
+.idea

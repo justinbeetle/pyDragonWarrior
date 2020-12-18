@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<SaveState dir="EAST" gp="100000" map="hauksness" name="Wallace" x="18" xp="24000" y="13">
+   <EquippedItems>
+      <Item name="Flame Sword"/>
+      <Item name="Erdrick's Armor"/>
+      <Item name="Silver Shield"/>
+      <Item name="Dragon's Scale"/>
+      <Item name="Fighter's Ring"/>
+   </EquippedItems>
+   <UnequippedItems>
+      <Item count="10" name="Fairy Water"/>
+      <Item count="10" name="Herb"/>
+      <Item count="10" name="Key"/>
+      <Item count="10" name="Torch"/>
+      <Item count="10" name="Wings"/>
+   </UnequippedItems>
+</SaveState>

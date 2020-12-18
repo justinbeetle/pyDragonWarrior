@@ -1,4 +1,6 @@
 <Game dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations_20" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+   <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
+
    <Tiles>
       <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
       <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
