@@ -885,6 +885,10 @@ class GameInfo:
                     self.dialog_sequences[label] = conditional_dialog
 
             elif element.tag == 'DialogAction':
+                approach_dialog: Optional[DialogType] = None
+                if 'approachDialogScript' in element.attrib:
+                    approach_dialog = [DialogGoTo(element.attrib['approachDialogScript'])]
+
                 victory_dialog: Optional[DialogType] = None
                 if 'victoryDialogScript' in element.attrib:
                     victory_dialog = [DialogGoTo(element.attrib['victoryDialogScript'])]
@@ -923,6 +927,7 @@ class GameInfo:
                                            map_name=map_name,
                                            map_pos=map_pos,
                                            map_dir=map_dir,
+                                           approach_dialog=approach_dialog,
                                            victory_dialog=victory_dialog,
                                            run_away_dialog=run_away_dialog,
                                            encounter_music=encounter_music))

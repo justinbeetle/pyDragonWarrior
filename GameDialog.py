@@ -29,6 +29,7 @@ class GameDialog:
     font_size = 32
     font_color = NOMINAL_HEALTH_FONT_COLOR
     font: pygame.Font
+    anti_alias = True
     outside_spacing_pixels = 24
     internal_spacing_pixels = 10
     selection_indicator_pixels = 16
@@ -138,7 +139,10 @@ class GameDialog:
         pygame.draw.rect(self.image, self.font_color,
                          pygame.Rect(8, 8, self.image.get_width() - 16, self.image.get_height() - 16), 7)
         if self.title is not None:
-            title_image = GameDialog.font.render(self.title, False, self.font_color, pygame.Color('black'))
+            title_image = GameDialog.font.render(self.title,
+                                                 GameDialog.anti_alias,
+                                                 self.font_color,
+                                                 pygame.Color('black'))
             title_image_pos_x = (self.image.get_width() - title_image.get_width()) / 2
             self.image.fill(
                 pygame.Color('black'),
@@ -435,7 +439,10 @@ class GameDialog:
         col_pos_x = GameDialog.outside_spacing_pixels
         row_pos_y = self.get_starting_row_pos_y()
         for lines in self.displayed_message_lines:
-            self.image.blit(GameDialog.font.render(lines, False, self.font_color, pygame.Color('black')),
+            self.image.blit(GameDialog.font.render(lines,
+                                                   GameDialog.anti_alias,
+                                                   self.font_color,
+                                                   pygame.Color('black')),
                             (col_pos_x, row_pos_y))
             row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
@@ -451,7 +458,7 @@ class GameDialog:
                 first_col_pos_x += GameDialog.font.size(self.row_data_prompt)[0] + GameDialog.internal_spacing_pixels
                 col_pos_x = first_col_pos_x - GameDialog.internal_spacing_pixels
                 self.image.blit(GameDialog.font.render(self.row_data_prompt,
-                                                       False,
+                                                       GameDialog.anti_alias,
                                                        self.font_color,
                                                        pygame.Color('black')),
                                 (GameDialog.outside_spacing_pixels, row_pos_y))
@@ -473,7 +480,7 @@ class GameDialog:
                         if self.is_menu:
                             col_pos_x += GameDialog.selection_indicator_pixels + GameDialog.internal_spacing_pixels
                     self.image.blit(GameDialog.font.render(self.row_data[row][col],
-                                                           False,
+                                                           GameDialog.anti_alias,
                                                            self.font_color,
                                                            pygame.Color('black')),
                                     (col_pos_x, row_pos_y))
@@ -481,7 +488,10 @@ class GameDialog:
 
             col_pos_x = GameDialog.outside_spacing_pixels
             for lines in self.row_data_trailing_message_lines:
-                self.image.blit(GameDialog.font.render(lines, False, self.font_color, pygame.Color('black')),
+                self.image.blit(GameDialog.font.render(lines,
+                                                       GameDialog.anti_alias,
+                                                       self.font_color,
+                                                       pygame.Color('black')),
                                 (col_pos_x, row_pos_y))
                 row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
@@ -671,7 +681,7 @@ class GameDialog:
                 orig_user_text = self.user_text
                 if pygame.K_BACKSPACE == event.key:
                     self.user_text = self.user_text[:-1]
-                elif 1 == len(event.unicode):
+                elif 'unicode' in event.__dict__ and 1 == len(event.unicode):
                     if self.input_regex is None or re.match(self.input_regex, event.unicode):
                         self.user_text += event.unicode
 

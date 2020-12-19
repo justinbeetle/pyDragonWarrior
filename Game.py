@@ -24,11 +24,13 @@ class Game:
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int) -> None:
+                 tile_size_pixels: int,
+                 add_math_problems_in_combat: bool) -> None:
         self.game_state = GameState(base_path,
                                     game_xml_path,
                                     desired_win_size_pixels,
-                                    tile_size_pixels)
+                                    tile_size_pixels,
+                                    add_math_problems_in_combat)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
         GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
@@ -39,18 +41,22 @@ class Game:
         self.exploring_loop()
 
     def title_screen_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
-        #self.game_state.load(pc_name_or_file_name)
-
         # Play title music and display title screen
         AudioPlayer().play_music(self.game_state.game_info.title_music)
         title_image_size_px = Point(self.game_state.game_info.title_image.get_size())
         title_image_size_px *= max(1, int(min(self.game_state.get_win_size_pixels().w * 0.8 / title_image_size_px.w,
                                               self.game_state.get_win_size_pixels().h * 0.8 / title_image_size_px.h)))
         title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px)
-        title_image_dest_px = Point(
-            (self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
-            self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
+        title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
+                                    self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
         self.game_state.screen.fill(pygame.Color('black'))
+        self.game_state.screen.blit(title_image, title_image_dest_px)
+        title_image = GameDialog.font.render('Press any key',
+                                             GameDialog.anti_alias,
+                                             pygame.Color('white'),
+                                             pygame.Color('black'))
+        title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image.get_width()) / 2,
+                                    3 * self.game_state.get_win_size_pixels().h / 4)
         self.game_state.screen.blit(title_image, title_image_dest_px)
         pygame.display.flip()
 
@@ -481,26 +487,31 @@ class Game:
 
 
 def main() -> None:
+    import argparse
     import sys
-    import os
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--math', help='Math problems used in combat', default=False, action='store_true')
+    parser.add_argument('save', nargs='?', help='Load a specific saved game file')
+    args = parser.parse_args()
 
     pygame.init()
     pygame.mouse.set_visible(False)
-    GameEvents.setup_joystick()
-
-    saved_game_file = None
-    if len(sys.argv) > 1:
-        saved_game_file = sys.argv[1]
+    if GameEvents.setup_joystick():
+        if args.math:
+            # Disable math problems if the user is using a joystick
+            print('Disabling math problems in combat because a joystick/gamepad was detected', flush=True)
+            args.math = False
 
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 20 * 3
-    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels, args.math)
 
     # Run the game
-    game.run_game_loop(saved_game_file)
+    game.run_game_loop(args.save)
 
     # Exit the game
     AudioPlayer().terminate()

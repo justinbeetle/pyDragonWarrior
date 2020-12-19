@@ -369,7 +369,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def get_available_spells(self) -> List[Spell]:
         available_spells = []
         for level in self.character_type.levels:
-            if level.xp < self.xp and level.spell is not None:
+            if level.number <= self.level.number and level.spell is not None:
                 available_spells.append(level.spell)
         return available_spells
 

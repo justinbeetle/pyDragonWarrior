@@ -24,7 +24,7 @@ def main():
     is_running = True
     while is_running:
         for event in pygame.event.get():
-            # print( 'event =', event, flush=True )
+            print('event =', event, flush=True )
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     is_running = False

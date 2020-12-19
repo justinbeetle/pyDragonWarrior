@@ -92,7 +92,7 @@ class MonsterState(CombatCharacterState):
             max_damage = (self.get_strength() - target.get_defense_strength() // 2) // 2
         else:
             min_damage = 0
-            max_damage = (self.get_strength() + 4) // 3
+            max_damage = (self.get_strength() + 4) // 6
         damage = CombatCharacterState.calc_damage(
             min_damage,
             max_damage,

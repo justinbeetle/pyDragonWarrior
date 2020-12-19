@@ -152,10 +152,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         modifier = target.get_damage_modifier(damage_type)
         damage = math.floor(min_damage + random.uniform(0, 1) * (max_damage - min_damage) * modifier)
         if damage < 1:
-            if random.uniform(0, 1) < 0.5:
-                damage = 0
-            else:
-                damage = 1
+            damage = random.randint(0, 1)
         return damage
 
     def __str__(self) -> str:

@@ -36,7 +36,9 @@ class GameState(GameStateInterface):
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
                  tile_size_pixels: int,
-                 saved_game_file: Optional[str] = None) -> None:
+                 add_math_problems_in_combat = False) -> None:
+
+        self.add_math_problems_in_combat = add_math_problems_in_combat
 
         if desired_win_size_pixels is None:
             screen = pygame.display.set_mode(
@@ -72,7 +74,7 @@ class GameState(GameStateInterface):
         self.exterior_map_dmg_image = pygame.surface.Surface((0, 0))
         self.interior_map_dmg_image: Optional[pygame.surface.Surface] = None
 
-        self.load(saved_game_file)
+        self.load()
 
         # TODO: Migrate these to here
         # self.message_dialog: Optional[GameDialog] = None
@@ -866,6 +868,9 @@ class GameState(GameStateInterface):
 
         # Restore initial background image
         menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
+
+    def should_add_math_problems_in_combat(self) -> bool:
+        return self.add_math_problems_in_combat
 
 
 def main() -> None:

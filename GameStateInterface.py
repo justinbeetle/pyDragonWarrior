@@ -101,3 +101,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def handle_quit(self, force: bool = False) -> None:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def should_add_math_problems_in_combat(self) -> bool:
+        raise NotImplementedError

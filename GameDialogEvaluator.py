@@ -730,9 +730,14 @@ class GameDialogEvaluator:
                         if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             worked = True
                             is_critical_hit = None
-                            if item.problem is not None and user_answer == item.problem.answer:
-                                # TODO: Make 5 second time threshold configurable
-                                is_critical_hit = seconds_waiting < 5.0 and target.allows_critical_hits()
+                            if item.problem is not None:
+                                if user_answer == item.problem.answer:
+                                    # TODO: Make 5 second time threshold configurable
+                                    is_critical_hit = seconds_waiting < 5.0
+                                    message_dialog.add_message("That's right!")
+                                else:
+                                    message_dialog.add_message('Wrong!  The correct answer is ' +
+                                                               str(item.problem.answer))
 
                             if item.count != 'default':
                                 if is_critical_hit is None:
@@ -760,7 +765,10 @@ class GameDialogEvaluator:
 
                             if 0 < damage:
                                 if is_critical_hit:
-                                    message_dialog.add_message('Excellent move!')
+                                    if target.allows_critical_hits():
+                                        message_dialog.add_message('Excellent move!')
+                                    else:
+                                        message_dialog.add_message('Great move!')
 
                                 # Check for a dodge
                                 if allow_dodge and target.is_dodging_attack():

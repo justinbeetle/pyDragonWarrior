@@ -4,13 +4,14 @@ from typing import List, Optional, Tuple
 
 import pygame
 
+joysticks = []
 # Build a scancode to key dictionary as KEYDOWN events are encountered.  For some reason pygame doesn't otherwise
 # have a means of determining this association to make the output of pygame.key.get_pressed().
 scancode_to_key_dict = {}
 keys_to_repeat = [pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT]
 
-def setup_joystick() -> None:
-    joysticks = []
+
+def setup_joystick() -> bool:
     print('pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True)
     for joystickId in range(pygame.joystick.get_count()):
         joystick = pygame.joystick.Joystick(joystickId)
@@ -20,13 +21,21 @@ def setup_joystick() -> None:
         print('Initializing joystick...', flush=True)
         joystick.init()
         joysticks.append(joystick)
+    return len(joysticks) > 0
 
-def get_events(is_keyboard_repeat_enabled = False, translate_WASD_to_ULDR = True) -> List[pygame.event.Event]:
+
+def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) -> List[pygame.event.Event]:
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
+        #print('Detected event', event, flush=True)
+        #if 'unicode' in event.__dict__:
+        #    print('Detected event.unicode', event.unicode, flush=True)
+        #else:
+        #    print('Detected event without event.unicode', flush=True)
+
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             # Convert WASD to Up/Left/Down/Right
-            if translate_WASD_to_ULDR:
+            if translate_wasd_to_uldr:
                 if pygame.K_w == event.key:
                     event.key = pygame.K_UP
                 elif pygame.K_a == event.key:
@@ -50,14 +59,21 @@ def get_events(is_keyboard_repeat_enabled = False, translate_WASD_to_ULDR = True
                 event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_RETURN})
             elif event.button == 1:
                 event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_SPACE})
-        elif event.type == pygame.JOYHATMOTION and not is_keyboard_repeat_enabled:
+            elif event.button == 6:
+                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_ESCAPE})
+            elif event.button == 7:
+                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_F1})
+            else:
+                # Map all other buttons to an unused key
+                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_F15})
+        elif event.type == pygame.JOYHATMOTION:
             event = get_event_for_joystick_hat_position(event.value)
 
         if event is not None:
             events.append(event)
 
     if is_keyboard_repeat_enabled:
-        # Generate key down events from a joystick hat for the case were repeats are enabled
+        # Generate key down events from a joystick hat for the case where repeats are enabled
         for joystick_id in range(pygame.joystick.get_count()):
             joystick = pygame.joystick.Joystick(joystick_id)
             if not joystick.get_init():
@@ -80,7 +96,7 @@ def get_events(is_keyboard_repeat_enabled = False, translate_WASD_to_ULDR = True
 
     return events
 
-#
+
 def add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.event.Event) -> None:
     if pygame.KEYDOWN == event.type:
         for existing_event in events:
@@ -90,8 +106,10 @@ def add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.e
                 return
     events.append(event)
 
+
 def clear_events() -> None:
     get_events()
+
 
 def get_event_for_joystick_hat_position(hat_position: Tuple[float, float]) -> Optional[pygame.event.Event]:
     event = None
