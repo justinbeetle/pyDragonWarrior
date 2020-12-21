@@ -522,7 +522,7 @@ class CombatEncounter(CombatEncounterInterface):
         addend_1 = random.randrange(min_term, max_term)
         addend_2 = random.randrange(min_term, max_term)
         sum = addend_1 + addend_2
-        return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum), '[0-9]')
+        return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum), '0123456789')
 
     @staticmethod
     def gen_subtraction_problem(min_term=0,
@@ -538,7 +538,7 @@ class CombatEncounter(CombatEncounterInterface):
             minuend = a+b
             subtrahend = random.choice((a, b))
         difference = minuend - subtrahend
-        return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference), '[0-9]')
+        return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference), '0123456789')
 
     @staticmethod
     def gen_multiplication_problem(min_term=0,
@@ -560,7 +560,7 @@ class CombatEncounter(CombatEncounterInterface):
             multiplicand_1, multiplicand_2 = multiplicand_2, multiplicand_1
 
         product = multiplicand_1 * multiplicand_2
-        return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product), '[0-9]')
+        return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product), '0123456789')
 
     @staticmethod
     def gen_division_problem(min_term=0, max_term=12) -> Problem:
@@ -571,7 +571,7 @@ class CombatEncounter(CombatEncounterInterface):
         if divisor == 0:
             divisor = 1
         quotient = dividend // divisor
-        return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '[0-9]')
+        return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '0123456789')
 
     @staticmethod
     def gen_any_problem(min_term=0, max_term=12) -> Problem:

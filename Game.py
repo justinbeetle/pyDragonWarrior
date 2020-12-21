@@ -487,21 +487,19 @@ class Game:
 
 
 def main() -> None:
-    import argparse
-    import sys
+    pygame.init()
+    pygame.mouse.set_visible(False)
+    has_joystick = GameEvents.setup_joystick()
 
+    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--math', help='Math problems used in combat', default=False, action='store_true')
+    parser.add_argument('-k', '--keyboard', help='Keyboard will be used for providing user inputs',
+                        default=not has_joystick, action='store_true')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
 
-    pygame.init()
-    pygame.mouse.set_visible(False)
-    if GameEvents.setup_joystick():
-        if args.math:
-            # Disable math problems if the user is using a joystick
-            print('Disabling math problems in combat because a joystick/gamepad was detected', flush=True)
-            args.math = False
+    GameDialog.no_keyboard = not args.keyboard
 
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]

@@ -5,7 +5,7 @@ Current Efforts:
    Drop CombatEncounter.py into Game.py - DONE!
    Get test saves for testing all quest encounters - DONE!
    Get fairy flute to work on Golum correctly - DONE!
-   Look into the damage calculations - seeming a little funky
+   Look into the damage calculations - DONE!
    More sets of updates to GameDialog - add class for row data and allow multiple row data entries to support a nicer gold display at bottom.  More spacing types to fix the status display for larger party sizes.
    Add character selection from menu and target selection for spells, etc.
    Add trading of items between characters
@@ -54,7 +54,7 @@ Current Efforts:
 37) Implement quest items - DONE!
 38) Move sound selections into game.xml - Partially implemented
 39) Make traversing stairs in caves optional
-40) Use controller to specify character name for new quest or answers to math problems.
+40) Use controller to specify character name for new quest or answers to math problems - DONE!
 
 Make custom images
 Area clearing - make the monster sets per area dynamic

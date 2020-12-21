@@ -122,8 +122,8 @@ class GameDialogEvaluator:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
 
-    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, input_regex: Optional[str] = None) -> str:
-        message_dialog.prompt_for_user_text(prompt, input_regex)
+    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, allowed_input: Optional[str] = None) -> str:
+        message_dialog.prompt_for_user_text(prompt, allowed_input)
         message_dialog.blit(self.game_state.screen, True)
 
         is_waiting_for_user_input = True
@@ -136,7 +136,20 @@ class GameDialogEvaluator:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
-                        is_waiting_for_user_input = False
+                        if GameDialog.no_keyboard:
+                            # Get a menu selection and turn that into an event
+                            menu_result = message_dialog.get_selected_menu_option()
+                            if menu_result == GameDialog.ENTER_UNICODE:
+                                is_waiting_for_user_input = False
+                            elif menu_result == GameDialog.BACKSPACE_UNICODE:
+                                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_BACKSPACE})
+                            else:
+                                event = pygame.event.Event(pygame.KEYDOWN, {'key': None, 'unicode': menu_result})
+
+                            if is_waiting_for_user_input:
+                                message_dialog.process_event(event, self.game_state.screen)
+                        else:
+                            is_waiting_for_user_input = False
                     else:
                         message_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
@@ -157,17 +170,17 @@ class GameDialogEvaluator:
                         if allow_quit:
                             self.game_state.handle_quit()
                         else:
-                            menu_result = ""
+                            menu_result = ''
                     elif event.key == pygame.K_RETURN:
                         menu_result = menu_dialog.get_selected_menu_option()
                     elif event.key == pygame.K_SPACE:
-                        menu_result = ""
+                        menu_result = ''
                     else:
                         menu_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
 
-        if menu_result == "":
+        if menu_result == '':
             menu_result = None
 
         return menu_result
@@ -722,7 +735,7 @@ class GameDialogEvaluator:
                         # Prompt user for problem and get their answer
                         user_answer, seconds_waiting = self.wait_for_user_input(message_dialog,
                                                                                 item.problem.problem,
-                                                                                item.problem.answer_regex)
+                                                                                item.problem.answer_allowed_characters)
                         # print('User answer to problem', item.problem.problem, 'was', user_answer, 'in',
                         #      round(seconds_waiting, 2), 'seconds; expected answer', item.problem.answer, flush=True)
 
