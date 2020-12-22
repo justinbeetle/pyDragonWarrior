@@ -54,7 +54,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def set_map(self,
                 new_map_name: str,
                 one_time_decorations: Optional[List[MapDecoration]] = None,
-                respawn_decorations: bool = False) -> None:
+                respawn_decorations=False) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -71,9 +71,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def draw_map(self,
-                 flip_buffer: bool = True,
-                 draw_background: bool = True,
-                 draw_characters: bool = True) -> None:
+                 flip_buffer=True,
+                 draw_background=True,
+                 draw_characters=True,
+                 draw_combat=True) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod

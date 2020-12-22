@@ -140,7 +140,7 @@ class CombatEncounter(CombatEncounterInterface):
         self.game_state.screen.blit(self.background_image, (0, 0))
 
         # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
-        self.game_state.draw_map(False)
+        self.game_state.draw_map(False, draw_combat=False)
         pygame.display.flip()
 
     def render_monsters(self,
@@ -643,6 +643,7 @@ def main() -> None:
     mock_game_state.is_running = True
     mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
+    mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
     def handle_quit_side_effect() -> None:
         mock_game_state.is_running = False
@@ -666,6 +667,9 @@ def main() -> None:
     # Run a series of combat encounters
     CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
     for (hero_party, monster_party) in combat_parties:
+        if not mock_game_state.is_running:
+            break
+
         mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
         combat_encounter = CombatEncounter(game_info,
                                            mock_game_state,

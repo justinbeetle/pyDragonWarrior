@@ -122,6 +122,9 @@ class GameDialogEvaluator:
                     message_dialog.erase_waiting_indicator()
                     message_dialog.blit(self.game_state.screen, True)
 
+        # Since we just waited, clean wait_before_new_text
+        self.wait_before_new_text = False
+
     def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, allowed_input: Optional[str] = None) -> str:
         message_dialog.prompt_for_user_text(prompt, allowed_input)
         message_dialog.blit(self.game_state.screen, True)

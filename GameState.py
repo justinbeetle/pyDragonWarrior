@@ -659,9 +659,10 @@ class GameState(GameStateInterface):
                                          self.win_size_pixels.y))
 
     def draw_map(self,
-                 flip_buffer: bool = True,
-                 draw_background: bool = True,
-                 draw_characters: bool = True) -> None:
+                 flip_buffer=True,
+                 draw_background=True,
+                 draw_characters=True,
+                 draw_combat=True) -> None:
         # Implement light diameter via clipping
         if self.is_light_restricted():
             self.screen.fill(pygame.Color('black'))
@@ -677,6 +678,11 @@ class GameState(GameStateInterface):
 
         # Restore clipping for entire window
         self.set_clipping_for_window()
+
+        # If in combat, refresh the background image and render the monsters.
+        if draw_combat and self.combat_encounter is not None:
+            self.combat_encounter.background_image = self.screen.copy()
+            self.combat_encounter.render_monsters()
 
         # Flip the screen buffer
         if flip_buffer:
