@@ -48,7 +48,7 @@ Current Efforts:
 31) Door, chest, hidden item, and special monster respawn control - DONE!
 32) Add armor healing - DONE!
 33) Add roofs to cities - Partially implemented - Shouldn't be able to see between areas
-34) Add title screen and create/load/delete menu on start - DONE, except for delete
+34) Add title screen and create/load/delete menu on start - DONE!
 35) Add more cities - DONE!
 36) Add more caves - DONE!
 37) Implement quest items - DONE!

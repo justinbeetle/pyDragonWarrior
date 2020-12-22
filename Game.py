@@ -86,13 +86,15 @@ class Game:
             if 0 < len(saved_games):
                 menu_options.append('Continue a Quest')
             menu_options.append('Begin a Quest')
+            if 0 < len(saved_games):
+                menu_options.append('Delete a Quest')
 
             while self.game_state.is_running:
                 message_dialog = GameDialog.create_message_dialog()
                 message_dialog.add_menu_prompt(menu_options, 1)
                 message_dialog.blit(self.game_state.screen, True)
                 menu_result = self.gde.get_menu_result(message_dialog)
-                print('menu_result =', menu_result, flush=True)
+                # print('menu_result =', menu_result, flush=True)
                 if menu_result == 'Continue a Quest':
                     message_dialog.clear()
                     message_dialog.add_menu_prompt(saved_games, 1)
@@ -101,22 +103,35 @@ class Game:
                     if menu_result is not None:
                         pc_name_or_file_name = menu_result
                         break
+                if menu_result == 'Delete a Quest':
+                    message_dialog.clear()
+                    message_dialog.add_menu_prompt(saved_games, 1)
+                    message_dialog.blit(self.game_state.screen, True)
+                    menu_result = self.gde.get_menu_result(message_dialog)
+                    if menu_result is not None:
+                        message_dialog.add_yes_no_prompt('Are you sure?')
+                        message_dialog.blit(self.game_state.screen, True)
+                        if self.gde.get_menu_result(message_dialog) == 'YES':
+                            saved_games.remove(menu_result)
+                            # Delete the save game by archiving it off
+                            saved_game_file = os.path.join(self.game_state.game_info.saves_path,
+                                                           menu_result + '.xml')
+                            self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
                 elif menu_result == 'Begin a Quest':
                     message_dialog.clear()
                     pc_name_or_file_name = self.gde.wait_for_user_input(message_dialog,  'What is your name?')[0]
 
                     if pc_name_or_file_name in saved_games:
-                        message_dialog.add_message('Thou hast already started a quest.  Dost thou desire to start over?')
-                        message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
+                        message_dialog.add_yes_no_prompt('Thou hast already started a quest.  ' /
+                                                         'Dost thou desire to start over?')
                         message_dialog.blit(self.game_state.screen, True)
                         menu_result = self.gde.get_menu_result(message_dialog)
-                        if menu_result == 'Yes':
-                            # Delete the existing save game for this user after archiving it off
+                        if menu_result == 'YES':
+                            # Delete the existing save game by archiving it off
                             saved_game_file = os.path.join(self.game_state.game_info.saves_path,
                                                            pc_name_or_file_name + '.xml')
                             self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
-                            os.remove(saved_game_file)
-                        elif menu_result != 'No':
+                        elif menu_result != 'NO':
                             continue
                     break
 
@@ -497,13 +512,16 @@ def main() -> None:
 
     import argparse
     parser = argparse.ArgumentParser()
+    parser.add_argument('-g', '--gamepad', help='Gamepad (if present) will be used for providing user inputs',
+                        default=has_joystick, action='store_true')
+    parser.add_argument('-k', '--keyboard', dest='gamepad', help='Keyboard will be used for providing user inputs',
+                        default=not has_joystick, action='store_false')
     parser.add_argument('-m', '--math', help='Math problems used in combat', default=False, action='store_true')
-    parser.add_argument('-k', '--keyboard', help='Keyboard will be used for providing user inputs',
-                        default=not has_joystick, action='store_true')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
+    # print('args =', args, flush=True)
 
-    GameDialog.no_keyboard = not args.keyboard
+    GameDialog.no_keyboard = args.gamepad
 
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]

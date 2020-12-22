@@ -274,7 +274,7 @@ class GameState(GameStateInterface):
             if not os.path.isfile(rename_file_path):
                 os.rename(save_game_file_path, rename_file_path)
             else:
-                print ('ERROR: File already exists:', rename_file_path, flush=True)
+                print('ERROR: File already exists:', rename_file_path, flush=True)
 
     def get_map_image_rect(self) -> pygame.Rect:
         # Always rendering to the entire screen but need to determine the
