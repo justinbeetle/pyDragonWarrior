@@ -14,7 +14,7 @@
       <Item name="Wings"         count="10"/>
       <Item name="Flame Sword"   count="1"/>
       <Item name="Leather Armor" count="1"/>
-      <Item name="Ball Of Light" count="1"/>
+      <Item name="Ball of Light" count="1"/>
    </UnequippedItems>
    <ProgressMarkers>
       <ProgressMarker name="PM_Created_Rainbow_Bridge"/>

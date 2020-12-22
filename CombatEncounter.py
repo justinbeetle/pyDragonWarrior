@@ -395,7 +395,8 @@ class CombatEncounter(CombatEncounterInterface):
                     menu_dialog.erase(self.game_state.screen, self.background_image, True)
 
             elif menu_result == 'ITEM':
-                item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
+                item_cols = 2
+                item_row_data = hero.get_item_row_data(item_cols, limit_to_unequipped=True, filter_types=['Tool'])
                 if len(item_row_data) == 0:
                     self.message_dialog.add_message('Thou dost not have any tools.')
                     continue
@@ -405,7 +406,7 @@ class CombatEncounter(CombatEncounterInterface):
                         None,
                         'ITEMS',
                         item_row_data,
-                        2,
+                        item_cols,
                         GameDialogSpacing.OUTSIDE_JUSTIFIED)
                     menu_dialog.blit(self.game_state.screen, True)
                     item_result = self.gde.get_menu_result(menu_dialog)

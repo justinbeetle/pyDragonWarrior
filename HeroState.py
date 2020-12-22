@@ -59,7 +59,15 @@ class HeroState(MapCharacterState, CombatCharacterState):
         for item in sorted(self.unequipped_items, key=lambda inner_item: inner_item.name):
             item_count_str = str(self.unequipped_items[item])
             HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
-        return item_row_data
+
+        # Flip the data
+        flipped_item_row_data: List[List[str]] = []
+        for i in range((len(item_row_data) + 1) // 2):
+            flipped_item_row_data.append(item_row_data[i])
+            old_index = (len(item_row_data) + 1) // 2 + i
+            if old_index < len(item_row_data):
+                flipped_item_row_data.append(item_row_data[old_index])
+        return flipped_item_row_data
 
     @staticmethod
     def add_item_to_item_row_data(item: ItemType,
@@ -311,12 +319,12 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return 0
 
     def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
-        if ActionCategoryTypeEnum.MAGICAL:
+        if ActionCategoryTypeEnum.MAGICAL == damage_type:
             if self.armor is not None:
-                self.armor.hurt_dmg_modifier
-        elif ActionCategoryTypeEnum.FIRE:
+                return self.armor.hurt_dmg_modifier
+        elif ActionCategoryTypeEnum.FIRE == damage_type:
             if self.armor is not None:
-                self.armor.fire_dmg_modifier
+                return self.armor.fire_dmg_modifier
         return 1.0
 
     def get_attack_damage(self,

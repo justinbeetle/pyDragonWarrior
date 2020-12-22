@@ -565,7 +565,9 @@ class GameDialogEvaluator:
                     self.game_state.draw_map()
 
                 elif item.type == DialogActionEnum.REPEL_MONSTERS:
-                    print('ERROR: DialogActionEnum.REPEL_MONSTERS is not implemented', flush=True)
+                    self.hero_party.repel_monsters = True
+                    self.hero_party.repel_monsters_decay_steps_remaining = item.decay_steps
+                    self.hero_party.repel_monster_fade_dialog = item.fade_dialog
 
                 elif item.type == DialogActionEnum.GOTO_COORDINATES:
                     for hero in self.hero_party.members:
@@ -755,6 +757,7 @@ class GameDialogEvaluator:
                             if item.count != 'default':
                                 if is_critical_hit is None:
                                     is_critical_hit = False
+
                                 damage = round(GameTypes.get_int_value(item.count)
                                                * target.get_damage_modifier(item.category))
                                 # print('Using item damage', flush=True)

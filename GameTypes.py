@@ -132,15 +132,14 @@ class DialogActionEnum(Enum):
     GAIN_ITEM = 5                      # attributes: item (if unknown name, treated as a progress marker),
     #                                                count (defaults to 1), bypass (to bypass updating the screen)
     SET_LIGHT_DIAMETER = 6             # attributes: count, decay (number or unlimited)
-    REPEL_MONSTERS = 7                 # attributes: decay
+    REPEL_MONSTERS = 7                 # attributes: decay, fade_dialog
     GOTO_COORDINATES = 8               # attributes: map, x, y, dir
     GOTO_LAST_OUTSIDE_COORDINATES = 9  # attributes: <none>
     PLAY_SOUND = 10                    # attributes: name
     PLAY_MUSIC = 11                    # attributes: name (play it once and return to looping on the prior music)
     VISUAL_EFFECT = 12                 # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
-    START_ENCOUNTER = 13               # attributes: name, approach_dialog (approachDialogScript in XML),
-    #                                                victory_dialog (victoryDialogScript in XML),
-    #                                                run_away_dialog (runAwayDialogScript in XML), encounterMusic
+    START_ENCOUNTER = 13               # attributes: name, approach_dialog, victory_dialog, run_away_dialog,
+    #                                                encounterMusic
     OPEN_DOOR = 14                     # attributes: <none>
     SLEEP = 15                         # attributes: bypass (to bypass resistances), category
     STOPSPELL = 16                     # attributes: bypass (to bypass resistances), category
@@ -300,6 +299,7 @@ class DialogAction:
     count: Union[int, str] = 1
     bypass: bool = False
     decay_steps: Optional[int] = None
+    fade_dialog: Optional[DialogType] = None
     map_name: Optional[str] = None
     map_pos: Optional[Point] = None
     map_dir: Optional[Direction] = None
@@ -368,6 +368,7 @@ class PointTransition(NamedTuple):
     respawn_decorations: bool
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
+    is_automatic: Optional[bool] = None
 
 
 class NpcInfo(NamedTuple):

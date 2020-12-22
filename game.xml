@@ -1256,8 +1256,24 @@
                      <DialogOption name="No">
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
                <DialogOption name="No" label="fight_dragon_lord">
-                   <Dialog>"Thou art a fool!"</Dialog>
-                   <DialogAction type="START_ENCOUNTER" name="Dragonlord" victoryDialogScript="defeated_dragonlord_first_form"/></DialogOption></DialogOptions></NonPlayerCharacter>
+                  <Dialog>"Thou art a fool!"</Dialog>
+                  <DialogAction type="START_ENCOUNTER" name="Dragonlord">
+                     <ApproachDialog><Dialog>The Dragonlord draws near!</Dialog></ApproachDialog>
+                     <VictoryDialog>
+                        <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
+                        <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg">
+                           <ApproachDialog><Dialog>The Dragonlord revealed his true self!</Dialog></ApproachDialog>
+                           <VictoryDialog>
+                              <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
+                              <DialogAction type="GAIN_ITEM" name="Ball of Light"/>
+                              <Dialog>Thou hast found the Ball of Light.</Dialog>
+                              <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
+                              <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
+                              <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
+                              <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></VictoryDialog>
+                           <RunAwayDialog><DialogAction type="SET_LIGHT_DIAMETER" count="unlimited"/></RunAwayDialog>
+                        </DialogAction></VictoryDialog>
+                  </DialogAction></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
       <Map name="bat_cave_lvl1" tiles="bat_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
@@ -1290,25 +1306,6 @@
    </Maps>
 
    <DialogScripts>
-      <DialogScript label="defeated_dragonlord_first_form">
-         <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
-         <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" approachDialogScript="approach_dragonlord_second_form" victoryDialogScript="defeated_dragonlord_second_form" runAwayDialogScript="runaway_dragonlord_second_form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"/></DialogScript>
-
-      <DialogScript label="approach_dragonlord_second_form">
-         <Dialog>The Dragonlord revealed his true self!</Dialog></DialogScript>
-
-      <DialogScript label="defeated_dragonlord_second_form">
-         <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
-         <DialogAction type="GAIN_ITEM" name="Ball of Light"/>
-         <Dialog>Thou hast found the Ball of Light.</Dialog>
-         <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
-         <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
-         <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></DialogScript>
-
-      <DialogScript label="runaway_dragonlord_second_form">
-         <DialogAction type="SET_LIGHT_DIAMETER" count="unlimited"/></DialogScript>
-
       <DialogScript label="weapon_and_armor_vendor">
          <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
             <InventoryItemType type="Weapon"/>
@@ -1881,8 +1878,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of repel.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAction type="REPEL_MONSTERS" decay="128"/></Spell>
+         <DialogAction type="REPEL_MONSTERS" decay="12"><FadeDialog><Dialog>Repel has lost its effect.</Dialog></FadeDialog></DialogAction></Spell>
 
       <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
          <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
@@ -1958,9 +1954,9 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes"/>
 
          <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no"  availableInCombat="no">
-            <DialogAction type="REPEL_MONSTERS" decay="128"/>
+            <DialogAction type="REPEL_MONSTERS" decay="128"><FadeDialog><Dialog>The fairy water has lost its effect.</Dialog></FadeDialog></DialogAction>
             <DialogAction type="LOSE_ITEM" name="Fairy Water"/>
-            <Dialog>[ACTOR] drank the vial of Fairy Water.</Dialog></Tool>
+            <Dialog>[ACTOR] drank the vial of fairy water.</Dialog></Tool>
 
          <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
 

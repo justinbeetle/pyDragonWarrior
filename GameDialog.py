@@ -459,7 +459,6 @@ class GameDialog:
             if self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED and num_cols % 2 != 0:
                 print('ERROR: refresh_image invoked with OUTSIDE_JUSTIFIED for odd num_cols =', num_cols, flush=True)
             first_col_pos_x = GameDialog.outside_spacing_pixels
-            col_pos_x = first_col_pos_x
             if self.row_data_prompt is not None:
                 first_col_pos_x += GameDialog.font.size(self.row_data_prompt)[0]
                 self.image.blit(GameDialog.font.render(self.row_data_prompt,
@@ -473,7 +472,8 @@ class GameDialog:
             for col in range(num_cols):
                 col_width = 0
                 for row in range(len(self.row_data)):
-                    col_width = max(col_width, GameDialog.font.size(self.row_data[row][col])[0])
+                    if self.row_data[row][col] is not None:
+                        col_width = max(col_width, GameDialog.font.size(self.row_data[row][col])[0])
                 col_widths.append(col_width)
 
             for row in range(len(self.row_data)):
@@ -658,7 +658,8 @@ class GameDialog:
                 if col != 0:
                     prev_col_width = 0
                     for row in range(len(self.row_data)):
-                        prev_col_width = max(prev_col_width, GameDialog.font.size(self.menu_data[row][col - 1])[0])
+                        if self.menu_data[row][col - 1] is not None:
+                            prev_col_width = max(prev_col_width, GameDialog.font.size(self.menu_data[row][col - 1])[0])
 
                     col_pos_x += prev_col_width + GameDialog.selection_indicator_pixels + \
                                  GameDialog.internal_spacing_pixels

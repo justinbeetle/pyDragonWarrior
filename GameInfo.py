@@ -886,16 +886,24 @@ class GameInfo:
 
             elif element.tag == 'DialogAction':
                 approach_dialog: Optional[DialogType] = None
-                if 'approachDialogScript' in element.attrib:
-                    approach_dialog = [DialogGoTo(element.attrib['approachDialogScript'])]
+                approach_dialog_element = element.find('ApproachDialog')
+                if approach_dialog_element is not None:
+                    approach_dialog = self.parse_dialog(approach_dialog_element)
 
                 victory_dialog: Optional[DialogType] = None
-                if 'victoryDialogScript' in element.attrib:
-                    victory_dialog = [DialogGoTo(element.attrib['victoryDialogScript'])]
+                victory_dialog_element = element.find('VictoryDialog')
+                if victory_dialog_element is not None:
+                    victory_dialog = self.parse_dialog(victory_dialog_element)
 
                 run_away_dialog: Optional[DialogType] = None
-                if 'runAwayDialogScript' in element.attrib:
-                    run_away_dialog = [DialogGoTo(element.attrib['runAwayDialogScript'])]
+                run_away_dialog_element = element.find('RunAwayDialog')
+                if run_away_dialog_element is not None:
+                    run_away_dialog = self.parse_dialog(run_away_dialog_element)
+
+                fade_dialog: Optional[DialogType] = None
+                fade_dialog_element = element.find('FadeDialog')
+                if fade_dialog_element is not None:
+                    fade_dialog = self.parse_dialog(fade_dialog_element)
 
                 encounter_music = None
                 if 'encounterMusic' in element.attrib:
@@ -923,6 +931,7 @@ class GameInfo:
                                            count=count,
                                            bypass=bypass,
                                            decay_steps=decay_steps,
+                                           fade_dialog=fade_dialog,
                                            category=category,
                                            map_name=map_name,
                                            map_pos=map_pos,

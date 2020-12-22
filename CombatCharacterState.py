@@ -150,7 +150,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         # print('min_damage =', min_damage, flush=True)
         # print('max_damage =', max_damage, flush=True)
         modifier = target.get_damage_modifier(damage_type)
-        damage = math.floor(min_damage + random.uniform(0, 1) * (max_damage - min_damage) * modifier)
+        damage = math.floor((min_damage + random.uniform(0, 1) * (max_damage - min_damage)) * modifier)
         if damage < 1:
             damage = random.randint(0, 1)
         return damage

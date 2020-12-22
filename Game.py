@@ -255,7 +255,8 @@ class Game:
                         # TODO: Need to choose the hero to use an item
                         actor = self.game_state.hero_party.main_character
                         self.gde.set_actor(actor)
-                        item_row_data = actor.get_item_row_data()
+                        item_cols = 2
+                        item_row_data = actor.get_item_row_data(item_cols)
                         if len(item_row_data) == 0:
                             self.gde.dialog_loop('Thou dost not have any items.')
                         else:
@@ -264,7 +265,7 @@ class Game:
                                 None,
                                 'ITEMS',
                                 item_row_data,
-                                2,
+                                item_cols,
                                 GameDialogSpacing.OUTSIDE_JUSTIFIED)
                             menu_dialog.blit(self.game_state.screen, True)
                             item_result = self.gde.get_menu_result(menu_dialog)
@@ -403,7 +404,8 @@ class Game:
                 # See if this tile has any associated transitions
                 # TODO: Uncomment following statement to disable coordinate logging
                 # print('Check for transitions at', hero_dest_dat_tile, flush=True)
-                transition = self.game_state.get_point_transition(hero_dest_dat_tile)
+                transition = self.game_state.get_point_transition(hero_dest_dat_tile,
+                                                                  filter_to_automatic_transitions=True)
 
             # Check for tile penalty effects
             if dest_tile_type.hp_penalty > 0 and not self.game_state.hero_party.is_ignoring_tile_penalties():
@@ -412,13 +414,15 @@ class Game:
 
             # Check for any status effect changes or healing to occur as the party moves
             has_low_health = self.game_state.hero_party.has_low_health()
-            self.game_state.hero_party.inc_step_counter()
+            dialog_from_inc_step_count = self.game_state.hero_party.inc_step_counter()
             if has_low_health != self.game_state.hero_party.has_low_health():
                 # Change default dialog font color
                 self.gde.update_default_dialog_font_color()
 
                 # Redraw the map
                 self.game_state.draw_map(True)
+            if dialog_from_inc_step_count is not None:
+                self.gde.dialog_loop(dialog_from_inc_step_count)
 
         else:
             audio_player.play_sound('bump.wav')

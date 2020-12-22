@@ -330,13 +330,23 @@ class GameState(GameStateInterface):
         return self.game_info.tiles[
             self.game_info.tile_symbols[self.game_info.maps[self.map_state.name].dat[int(tile.y)][int(tile.x)]]]
 
-    def get_point_transition(self, tile: Optional[Point] = None) -> Optional[PointTransition]:
+    # Find point transitions for either the specified point or the current position of the player character.
+    # If auto is true, only look for automatic point transitions
+    def get_point_transition(self, tile: Optional[Point] = None,
+                             filter_to_automatic_transitions = False) -> Optional[PointTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
             if point_transition.src_point == tile and self.check_progress_markers(
                     point_transition.progress_marker, point_transition.inverse_progress_marker):
-                return point_transition
+                if filter_to_automatic_transitions:
+                    if point_transition.is_automatic is None and not self.is_light_restricted():
+                        # By default, make transitions manual in dark places
+                        return point_transition
+                    elif point_transition.is_automatic:
+                        return point_transition
+                else:
+                    return point_transition
         return None
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
@@ -798,6 +808,9 @@ class GameState(GameStateInterface):
                 monster_party = MonsterParty([MonsterState(monster_info)])
         else:
             monster_party = MonsterParty([MonsterState(monster_info)])
+
+        if self.hero_party.is_monster_party_repelled(monster_party, self.is_outside()):
+            return
 
         # A combat encounter requires an encounter image
         encounter_image = self.game_info.maps[self.map_state.name].encounter_image

@@ -49,7 +49,6 @@ class MonsterParty:
                              + ' ' + monster.monster_info.name)
             current_monster_type_to_count_map[monster.monster_info.name] += 1
 
-
     def is_still_in_combat(self) -> bool:
         for member in self.members:
             if member.is_still_in_combat():
@@ -62,6 +61,13 @@ class MonsterParty:
             if member.is_still_in_combat():
                 alive_members.append(member)
         return alive_members
+
+    def get_highest_attack_strength(self):
+        highest_attack_strength = 0
+        for member in self.members:
+            if member.is_still_in_combat():
+                highest_attack_strength = max(highest_attack_strength, member.get_attack_strength())
+        return highest_attack_strength
 
     def get_default_approach_dialog(self) -> str:
         if 1 == len(self.members):

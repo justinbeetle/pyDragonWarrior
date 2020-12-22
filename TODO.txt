@@ -39,7 +39,7 @@ Current Efforts:
 22) Add magic restore NPC - DONE!
 23) Add moving NPCs - DONE!
 24) Add a cave with limited visibility - DONE!
-25) Add spells - Partially implemented - Waiting on REPEL
+25) Add spells - DONE!
 26) Add item control (equip, unequip, drop, use) - DONE!
 27) Improved monster AI (running, spells, different attack types) - DONE!
 28) game.xml changes to make it easier to specify chest contents - Partially implemented
@@ -53,7 +53,7 @@ Current Efforts:
 36) Add more caves - DONE!
 37) Implement quest items - DONE!
 38) Move sound selections into game.xml - Partially implemented
-39) Make traversing stairs in caves optional
+39) Make traversing stairs in caves optional - DONE!
 40) Use controller to specify character name for new quest or answers to math problems - DONE!
 
 Make custom images
