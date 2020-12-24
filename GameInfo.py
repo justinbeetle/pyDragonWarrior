@@ -1157,7 +1157,7 @@ class GameInfoMapViewer:
         self.audio_player.terminate()
         pygame.quit()
 
-    def view_map(self, map_name : str) -> None:
+    def view_map(self, map_name: str) -> None:
         if not self.is_running:
             return
 

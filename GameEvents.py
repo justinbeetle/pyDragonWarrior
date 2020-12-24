@@ -5,10 +5,6 @@ from typing import List, Optional, Tuple
 import pygame
 
 joysticks = []
-# Build a scancode to key dictionary as KEYDOWN events are encountered.  For some reason pygame doesn't otherwise
-# have a means of determining this association to make the output of pygame.key.get_pressed().
-scancode_to_key_dict = {}
-keys_to_repeat = [pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT]
 
 
 def setup_joystick() -> bool:
@@ -27,12 +23,6 @@ def setup_joystick() -> bool:
 def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) -> List[pygame.event.Event]:
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
-        #print('Detected event', event, flush=True)
-        #if 'unicode' in event.__dict__:
-        #    print('Detected event.unicode', event.unicode, flush=True)
-        #else:
-        #    print('Detected event without event.unicode', flush=True)
-
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             # Convert WASD to Up/Left/Down/Right
             if translate_wasd_to_uldr:
@@ -46,9 +36,6 @@ def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) ->
                     event.key = pygame.K_RIGHT
             if pygame.K_KP_ENTER == event.key:
                 event.key = pygame.K_RETURN
-
-            # Populate scancode_to_key_dict from KEYDOWN events
-            scancode_to_key_dict[event.scancode] = event.key
 
         elif event.type == pygame.ACTIVEEVENT and event.gain:
             print('Detected gain focus event', flush=True)
@@ -83,16 +70,16 @@ def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) ->
                 if event is not None:
                     add_event_if_not_duplicate(events, event)
 
-        # Generate key down events for pressed keys using scancode_to_key_dict
-        for scancode in [scancode for (scancode, is_pressed) in enumerate(pygame.key.get_pressed()) if
-                         is_pressed]:
-            # print("detected pressed key with scancode", scancode, flush=True)
-            if scancode in scancode_to_key_dict and scancode_to_key_dict[scancode] in keys_to_repeat:
-                event = pygame.event.Event(pygame.KEYDOWN, {'key': scancode_to_key_dict[scancode]})
-                # print('Adding KEYDOWN (2) event for key', pygame.key.name(event.key), flush=True)
-                add_event_if_not_duplicate(events, event)
-            # else:
-            #    print("ERROR: Not adding KEYDOWN event for scancode", scancode, flush=True)
+        # Generate key down events for pressed keys
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_UP] or (translate_wasd_to_uldr and pressed[pygame.K_w]):
+            add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_UP}))
+        elif pressed[pygame.K_DOWN] or (translate_wasd_to_uldr and pressed[pygame.K_s]):
+            add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_DOWN}))
+        if pressed[pygame.K_LEFT] or (translate_wasd_to_uldr and pressed[pygame.K_a]):
+            add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_LEFT}))
+        elif pressed[pygame.K_RIGHT] or (translate_wasd_to_uldr and pressed[pygame.K_d]):
+            add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_RIGHT}))
 
     return events
 

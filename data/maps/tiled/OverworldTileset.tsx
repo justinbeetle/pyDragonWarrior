@@ -12,6 +12,8 @@
   <terrain name="shallow ocean (under layer)" tile="826"/>
   <terrain name="ocean (under layer)" tile="801"/>
   <terrain name="deep ocean (under layer)" tile="896"/>
+  <terrain name="swamp" tile="977"/>
+  <terrain name="pine trees (object layer)" tile="698"/>
  </terraintypes>
  <tile id="0" terrain="1,1,1,1">
   <properties>
@@ -2228,12 +2230,12 @@
    <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="365">
+ <tile id="365" terrain=",4,,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="366">
+ <tile id="366" terrain="4,,,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -3927,32 +3929,32 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="652">
+ <tile id="652" terrain=",,,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="653">
+ <tile id="653" terrain=",,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="654">
+ <tile id="654" terrain=",,11,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="655">
+ <tile id="655" terrain=",11,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="656">
+ <tile id="656" terrain="11,,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="657">
+ <tile id="657" terrain="11,11,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -4167,32 +4169,32 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="692">
+ <tile id="692" terrain=",11,,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="693">
+ <tile id="693" terrain="11,11,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="694">
+ <tile id="694" terrain="11,,11,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="695">
+ <tile id="695" terrain="11,11,,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="696">
+ <tile id="696" terrain="11,11,11,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="697">
+ <tile id="697" terrain="11,11,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -4399,27 +4401,27 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="732">
+ <tile id="732" terrain=",11,,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="733">
+ <tile id="733" terrain="11,11,,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="734">
+ <tile id="734" terrain="11,,,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="735">
+ <tile id="735" terrain=",11,11,">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="736">
+ <tile id="736" terrain="11,,,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -5520,17 +5522,17 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="897">
+ <tile id="897" terrain="10,10,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="898">
+ <tile id="898" terrain="10,10,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="899">
+ <tile id="899" terrain="10,10,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -5779,22 +5781,22 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="936">
+ <tile id="936" terrain="1,1,1,10">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="937">
+ <tile id="937" terrain="1,1,10,10">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="938">
+ <tile id="938" terrain="1,1,10,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="939">
+ <tile id="939" terrain="10,10,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -6043,19 +6045,19 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="976">
+ <tile id="976" terrain="1,10,1,10">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="977">
+ <tile id="977" terrain="10,10,10,10">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="978">
+ <tile id="978" terrain="10,1,10,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="979">
@@ -6307,19 +6309,19 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1016">
+ <tile id="1016" terrain="1,10,1,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="1017">
+ <tile id="1017" terrain="10,10,1,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="1018">
+ <tile id="1018" terrain="10,1,1,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="1019">
@@ -6572,22 +6574,22 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1056">
+ <tile id="1056" terrain="1,10,10,10">
+  <properties>
+   <property name="walkable" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1057" terrain="10,1,10,10">
+  <properties>
+   <property name="walkable" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1058" terrain="1,10,10,1">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1057">
-  <properties>
-   <property name="walkable" type="bool" value="false"/>
-  </properties>
- </tile>
- <tile id="1058">
-  <properties>
-   <property name="walkable" type="bool" value="false"/>
-  </properties>
- </tile>
- <tile id="1059">
+ <tile id="1059" terrain="10,1,1,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -6836,14 +6838,14 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1096">
+ <tile id="1096" terrain="10,10,1,10">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="1097">
+ <tile id="1097" terrain="10,10,10,1">
   <properties>
-   <property name="walkable" type="bool" value="false"/>
+   <property name="walkable" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="1098">
@@ -7100,22 +7102,22 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1136">
+ <tile id="1136" terrain="5,5,1,10">
+  <properties>
+   <property name="walkable" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1137" terrain="5,5,10,1">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1137">
+ <tile id="1138" terrain="5,1,5,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1138">
-  <properties>
-   <property name="walkable" type="bool" value="false"/>
-  </properties>
- </tile>
- <tile id="1139">
+ <tile id="1139" terrain="1,5,10,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -7364,22 +7366,22 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1176">
+ <tile id="1176" terrain="1,10,5,5">
+  <properties>
+   <property name="walkable" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="1177" terrain="10,1,5,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1177">
+ <tile id="1178" terrain="5,10,5,1">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1178">
-  <properties>
-   <property name="walkable" type="bool" value="false"/>
-  </properties>
- </tile>
- <tile id="1179">
+ <tile id="1179" terrain="10,5,1,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -7629,17 +7631,17 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1216">
+ <tile id="1216" terrain="10,10,10,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1217">
+ <tile id="1217" terrain="10,10,5,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1218">
+ <tile id="1218" terrain="10,10,5,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -7893,17 +7895,17 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1256">
+ <tile id="1256" terrain="10,5,10,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1257">
+ <tile id="1257" terrain="5,5,5,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1258">
+ <tile id="1258" terrain="5,10,5,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -8158,17 +8160,17 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1296">
+ <tile id="1296" terrain="10,5,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1297">
+ <tile id="1297" terrain="5,5,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1298">
+ <tile id="1298" terrain="5,10,10,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -8422,12 +8424,12 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1336">
+ <tile id="1336" terrain="10,5,5,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1337">
+ <tile id="1337" terrain="5,10,5,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -8686,12 +8688,12 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1376">
+ <tile id="1376" terrain="5,5,10,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1377">
+ <tile id="1377" terrain="5,5,5,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
@@ -8951,12 +8953,12 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1416">
+ <tile id="1416" terrain="10,5,5,10">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="1417">
+ <tile id="1417" terrain="5,10,10,5">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>
