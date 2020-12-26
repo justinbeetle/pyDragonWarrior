@@ -4426,7 +4426,7 @@
    <property name="walkable" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="737">
+ <tile id="737" terrain="11,11,11,11">
   <properties>
    <property name="walkable" type="bool" value="false"/>
   </properties>

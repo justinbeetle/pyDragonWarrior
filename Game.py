@@ -24,13 +24,11 @@ class Game:
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int,
-                 add_math_problems_in_combat: bool) -> None:
+                 tile_size_pixels: int) -> None:
         self.game_state = GameState(base_path,
                                     game_xml_path,
                                     desired_win_size_pixels,
-                                    tile_size_pixels,
-                                    add_math_problems_in_combat)
+                                    tile_size_pixels)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
         GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
@@ -82,14 +80,18 @@ class Game:
             for saved_game_file in saved_game_files:
                 saved_games.append(os.path.basename(saved_game_file)[:-4])
 
-            menu_options = []
-            if 0 < len(saved_games):
-                menu_options.append('Continue a Quest')
-            menu_options.append('Begin a Quest')
-            if 0 < len(saved_games):
-                menu_options.append('Delete a Quest')
-
             while self.game_state.is_running:
+                menu_options = []
+                if 0 < len(saved_games):
+                    menu_options.append('Continue a Quest')
+                menu_options.append('Begin a Quest')
+                if 0 < len(saved_games):
+                    menu_options.append('Delete a Quest')
+                if self.game_state.should_add_math_problems_in_combat():
+                    menu_options.append('Combat Mode: Math')
+                else:
+                    menu_options.append('Combat Mode: Classic')
+
                 message_dialog = GameDialog.create_message_dialog()
                 message_dialog.add_menu_prompt(menu_options, 1)
                 message_dialog.blit(self.game_state.screen, True)
@@ -133,7 +135,8 @@ class Game:
                             self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
                         elif menu_result != 'NO':
                             continue
-                    break
+                elif menu_result.startswith('Combat Mode:'):
+                    self.game_state.toggle_should_add_math_problems_in_combat()
 
         # Load the saved game
         self.game_state.load(pc_name_or_file_name)
@@ -516,7 +519,6 @@ def main() -> None:
                         default=has_joystick, action='store_true')
     parser.add_argument('-k', '--keyboard', dest='gamepad', help='Keyboard will be used for providing user inputs',
                         default=not has_joystick, action='store_false')
-    parser.add_argument('-m', '--math', help='Math problems used in combat', default=False, action='store_true')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
     # print('args =', args, flush=True)
@@ -528,7 +530,7 @@ def main() -> None:
     game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 20 * 3
-    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels, args.math)
+    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels)
 
     # Run the game
     game.run_game_loop(args.save)

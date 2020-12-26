@@ -35,10 +35,9 @@ class GameState(GameStateInterface):
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int,
-                 add_math_problems_in_combat = False) -> None:
+                 tile_size_pixels: int) -> None:
 
-        self.add_math_problems_in_combat = add_math_problems_in_combat
+        self.__should_add_math_problems_in_combat = True
 
         if desired_win_size_pixels is None:
             screen = pygame.display.set_mode(
@@ -889,7 +888,10 @@ class GameState(GameStateInterface):
         menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
 
     def should_add_math_problems_in_combat(self) -> bool:
-        return self.add_math_problems_in_combat
+        return self.__should_add_math_problems_in_combat
+
+    def toggle_should_add_math_problems_in_combat(self) -> None:
+        self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat
 
 
 def main() -> None:
