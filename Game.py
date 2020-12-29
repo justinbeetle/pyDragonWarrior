@@ -135,7 +135,7 @@ class Game:
                             self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
                         elif menu_result != 'NO':
                             continue
-                elif menu_result.startswith('Combat Mode:'):
+                elif menu_result is not None and menu_result.startswith('Combat Mode:'):
                     self.game_state.toggle_should_add_math_problems_in_combat()
 
         # Load the saved game

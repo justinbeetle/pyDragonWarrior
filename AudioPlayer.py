@@ -97,11 +97,11 @@ class AudioPlayer:
 
                 self.music_thread_lock.release()
                 pygame.time.wait(100)
-         
+
         def play_sound(self, sound_rel_file_path: str) -> None:
             sound_thread = threading.Thread(target=self.__sound_thread, args=[sound_rel_file_path])
             sound_thread.start()
-         
+
         def __sound_thread(self, sound_rel_file_path: str) -> None:
             # Load the sound if not previously loaded
             if sound_rel_file_path not in self.sounds:
@@ -111,23 +111,23 @@ class AudioPlayer:
             channel = self.sounds[sound_rel_file_path].play()
             while self.running and channel.get_busy():
                 pygame.time.wait(10)
-            
+
         def stop_music(self) -> None:
             self.music_rel_file_path1 = self.music_rel_file_path2 = None
-         
+
         def terminate(self) -> None:
             self.running = False
-            
+
     instance: Optional[AudioPlayer.__AudioPlayer] = None
 
     def __init__(self) -> None:
         if not AudioPlayer.instance:
             AudioPlayer.instance = AudioPlayer.__AudioPlayer()
-         
+
     def set_music_path(self, music_path: str) -> None:
         if self.instance is not None:
             self.instance.set_music_path(music_path)
-      
+
     def set_sound_path(self, sound_path: str) -> None:
         if self.instance is not None:
             self.instance.set_sound_path(sound_path)
@@ -146,15 +146,15 @@ class AudioPlayer:
                                      interrupt,
                                      music_file_start1,
                                      music_file_start2)
-      
+
     def play_sound(self, sound_file_path: str) -> None:
         if self.instance is not None:
             self.instance.play_sound(sound_file_path)
-      
+
     def stop_music(self) -> None:
         if self.instance is not None:
             self.instance.stop_music()
-      
+
     def terminate(self) -> None:
         if self.instance is not None:
             self.instance.terminate()
