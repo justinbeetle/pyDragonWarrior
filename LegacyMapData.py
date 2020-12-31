@@ -13,7 +13,7 @@ import pygame
 import pyscroll
 
 from GameInfo import GameInfo
-from GameTypes import MapDecoration
+from GameTypes import MapDecoration, Tile
 from Point import Point
 
 
@@ -21,13 +21,11 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     def __init__(self,
                  game_info: GameInfo,
                  map_name: str,
-                 image_pad_tiles: Point = Point(0, 0),
-                 map_decorations: List[MapDecoration] = []):
+                 image_pad_tiles: Point = Point(0, 0)):
         super(LegacyMapData, self).__init__()
         self.game_info = game_info
         self.map_name = map_name
         self.image_pad_tiles = Point(image_pad_tiles)
-        self.map_decorations = map_decorations + self.game_info.maps[map_name].map_decorations
 
         self.map_size_tiles = self.game_info.maps[self.map_name].size + 2 * self.image_pad_tiles
 
@@ -140,17 +138,16 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
 
         :return: (int, int)
         """
+        # This size INCLUDES the padding
         return self.map_size_tiles.w, self.map_size_tiles.h
 
     @property
     def visible_tile_layers(self):
         # 0 = Base Map
-        # 1 = Decorations Group # SOME OF THESE ARE LARGER THAN A SINGLE TILE?  Probably needs to be an object layer?
-        # 2 = Characters
-        # 3 = Overlay Map (Roofs)
+        # 4 = Overlay Map (Roofs)
         tile_layers = [0]
         if self.overlay_images is not None and self.layers_to_render > 1:
-            tile_layers.append(3)
+            tile_layers.append(4)
         return tile_layers
 
     @property
@@ -158,9 +155,9 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         return []
 
     def _get_tile_image(self, x, y, l):
-        if 0 == l:    # Map
+        if l == 0:   # Base Map
             return self.base_map_images[y][x]
-        elif l == 3 and self.layers_to_render > 1:  # Overlay Map
+        elif l == 4 and self.layers_to_render > 1:  # Overlay Map
             return self.overlay_images[y][x]
 
         return None

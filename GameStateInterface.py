@@ -8,6 +8,7 @@ import abc
 import pygame
 
 from GameDialog import GameDialog
+from GameInfo import GameInfo
 from GenericGameState import GenericGameState
 from HeroParty import HeroParty
 from Point import Point
@@ -16,6 +17,14 @@ from Point import Point
 class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def __init__(self, screen: pygame.surface.Surface) -> None:
         super().__init__(screen)
+
+    @abc.abstractmethod
+    def get_game_info(self) -> GameInfo:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_image_pad_tiles(self) -> Point:
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_hero_party(self) -> HeroParty:

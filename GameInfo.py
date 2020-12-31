@@ -609,34 +609,39 @@ class GameInfo:
          
             # Load map dat file
             # print('Load map dat file', flush=True)
-            map_dat = []
             map_dat_file_name = os.path.join(maps_path, element.attrib['tiles'])
-            map_dat_file = open(map_dat_file_name, 'r')
-            # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
-            for line in map_dat_file:
-                line = line.strip('\n')
-                map_dat.append(line)
-                # TODO: Validate the map is rectangular and all tiles are defined
-            map_dat_file.close()
-            map_dat_size = Point(len(map_dat[0]), len(map_dat))
-
-            # Conditionally load map dat overlap file
+            map_tiled_file_name = None
+            map_dat = []
             map_overlay_dat = None
-            if 'overlayTiles' in element.attrib:
-                # print('Load map overlay dat file', flush=True)
-                map_overlay_dat = []
-                map_overlay_dat_file_name = os.path.join(maps_path, element.attrib['overlayTiles'])
-                map_overlay_dat_file = open(map_overlay_dat_file_name, 'r')
+            map_dat_size = Point()
+            if map_dat_file_name.endswith('.tmx'):
+                map_tiled_file_name = map_dat_file_name
+            else:
+                map_dat_file = open(map_dat_file_name, 'r')
                 # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
-                for line in map_overlay_dat_file:
+                for line in map_dat_file:
                     line = line.strip('\n')
-                    map_overlay_dat.append(line)
+                    map_dat.append(line)
                     # TODO: Validate the map is rectangular and all tiles are defined
-                map_overlay_dat_file.close()
-                map_overlay_dat_size = Point(len(map_overlay_dat[0]), len(map_overlay_dat))
-                if map_dat_size != map_overlay_dat_size:
-                    print('ERROR: Size mismatch between the map and map overlaps.  Map size =', map_dat_size,
-                          '; Overlay size =', map_overlay_dat_size, flush=True)
+                map_dat_file.close()
+                map_dat_size = Point(len(map_dat[0]), len(map_dat))
+
+                # Conditionally load map dat overlap file
+                if 'overlayTiles' in element.attrib:
+                    # print('Load map overlay dat file', flush=True)
+                    map_overlay_dat = []
+                    map_overlay_dat_file_name = os.path.join(maps_path, element.attrib['overlayTiles'])
+                    map_overlay_dat_file = open(map_overlay_dat_file_name, 'r')
+                    # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
+                    for line in map_overlay_dat_file:
+                        line = line.strip('\n')
+                        map_overlay_dat.append(line)
+                        # TODO: Validate the map is rectangular and all tiles are defined
+                    map_overlay_dat_file.close()
+                    map_overlay_dat_size = Point(len(map_overlay_dat[0]), len(map_overlay_dat))
+                    if map_dat_size != map_overlay_dat_size:
+                        print('ERROR: Size mismatch between the map and map overlaps.  Map size =', map_dat_size,
+                              '; Overlay size =', map_overlay_dat_size, flush=True)
 
             # Parse map monster info
             # print('Parse map monster info', flush=True)
@@ -644,8 +649,8 @@ class GameInfo:
             if 'monsterSet' in element.attrib:
                 monster_zones.append(MonsterZone(0,
                                                  0,
-                                                 int(map_dat_size.w),
-                                                 int(map_dat_size.h),
+                                                 999999999,
+                                                 999999999,
                                                  element.attrib['monsterSet']))
             else:
                 for monsterZoneElement in element.findall('MonsterZones/MonsterZone'):
@@ -669,6 +674,7 @@ class GameInfo:
             # Save the map information
             # print('Save the map information', flush=True)
             self.maps[map_name] = Map(map_name,
+                                      map_tiled_file_name,
                                       map_dat,
                                       map_overlay_dat,
                                       map_dat_size,

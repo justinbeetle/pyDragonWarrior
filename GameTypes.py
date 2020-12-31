@@ -93,6 +93,18 @@ class Direction(Enum):
                 return direction
         return Direction.SOUTH
 
+    @staticmethod
+    def get_direction(pygame_key: int) -> Optional[Direction]:
+        if pygame.K_UP == pygame_key:
+            return Direction.NORTH
+        elif pygame.K_DOWN == pygame_key:
+            return Direction.SOUTH
+        elif pygame.K_RIGHT == pygame_key:
+            return Direction.EAST
+        elif pygame.K_LEFT == pygame_key:
+            return Direction.WEST
+        return None
+
 
 class Phase(Enum):
     A = 1
@@ -423,9 +435,10 @@ class SpecialMonster(NamedTuple):
 
 class Map(NamedTuple):
     name: str
+    tiled_filename: Optional[str]
     dat: List[str]
     overlay_dat: Optional[List[str]]
-    size: Point
+    size: Point  # This needs to be deprecated as we don't know it in advance for tiled maps
     music: str
     light_diameter: Optional[int]
     leaving_transition: Optional[LeavingTransition]
@@ -443,6 +456,7 @@ class Map(NamedTuple):
                dat: List[str]) -> Map:
         size = Point(len(dat[0]), len(dat))
         return Map(name,
+                   None,
                    dat,
                    None,
                    size,

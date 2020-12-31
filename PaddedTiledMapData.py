@@ -17,9 +17,12 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
     Use of this class requires a recent version of pytmx.
     """
 
-    def __init__(self, tmx, image_pad_tiles=(0, 0)):
+    def __init__(self, tmx_filename, image_pad_tiles=(0, 0)):
         super(PaddedTiledMapData, self).__init__()
-        self.tmx = tmx
+
+        # load data from pytmx
+        self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
+
         self.image_pad_tiles = image_pad_tiles
         self.reload_animations()
         self.layers_to_render = self.get_num_layers()
@@ -76,7 +79,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         
         :return: (int, int)
         """
-        return self.tmx.width + 2*self.image_pad_tiles[0], self.tmx.height + 2*self.image_pad_tiles[1]
+        # This size INCLUDES the padding
+        return self.tmx.width + 2*self.image_pad_tiles.w, self.tmx.height + 2*self.image_pad_tiles.h
 
     @property
     def visible_tile_layers(self):
@@ -170,11 +174,8 @@ class ScrollTest:
     def __init__(self, screen, filename):
         self.screen = screen
 
-        # load data from pytmx
-        tmx_data = pytmx.util_pygame.load_pygame(filename)
-
         # create new data source
-        map_data = PaddedTiledMapData(tmx_data, (100, 100))
+        map_data = PaddedTiledMapData(filename, (100, 100))
 
         # create new renderer
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())

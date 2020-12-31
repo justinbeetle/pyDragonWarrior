@@ -73,6 +73,7 @@ class GameState(GameStateInterface):
         self.exterior_map_dmg_image = pygame.surface.Surface((0, 0))
         self.interior_map_dmg_image: Optional[pygame.surface.Surface] = None
 
+        self.pending_dialog: Optional[DialogType] = None
         self.load()
 
         # TODO: Migrate these to here
@@ -332,7 +333,7 @@ class GameState(GameStateInterface):
     # Find point transitions for either the specified point or the current position of the player character.
     # If auto is true, only look for automatic point transitions
     def get_point_transition(self, tile: Optional[Point] = None,
-                             filter_to_automatic_transitions = False) -> Optional[PointTransition]:
+                             filter_to_automatic_transitions=False) -> Optional[PointTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
@@ -753,6 +754,12 @@ class GameState(GameStateInterface):
 
         self.tick_count += 1
         pygame.time.Clock().tick(40)
+
+    def get_game_info(self) -> GameInfo:
+        return self.game_info
+
+    def get_image_pad_tiles(self) -> Point:
+        return self.image_pad_tiles
 
     def get_hero_party(self) -> HeroParty:
         return self.hero_party
