@@ -13,11 +13,13 @@ import pygame
 import pyscroll
 
 from GameInfo import GameInfo
-from GameTypes import MapDecoration, Tile
 from Point import Point
 
 
 class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
+    BASE_MAP_LAYER = 0
+    OVERLAY_MAP_LAYER = 5
+
     def __init__(self,
                  game_info: GameInfo,
                  map_name: str,
@@ -34,7 +36,8 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         self.overlay_images = None
         if self.game_info.maps[map_name].overlay_dat is not None:
             self.overlay_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].overlay_dat)
-        self.layers_to_render = self.get_num_layers()
+        self.layers_to_render = self.all_tile_layers
+        self.layers_changed = False
 
     def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.Surface]]]:
 
@@ -82,16 +85,35 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
 
         return map_images
 
-    def get_num_layers(self):
-        if self.overlay_images is None:
-            return 1
-        return 2
+    def set_tile_layers_to_render(self, layers_to_render):
+        if self.layers_to_render != layers_to_render:
+            self.layers_to_render = layers_to_render
+            self.layers_changed = True
+
+    def have_layers_changed(self) -> bool:
+        ret_val = self.layers_changed
+        self.layers_changed = False
+        return ret_val
 
     def decrement_layers_to_render(self):
-        self.layers_to_render = max(1, self.layers_to_render-1)
+        self.layers_to_render = self.base_tile_layers
 
     def increment_layers_to_render(self):
-        self.layers_to_render = min(self.get_num_layers(), self.layers_to_render+1)
+        self.layers_to_render = self.all_tile_layers
+
+    @property
+    def all_tile_layers(self):
+        return self.base_tile_layers + self.overlay_tile_layers
+
+    @property
+    def base_tile_layers(self):
+        return [LegacyMapData.BASE_MAP_LAYER]
+
+    @property
+    def overlay_tile_layers(self):
+        if self.overlay_images is not None:
+            return[LegacyMapData.OVERLAY_MAP_LAYER]
+        return []
 
     def get_animations(self):
         return None
@@ -143,21 +165,25 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
 
     @property
     def visible_tile_layers(self):
-        # 0 = Base Map
-        # 5 = Overlay Map (Roofs)
-        tile_layers = [0]
-        if self.overlay_images is not None and self.layers_to_render > 1:
-            tile_layers.append(5)
-        return tile_layers
+        return self.layers_to_render
 
     @property
     def visible_object_layers(self):
         return []
 
-    def _get_tile_image(self, x, y, l):
-        if l == 0:   # Base Map
+    def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
+        if l not in self.all_tile_layers or (limit_to_visible and l not in self.layers_to_render):
+            return None
+
+        if not image_indexing:
+            # With image_indexing, coord (0,0) is where the pad starts.
+            # Without image_indexing, coord (0,0) is where the Tiled map starts.
+            x = x + self.image_pad_tiles[0]
+            y = y + self.image_pad_tiles[1]
+
+        if l == LegacyMapData.BASE_MAP_LAYER:
             return self.base_map_images[y][x]
-        elif l == 5 and self.layers_to_render > 1:  # Overlay Map
+        elif l == LegacyMapData.OVERLAY_MAP_LAYER:
             return self.overlay_images[y][x]
 
         return None
@@ -393,6 +419,10 @@ class MapViewer:
 
     def view_map(self, map_name: str) -> None:
         if not self.is_running:
+            return
+
+        if self.game_info.maps[map_name].tiled_filename is not None:
+            print('Skipping tiled map', map_name, flush=True)
             return
 
         self.audio_player.play_music(self.game_info.maps[map_name].music)

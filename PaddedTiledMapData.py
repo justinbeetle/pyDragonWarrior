@@ -6,6 +6,8 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
+from typing import Optional
+
 import pygame
 import pyscroll
 import pytmx
@@ -17,14 +19,18 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
     Use of this class requires a recent version of pytmx.
     """
 
-    def __init__(self, tmx_filename, image_pad_tiles=(0, 0), desired_tile_size=None):
+    def __init__(self, tmx_filename, image_pad_tiles=(0, 0), desired_tile_size: Optional[int] = None):
         super(PaddedTiledMapData, self).__init__()
 
         # load data from pytmx
         self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
 
+        # Determine desired amount of pre-zoom
+        self.pre_zoom = 1.0
+        if desired_tile_size is not None:
+            self.pre_zoom = desired_tile_size / self.tmx.tilewidth
+
         # Pre-zoom tile images
-        self.pre_zoom = desired_tile_size / self.tmx.tilewidth
         if self.pre_zoom != 1.0:
             images = list()
             for i in self.tmx.images:
@@ -36,16 +42,58 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
         self.image_pad_tiles = image_pad_tiles
         self.reload_animations()
-        self.layers_to_render = self.get_num_layers()
+        self.layers_to_render = self.all_tile_layers
+        self.layers_changed = False
 
-    def get_num_layers(self):
-        return sum(1 for l in self.tmx.visible_tile_layers)
+    def set_tile_layers_to_render(self, layers_to_render):
+        if self.layers_to_render != layers_to_render:
+            self.layers_to_render = layers_to_render
+            self.layers_changed = True
+
+    def have_layers_changed(self) -> bool:
+        ret_val = self.layers_changed
+        self.layers_changed = False
+        return ret_val
 
     def decrement_layers_to_render(self):
-        self.layers_to_render = max(1, self.layers_to_render-1)
+        if len(self.layers_to_render) > 1:
+            self.layers_to_render = self.layers_to_render[:-1]
 
     def increment_layers_to_render(self):
-        self.layers_to_render = min(self.get_num_layers(), self.layers_to_render+1)
+        layer_added = False
+        new_layers = []
+        for l in self.all_tile_layers:
+            if l in self.layers_to_render:
+                new_layers.append(l)
+            elif not layer_added:
+                new_layers.append(l)
+                layer_added = True
+        self.layers_to_render = new_layers
+
+    @property
+    def all_tile_layers(self):
+        tile_layers = []
+        for l in self.tmx.visible_tile_layers:
+            tile_layers.append(l)
+        return tile_layers
+
+    @property
+    def base_tile_layers(self):
+        tile_layers = []
+        for idx, l in enumerate(self.tmx.layers):
+            # Assume base layers are the default
+            if l.visible and ('is_overlay' not in l.properties or not l.properties['is_overlay']):
+                tile_layers.append(idx)
+        return tile_layers
+
+    @property
+    def overlay_tile_layers(self):
+        tile_layers = []
+        for idx, l in enumerate(self.tmx.layers):
+            # Assume base layers are the default
+            if l.visible and 'is_overlay' in l.properties and l.properties['is_overlay']:
+                tile_layers.append(idx)
+        return tile_layers
 
     def get_animations(self):
         for gid, d in self.tmx.tile_properties.items():
@@ -93,7 +141,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         :return: (int, int)
         """
         # This size INCLUDES the padding
-        return self.tmx.width + 2*self.image_pad_tiles.w, self.tmx.height + 2*self.image_pad_tiles.h
+        return self.tmx.width + 2*self.image_pad_tiles[0], self.tmx.height + 2*self.image_pad_tiles[1]
 
     @property
     def visible_tile_layers(self):
@@ -101,12 +149,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         
         :return: [int, int, ...]
         """
-        visible_tile_layers = []
-        for idx, l in enumerate(self.tmx.visible_tile_layers):
-            if idx >= self.layers_to_render:
-                break
-            visible_tile_layers.append(l)
-        return visible_tile_layers
+        return self.layers_to_render
 
     @property
     def visible_object_layers(self):
@@ -119,14 +162,16 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return (layer for layer in self.tmx.visible_layers
                 if isinstance(layer, pytmx.TiledObjectGroup))
 
-    def _get_tile_image(self, x, y, l):
-        if l not in self.visible_tile_layers:
+    def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
+        if l not in self.visible_tile_layers and limit_to_visible:
             return None
         try:
-            return self.tmx.get_tile_image(
-                min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1),
-                min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1),
-                l)
+            if image_indexing:
+                # With image_indexing, coord (0,0) is where the pad starts.
+                # Without image_indexing, coord (0,0) is where the Tiled map starts.
+                x = min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)
+                y = min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)
+            return self.tmx.get_tile_image(x, y, l)
         except ValueError:
             return None
 

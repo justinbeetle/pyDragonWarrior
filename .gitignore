@@ -109,5 +109,6 @@ data/sounds
 
 # Ignore archived saves
 saves/archive
+saves/deleted
 
 .idea

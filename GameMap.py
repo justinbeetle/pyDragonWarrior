@@ -31,13 +31,14 @@ class MapSprite(pygame.sprite.Sprite):
 class MapDecorationSprite(MapSprite):
     def __init__(self, decoration: MapDecoration) -> None:
         super().__init__()
-        self.image = decoration.type.image
-        self.rect = self.get_rect_from_tile(decoration.point)
+        self.decoration = decoration
+        self.image = self.decoration.type.image
+        self.rect = self.get_rect_from_tile(self.decoration.point)
 
         # Modified the rect to center the decoration horizontally and to have the base of it aligned with the bottom
         # of its assigned tile.
-        self.rect.x = int(self.rect.x + (MapSprite.tile_size_pixels - decoration.type.image.get_width()) / 2)
-        self.rect.y = int(self.rect.y + MapSprite.tile_size_pixels - decoration.type.image.get_height())
+        self.rect.x = int(self.rect.x + (MapSprite.tile_size_pixels - self.image.get_width()) / 2)
+        self.rect.y = int(self.rect.y + MapSprite.tile_size_pixels - self.image.get_height())
 
 
 class CharacterSprite(MapSprite):
@@ -101,12 +102,11 @@ class HeroSprite(CharacterSprite):
 
 
 class NpcSprite(CharacterSprite):
-    def __init__(self, npc_info: NpcInfo) -> None:
-        self.npc_info = npc_info
-        super().__init__(NpcState(npc_info))
+    def __init__(self, character: NpcState) -> None:
+        super().__init__(character)
 
     def can_start_moving(self) -> bool:
-        return self.npc_info.walking and \
+        return self.character.npc_info.walking and \
                self.update_count % self.updates_per_phase_change == self.updates_per_phase_change - 1
 
 
@@ -121,7 +121,10 @@ class GameMap:
             self.map_decorations = self.map.map_decorations
         else:
             self.map_decorations = map_decorations
-        self.npcs: List[NpcState] = self.map.npcs  # TODO: Not right as it doesn't take into account progress markers
+        self.npcs: List[NpcState] = []
+        for npc in self.map.npcs:
+            # TODO: Not right as it doesn't take into account progress markers
+            self.npcs.append(NpcState(npc))
 
         # Create the map data
         if self.map.tiled_filename is not None:
@@ -143,7 +146,8 @@ class GameMap:
         # layer 3:  decorations (chests, doors, and other objects non-permanent objects not present in Tiled)
         # layer 4:  characters
         # layer 5:  over (roofs)
-        self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=3)
+        self.sprite_layer = self.map_data.base_tile_layers[-1]
+        self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=self.sprite_layer)
 
         MapSprite.image_pad_tiles = self.game_state.get_image_pad_tiles()
         MapSprite.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
@@ -152,14 +156,14 @@ class GameMap:
         # Add decorations to the group
         for decoration in self.map_decorations:
             if decoration.type is not None:
-                self.group.add(MapDecorationSprite(decoration), layer=3)
+                self.group.add(MapDecorationSprite(decoration))
 
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
         for hero in reversed(hero_party.members):
-            self.group.add(HeroSprite(hero, hero_party), layer=4)
+            self.group.add(HeroSprite(hero, hero_party))
         for npc in self.npcs:
-            self.group.add(NpcSprite(npc), layer=4)
+            self.group.add(NpcSprite(npc))
 
     def size(self, with_padding=False) -> Point:
         # Doesn't include padding, just the size of data size of the map
@@ -181,8 +185,15 @@ class GameMap:
                            self.game_state.get_hero_party().get_curr_pos_dat_tile()) *
                            self.map_data.tile_size + self.game_state.get_hero_party().get_curr_pos_offset_img_px())
 
-        # Detect if the hero is eclipsed by the over layer(s), if so, do not render those layers
-        # TODO: Implement this
+        # Detect if the hero is eclipsed by the over layer(s).  If so, do not render those layers.
+        if self.is_interior():
+            layers_to_render = self.map_data.base_tile_layers
+        else:
+            layers_to_render = self.map_data.all_tile_layers
+
+        if layers_to_render != self.map_data.visible_tile_layers:
+            self.map_data.set_tile_layers_to_render(layers_to_render)
+            self.map_layer.redraw_tiles(self.map_layer._buffer)
 
         # tell the map_layer (BufferedRenderer) to draw to the surface
         # the draw function requires a rect to draw to.
@@ -196,7 +207,7 @@ class GameMap:
             tile_name = None
             for l in self.map_data.visible_tile_layers:
                 tile_properties = self.map_data.tmx.get_tile_properties(tile.x, tile.y, l)
-                if tile_properties is not None and 'type' in tile_properties:
+                if tile_properties is not None and 'type' in tile_properties and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
                 return self.game_state.get_game_info().tiles[tile_name]
@@ -234,19 +245,19 @@ class GameMap:
                         return point_transition
                 else:
                     return point_transition
-        return None
+        return None'''
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
         decorations = []
         if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
+            tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
         for decoration in self.map_decorations:
-            if decoration.point == tile and self.check_progress_markers(
+            if decoration.point == tile and self.game_state.check_progress_markers(
                     decoration.progress_marker, decoration.inverse_progress_marker):
                 decorations.append(decoration)
         return decorations
 
-    def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
+    '''def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for special_monster in self.game_info.maps[self.map_state.name].special_monsters:
@@ -254,7 +265,7 @@ class GameMap:
                     special_monster.progress_marker, special_monster.inverse_progress_marker):
                 print('Found monster at point: ', tile, flush=True)
                 return special_monster
-        return None
+        return None'''
 
     def get_tile_degrees_of_freedom(self,
                                     tile: Point,
@@ -279,8 +290,8 @@ class GameMap:
         movement_allowed = False
 
         # Check if native tile allows movement
-        if (0 <= tile.x < self.game_info.maps[self.map_state.name].size.w
-                and 0 <= tile.y < self.game_info.maps[self.map_state.name].size.h
+        if (0 <= tile.x < self.size().w
+                and 0 <= tile.y < self.size().h
                 and self.get_tile_info(tile).walkable):
             movement_allowed = True
 
@@ -329,26 +340,30 @@ class GameMap:
 
         return movement_allowed
 
-    def get_tile_monsters(self, tile: Optional[Point] = None) -> List[str]:
+    '''def get_tile_monsters(self, tile: Optional[Point] = None) -> List[str]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for mz in self.game_info.maps[self.map_state.name].monster_zones:
             if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
                 # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
                 return self.game_info.monster_sets[mz.name]
-        return []
+        return []'''
 
-    def is_interior(self, pos_dat_tile: Point) -> bool:
-        overlay_dat = self.game_info.maps[self.map_state.name].overlay_dat
-        return (overlay_dat is not None
-                and overlay_dat[int(pos_dat_tile.y)][int(pos_dat_tile.x)] in self.game_info.tile_symbols)
+    def is_interior(self, pos_dat_tile: Optional[Point] = None) -> bool:
+        if pos_dat_tile is None:
+            pos_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
+        for l in self.map_data.overlay_tile_layers:
+            if self.map_data._get_tile_image(pos_dat_tile.x, pos_dat_tile.y, l,
+                                             image_indexing=False, limit_to_visible=False) is not None:
+                return True
+        return False
 
-    def is_exterior(self, pos_dat_tile: Point) -> bool:
+    def is_exterior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         return not self.is_interior(pos_dat_tile)
 
     def is_facing_door(self) -> bool:
-        door_open_dest_dat_tile = self.hero_party.get_curr_pos_dat_tile() \
-                                  + self.hero_party.get_direction().get_vector()
+        door_open_dest_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile() \
+                                  + self.game_state.get_hero_party().get_direction().get_vector()
         for decoration in self.map_decorations:
             if (door_open_dest_dat_tile == decoration.point
                     and decoration.type is not None
@@ -357,8 +372,8 @@ class GameMap:
         return False
 
     def open_door(self) -> None:
-        door_open_dest_dat_tile = self.hero_party.get_curr_pos_dat_tile() \
-                                  + self.hero_party.get_direction().get_vector()
+        door_open_dest_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile() \
+                                  + self.game_state.get_hero_party().get_direction().get_vector()
         for decoration in self.map_decorations:
             if (door_open_dest_dat_tile == decoration.point
                     and decoration.type is not None
@@ -371,20 +386,15 @@ class GameMap:
         # Remove the decoration from the map (if present)
         if decoration in self.map_decorations:
             self.map_decorations.remove(decoration)
-            if self.map_state.name not in self.removed_decorations_by_map:
-                self.removed_decorations_by_map[self.map_state.name] = []
-            self.removed_decorations_by_map[self.map_state.name].append(decoration)
-            self.map_state = self.game_info.get_map_image_info(self.map_state.name,
-                                                               self.image_pad_tiles,
-                                                               self.map_decorations)
 
-            # Get exterior and interior map images
-            self.update_images()
+            for sprite in self.group.remove_sprites_of_layer(self.sprite_layer):
+                if isinstance(sprite, MapDecorationSprite):
+                    if sprite.decoration != decoration:
+                        self.group.add(sprite)
+                else:
+                    self.group.add(sprite)
 
-            # Draw the map to the screen
-            self.draw_map()
-
-    def set_clipping_for_light_diameter(self) -> None:
+    '''def set_clipping_for_light_diameter(self) -> None:
         # TODO: Rework for parties
         if self.is_light_restricted() and self.hero_party.light_diameter is not None:
             self.screen.set_clip(
@@ -399,8 +409,7 @@ class GameMap:
         self.screen.set_clip(pygame.Rect(0,
                                          0,
                                          self.win_size_pixels.x,
-                                         self.win_size_pixels.y))
-    '''
+                                         self.win_size_pixels.y))'''
 
 
 class MapViewer:
@@ -447,6 +456,7 @@ class MapViewer:
         self.mock_game_state.get_game_info = MagicMock(return_value=self.game_info)
         self.mock_game_state.get_image_pad_tiles = MagicMock(return_value=self.image_pad_tiles)
         self.mock_game_state.get_hero_party = MagicMock(return_value=self.hero_party)
+        self.mock_game_state.check_progress_markers = MagicMock(return_value=True)
 
     def __del__(self) -> None:
         # Terminate pygame
@@ -475,6 +485,18 @@ class MapViewer:
                         self.is_running = False
                     elif event.key == pygame.K_RETURN:
                         done_with_map = True
+                    elif event.key == pygame.K_e:
+                        if game_map.is_facing_door():
+                            print('Opened door', flush=True)
+                            game_map.open_door()
+                        else:
+                            for decoration in game_map.get_decorations():
+                                if decoration.type is not None and decoration.type.remove_with_search:
+                                    print('Removing decoration', decoration, flush=True)
+                                    game_map.remove_decoration(decoration)
+                                else:
+                                    print('Not removing decoration', decoration, flush=True)
+
                     else:
                         move_direction = Direction.get_direction(event.key)
                 elif event.type == pygame.QUIT:
@@ -483,10 +505,9 @@ class MapViewer:
                 if move_direction is not None:
                     self.hero_party.members[0].direction = move_direction
                     dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
-                    dest_tile_x = min(max(0, dest_tile.x), game_map.size().w - 1)
-                    dest_tile_y = min(max(0, dest_tile.y), game_map.size().h - 1)
-                    self.hero_party.members[0].curr_pos_dat_tile = Point(dest_tile_x, dest_tile_y)
-                    print('tile type =', game_map.get_tile_info().name, flush=True)
+                    if game_map.can_move_to_tile(dest_tile):
+                        self.hero_party.members[0].curr_pos_dat_tile = dest_tile
+                        print('moved to tile of type ', game_map.get_tile_info().name, flush=True)
 
             game_map.update()
             game_map.draw()

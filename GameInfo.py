@@ -168,8 +168,8 @@ class GameInfo:
         max_tile_variants = 1
         for element in xml_root.findall("./Tiles/Tile"):
             tile_name = element.attrib['name']
-            tile_symbol = element.attrib['symbol']
-            tile_image_file_name = os.path.join(tile_path, element.attrib['image'])
+            tile_symbol = ''
+            tile_image_file_name = ''
             tile_walkable = True
             can_talk_over = False
             hp_penalty = 0
@@ -177,6 +177,12 @@ class GameInfo:
             speed = 1.0
             spawn_rate = 1.0
             tile_type = 'simple'
+            if 'symbol' in element.attrib:
+                tile_symbol = element.attrib['symbol']
+            if 'image' in element.attrib:
+                tile_image_file_name = os.path.join(tile_path, element.attrib['image'])
+            else:
+                tile_type = 'tiled'
             if 'walkable' in element.attrib:
                 tile_walkable = element.attrib['walkable'] == 'yes'
             if 'canTalkOver' in element.attrib:
@@ -191,9 +197,14 @@ class GameInfo:
                 spawn_rate = GameTypes.parse_float(element.attrib['spawnRate'])
             if 'type' in element.attrib:
                 tile_type = element.attrib['type']
-            
-            # print('Loading image', tileImageFileName, flush=True)
-            tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
+
+            # Load the tile image for tile types which are not exclusive to tiled maps
+            if tile_type == 'tiled':
+                tile_images_scaled: List[List[pygame.surface.Surface]] = []
+            else:
+                # print('Loading image', tileImageFileName, flush=True)
+                tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
+
             if tile_type == 'complex':
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
                 tile_images_scaled: List[List[pygame.surface.Surface]] = []
@@ -212,7 +223,7 @@ class GameInfo:
                                 (self.tile_size_pixels, self.tile_size_pixels),
                                 temp_surface)
                             tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
-            else:
+            elif tile_type == 'simple':
                 tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
                 max_tile_variants = max(max_tile_variants, tile_variants)
                 temp_surface_list: List[pygame.surface.Surface] = []
@@ -226,8 +237,9 @@ class GameInfo:
                         (self.tile_size_pixels, self.tile_size_pixels),
                         temp_surface_list[-1])
                 tile_images_scaled = [temp_surface_list] * 16
-         
-            self.tile_symbols[tile_symbol] = tile_name
+
+            if len(tile_symbol) == 1:
+                self.tile_symbols[tile_symbol] = tile_name
             self.tiles[tile_name] = Tile(tile_name,
                                          tile_symbol,
                                          tile_images_scaled,
