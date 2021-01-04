@@ -21,8 +21,8 @@ from Point import Point
 
 
 class GameInfo:
-    TRANSPARENT_COLOR = pygame.Color(0, 128, 128)
-   
+    TRANSPARENT_COLOR = pygame.Color(0, 0, 0, 0)
+
     def __init__(self,
                  base_path: str,
                  game_xml_path: str,
@@ -270,17 +270,16 @@ class GameInfo:
             
             decoration_image_filename = os.path.join(decoration_path, element.attrib['image'])
             # print('Loading image', decoration_image_filename, flush=True)
-            decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert()
+            decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
             unscaled_size_pixels = Point(decoration_image_unscaled.get_size())
             max_scaled_size_pixels = Point(width_tiles, height_tiles) * self.tile_size_pixels
             scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
             scale_factor = max(scale_factor_point.w, scale_factor_point.h)
             scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
-            decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels)
+            decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
             pygame.transform.scale(decoration_image_unscaled,
                                    scaled_size_pixels.getAsIntTuple(),
                                    decoration_image_scaled)
-            decoration_image_scaled.set_colorkey(GameInfo.TRANSPARENT_COLOR)
             self.decorations[decoration_name] = Decoration(decoration_name,
                                                            width_tiles,
                                                            height_tiles,
@@ -355,20 +354,20 @@ class GameInfo:
                 character_levels = levels[element.attrib['levels']]
             character_type_filename = os.path.join(character_path, element.attrib['image'])
             # print('Loading image', character_type_filename, flush=True)
-            character_type_image = pygame.image.load(character_type_filename).convert()
+            character_type_image = pygame.image.load(character_type_filename).convert_alpha()
             character_type_images = {}
             x_px = 0
             for direction in [Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST]:
                 direction_character_type_images = {}
                 for phase in [Phase.A, Phase.B]:
-                    image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                    image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
+                                                   flags=pygame.SRCALPHA)
                     pygame.transform.scale(character_type_image.subsurface(x_px,
                                                                            0,
                                                                            character_type_image.get_height(),
                                                                            character_type_image.get_height()),
                                            (self.tile_size_pixels, self.tile_size_pixels),
                                            image)
-                    image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
                     direction_character_type_images[phase] = image
                     x_px += character_type_image.get_height() + 1
                 character_type_images[direction] = direction_character_type_images
@@ -414,16 +413,15 @@ class GameInfo:
             monster_name = element.attrib['name']
 
             monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
-            unscaled_monster_image = pygame.image.load(monster_image_file_name).convert()
+            unscaled_monster_image = pygame.image.load(monster_image_file_name).convert_alpha()
             monster_image = pygame.transform.scale(unscaled_monster_image,
                                                    (unscaled_monster_image.get_width() * monster_scale_factor,
                                                     unscaled_monster_image.get_height() * monster_scale_factor))
-            monster_image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
 
             dmg_image = monster_image.copy()
             for x in range(dmg_image.get_width()):
                 for y in range(dmg_image.get_height()):
-                    if dmg_image.get_at((x, y)) != GameInfo.TRANSPARENT_COLOR:
+                    if dmg_image.get_at((x, y)).a != 0:
                         dmg_image.set_at((x, y), pygame.Color('red'))
 
             (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
@@ -1008,7 +1006,6 @@ class GameInfo:
                 map_image_size_pixels,
                 overlay_dat,
                 GameInfo.TRANSPARENT_COLOR)
-            map_overlay_image.set_colorkey(GameInfo.TRANSPARENT_COLOR)
          
         # Return the map image info
         return MapImageInfo(map_name, map_image, map_image_size_tiles, map_image_size_pixels, map_overlay_image)
@@ -1020,7 +1017,7 @@ class GameInfo:
                       map_image_size_pixels: Point,
                       dat: List[str],
                       fill_color: pygame.Color) -> pygame.surface.Surface:
-        map_image = pygame.surface.Surface(map_image_size_pixels)
+        map_image = pygame.surface.Surface(map_image_size_pixels, flags=pygame.SRCALPHA)
         map_image.fill(fill_color)
 
         # Blit the padded portions of the image

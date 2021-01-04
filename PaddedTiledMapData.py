@@ -17,11 +17,22 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
     Use of this class requires a recent version of pytmx.
     """
 
-    def __init__(self, tmx_filename, image_pad_tiles=(0, 0)):
+    def __init__(self, tmx_filename, image_pad_tiles=(0, 0), desired_tile_size=None):
         super(PaddedTiledMapData, self).__init__()
 
         # load data from pytmx
         self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
+
+        # Pre-zoom tile images
+        self.pre_zoom = desired_tile_size / self.tmx.tilewidth
+        if self.pre_zoom != 1.0:
+            images = list()
+            for i in self.tmx.images:
+                if i is not None:
+                    images.append(pygame.transform.scale(i, self.tile_size))
+                else:
+                    images.append(None)
+            self.tmx.images = images
 
         self.image_pad_tiles = image_pad_tiles
         self.reload_animations()
@@ -47,7 +58,6 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
                 yield gid, frames
 
     def convert_surfaces(self, parent, alpha=False):
-        pass
         """ Convert all images in the data to match the parent
 
         :param parent: pygame.Surface
@@ -71,7 +81,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         
         :return: (int, int)
         """
-        return self.tmx.tilewidth, self.tmx.tileheight
+        if self.pre_zoom == 1.0:
+            return self.tmx.tilewidth, self.tmx.tileheight
+        else:
+            return int(self.pre_zoom*self.tmx.tilewidth), int(self.pre_zoom*self.tmx.tileheight)
 
     @property
     def map_size(self):

@@ -144,10 +144,10 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     @property
     def visible_tile_layers(self):
         # 0 = Base Map
-        # 4 = Overlay Map (Roofs)
+        # 5 = Overlay Map (Roofs)
         tile_layers = [0]
         if self.overlay_images is not None and self.layers_to_render > 1:
-            tile_layers.append(4)
+            tile_layers.append(5)
         return tile_layers
 
     @property
@@ -157,7 +157,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     def _get_tile_image(self, x, y, l):
         if l == 0:   # Base Map
             return self.base_map_images[y][x]
-        elif l == 4 and self.layers_to_render > 1:  # Overlay Map
+        elif l == 5 and self.layers_to_render > 1:  # Overlay Map
             return self.overlay_images[y][x]
 
         return None

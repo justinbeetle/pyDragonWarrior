@@ -56,7 +56,10 @@ class CharacterSprite(MapSprite):
         return self.character.character_type.images[self.character.direction][self.phase]
 
     def get_rect(self):
-        return self.get_rect_from_tile(self.character.curr_pos_dat_tile).move(self.character.curr_pos_offset_img_px)
+        char_rect = self.image.get_rect()
+        char_rect.midbottom = self.get_rect_from_tile(self.character.curr_pos_dat_tile).move(
+            self.character.curr_pos_offset_img_px).midbottom
+        return char_rect
 
     def update(self):
         self.update_count += 1
@@ -123,18 +126,15 @@ class GameMap:
         # Create the map data
         if self.map.tiled_filename is not None:
             self.map_data = PaddedTiledMapData(self.map.tiled_filename,
-                                               self.game_state.get_image_pad_tiles())
+                                               self.game_state.get_image_pad_tiles(),
+                                               desired_tile_size=self.game_state.get_game_info().tile_size_pixels)
         else:
             self.map_data = LegacyMapData(self.game_state.get_game_info(),
                                           self.map.name,
                                           self.game_state.get_image_pad_tiles())
 
         # Create renderer
-        self.map_layer = pyscroll.orthographic.BufferedRenderer(self.map_data, self.game_state.screen.get_size())
-
-        # 16 pixels tiles scaled 5x and 20 pixels decorations scaled 4x
-        if isinstance(self.map_data, PaddedTiledMapData):
-            self.map_layer.zoom = self.game_state.get_game_info().tile_size_pixels / self.map_data.tile_size[0]
+        self.map_layer = pyscroll.BufferedRenderer(self.map_data, self.game_state.screen.get_size())
 
         # pyscroll supports layered rendering.  our map has 3 'under' layers
         # layer 0:  under (water)
@@ -157,9 +157,9 @@ class GameMap:
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
         for hero in reversed(hero_party.members):
-            self.group.add(HeroSprite(hero, hero_party))
+            self.group.add(HeroSprite(hero, hero_party), layer=4)
         for npc in self.npcs:
-            self.group.add(NpcSprite(npc))
+            self.group.add(NpcSprite(npc), layer=4)
 
     def size(self, with_padding=False) -> Point:
         # Doesn't include padding, just the size of data size of the map
@@ -188,7 +188,7 @@ class GameMap:
         # the draw function requires a rect to draw to.
         self.group.draw(surface)
 
-    def get_tile_info(self, tile: Optional[Point]) -> Tile:
+    def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         if tile is None:
             tile = self.game_state.get_hero_party().main_character.curr_pos_dat_tile
 
@@ -196,14 +196,14 @@ class GameMap:
             tile_name = None
             for l in self.map_data.visible_tile_layers:
                 tile_properties = self.map_data.tmx.get_tile_properties(tile.x, tile.y, l)
-                if 'type' in tile_properties:
+                if tile_properties is not None and 'type' in tile_properties:
                     tile_name = tile_properties['type']
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
                 return self.game_state.get_game_info().tiles[tile_name]
         else:
             return self.game_state.get_game_info().tiles[
                 self.game_state.get_game_info().tile_symbols[
-                    self.game_state.get_game_info().maps[self.map_state.name].dat[int(tile.y)][int(tile.x)]]]
+                    self.map.dat[int(tile.y)][int(tile.x)]]]
 
         # Return a default, walkable tile as a default
         return Tile('DEFAULT TILE',
@@ -413,7 +413,7 @@ class MapViewer:
         self.clock = pygame.time.Clock()
 
         # Setup to draw maps
-        self.tile_size_pixels = 80  # 4*20 and 5*16
+        self.tile_size_pixels = 60
         desired_win_size_pixels = Point(2560, 1340)
         if desired_win_size_pixels is None:
             self.screen = pygame.display.set_mode(
@@ -424,8 +424,7 @@ class MapViewer:
         else:
             self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(),
-                                                  pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
+            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(), pygame.SRCALPHA)
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
 
         # Initialize GameInfo
@@ -486,7 +485,8 @@ class MapViewer:
                     dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
                     dest_tile_x = min(max(0, dest_tile.x), game_map.size().w - 1)
                     dest_tile_y = min(max(0, dest_tile.y), game_map.size().h - 1)
-                    self.hero_party.members[0].curr_pos_dat_tile = (dest_tile_x, dest_tile_y)
+                    self.hero_party.members[0].curr_pos_dat_tile = Point(dest_tile_x, dest_tile_y)
+                    print('tile type =', game_map.get_tile_info().name, flush=True)
 
             game_map.update()
             game_map.draw()
