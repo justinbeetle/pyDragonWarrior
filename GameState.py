@@ -58,14 +58,18 @@ class GameState(GameStateInterface):
 
         super().__init__(screen)
 
+        # TODO: Migrate these into MapCharacterState, which should extend pygame.sprite.Sprite
         self.phase = Phase.A
         self.tick_count = 1
+
         self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
+        # TODO: Migrate these to GameMap
         self.map_decorations: List[MapDecoration] = []
         self.npcs: List[NpcState] = []
 
+        # TODO: Remove these in favor of GameMap
         # map_state, exterior_map_image, and interior_map_image are initialized with meaningful values in set_map
         self.map_state = MapImageInfo.create_null()
         self.exterior_map_image = pygame.surface.Surface((0, 0))
@@ -574,7 +578,7 @@ class GameState(GameStateInterface):
         curr_pos_dat_tile = self.hero_party.get_curr_pos_dat_tile()
         if (curr_pos_dat_tile is None
                 or curr_pos_dat_tile[0] < 1
-                or curr_pos_dat_tile[0] < 1
+                or curr_pos_dat_tile[1] < 1
                 or curr_pos_dat_tile[0] > self.game_info.maps[self.map_state.name].size[0] - 1
                 or curr_pos_dat_tile[1] > self.game_info.maps[self.map_state.name].size[1] - 1):
             print('ERROR: Invalid hero position, defaulting to middle tile', flush=True)

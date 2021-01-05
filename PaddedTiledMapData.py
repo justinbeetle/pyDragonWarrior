@@ -72,10 +72,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
     @property
     def all_tile_layers(self):
-        tile_layers = []
-        for l in self.tmx.visible_tile_layers:
-            tile_layers.append(l)
-        return tile_layers
+        return self.base_tile_layers + self.overlay_tile_layers
 
     @property
     def base_tile_layers(self):
@@ -87,12 +84,20 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return tile_layers
 
     @property
+    def decoration_layer(self):
+        return self.base_tile_layers[-1] + 1
+
+    @property
+    def character_layer(self):
+        return self.base_tile_layers[-1] + 2
+
+    @property
     def overlay_tile_layers(self):
         tile_layers = []
         for idx, l in enumerate(self.tmx.layers):
             # Assume base layers are the default
             if l.visible and 'is_overlay' in l.properties and l.properties['is_overlay']:
-                tile_layers.append(idx)
+                tile_layers.append(idx + 2)
         return tile_layers
 
     def get_animations(self):
@@ -165,12 +170,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
     def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
         if l not in self.visible_tile_layers and limit_to_visible:
             return None
+        if l not in self.base_tile_layers:
+            l = l - 2
+        if image_indexing:
+            # With image_indexing, coord (0,0) is where the pad starts.
+            # Without image_indexing, coord (0,0) is where the Tiled map starts.
+            x = min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)
+            y = min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)
         try:
-            if image_indexing:
-                # With image_indexing, coord (0,0) is where the pad starts.
-                # Without image_indexing, coord (0,0) is where the Tiled map starts.
-                x = min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)
-                y = min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)
             return self.tmx.get_tile_image(x, y, l)
         except ValueError:
             return None

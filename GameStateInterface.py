@@ -31,6 +31,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
         raise NotImplementedError
 

@@ -4,10 +4,11 @@ from typing import Dict, List, Optional
 
 import pygame
 import pyscroll
+import random
 
 from AudioPlayer import AudioPlayer
 from GameStateInterface import GameStateInterface
-from GameTypes import CharacterType, Direction, Map, MapDecoration, NpcInfo, Phase, PointTransition, SpecialMonster, Tile
+from GameTypes import CharacterType, Direction, MapDecoration, Phase, Tile
 from HeroParty import HeroParty
 from HeroState import HeroState
 from LegacyMapData import LegacyMapData
@@ -20,6 +21,7 @@ from NpcState import NpcState
 class MapSprite(pygame.sprite.Sprite):
     image_pad_tiles = Point()
     tile_size_pixels = 16
+    image_px_step_size = 4
 
     def __init__(self) -> None:
         super().__init__()
@@ -62,7 +64,16 @@ class CharacterSprite(MapSprite):
             self.character.curr_pos_offset_img_px).midbottom
         return char_rect
 
-    def update(self):
+    def update(self, game_map):
+        # Move the character in steps to the destination tile
+        if self.character.curr_pos_dat_tile != self.character.dest_pos_dat_tile:
+            direction_vector = self.character.direction.get_vector()
+            self.character.curr_pos_offset_img_px += direction_vector * MapSprite.image_px_step_size
+            if self.character.curr_pos_offset_img_px.mag() / MapSprite.tile_size_pixels >= direction_vector.mag():
+                self.character.curr_pos_dat_tile = self.character.dest_pos_dat_tile
+                self.character.curr_pos_offset_img_px = Point(0, 0)
+
+        # Check for phase updates
         self.update_count += 1
         if self.update_count % self.updates_per_phase_change == 0:
             if self.phase == Phase.A:
@@ -70,6 +81,7 @@ class CharacterSprite(MapSprite):
             else:
                 self.phase = Phase.A
 
+        # Update the image and rect
         self.image = self.get_image()
         self.rect = self.get_rect()
 
@@ -103,11 +115,23 @@ class HeroSprite(CharacterSprite):
 
 class NpcSprite(CharacterSprite):
     def __init__(self, character: NpcState) -> None:
+        self.updates_per_npc_move = 60  # TODO: Make this a parameter of a character
         super().__init__(character)
 
-    def can_start_moving(self) -> bool:
-        return self.character.npc_info.walking and \
-               self.update_count % self.updates_per_phase_change == self.updates_per_phase_change - 1
+    def update(self, game_map):
+        if self.character.npc_info.walking:
+            # Start moving NPC by setting a destination tile
+            if (self.update_count % self.updates_per_npc_move) == self.updates_per_npc_move - 1:
+                # TODO: Determine where to move instead of blindly moving forward
+                self.character.direction = random.choice(list(Direction))
+                dest_tile = self.character.curr_pos_dat_tile + self.character.direction.get_vector()
+                if game_map.can_move_to_tile(dest_tile, True, True, True, self.character.curr_pos_dat_tile):
+                    self.character.dest_pos_dat_tile = dest_tile
+        else:
+            # Stationary characters should resume looking in the default direction after talking to the player.
+            self.character.direction = self.character.npc_info.direction
+
+        super().update(game_map)
 
 
 class GameMap:
@@ -139,31 +163,25 @@ class GameMap:
         # Create renderer
         self.map_layer = pyscroll.BufferedRenderer(self.map_data, self.game_state.screen.get_size())
 
-        # pyscroll supports layered rendering.  our map has 3 'under' layers
-        # layer 0:  under (water)
-        # layer 1:  ground (land)
-        # layer 2:  objects (cities, forests, etc.)
-        # layer 3:  decorations (chests, doors, and other objects non-permanent objects not present in Tiled)
-        # layer 4:  characters
-        # layer 5:  over (roofs)
-        self.sprite_layer = self.map_data.base_tile_layers[-1]
-        self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=self.sprite_layer)
+        # Create the pyscroll group to support character and decoration sprites
+        self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=self.map_data.decoration_layer)
 
         MapSprite.image_pad_tiles = self.game_state.get_image_pad_tiles()
         MapSprite.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
+        MapSprite.image_px_step_size = self.game_state.get_game_info().image_px_step_size
         HeroSprite.character_types = self.game_state.get_game_info().character_types
 
         # Add decorations to the group
         for decoration in self.map_decorations:
             if decoration.type is not None:
-                self.group.add(MapDecorationSprite(decoration))
+                self.group.add(MapDecorationSprite(decoration), layer=self.map_data.decoration_layer)
 
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
         for hero in reversed(hero_party.members):
-            self.group.add(HeroSprite(hero, hero_party))
+            self.group.add(HeroSprite(hero, hero_party), layer=self.map_data.character_layer)
         for npc in self.npcs:
-            self.group.add(NpcSprite(npc))
+            self.group.add(NpcSprite(npc), layer=self.map_data.character_layer)
 
     def size(self, with_padding=False) -> Point:
         # Doesn't include padding, just the size of data size of the map
@@ -173,15 +191,14 @@ class GameMap:
             return Point(self.map_data.map_size) - 2 * self.game_state.get_image_pad_tiles()
 
     def update(self):
-        # TODO: Move logic for moving an NPC here
-        self.group.update()
+        self.group.update(self)
 
     def draw(self, surface: Optional[pygame.Surface] = None):
         if surface is None:
             surface = self.game_state.screen
 
         # Center the map on the PC
-        self.group.center((self.game_state.get_image_pad_tiles() +
+        self.group.center((self.game_state.get_image_pad_tiles() + Point(0.5, 0.5) +
                            self.game_state.get_hero_party().get_curr_pos_dat_tile()) *
                            self.map_data.tile_size + self.game_state.get_hero_party().get_curr_pos_offset_img_px())
 
@@ -190,7 +207,6 @@ class GameMap:
             layers_to_render = self.map_data.base_tile_layers
         else:
             layers_to_render = self.map_data.all_tile_layers
-
         if layers_to_render != self.map_data.visible_tile_layers:
             self.map_data.set_tile_layers_to_render(layers_to_render)
             self.map_layer.redraw_tiles(self.map_layer._buffer)
@@ -198,6 +214,34 @@ class GameMap:
         # tell the map_layer (BufferedRenderer) to draw to the surface
         # the draw function requires a rect to draw to.
         self.group.draw(surface)
+
+        if self.game_state.get_hero_party().light_diameter is not None:
+            light_radius_px = self.game_state.get_hero_party().light_diameter \
+                                * self.game_state.get_game_info().tile_size_pixels / 2
+
+            # Left
+            surface.fill(pygame.Color('black'), pygame.Rect(0,
+                                                            0,
+                                                            surface.get_width() / 2 - light_radius_px,
+                                                            surface.get_height()))
+
+            # Right
+            surface.fill(pygame.Color('black'), pygame.Rect(surface.get_width() / 2 + light_radius_px,
+                                                            0,
+                                                            surface.get_width() / 2 - light_radius_px,
+                                                            surface.get_height()))
+
+            # Top
+            surface.fill(pygame.Color('black'), pygame.Rect(0,
+                                                            0,
+                                                            surface.get_width(),
+                                                            surface.get_height() / 2 - light_radius_px))
+
+            # Bottom
+            surface.fill(pygame.Color('black'), pygame.Rect(0,
+                                                            surface.get_height() / 2 + light_radius_px,
+                                                            surface.get_width(),
+                                                            surface.get_height() / 2 - light_radius_px))
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         if tile is None:
@@ -324,7 +368,7 @@ class GameMap:
                 movement_allowed = False
                 # print('Movement not allowed: NPC degree-of-freedom limit not met', flush=True)
             if movement_allowed and is_npc:
-                for hero in self.hero_party.members:
+                for hero in self.game_state.get_hero_party().members:
                     if tile == hero.curr_pos_dat_tile or tile == hero.dest_pos_dat_tile:
                         movement_allowed = False
                         # print('Movement not allowed: PC in the way', flush=True)
@@ -348,6 +392,19 @@ class GameMap:
                 # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
                 return self.game_info.monster_sets[mz.name]
         return []'''
+
+    def bounds_check_pc_position(self) -> None:
+        # Bounds checking to ensure a valid hero/center position
+        curr_pos_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
+        if (curr_pos_dat_tile is None
+                or curr_pos_dat_tile.x < 1
+                or curr_pos_dat_tile.y < 1
+                or curr_pos_dat_tile.x > self.size().w - 1
+                or curr_pos_dat_tile.y > self.size().h - 1):
+            print('ERROR: Invalid hero position, defaulting to middle tile', flush=True)
+            self.game_state.get_hero_party().set_pos(Point(self.size().w // 2,
+                                                           self.size().h // 2),
+                                                     Direction.SOUTH)
 
     def is_interior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         if pos_dat_tile is None:
@@ -387,29 +444,9 @@ class GameMap:
         if decoration in self.map_decorations:
             self.map_decorations.remove(decoration)
 
-            for sprite in self.group.remove_sprites_of_layer(self.sprite_layer):
-                if isinstance(sprite, MapDecorationSprite):
-                    if sprite.decoration != decoration:
-                        self.group.add(sprite)
-                else:
-                    self.group.add(sprite)
-
-    '''def set_clipping_for_light_diameter(self) -> None:
-        # TODO: Rework for parties
-        if self.is_light_restricted() and self.hero_party.light_diameter is not None:
-            self.screen.set_clip(
-                self.get_tile_region_screen_rect(
-                    self.hero_party.get_curr_pos_dat_tile(),
-                    self.hero_party.light_diameter / 2,
-                    self.hero_party.get_curr_pos_offset_img_px()))
-        else:
-            self.set_clipping_for_window()
-
-    def set_clipping_for_window(self) -> None:
-        self.screen.set_clip(pygame.Rect(0,
-                                         0,
-                                         self.win_size_pixels.x,
-                                         self.win_size_pixels.y))'''
+            for sprite in self.group.remove_sprites_of_layer(self.map_data.decoration_layer):
+                if sprite.decoration != decoration:
+                    self.group.add(sprite, layer=self.map_data.decoration_layer)
 
 
 class MapViewer:
@@ -471,7 +508,9 @@ class MapViewer:
         game_map = GameMap(self.mock_game_state, map_name)
 
         # Center hero party in map
-        self.hero_party.set_pos(game_map.size() // 2, Direction.SOUTH)
+        self.hero_party.light_diameter = self.game_info.maps[map_name].light_diameter
+        self.hero_party.set_pos(Point(-1, -1), Direction.SOUTH)
+        game_map.bounds_check_pc_position()
 
         done_with_map = False
 
@@ -485,6 +524,12 @@ class MapViewer:
                         self.is_running = False
                     elif event.key == pygame.K_RETURN:
                         done_with_map = True
+                    elif event.key == pygame.K_EQUALS:
+                        if self.hero_party.light_diameter is not None:
+                            self.hero_party.light_diameter += 1
+                    elif event.key == pygame.K_MINUS:
+                        if self.hero_party.light_diameter is not None:
+                            self.hero_party.light_diameter = max(1, self.hero_party.light_diameter-1)
                     elif event.key == pygame.K_e:
                         if game_map.is_facing_door():
                             print('Opened door', flush=True)
@@ -503,16 +548,25 @@ class MapViewer:
                     self.is_running = False
 
                 if move_direction is not None:
-                    self.hero_party.members[0].direction = move_direction
-                    dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
-                    if game_map.can_move_to_tile(dest_tile):
-                        self.hero_party.members[0].curr_pos_dat_tile = dest_tile
-                        print('moved to tile of type ', game_map.get_tile_info().name, flush=True)
+                    if self.hero_party.members[0].curr_pos_dat_tile != self.hero_party.members[0].dest_pos_dat_tile:
+                        print('Ignoring move as another move is already in progress', flush=True)
+                        continue
+                    if move_direction != self.hero_party.members[0].direction:
+                        self.hero_party.members[0].direction = move_direction
+                    else:
+                        dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
+                        if game_map.can_move_to_tile(dest_tile):
+                            self.hero_party.members[0].dest_pos_dat_tile = dest_tile
+                            print('moved to tile of type ', game_map.get_tile_info().name, flush=True)
 
-            game_map.update()
-            game_map.draw()
-            pygame.display.flip()
-            self.clock.tick(30)
+            updated = False
+            while not updated or \
+                    self.hero_party.members[0].curr_pos_dat_tile != self.hero_party.members[0].dest_pos_dat_tile:
+                updated = True
+                game_map.update()
+                game_map.draw()
+                pygame.display.flip()
+                self.clock.tick(30)
 
 
 def main() -> None:

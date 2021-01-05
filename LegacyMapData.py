@@ -18,7 +18,9 @@ from Point import Point
 
 class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     BASE_MAP_LAYER = 0
-    OVERLAY_MAP_LAYER = 5
+    DECORATION_LAYER = 1
+    CHARACTER_LAYER = 2
+    OVERLAY_MAP_LAYER = 3
 
     def __init__(self,
                  game_info: GameInfo,
@@ -108,6 +110,14 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     @property
     def base_tile_layers(self):
         return [LegacyMapData.BASE_MAP_LAYER]
+
+    @property
+    def decoration_layer(self):
+        return LegacyMapData.DECORATION_LAYER
+
+    @property
+    def character_layer(self):
+        return LegacyMapData.CHARACTER_LAYER
 
     @property
     def overlay_tile_layers(self):
