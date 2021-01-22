@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="129" height="128" tilewidth="16" tileheight="16" infinite="0" nextlayerid="16" nextobjectid="1">
- <tileset firstgid="1" source="OverworldTileset.tsx"/>
- <tileset firstgid="1521" source="tropical extras.tsx"/>
+ <tileset firstgid="1" source="tilesets/overworld/OverworldTileset.tsx"/>
+ <tileset firstgid="1521" source="tilesets/overworld/tropical_extras.tsx"/>
  <layer id="9" name="under" width="129" height="128" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.2.2" name="overworld" tilewidth="16" tileheight="16" tilecount="1520" columns="40">
- <image source="Overworld_Tileset.png" width="640" height="608"/>
+<tileset version="1.2" tiledversion="1.2.2" name="overworld" tilewidth="16" tileheight="16" tilecount="3200" columns="40">
+ <image source="Overworld_Tileset.png" width="640" height="1280"/>
  <terraintypes>
   <terrain name="trees (object layer)" tile="286"/>
   <terrain name="regular grass" tile="1"/>
@@ -14,6 +14,10 @@
   <terrain name="deep ocean (under layer)" tile="896"/>
   <terrain name="swamp" tile="977"/>
   <terrain name="pine trees (object layer)" tile="698"/>
+  <terrain name="village grass" tile="1640"/>
+  <terrain name="village dirt" tile="1571"/>
+  <terrain name="village path" tile="1576"/>
+  <terrain name="village light grass" tile="1561"/>
  </terraintypes>
  <tile id="0" terrain="1,1,1,1">
   <properties>
@@ -9633,4 +9637,98 @@
    <property name="type" value=""/>
   </properties>
  </tile>
+ <tile id="1520" terrain="12,12,12,15"/>
+ <tile id="1521" terrain="12,12,15,15"/>
+ <tile id="1522" terrain="12,12,15,12"/>
+ <tile id="1523" terrain="12,15,15,15"/>
+ <tile id="1524" terrain="15,12,15,15"/>
+ <tile id="1525" terrain="12,12,12,1"/>
+ <tile id="1526" terrain="12,12,1,1"/>
+ <tile id="1527" terrain="12,12,1,12"/>
+ <tile id="1528" terrain="12,1,1,1"/>
+ <tile id="1529" terrain="1,12,1,1"/>
+ <tile id="1530" terrain="12,12,12,13"/>
+ <tile id="1531" terrain="12,12,13,13"/>
+ <tile id="1532" terrain="12,12,13,12"/>
+ <tile id="1533" terrain="12,13,13,13"/>
+ <tile id="1534" terrain="13,12,13,13"/>
+ <tile id="1535" terrain="13,13,13,14"/>
+ <tile id="1536" terrain="13,13,14,14"/>
+ <tile id="1537" terrain="13,13,14,13"/>
+ <tile id="1538" terrain="13,14,14,14"/>
+ <tile id="1539" terrain="14,13,14,14"/>
+ <tile id="1560" terrain="12,15,12,15"/>
+ <tile id="1561" terrain="15,15,15,15"/>
+ <tile id="1562" terrain="15,12,15,12"/>
+ <tile id="1563" terrain="15,15,12,15"/>
+ <tile id="1564" terrain="15,15,15,12"/>
+ <tile id="1565" terrain="12,1,12,1"/>
+ <tile id="1567" terrain="1,12,1,12"/>
+ <tile id="1568" terrain="1,1,12,1"/>
+ <tile id="1569" terrain="1,1,1,12"/>
+ <tile id="1570" terrain="12,13,12,13"/>
+ <tile id="1571" terrain="13,13,13,13"/>
+ <tile id="1572" terrain="13,12,13,12"/>
+ <tile id="1573" terrain="13,13,12,13"/>
+ <tile id="1574" terrain="13,13,13,12"/>
+ <tile id="1575" terrain="13,14,13,14"/>
+ <tile id="1576" terrain="14,14,14,14"/>
+ <tile id="1577" terrain="14,13,14,13"/>
+ <tile id="1578" terrain="14,14,13,14"/>
+ <tile id="1579" terrain="14,14,14,13"/>
+ <tile id="1600" terrain="12,15,12,12"/>
+ <tile id="1601" terrain="15,15,12,12"/>
+ <tile id="1602" terrain="15,12,12,12"/>
+ <tile id="1603" terrain="12,15,15,12"/>
+ <tile id="1604" terrain="15,12,12,15"/>
+ <tile id="1605" terrain="12,1,12,12"/>
+ <tile id="1606" terrain="1,1,12,12"/>
+ <tile id="1607" terrain="1,12,12,12"/>
+ <tile id="1608" terrain="12,1,1,12"/>
+ <tile id="1609" terrain="1,12,12,1"/>
+ <tile id="1610" terrain="12,13,12,12"/>
+ <tile id="1611" terrain="13,13,12,12"/>
+ <tile id="1612" terrain="13,12,12,12"/>
+ <tile id="1613" terrain="12,13,13,12"/>
+ <tile id="1614" terrain="13,12,12,13"/>
+ <tile id="1615" terrain="13,14,13,13"/>
+ <tile id="1616" terrain="14,14,13,13"/>
+ <tile id="1617" terrain="14,13,13,13"/>
+ <tile id="1618" terrain="13,14,14,13"/>
+ <tile id="1619" terrain="14,13,13,14"/>
+ <tile id="1640" terrain="12,12,12,12"/>
+ <tile id="1641" terrain="12,12,12,12" probability="0.03"/>
+ <tile id="1642" terrain="12,12,12,12" probability="0.03"/>
+ <tile id="1646" terrain="13,13,13,13"/>
+ <tile id="1647" terrain="13,13,13,13" probability="0.1"/>
+ <tile id="1648" terrain="13,13,13,13" probability="0.1"/>
+ <tile id="1649" terrain="13,13,13,13" probability="0.1"/>
+ <tile id="1650" terrain="13,13,13,13" probability="0.05"/>
+ <tile id="1658" terrain="14,14,14,14" probability="0.025"/>
+ <tile id="1659" terrain="14,14,14,14" probability="0.05"/>
+ <tile id="1680" terrain="1,1,1,13"/>
+ <tile id="1681" terrain="1,1,13,13"/>
+ <tile id="1682" terrain="1,1,13,1"/>
+ <tile id="1683" terrain="1,13,13,13"/>
+ <tile id="1684" terrain="13,1,13,13"/>
+ <tile id="1686" terrain="13,13,13,13" probability="0.05"/>
+ <tile id="1687" terrain="13,13,13,13" probability="0.05"/>
+ <tile id="1688" terrain="13,13,13,13" probability="0.05"/>
+ <tile id="1698" terrain="14,14,14,14" probability="0.05"/>
+ <tile id="1699" terrain="14,14,14,14" probability="0.05"/>
+ <tile id="1720" terrain="1,13,1,13"/>
+ <tile id="1721" terrain="13,13,13,13"/>
+ <tile id="1722" terrain="13,1,13,1"/>
+ <tile id="1723" terrain="13,13,1,13"/>
+ <tile id="1724" terrain="13,13,13,1"/>
+ <tile id="1760" terrain="1,13,1,1"/>
+ <tile id="1761" terrain="13,13,1,1"/>
+ <tile id="1762" terrain="13,1,1,1"/>
+ <tile id="1763" terrain="1,13,13,1"/>
+ <tile id="1764" terrain="13,1,1,13"/>
+ <tile id="1800" terrain="1,1,1,13"/>
+ <tile id="1802" terrain="1,1,13,1"/>
+ <tile id="1880" terrain="1,13,1,1"/>
+ <tile id="1882" terrain="13,1,1,1"/>
+ <tile id="1964" terrain=",1,,"/>
 </tileset>
