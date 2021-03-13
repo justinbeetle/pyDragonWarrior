@@ -8,7 +8,7 @@ import random
 
 from AudioPlayer import AudioPlayer
 from GameStateInterface import GameStateInterface
-from GameTypes import CharacterType, Direction, MapDecoration, Phase, Tile
+from GameTypes import CharacterType, Direction, MapDecoration, Tile
 from HeroParty import HeroParty
 from HeroState import HeroState
 from LegacyMapData import LegacyMapData
@@ -48,7 +48,7 @@ class CharacterSprite(MapSprite):
     def __init__(self, character: MapCharacterState) -> None:
         super().__init__()
         self.character = character
-        self.phase = Phase.A
+        self.phase = 0
         self.update_count = 0
         self.updates_per_phase_change = 20  # TODO: Make this a parameter of a character
 
@@ -76,10 +76,7 @@ class CharacterSprite(MapSprite):
         # Check for phase updates
         self.update_count += 1
         if self.update_count % self.updates_per_phase_change == 0:
-            if self.phase == Phase.A:
-                self.phase = Phase.B
-            else:
-                self.phase = Phase.A
+            self.phase = (self.phase + 1) % self.character.character_type.num_phases
 
         # Update the image and rect
         self.image = self.get_image()
@@ -557,7 +554,7 @@ class MapViewer:
                         dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
                         if game_map.can_move_to_tile(dest_tile):
                             self.hero_party.members[0].dest_pos_dat_tile = dest_tile
-                            print('moved to tile of type ', game_map.get_tile_info().name, flush=True)
+                            print('moved to tile of type', game_map.get_tile_info().name, flush=True)
 
             updated = False
             while not updated or \

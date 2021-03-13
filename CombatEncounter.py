@@ -23,7 +23,7 @@ from Point import Point
 
 
 class CombatEncounter(CombatEncounterInterface):
-    MONSTER_SPACING_PIXELS = 20
+    MONSTER_SPACING_PIXELS = -5
     DAMAGE_FLICKER_PIXELS = 4
     default_encounter_music = ''
 

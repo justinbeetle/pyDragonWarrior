@@ -14,9 +14,9 @@ from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, Decoration, 
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
     DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, \
-    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, \
-    MonsterInfo, MonsterZone, NpcInfo, Phase, PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, \
-    Tool, Weapon
+    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, \
+    MonsterZone, NpcInfo, PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
+
 from Point import Point
 
 
@@ -364,28 +364,62 @@ class GameInfo:
             character_levels: List[Level] = []
             if 'levels' in element.attrib and element.attrib['levels'] in levels:
                 character_levels = levels[element.attrib['levels']]
+            num_phases = 2
+            if 'phases' in element.attrib:
+                num_phases = int(element.attrib['phases'])
             character_type_filename = os.path.join(character_path, element.attrib['image'])
             # print('Loading image', character_type_filename, flush=True)
             character_type_image = pygame.image.load(character_type_filename).convert_alpha()
             character_type_images = {}
-            x_px = 0
-            for direction in [Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST]:
-                direction_character_type_images = {}
-                for phase in [Phase.A, Phase.B]:
-                    image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
-                                                   flags=pygame.SRCALPHA)
-                    pygame.transform.scale(character_type_image.subsurface(x_px,
-                                                                           0,
-                                                                           character_type_image.get_height(),
-                                                                           character_type_image.get_height()),
-                                           (self.tile_size_pixels, self.tile_size_pixels),
-                                           image)
-                    direction_character_type_images[phase] = image
-                    x_px += character_type_image.get_height() + 1
-                character_type_images[direction] = direction_character_type_images
-            self.character_types[character_type] = CharacterType(character_type,
-                                                                 character_type_images,
-                                                                 character_levels)
+            if character_type_image.get_width() == character_type_image.get_height() * 8 + 7:
+                # Support for old style character images
+                x_px = 0
+                for direction in [Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST]:
+                    direction_character_type_images = {}
+                    for phase in range(num_phases):
+                        image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
+                                                       flags=pygame.SRCALPHA)
+                        pygame.transform.scale(character_type_image.subsurface(x_px,
+                                                                               0,
+                                                                               character_type_image.get_height(),
+                                                                               character_type_image.get_height()),
+                                               (self.tile_size_pixels, self.tile_size_pixels),
+                                               image)
+                        direction_character_type_images[phase] = image
+                        x_px += character_type_image.get_height() + 1
+                    character_type_images[direction] = direction_character_type_images
+            else:
+                phase_image_size = Point(character_type_image.get_width() // num_phases,
+                                         character_type_image.get_height() // 4)
+                scale_factor = self.tile_size_pixels / max(phase_image_size.w, phase_image_size.h)
+                phase_image_scaled_size = Point(int(scale_factor * phase_image_size.w),
+                                                int(scale_factor * phase_image_size.h))
+                dest_image_rect = pygame.Rect((self.tile_size_pixels - phase_image_scaled_size.w) // 2,
+                                              (self.tile_size_pixels - phase_image_scaled_size.h) // 2,
+                                              phase_image_scaled_size.w,
+                                              phase_image_scaled_size.h)
+                for (idx, direction) in enumerate([Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.NORTH]):
+                    y_px = idx * phase_image_size.h
+                    direction_character_type_images = {}
+                    for phase in range(num_phases):
+                        x_px = phase * phase_image_size.w
+                        image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
+                                                       flags=pygame.SRCALPHA)
+                        pygame.transform.scale(character_type_image.subsurface(x_px,
+                                                                               y_px,
+                                                                               phase_image_size.w,
+                                                                               phase_image_size.h),
+                                               phase_image_scaled_size,
+                                               image.subsurface(dest_image_rect))
+                        direction_character_type_images[phase] = image
+                    character_type_images[direction] = direction_character_type_images
+
+            new_char = CharacterType(name=character_type,
+                                     images=character_type_images,
+                                     levels=character_levels,
+                                     num_phases=num_phases)
+
+            self.character_types[character_type] = new_char
 
         # Parse monster actions
         monster_actions: Dict[str, MonsterAction] = {}

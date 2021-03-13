@@ -106,11 +106,6 @@ class Direction(Enum):
         return None
 
 
-class Phase(Enum):
-    A = 1
-    B = 2
-
-
 # Conditionals supported for dialog checks
 class DialogCheckEnum(Enum):
     HAS_ITEM = 1                       # attributes: name (if unknown name, treated as a progress marker),
@@ -357,8 +352,9 @@ class Decoration(NamedTuple):
 
 class CharacterType(NamedTuple):
     name: str
-    images: Dict[Direction, Dict[Phase, pygame.surface.Surface]]
+    images: Dict[Direction, Dict[int, pygame.surface.Surface]]
     levels: List[Level] = []
+    num_phases: int = 2
 
     @staticmethod
     def create_null(name: str = 'null') -> CharacterType:

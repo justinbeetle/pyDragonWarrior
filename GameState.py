@@ -14,7 +14,7 @@ import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
 from GameTypes import DialogReplacementVariables, DialogType, Direction, LeavingTransition, \
-    MapDecoration, MapImageInfo, MonsterInfo, Phase, PointTransition, SpecialMonster, Tile
+    MapDecoration, MapImageInfo, MonsterInfo, PointTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
@@ -59,7 +59,7 @@ class GameState(GameStateInterface):
         super().__init__(screen)
 
         # TODO: Migrate these into MapCharacterState, which should extend pygame.sprite.Sprite
-        self.phase = Phase.A
+        self.phase_count = 0
         self.tick_count = 1
 
         self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
@@ -535,8 +535,9 @@ class GameState(GameStateInterface):
                     character_images = character.character_type.images
             else:
                 character_images = character.character_type.images
+            character_direction_images = character_images[character.direction]
             self.screen.blit(
-                character_images[character.direction][self.phase],
+                character_direction_images[self.phase_count % len(character_direction_images)],
                 self.get_tile_screen_rect(
                     character.curr_pos_dat_tile,
                     character.curr_pos_offset_img_px))
@@ -696,10 +697,7 @@ class GameState(GameStateInterface):
         phase_changed = False
         if self.tick_count % GameState.PHASE_TICKS == 0:
             phase_changed = True
-            if self.phase == Phase.A:
-                self.phase = Phase.B
-            else:
-                self.phase = Phase.A
+            self.phase_count += 1
 
         # Implement light diameter via clipping
         self.set_clipping_for_light_diameter()
