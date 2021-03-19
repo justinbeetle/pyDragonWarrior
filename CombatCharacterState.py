@@ -85,53 +85,53 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_name(self) -> str:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_type_name(self) -> str:
-        raise NotImplementedError
+        pass
 
     # Determine if character should remain asleep.  Should maintain turnsAsleep.
     @abc.abstractmethod
     def is_still_asleep(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_strength(self) -> int:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_agility(self) -> int:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_attack_strength(self) -> int:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_defense_strength(self) -> int:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def allows_critical_hits(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_dodging_attack(self) -> bool:
-        raise NotImplementedError
+        pass
 
     # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     @abc.abstractmethod
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_spell_resistance(self, spell: Spell) -> float:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
-        raise NotImplementedError
+        pass
 
     # Return damage along with a bool indicating whether the attack was a critical hit
     # Accounts for and applies the damage modifier
@@ -140,7 +140,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
                           target: CombatCharacterState,
                           damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
                           is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
-        raise NotImplementedError
+        pass
 
     @staticmethod
     def calc_damage(min_damage: int,

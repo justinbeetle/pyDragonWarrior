@@ -43,7 +43,7 @@ Current Efforts:
 26) Add item control (equip, unequip, drop, use) - DONE!
 27) Improved monster AI (running, spells, different attack types) - DONE!
 28) game.xml changes to make it easier to specify chest contents - Partially implemented
-29) game.xml changes to make it easier to specify transitions
+29) game.xml changes to make it easier to specify transitions - DONE!
 30) Add special monsters - DONE!
 31) Door, chest, hidden item, and special monster respawn control - DONE!
 32) Add armor healing - DONE!

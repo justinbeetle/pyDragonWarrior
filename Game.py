@@ -14,7 +14,7 @@ import GameEvents
 from GameState import GameState
 from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import Direction, DialogType, LeavingTransition, PointTransition, Tool
+from GameTypes import Direction, DialogType, OutgoingTransition, Tool
 from Point import Point
 import SurfaceEffects
 
@@ -275,7 +275,7 @@ class Game:
                         actor = self.game_state.hero_party.main_character
                         self.gde.set_actor(actor)
                         item_cols = 2
-                        item_row_data = actor.get_item_row_data(item_cols)
+                        item_row_data = actor.get_item_row_data()
                         if len(item_row_data) == 0:
                             self.gde.dialog_loop('Thou dost not have any items.')
                         else:
@@ -382,7 +382,7 @@ class Game:
 
     def scroll_tile(self) -> None:
 
-        transition: Optional[Union[LeavingTransition, PointTransition]] = None
+        transition: Optional[OutgoingTransition] = None
 
         map_image_rect = self.game_state.get_map_image_rect()
         orig_map_image_rect = self.game_state.get_map_image_rect()

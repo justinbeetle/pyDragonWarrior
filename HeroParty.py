@@ -236,7 +236,7 @@ class HeroParty:
                 lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
         return lowest_health_ratio
 
-    def get_highest_defense_strength(self):
+    def get_highest_defense_strength(self) -> int:
         highest_defense_strength = 0
         for member in self.members:
             if member.is_alive():

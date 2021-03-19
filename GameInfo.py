@@ -9,13 +9,13 @@ import xml.etree.ElementTree
 
 from AudioPlayer import AudioPlayer
 import GameEvents
-from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, Decoration, DialogAction, DialogActionEnum, \
-    DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
+from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterType, Decoration, DialogAction, \
+    DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
-    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, \
-    LeavingTransition, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, \
-    MonsterZone, NpcInfo, PointTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
+    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, Level, Map, \
+    MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, NpcInfo, \
+    OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
 
 from Point import Point
 
@@ -68,9 +68,10 @@ class GameInfo:
 
         # Parse title information
         title_element = xml_root.find('Title')
-        self.title_music = title_element.attrib['music']
-        title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
-        self.title_image = pygame.image.load(title_image_file_name).convert()
+        if title_element is not None:
+            self.title_music = title_element.attrib['music']
+            title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
+            self.title_image = pygame.image.load(title_image_file_name).convert()
 
         # Parse items
         self.items: Dict[str, ItemType] = {}
@@ -537,46 +538,57 @@ class GameInfo:
                 origin = Point(int(element.attrib['originX']), int(element.attrib['originY']))
 
             # Parse transitions
-            # print( 'Parse transitions', flush=True )
-            leaving_transition = None
-            point_transitions: List[PointTransition] = []
+            # print('Parse transitions', flush=True)
+            leaving_transition: Optional[OutgoingTransition] = None
+            point_transitions: List[OutgoingTransition] = []
+            transitions_by_map: Dict[str, AnyTransition] = {}
+            transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]] = {}
+            transitions_by_name: Dict[str, AnyTransition] = {}
             map_decorations: List[MapDecoration] = []
-            trans_element = element.find('LeavingTransition')
-            if trans_element is not None:
+
+            def parse_outgoing_transition(trans_element: xml.etree.ElementTree.Element) -> OutgoingTransition:
+                name = None
+                if 'name' in trans_element.attrib:
+                    name = trans_element.attrib['name']
+                dest_name = None
+                if 'toName' in trans_element.attrib:
+                    dest_name = trans_element.attrib['toName']
                 respawn_decorations = False
                 if 'respawnDecorations' in trans_element.attrib:
                     respawn_decorations = trans_element.attrib['respawnDecorations'] == 'yes'
-                leaving_transition = LeavingTransition(trans_element.attrib['toMap'],
-                                                       Point(int(trans_element.attrib['toX']),
-                                                             int(trans_element.attrib['toY'])),
-                                                       Direction[trans_element.attrib['toDir']],
-                                                       respawn_decorations)
-            for trans_element in element.findall('PointTransition'):
-                respawn_decorations = False
-                if 'respawnDecorations' in trans_element.attrib:
-                    respawn_decorations = trans_element.attrib['respawnDecorations'] == 'yes'
-                from_point = Point(int(trans_element.attrib['fromX']),
-                                   int(trans_element.attrib['fromY']))
                 progress_marker = None
                 if 'progressMarker' in trans_element.attrib:
                     progress_marker = trans_element.attrib['progressMarker']
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in trans_element.attrib:
                     inverse_progress_marker = trans_element.attrib['inverseProgressMarker']
-                point_transitions.append(PointTransition(from_point,
-                                                         trans_element.attrib['toMap'],
-                                                         Point(int(trans_element.attrib['toX']),
-                                                               int(trans_element.attrib['toY'])),
-                                                         Direction[trans_element.attrib['toDir']],
-                                                         respawn_decorations,
-                                                         progress_marker,
-                                                         inverse_progress_marker))
+                transition = OutgoingTransition(Point(int(trans_element.attrib['x']),
+                                                      int(trans_element.attrib['y'])),
+                                                Direction[trans_element.attrib['dir']],
+                                                name,
+                                                trans_element.attrib['toMap'],
+                                                dest_name,
+                                                respawn_decorations,
+                                                progress_marker,
+                                                inverse_progress_marker)
+                transitions_by_map[transition.dest_map] = transition
+                if transition.name is not None:
+                    if transition.dest_map not in transitions_by_map_and_name:
+                        transitions_by_map_and_name[transition.dest_map] = {}
+                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
+                    transitions_by_name[transition.name] = transition
                 if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
                     map_decorations.append(MapDecoration.create(self.decorations[trans_element.attrib['decoration']],
-                                                                from_point,
+                                                                transition.point,
                                                                 None,
                                                                 progress_marker,
                                                                 inverse_progress_marker))
+                return transition
+            trans_element = element.find('LeavingTransition')
+            if trans_element is not None:
+                leaving_transition = parse_outgoing_transition(trans_element)
+            for trans_element in element.findall('PointTransition'):
+                point_transitions.append(parse_outgoing_transition(trans_element))
 
             # Parse NPCs
             # print( 'Parse NPCs', flush=True )
@@ -726,6 +738,9 @@ class GameInfo:
                                       light_diameter,
                                       leaving_transition,
                                       point_transitions,
+                                      transitions_by_map,
+                                      transitions_by_map_and_name,
+                                      transitions_by_name,
                                       npcs,
                                       map_decorations,
                                       monster_zones,

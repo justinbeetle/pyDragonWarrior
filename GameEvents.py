@@ -20,7 +20,7 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
-def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) -> List[pygame.event.Event]:
+def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: bool=True) -> List[pygame.event.Event]:
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
@@ -53,11 +53,14 @@ def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) ->
             else:
                 # Map all other buttons to an unused key
                 event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_F15})
-        elif event.type == pygame.JOYHATMOTION:
-            event = get_event_for_joystick_hat_position(event.value)
 
-        if event is not None:
-            events.append(event)
+        elif event.type == pygame.JOYHATMOTION:
+            joystick_hat_event = get_event_for_joystick_hat_position(event.value)
+            if joystick_hat_event is None:
+                continue
+            event = joystick_hat_event
+
+        events.append(event)
 
     if is_keyboard_repeat_enabled:
         # Generate key down events from a joystick hat for the case where repeats are enabled
@@ -66,9 +69,9 @@ def get_events(is_keyboard_repeat_enabled=False, translate_wasd_to_uldr=True) ->
             if not joystick.get_init():
                 continue
             for hat_id in range(joystick.get_numhats()):
-                event = get_event_for_joystick_hat_position(joystick.get_hat(hat_id))
-                if event is not None:
-                    add_event_if_not_duplicate(events, event)
+                joystick_hat_event = get_event_for_joystick_hat_position(joystick.get_hat(hat_id))
+                if joystick_hat_event is not None:
+                    add_event_if_not_duplicate(events, joystick_hat_event)
 
         # Generate key down events for pressed keys
         pressed = pygame.key.get_pressed()

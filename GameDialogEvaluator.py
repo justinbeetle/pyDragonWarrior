@@ -37,7 +37,7 @@ class GameDialogEvaluator:
         self.actor: CombatCharacterState = self.hero_party.main_character
         self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
 
-    def refresh_game_state(self):
+    def refresh_game_state(self) -> None:
         self.hero_party = self.game_state.get_hero_party()
         self.replacement_variables = self.game_state.get_dialog_replacement_variables()
         self.actor: CombatCharacterState = self.hero_party.main_character
@@ -125,7 +125,10 @@ class GameDialogEvaluator:
         # Since we just waited, clean wait_before_new_text
         self.wait_before_new_text = False
 
-    def wait_for_user_input(self, message_dialog: GameDialog, prompt: str, allowed_input: Optional[str] = None) -> str:
+    def wait_for_user_input(self,
+                            message_dialog: GameDialog,
+                            prompt: str,
+                            allowed_input: Optional[str] = None) -> (str, float):
         message_dialog.prompt_for_user_text(prompt, allowed_input)
         message_dialog.blit(self.game_state.screen, True)
 

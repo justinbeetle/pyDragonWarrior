@@ -62,7 +62,7 @@ class MonsterParty:
                 alive_members.append(member)
         return alive_members
 
-    def get_highest_attack_strength(self):
+    def get_highest_attack_strength(self) -> int:
         highest_attack_strength = 0
         for member in self.members:
             if member.is_still_in_combat():

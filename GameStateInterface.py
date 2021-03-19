@@ -20,83 +20,83 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_game_info(self) -> GameInfo:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_image_pad_tiles(self) -> Point:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_hero_party(self) -> HeroParty:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_outside(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_inside(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_in_combat(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_combat_allowed(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def is_light_restricted(self) -> bool:
-        raise NotImplementedError
+        pass
 
     # TODO: Move this into the HeroParty
     @abc.abstractmethod
     def get_map_name(self) -> str:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def set_map(self,
                 new_map_name: str,
                 one_time_decorations: Optional[List[MapDecoration]] = None,
-                respawn_decorations=False) -> None:
-        raise NotImplementedError
+                respawn_decorations: bool = False) -> None:
+        pass
 
     @abc.abstractmethod
     def is_facing_door(self) -> bool:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def open_door(self) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def remove_decoration(self, decoration: MapDecoration) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def draw_map(self,
-                 flip_buffer=True,
-                 draw_background=True,
-                 draw_characters=True,
-                 draw_combat=True) -> None:
-        raise NotImplementedError
+                 flip_buffer: bool = True,
+                 draw_background: bool = True,
+                 draw_characters: bool = True,
+                 draw_combat: bool = True) -> None:
+        pass
 
     @abc.abstractmethod
     def save(self) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def get_win_size_pixels(self) -> Point:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def initiate_encounter(self,
@@ -106,16 +106,16 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
                            run_away_dialog: Optional[DialogType] = None,
                            encounter_music: Optional[str] = None,
                            message_dialog: Optional[GameDialog] = None) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def handle_quit(self, force: bool = False) -> None:
-        raise NotImplementedError
+        pass
 
     @abc.abstractmethod
     def should_add_math_problems_in_combat(self) -> bool:
-        raise NotImplementedError
+        pass

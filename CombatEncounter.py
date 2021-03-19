@@ -396,7 +396,7 @@ class CombatEncounter(CombatEncounterInterface):
 
             elif menu_result == 'ITEM':
                 item_cols = 2
-                item_row_data = hero.get_item_row_data(item_cols, limit_to_unequipped=True, filter_types=['Tool'])
+                item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
                 if len(item_row_data) == 0:
                     self.message_dialog.add_message('Thou dost not have any tools.')
                     continue
@@ -519,15 +519,15 @@ class CombatEncounter(CombatEncounterInterface):
             damage_action.problem = problem
 
     @staticmethod
-    def gen_addition_problem(min_term=0, max_term=12) -> Problem:
+    def gen_addition_problem(min_term: int=0, max_term: int=12) -> Problem:
         addend_1 = random.randrange(min_term, max_term)
         addend_2 = random.randrange(min_term, max_term)
         sum = addend_1 + addend_2
         return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum), '0123456789')
 
     @staticmethod
-    def gen_subtraction_problem(min_term=0,
-                                max_term=12,
+    def gen_subtraction_problem(min_term: int=0,
+                                max_term: int=12,
                                 minuend_min: Optional[int]=None,
                                 minuend_max: Optional[int]=None) -> Problem:
         if minuend_min is not None and minuend_max is not None:
@@ -542,10 +542,10 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference), '0123456789')
 
     @staticmethod
-    def gen_multiplication_problem(min_term=0,
-                                   max_term=12,
-                                   multiplicand_1_range: Optional[list[int]]=None,
-                                   multiplicand_2_range: Optional[list[int]]=None) -> Problem:
+    def gen_multiplication_problem(min_term: int=0,
+                                   max_term: int=12,
+                                   multiplicand_1_range: Optional[List[int]]=None,
+                                   multiplicand_2_range: Optional[List[int]]=None) -> Problem:
         if multiplicand_1_range is None:
             multiplicand_1 = random.randrange(min_term, max_term)
         else:
@@ -564,7 +564,7 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product), '0123456789')
 
     @staticmethod
-    def gen_division_problem(min_term=0, max_term=12) -> Problem:
+    def gen_division_problem(min_term: int=0, max_term: int=12) -> Problem:
         a = random.randrange(min_term, max_term)
         b = random.randrange(min_term, max_term)
         dividend = a*b
@@ -575,7 +575,7 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '0123456789')
 
     @staticmethod
-    def gen_any_problem(min_term=0, max_term=12) -> Problem:
+    def gen_any_problem(min_term: int=0, max_term: int=12) -> Problem:
         a = random.randrange(0, 3)
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term, max_term)

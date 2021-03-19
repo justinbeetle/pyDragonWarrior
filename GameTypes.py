@@ -87,22 +87,24 @@ class Direction(Enum):
         return opposite
 
     @staticmethod
-    def get_direction(vector: Point) -> Direction:
-        for direction in Direction:
-            if direction.get_vector() == vector:
-                return direction
-        return Direction.SOUTH
-
-    @staticmethod
-    def get_direction(pygame_key: int) -> Optional[Direction]:
-        if pygame.K_UP == pygame_key:
-            return Direction.NORTH
-        elif pygame.K_DOWN == pygame_key:
-            return Direction.SOUTH
-        elif pygame.K_RIGHT == pygame_key:
-            return Direction.EAST
-        elif pygame.K_LEFT == pygame_key:
-            return Direction.WEST
+    def get_direction(input: Union[Point, int]) -> Optional[Direction]:
+        if isinstance(input, Point):
+            # Input is a vector
+            vector = input
+            for direction in Direction:
+                if direction.get_vector() == vector:
+                    return direction
+        elif isinstance(input, int):
+            # Input is a pygame_key
+            pygame_key = input
+            if pygame.K_UP == pygame_key:
+                return Direction.NORTH
+            elif pygame.K_DOWN == pygame_key:
+                return Direction.SOUTH
+            elif pygame.K_RIGHT == pygame_key:
+                return Direction.EAST
+            elif pygame.K_LEFT == pygame_key:
+                return Direction.WEST
         return None
 
 
@@ -361,22 +363,29 @@ class CharacterType(NamedTuple):
         return CharacterType(name, {})
 
 
-class LeavingTransition(NamedTuple):
-    dest_map: str
-    dest_point: Point
-    dest_dir: Direction
-    respawn_decorations: bool
+class IncomingTransition(NamedTuple):
+    point: Point                       # Location of PC on incoming transit; trigger point for outgoing point transit
+    dir: Direction                     # Direction of the PC on incoming transit
+    name: Optional[str]                # Name of transition (where needed due to keep transits unambiguous)
+    dest_map: Optional[str] = None     # Name of map to which the transition connects
 
 
-class PointTransition(NamedTuple):
-    src_point: Point
-    dest_map: str
-    dest_point: Point
-    dest_dir: Direction
-    respawn_decorations: bool
+class OutgoingTransition(NamedTuple):
+    point: Point                       # Location of PC on incoming transit; trigger point for outgoing point transit
+    dir: Direction                     # Direction of the PC on incoming transit
+    name: Optional[str]                # Name of transition (where needed due to keep transits unambiguous)
+    dest_map: str                      # Name of map to which the transition connects
+    dest_name: Optional[str] = None    # Name of destination transition in the destination map
+    respawn_decorations: bool = False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
+
+    # For point transitions, is the transit automatic or must it be player initiated.
+    # If None, default behavior is automatic if light not restricted, else manual.
     is_automatic: Optional[bool] = None
+
+
+AnyTransition = Union[IncomingTransition, OutgoingTransition]
 
 
 class NpcInfo(NamedTuple):
@@ -437,8 +446,11 @@ class Map(NamedTuple):
     size: Point  # This needs to be deprecated as we don't know it in advance for tiled maps
     music: str
     light_diameter: Optional[int]
-    leaving_transition: Optional[LeavingTransition]
-    point_transitions: List[PointTransition]
+    leaving_transition: Optional[OutgoingTransition]
+    point_transitions: List[OutgoingTransition]
+    transitions_by_map: Dict[str, AnyTransition]
+    transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]]
+    transitions_by_name: Dict[str, AnyTransition]
     npcs: List[NpcInfo]
     map_decorations: List[MapDecoration]
     monster_zones: List[MonsterZone]
@@ -460,6 +472,9 @@ class Map(NamedTuple):
                    None,
                    None,
                    [],
+                   {},
+                   {},
+                   {},
                    [],
                    [],
                    [],

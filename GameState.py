@@ -13,8 +13,8 @@ from CombatEncounter import CombatEncounter
 import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import DialogReplacementVariables, DialogType, Direction, LeavingTransition, \
-    MapDecoration, MapImageInfo, MonsterInfo, PointTransition, SpecialMonster, Tile
+from GameTypes import AnyTransition, DialogReplacementVariables, DialogType, Direction, MapDecoration, MapImageInfo, \
+    MonsterInfo, OutgoingTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
@@ -266,7 +266,7 @@ class GameState(GameStateInterface):
         save_game_file.write(xml_string)
         save_game_file.close()
 
-    def archive_saved_game_file(self, save_game_file_path, archive_dir_name='archive'):
+    def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str='archive') -> None:
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
             archive_dir = os.path.join(self.game_info.saves_path, archive_dir_name)
@@ -337,11 +337,11 @@ class GameState(GameStateInterface):
     # Find point transitions for either the specified point or the current position of the player character.
     # If auto is true, only look for automatic point transitions
     def get_point_transition(self, tile: Optional[Point] = None,
-                             filter_to_automatic_transitions=False) -> Optional[PointTransition]:
+                             filter_to_automatic_transitions: bool=False) -> Optional[OutgoingTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
-            if point_transition.src_point == tile and self.check_progress_markers(
+            if point_transition.point == tile and self.check_progress_markers(
                     point_transition.progress_marker, point_transition.inverse_progress_marker):
                 if filter_to_automatic_transitions:
                     if point_transition.is_automatic is None and not self.is_light_restricted():
@@ -559,20 +559,45 @@ class GameState(GameStateInterface):
         return not self.is_outside()
 
     def make_map_transition(self,
-                            transition: Optional[Union[LeavingTransition, PointTransition]]) -> bool:
-        if transition is not None:
-            AudioPlayer().play_sound('stairs.wav')
-            map_changing = transition.dest_map != self.map_state.name
-            if (self.game_info.maps[self.map_state.name].is_outside
-                    and not self.game_info.maps[transition.dest_map].is_outside):
-                self.hero_party.set_last_outside_pos(self.map_state.name,
-                                                     self.hero_party.get_curr_pos_dat_tile(),
-                                                     self.hero_party.get_direction())
-            self.hero_party.set_pos(transition.dest_point, transition.dest_dir)
-            self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
-            if not map_changing:
-                self.draw_map(True)
-        return transition is not None
+                            transition: Optional[OutgoingTransition]) -> bool:
+        if transition is None:
+            return False
+
+        map_changing = transition.dest_map != self.map_state.name
+        src_map = self.game_info.maps[self.map_state.name]
+        dest_map = self.game_info.maps[transition.dest_map]
+
+        # Find the destination transition corresponding to this transition
+        if transition.dest_name is None:
+            try:
+                dest_transition = dest_map.transitions_by_map[self.map_state.name]
+            except KeyError:
+                print('Failed to find destination transition by dest_map', flush=True)
+                return False
+        else:
+            try:
+                dest_transition = dest_map.transitions_by_map_and_name[self.map_state.name][transition.dest_name]
+            except KeyError:
+                try:
+                    dest_transition = dest_map.transitions_by_name[transition.dest_name]
+                except KeyError:
+                    print('Failed to find destination transition by dest_name', flush=True)
+                    return False
+
+        # If transitioning from outside to inside, save off last outside position
+        if src_map.is_outside and not dest_map.is_outside:
+            self.hero_party.set_last_outside_pos(self.map_state.name,
+                                                 self.hero_party.get_curr_pos_dat_tile(),
+                                                 self.hero_party.get_direction())
+
+        # Making the transition
+        AudioPlayer().play_sound('stairs.wav')
+        self.hero_party.set_pos(dest_transition.point, dest_transition.dir)
+        self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
+        if not map_changing:
+            self.draw_map(True)
+
+        return True
 
     def bounds_check_pc_position(self) -> None:
         # Bounds checking to ensure a valid hero/center position
@@ -664,10 +689,10 @@ class GameState(GameStateInterface):
                                          self.win_size_pixels.y))
 
     def draw_map(self,
-                 flip_buffer=True,
-                 draw_background=True,
-                 draw_characters=True,
-                 draw_combat=True) -> None:
+                 flip_buffer: bool=True,
+                 draw_background: bool=True,
+                 draw_characters: bool=True,
+                 draw_combat: bool=True) -> None:
         # Implement light diameter via clipping
         if self.is_light_restricted():
             self.screen.fill(pygame.Color('black'))

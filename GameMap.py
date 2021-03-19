@@ -272,11 +272,11 @@ class GameMap:
     # Find point transitions for either the specified point or the current position of the player character.
     # If auto is true, only look for automatic point transitions
     def get_point_transition(self, tile: Optional[Point] = None,
-                             filter_to_automatic_transitions=False) -> Optional[PointTransition]:
+                             filter_to_automatic_transitions=False) -> Optional[OutgoingTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
-            if point_transition.src_point == tile and self.check_progress_markers(
+            if point_transition.point == tile and self.check_progress_markers(
                     point_transition.progress_marker, point_transition.inverse_progress_marker):
                 if filter_to_automatic_transitions:
                     if point_transition.is_automatic is None and not self.is_light_restricted():
