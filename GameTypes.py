@@ -443,7 +443,6 @@ class Map(NamedTuple):
     tiled_filename: Optional[str]
     dat: List[str]
     overlay_dat: Optional[List[str]]
-    size: Point  # This needs to be deprecated as we don't know it in advance for tiled maps
     music: str
     light_diameter: Optional[int]
     leaving_transition: Optional[OutgoingTransition]

@@ -733,7 +733,6 @@ class GameInfo:
                                       map_tiled_file_name,
                                       map_dat,
                                       map_overlay_dat,
-                                      map_dat_size,
                                       music,
                                       light_diameter,
                                       leaving_transition,

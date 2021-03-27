@@ -58,7 +58,6 @@ def flickering(screen: pygame.surface.Surface) -> None:
     flicker_surface.set_alpha(128)
 
     for flicker_times in range(10):
-        screen.blit(background_surface, (0, 0))
         screen.blit(flicker_surface, (0, 0))
         pygame.display.flip()
         pygame.time.Clock().tick(30)
@@ -135,61 +134,3 @@ def rainbow_effect(screen: pygame.surface.Surface,
     # Restore original screen
     screen.blit(orig_screen, (0, 0))
     pygame.display.flip()
-
-
-def scroll_view(screen: pygame.surface.Surface,
-                image: pygame.surface.Surface,
-                direction: Direction,
-                view_rect: pygame.Rect,
-                zoom_factor: float,
-                image_px_step_size: int,
-                update: bool = False) -> None:
-    src_rect = None
-    dst_rect = None
-    zoom_view_rect = screen.get_clip()
-    image_w, image_h = image.get_size()
-    dst_image_px_step_size = math.ceil(image_px_step_size * zoom_factor)
-
-    if direction == Direction.NORTH:
-        if view_rect.top >= image_px_step_size:
-            screen.scroll(dy=dst_image_px_step_size)
-            view_rect.move_ip(0, -image_px_step_size)
-            src_rect = view_rect.copy()
-            src_rect.h = image_px_step_size
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.h = dst_image_px_step_size
-    elif direction == Direction.SOUTH:
-        if view_rect.bottom <= image_h - image_px_step_size:
-            screen.scroll(dy=-dst_image_px_step_size)
-            view_rect.move_ip(0, image_px_step_size)
-            src_rect = view_rect.copy()
-            src_rect.h = image_px_step_size
-            src_rect.bottom = view_rect.bottom
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.h = dst_image_px_step_size
-            dst_rect.bottom = zoom_view_rect.bottom
-    elif direction == Direction.WEST:
-        if view_rect.left >= image_px_step_size:
-            screen.scroll(dx=dst_image_px_step_size)
-            view_rect.move_ip(-image_px_step_size, 0)
-            src_rect = view_rect.copy()
-            src_rect.w = image_px_step_size
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.w = dst_image_px_step_size
-    elif direction == Direction.EAST:
-        if view_rect.right <= image_w - image_px_step_size:
-            screen.scroll(dx=-dst_image_px_step_size)
-            view_rect.move_ip(image_px_step_size, 0)
-            src_rect = view_rect.copy()
-            src_rect.w = image_px_step_size
-            src_rect.right = view_rect.right
-            dst_rect = zoom_view_rect.copy()
-            dst_rect.w = dst_image_px_step_size
-            dst_rect.right = zoom_view_rect.right
-    if src_rect is not None and dst_rect is not None:
-        src = image.subsurface(src_rect)
-        pygame.transform.scale(src,
-                               dst_rect.size,
-                               screen.subsurface(dst_rect))
-        if update:
-            pygame.display.update(zoom_view_rect)

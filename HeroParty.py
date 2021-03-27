@@ -199,6 +199,7 @@ class HeroParty:
     def set_pos(self, pos: Point, direction: Direction) -> None:
         for member in self.members:
             member.curr_pos_dat_tile = member.dest_pos_dat_tile = pos
+            member.curr_pos_offset_img_px = Point(0, 0)
             member.direction = direction
 
     def set_last_outside_pos(self, map_name: str, pos: Point, direction: Direction) -> None:

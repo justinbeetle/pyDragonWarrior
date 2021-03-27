@@ -796,7 +796,7 @@
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="123" terrain="1,2,2,1">
+ <tile id="123" terrain="0,0,0,0">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -3013,7 +3013,7 @@
  </tile>
  <tile id="498">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="gate"/>
   </properties>
  </tile>
  <tile id="499">

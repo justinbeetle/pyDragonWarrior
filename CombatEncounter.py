@@ -51,7 +51,10 @@ class CombatEncounter(CombatEncounterInterface):
         self.victory_dialog = victory_dialog
         self.run_away_dialog = run_away_dialog
 
-        self.game_state.draw_map(flip_buffer=False)
+        if self.game_state.is_light_restricted():
+            self.game_state.screen.fill(pygame.Color('black'))
+        else:
+            self.game_state.draw_map(flip_buffer=False)
         self.background_image = game_state.screen.copy()
 
         if message_dialog is not None:

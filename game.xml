@@ -21,11 +21,14 @@
       <Tile name="darkness" image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
 
       <Tile name="cliff"                                    walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="gate"                                     walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
       <Tile name="walls"                                    walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
    </Tiles>
 
    <Decorations>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="bridge_left" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>  <!-- TODO -->
+      <Decoration name="bridge_right" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/> <!-- TODO -->
       <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_A" image="castle_stone_A.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_B" image="castle_stone_B.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -187,8 +190,7 @@
    </CharacterTypes>
 
    <Maps>
-      <!-- tiles="tiled/alefgard.tmx" -->
-      <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
+      <!-- <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
          <PointTransition decoration="castle_stone_A"      x="44"  y="44"  dir="SOUTH" toMap="tantegel_lvl1"                 respawnDecorations="yes"/>
          <PointTransition decoration="town_stone_med_B"    x="49"  y="42"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
          <PointTransition decoration="town_stone_med_A"    x="3"   y="3"   dir="SOUTH" toMap="garinham"                      respawnDecorations="yes"/>
@@ -212,11 +214,117 @@
             <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
+         <MapPoint x="66" y="50" name="Rainbow_Bridge_Formation_Point"/>
          <MapDecoration type="bridge" x="65" y="50" progressMarker="PM_Created_Rainbow_Bridge"/>
 
          <Monster name="Golem" x="74" y="101" inverseProgressMarker="PM_Defeated_Golem">
             <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
             <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="74" y="100"/></RunAwayDialog></Monster>
+
+         <MonsterZones>
+            <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="31"  y="1"   w="15" h="15" set="2"/>
+            <MonsterZone x="46"  y="1"   w="15" h="15" set="2"/>
+            <MonsterZone x="61"  y="1"   w="15" h="15" set="3"/>
+            <MonsterZone x="76"  y="1"   w="15" h="15" set="5"/>
+            <MonsterZone x="91"  y="1"   w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="1"   w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="16"  y="16"  w="15" h="15" set="2"/>
+            <MonsterZone x="31"  y="16"  w="15" h="15" set="1"/>
+            <MonsterZone x="46"  y="16"  w="15" h="15" set="2"/>
+            <MonsterZone x="61"  y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="76"  y="16"  w="15" h="15" set="3"/>
+            <MonsterZone x="91"  y="16"  w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="16"  w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="31"  w="15" h="15" set="4"/>
+            <MonsterZone x="16"  y="31"  w="15" h="15" set="1"/>
+            <MonsterZone x="31"  y="31"  w="15" h="15" set="0"/>
+            <MonsterZone x="46"  y="31"  w="15" h="15" set="0"/>
+            <MonsterZone x="61"  y="31"  w="15" h="15" set="1"/>
+            <MonsterZone x="76"  y="31"  w="15" h="15" set="3"/>
+            <MonsterZone x="91"  y="31"  w="15" h="15" set="4"/>
+            <MonsterZone x="106" y="31"  w="15" h="15" set="5"/>
+
+            <MonsterZone x="1"   y="46"  w="15" h="15" set="5"/>
+            <MonsterZone x="16"  y="46"  w="15" h="15" set="1"/>
+            <MonsterZone x="31"  y="46"  w="15" h="15" set="1"/>
+            <MonsterZone x="46"  y="46"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="46"  w="15" h="15" set="9"/>
+            <MonsterZone x="76"  y="46"  w="15" h="15" set="6"/>
+            <MonsterZone x="91"  y="46"  w="15" h="15" set="6"/>
+            <MonsterZone x="106" y="46"  w="15" h="15" set="6"/>
+
+            <MonsterZone x="1"   y="61"  w="15" h="15" set="5"/>
+            <MonsterZone x="16"  y="61"  w="15" h="15" set="5"/>
+            <MonsterZone x="31"  y="61"  w="15" h="15" set="4"/>
+            <MonsterZone x="46"  y="61"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="61"  w="15" h="15" set="12"/>
+            <MonsterZone x="76"  y="61"  w="15" h="15" set="7"/>
+            <MonsterZone x="91"  y="61"  w="15" h="15" set="7"/>
+            <MonsterZone x="106" y="61"  w="15" h="15" set="7"/>
+
+            <MonsterZone x="1"   y="76"  w="15" h="15" set="10"/>
+            <MonsterZone x="16"  y="76"  w="15" h="15" set="9"/>
+            <MonsterZone x="31"  y="76"  w="15" h="15" set="8"/>
+            <MonsterZone x="46"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="76"  y="76"  w="15" h="15" set="12"/>
+            <MonsterZone x="91"  y="76"  w="15" h="15" set="8"/>
+            <MonsterZone x="106" y="76"  w="15" h="15" set="7"/>
+
+            <MonsterZone x="1"   y="91"  w="15" h="15" set="10"/>
+            <MonsterZone x="16"  y="91"  w="15" h="15" set="10"/>
+            <MonsterZone x="31"  y="91"  w="15" h="15" set="11"/>
+            <MonsterZone x="46"  y="91"  w="15" h="15" set="12"/>
+            <MonsterZone x="61"  y="91"  w="15" h="15" set="13"/>
+            <MonsterZone x="76"  y="91"  w="15" h="15" set="13"/>
+            <MonsterZone x="91"  y="91"  w="15" h="15" set="9"/>
+            <MonsterZone x="106" y="91"  w="15" h="15" set="8"/>
+
+            <MonsterZone x="1"   y="106" w="15" h="15" set="11"/>
+            <MonsterZone x="16"  y="106" w="15" h="15" set="11"/>
+            <MonsterZone x="31"  y="106" w="15" h="15" set="12"/>
+            <MonsterZone x="46"  y="106" w="15" h="15" set="13"/>
+            <MonsterZone x="61"  y="106" w="15" h="15" set="13"/>
+            <MonsterZone x="76"  y="106" w="15" h="15" set="12"/>
+            <MonsterZone x="91"  y="106" w="15" h="15" set="9"/>
+            <MonsterZone x="106" y="106" w="15" h="15" set="9"/>
+         </MonsterZones>
+      </Map> -->
+
+      <Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
+         <PointTransition decoration="pass"                x="46"  y="45"  dir="SOUTH" toMap="tantegel_lvl1"                 respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="50"  y="44"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="50"  y="45"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="3"   y="5"   dir="SOUTH" toMap="garinham"                      respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="110" y="13"  dir="SOUTH" toMap="kol"                           respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="109" y="76"  dir="SOUTH" toMap="rimuldar"                      respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="29"  y="93"  dir="SOUTH" toMap="hauksness"                     respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="79"  y="104" dir="SOUTH" toMap="cantlin"                       respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="31"  y="15"  dir="SOUTH" toMap="erdricks_tomb_lvl1"            respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="32"  y="60"  dir="WEST"  toMap="mountain_cave_lvl1"            respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="111" y="45"  dir="NORTH" toMap="swamp_cave"         toName="N" respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="111" y="54"  dir="SOUTH" toMap="swamp_cave"         toName="S" respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="86"  y="3"   dir="SOUTH" toMap="northern_shrine"               respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="114" y="115" dir="SOUTH" toMap="southern_shrine"               respawnDecorations="yes"/>
+         <PointTransition decoration="pass"                x="51"  y="52"  dir="SOUTH" toMap="charlock_lvl1"                 respawnDecorations="yes"/>
+
+         <MapDecoration type="None" x="84" y="119">
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
+            <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
+
+         <MapPoint x="70" y="53" name="Rainbow_Bridge_Formation_Point"/>
+         <MapDecoration type="bridge_left" x="68" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
+         <MapDecoration type="bridge_right" x="69" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
+
+         <Monster name="Golem" x="79" y="104" inverseProgressMarker="PM_Defeated_Golem">
+            <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="79" y="103"/></RunAwayDialog></Monster>
 
          <MonsterZones>
             <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
@@ -2045,7 +2153,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
-            <DialogAssert type="IS_AT_COORDINATES" map="overworld" x="66" y="50"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow_Bridge_Formation_Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert> <!-- TODO: Move all X/Y coordinates into the map - change this to call out an anchor point defined in the Map -->
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>

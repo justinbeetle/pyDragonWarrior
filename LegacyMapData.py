@@ -31,7 +31,9 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         self.map_name = map_name
         self.image_pad_tiles = Point(image_pad_tiles)
 
-        self.map_size_tiles = self.game_info.maps[self.map_name].size + 2 * self.image_pad_tiles
+        self.map_size_tiles = Point(
+            len(self.game_info.maps[self.map_name].dat[0]),
+            len(self.game_info.maps[self.map_name].dat)) + 2 * self.image_pad_tiles
 
         # Load up the images for the base map and overlay
         self.base_map_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].dat)

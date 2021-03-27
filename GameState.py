@@ -14,8 +14,9 @@ import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
 from GameTypes import AnyTransition, DialogReplacementVariables, DialogType, Direction, MapDecoration, MapImageInfo, \
-    MonsterInfo, OutgoingTransition, SpecialMonster, Tile
+    MonsterInfo, NpcInfo, OutgoingTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
+from GameMap import GameMap
 from GameStateInterface import GameStateInterface
 from MapCharacterState import MapCharacterState
 from HeroParty import HeroParty
@@ -58,24 +59,8 @@ class GameState(GameStateInterface):
 
         super().__init__(screen)
 
-        # TODO: Migrate these into MapCharacterState, which should extend pygame.sprite.Sprite
-        self.phase_count = 0
-        self.tick_count = 1
-
         self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
-
-        # TODO: Migrate these to GameMap
-        self.map_decorations: List[MapDecoration] = []
-        self.npcs: List[NpcState] = []
-
-        # TODO: Remove these in favor of GameMap
-        # map_state, exterior_map_image, and interior_map_image are initialized with meaningful values in set_map
-        self.map_state = MapImageInfo.create_null()
-        self.exterior_map_image = pygame.surface.Surface((0, 0))
-        self.interior_map_image: Optional[pygame.surface.Surface] = None
-        self.exterior_map_dmg_image = pygame.surface.Surface((0, 0))
-        self.interior_map_dmg_image: Optional[pygame.surface.Surface] = None
 
         self.pending_dialog: Optional[DialogType] = None
         self.load()
@@ -87,9 +72,12 @@ class GameState(GameStateInterface):
     def set_map(self,
                 new_map_name: str,
                 one_time_decorations: Optional[List[MapDecoration]] = None,
-                respawn_decorations: bool = False) -> None:
+                respawn_decorations: bool = False,
+                init: bool = False) -> None:
         # print('setMap to', new_map_name, flush=True)
-        old_map_name = self.map_state.name
+        old_map_name = ''
+        if not init:
+            old_map_name = self.get_map_name()
 
         # Set light diameter for the new map if there was not an old map or if the new default map
         # diameter is unlimited.  Also update the light diameter for the new map if the default light
@@ -108,22 +96,22 @@ class GameState(GameStateInterface):
         if respawn_decorations:
             self.removed_decorations_by_map = {}
 
-        self.map_decorations = self.game_info.maps[new_map_name].map_decorations.copy()
+        map_decorations = self.game_info.maps[new_map_name].map_decorations.copy()
         if one_time_decorations is not None:
-            self.map_decorations += one_time_decorations
+            map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
-        for decoration in self.map_decorations[:]:
+        for decoration in map_decorations[:]:
             if not self.check_progress_markers(decoration.progress_marker, decoration.inverse_progress_marker):
-                self.map_decorations.remove(decoration)
+                map_decorations.remove(decoration)
         # Prune out previously removed decorations
         if new_map_name in self.removed_decorations_by_map:
             for decoration in self.removed_decorations_by_map[new_map_name]:
-                if decoration in self.map_decorations:
-                    self.map_decorations.remove(decoration)
-        self.map_state = self.game_info.get_map_image_info(new_map_name, self.image_pad_tiles, self.map_decorations)
+                if decoration in map_decorations:
+                    map_decorations.remove(decoration)
 
         if old_map_name == new_map_name:
             # If loading up the same map, should retain the NPC positions
+            npcs = self.game_map.npcs
 
             # Remove any current NPCs which should be missing
             for npc_char in self.npcs[:]:
@@ -136,37 +124,20 @@ class GameState(GameStateInterface):
                 if not self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     continue
                 is_missing = True
-                for npc_char in self.npcs:
+                for npc_char in npcs:
                     if npc_char.npc_info is not None and npc == npc_char.npc_info:
                         is_missing = False
                         break
                 if is_missing:
-                    self.npcs.append(NpcState(npc))
+                    npcs.append(NpcState(npc))
         else:
             # On a map change load NPCs from scratch
-            self.npcs = []
+            npcs = []
             for npc in self.game_info.maps[new_map_name].npcs:
                 if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
-                    self.npcs.append(NpcState(npc))
+                    npcs.append(NpcState(npc))
 
-        # Bounds checking to ensure a valid hero/center position
-        self.bounds_check_pc_position()
-
-        # Get exterior and interior map images
-        self.update_images()
-
-    def update_images(self) -> None:
-        self.exterior_map_image = GameInfo.get_exterior_image(self.map_state)
-        self.interior_map_image = GameInfo.get_interior_image(self.map_state)
-
-        self.exterior_map_dmg_image = self.exterior_map_image.copy()
-        SurfaceEffects.pink_tinge(self.exterior_map_dmg_image, flip_buffer=False)
-
-        if self.interior_map_image is not None:
-            self.interior_map_dmg_image = self.interior_map_image.copy()
-            SurfaceEffects.pink_tinge(self.interior_map_dmg_image, flip_buffer=False)
-        else:
-            self.interior_map_dmg_image = None
+        self.game_map = GameMap(self, new_map_name, map_decorations, npcs)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game
@@ -201,13 +172,13 @@ class GameState(GameStateInterface):
         self.hero_party.add_member(mocha)
         '''
 
-        self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations)
+        self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations, init=True)
 
     def save(self, quick_save: bool=False) -> None:
         # TODO: Save data for multiple party members
         xml_root = xml.etree.ElementTree.Element('SaveState')
         xml_root.attrib['name'] = self.hero_party.main_character.name
-        xml_root.attrib['map'] = self.map_state.name
+        xml_root.attrib['map'] = self.get_map_name()
         xml_root.attrib['x'] = str(self.hero_party.main_character.curr_pos_dat_tile.x)
         xml_root.attrib['y'] = str(self.hero_party.main_character.curr_pos_dat_tile.y)
         xml_root.attrib['dir'] = self.hero_party.main_character.direction.name
@@ -280,59 +251,8 @@ class GameState(GameStateInterface):
             else:
                 print('ERROR: File already exists:', rename_file_path, flush=True)
 
-    def get_map_image_rect(self) -> pygame.Rect:
-        # Always rendering to the entire screen but need to determine the
-        # rectangle from the image which is to be scaled to the screen
-        curr_pos_dat_tile = self.hero_party.get_curr_pos_dat_tile()
-        curr_pos_offset_img_px = self.hero_party.get_curr_pos_offset_img_px()
-        return pygame.Rect(
-            (self.image_pad_tiles[0] + curr_pos_dat_tile[0] - self.win_size_tiles[
-                0] / 2 + 0.5) * self.game_info.tile_size_pixels + curr_pos_offset_img_px.x,
-            (self.image_pad_tiles[1] + curr_pos_dat_tile[1] - self.win_size_tiles[
-                1] / 2 + 0.5) * self.game_info.tile_size_pixels + curr_pos_offset_img_px.y,
-            self.win_size_pixels[0],
-            self.win_size_pixels[1])
-
-    def get_tile_image_rect(self,
-                            tile: Point,
-                            offset: Point = Point(0, 0)) -> pygame.Rect:
-        return self.get_tile_region_image_rect(tile, 0.5, offset)
-
-    def get_tile_region_image_rect(self,
-                                   center_tile: Point,
-                                   tile_radius: float,
-                                   offset: Point = Point(0, 0)) -> pygame.Rect:
-        return pygame.Rect(
-            (self.image_pad_tiles[0] + center_tile[0] + 0.5 - tile_radius) * self.game_info.tile_size_pixels + offset.x,
-            (self.image_pad_tiles[1] + center_tile[1] + 0.5 - tile_radius) * self.game_info.tile_size_pixels + offset.y,
-            (2 * tile_radius) * self.game_info.tile_size_pixels,
-            (2 * tile_radius) * self.game_info.tile_size_pixels)
-
-    def get_tile_screen_rect(self,
-                             tile: Point,
-                             offset: Point = Point(0, 0)) -> pygame.Rect:
-        return self.get_tile_region_screen_rect(tile, 0.5, offset)
-
-    def get_tile_region_screen_rect(self,
-                                    center_tile: Point,
-                                    tile_radius: float,
-                                    offset: Point = Point(0, 0)) -> pygame.Rect:
-        # Hero is always in the center of the screen
-        curr_pos_dat_tile = self.hero_party.get_curr_pos_dat_tile()
-        curr_pos_offset_img_px = self.hero_party.get_curr_pos_offset_img_px()
-        return pygame.Rect(
-            (self.win_size_tiles[0] / 2 + center_tile[0] - curr_pos_dat_tile[
-                0] - tile_radius) * self.game_info.tile_size_pixels + offset.x - curr_pos_offset_img_px.x,
-            (self.win_size_tiles[1] / 2 + center_tile[1] - curr_pos_dat_tile[
-                1] - tile_radius) * self.game_info.tile_size_pixels + offset.y - curr_pos_offset_img_px.y,
-            (2 * tile_radius) * self.game_info.tile_size_pixels,
-            (2 * tile_radius) * self.game_info.tile_size_pixels)
-
-    def get_tile_info(self, tile: Optional[Point]) -> Tile:
-        if tile is None:
-            tile = self.hero_party.main_character.curr_pos_dat_tile
-        return self.game_info.tiles[
-            self.game_info.tile_symbols[self.game_info.maps[self.map_state.name].dat[int(tile.y)][int(tile.x)]]]
+    def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
+        return self.game_map.get_tile_info(tile)
 
     # Find point transitions for either the specified point or the current position of the player character.
     # If auto is true, only look for automatic point transitions
@@ -340,7 +260,7 @@ class GameState(GameStateInterface):
                              filter_to_automatic_transitions: bool=False) -> Optional[OutgoingTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
+        for point_transition in self.game_info.maps[self.get_map_name()].point_transitions:
             if point_transition.point == tile and self.check_progress_markers(
                     point_transition.progress_marker, point_transition.inverse_progress_marker):
                 if filter_to_automatic_transitions:
@@ -354,19 +274,15 @@ class GameState(GameStateInterface):
         return None
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
-        decorations = []
-        if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
-        for decoration in self.map_decorations:
-            if decoration.point == tile and self.check_progress_markers(
-                    decoration.progress_marker, decoration.inverse_progress_marker):
-                decorations.append(decoration)
-        return decorations
+        return self.game_map.get_decorations(tile)
+
+    def get_npc_to_talk_to(self) -> Optional[NpcInfo]:
+        return self.game_map.get_npc_to_talk_to()
 
     def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for special_monster in self.game_info.maps[self.map_state.name].special_monsters:
+        for special_monster in self.game_info.maps[self.get_map_name()].special_monsters:
             if special_monster.point == tile and self.check_progress_markers(
                     special_monster.progress_marker, special_monster.inverse_progress_marker):
                 print('Found monster at point: ', tile, flush=True)
@@ -401,151 +317,26 @@ class GameState(GameStateInterface):
             return True
         return False
 
-    def get_tile_degrees_of_freedom(self,
-                                    tile: Point,
-                                    enforce_npc_hp_penalty_limit: bool,
-                                    prev_tile: Optional[Point]) -> int:
-        degrees_of_freedom = 0
-        for x in [tile.x - 1, tile.x + 1]:
-            if self.can_move_to_tile(Point(x, tile.y), enforce_npc_hp_penalty_limit, False, True, prev_tile):
-                degrees_of_freedom += 1
-        for y in [tile.y - 1, tile.y + 1]:
-            if self.can_move_to_tile(Point(tile.x, y), enforce_npc_hp_penalty_limit, False, True, prev_tile):
-                degrees_of_freedom += 1
-        # print('DOF for tile', tile, 'is', degrees_of_freedom, flush=True)
-        return degrees_of_freedom
-
     def can_move_to_tile(self,
                          tile: Point,
                          enforce_npc_hp_penalty_limit: bool = False,
                          enforce_npc_dof_limit: bool = False,
                          is_npc: bool = False,
                          prev_tile: Optional[Point] = None) -> bool:
-        movement_allowed = False
-
-        # Check if native tile allows movement
-        if (0 <= tile.x < self.game_info.maps[self.map_state.name].size.w
-                and 0 <= tile.y < self.game_info.maps[self.map_state.name].size.h
-                and self.get_tile_info(tile).walkable):
-            movement_allowed = True
-
-        # Check if a decoration prevents movement to the tile that otherwise allowed movement
-        if movement_allowed:
-            for decoration in self.map_decorations:
-                if decoration.type is not None and not decoration.type.walkable and decoration.overlaps(tile):
-                    movement_allowed = False
-                    # print('Movement not allowed: decoration not walkable', decoration, flush=True)
-                    break
-        # Check if a decoration allows movement to a tile to which movement was otherwise prevented
-        if not movement_allowed:
-            for decoration in self.map_decorations:
-                if decoration.type is not None and decoration.type.walkable and decoration.overlaps(tile):
-                    movement_allowed = True
-                    # print('Movement allowed: decoration walkable', decoration, flush=True)
-                    break
-
-        if movement_allowed:
-            if movement_allowed and enforce_npc_hp_penalty_limit and self.get_tile_info(tile).hp_penalty != 0:
-                movement_allowed = False
-                # print('Movement not allowed: NPC HP penalty limited', flush=True)
-            if movement_allowed and enforce_npc_hp_penalty_limit and prev_tile is not None and self.is_interior(
-                    tile) != self.is_interior(prev_tile):
-                movement_allowed = False
-                # print('Movement not allowed: NPC cannot move between interior and exterior tiles', flush=True)
-            if (movement_allowed
-                    and enforce_npc_dof_limit
-                    and self.get_tile_degrees_of_freedom(tile, enforce_npc_hp_penalty_limit, prev_tile) < 2):
-                movement_allowed = False
-                # print('Movement not allowed: NPC degree-of-freedom limit not met', flush=True)
-            if movement_allowed and is_npc:
-                for hero in self.hero_party.members:
-                    if tile == hero.curr_pos_dat_tile or tile == hero.dest_pos_dat_tile:
-                        movement_allowed = False
-                        # print('Movement not allowed: PC in the way', flush=True)
-                        break
-            if movement_allowed:
-                for npc in self.npcs:
-                    if tile == npc.curr_pos_dat_tile or tile == npc.dest_pos_dat_tile:
-                        movement_allowed = False
-                        # print('Movement not allowed: NPC in the way', flush=True)
-                        break
-        # else:
-        #   print('Movement not allowed: tile not walkable', flush=True)
-
-        return movement_allowed
+        return self.game_map.can_move_to_tile(tile,
+                                              enforce_npc_hp_penalty_limit,
+                                              enforce_npc_dof_limit,
+                                              is_npc,
+                                              prev_tile)
 
     def get_tile_monsters(self, tile: Optional[Point] = None) -> List[str]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for mz in self.game_info.maps[self.map_state.name].monster_zones:
+        for mz in self.game_info.maps[self.get_map_name()].monster_zones:
             if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
                 # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
                 return self.game_info.monster_sets[mz.name]
         return []
-
-    def erase_characters(self) -> None:
-        # Erase PCs
-        for hero in self.hero_party.members:
-            self.erase_character(hero)
-
-        # Erase NPCs
-        for npc in self.npcs:
-            self.erase_character(npc)
-
-    def erase_character(self, character: MapCharacterState) -> None:
-        pc = self.hero_party.members[0]
-        if character == pc or self.is_interior(pc.curr_pos_dat_tile) == self.is_interior(character.curr_pos_dat_tile):
-            self.screen.blit(
-                self.get_map_image().subsurface(
-                    self.get_tile_image_rect(
-                        character.curr_pos_dat_tile,
-                        character.curr_pos_offset_img_px)),
-                self.get_tile_screen_rect(
-                    character.curr_pos_dat_tile,
-                    character.curr_pos_offset_img_px))
-
-    def draw_characters(self) -> None:
-        # Draw PCs
-        for hero in reversed(self.hero_party.members):
-            self.draw_character(hero)
-
-        # Draw NPCs
-        for npc in self.npcs:
-            self.draw_character(npc)
-
-    def draw_character(self, character: MapCharacterState) -> None:
-        pc = self.hero_party.members[0]
-        if character == pc or self.is_interior(pc.curr_pos_dat_tile) == self.is_interior(character.curr_pos_dat_tile):
-            if isinstance(character, HeroState):
-                if character.hp <= 0:
-                    character_images = self.game_info.character_types['ghost'].images
-                elif character.character_type.name == 'hero':
-                    # TODO: Configurable way to handle the PC image mappings
-                    if character == self.hero_party.main_character and self.hero_party.has_item('PM_Carrying_Princess'):
-                        character_images = self.game_info.character_types['hero_carrying_princess'].images
-                    elif character.weapon is not None and character.shield is not None:
-                        character_images = self.game_info.character_types['hero_sword_and_shield'].images
-                    elif character.weapon is not None:
-                        character_images = self.game_info.character_types['hero_sword'].images
-                    elif character.shield is not None:
-                        character_images = self.game_info.character_types['hero_shield'].images
-                    else:
-                        character_images = self.game_info.character_types['hero'].images
-                else:
-                    character_images = character.character_type.images
-            else:
-                character_images = character.character_type.images
-            character_direction_images = character_images[character.direction]
-            self.screen.blit(
-                character_direction_images[self.phase_count % len(character_direction_images)],
-                self.get_tile_screen_rect(
-                    character.curr_pos_dat_tile,
-                    character.curr_pos_offset_img_px))
-        if character == pc and self.is_exterior(pc.curr_pos_dat_tile) and self.is_interior(pc.dest_pos_dat_tile):
-            # If moving inside should disappear as moving
-            self.screen.blit(
-                self.exterior_map_image.subsurface(self.get_tile_image_rect(pc.dest_pos_dat_tile)),
-                self.get_tile_screen_rect(pc.dest_pos_dat_tile))
 
     def is_light_restricted(self) -> bool:
         return (self.hero_party.light_diameter is not None
@@ -553,7 +344,7 @@ class GameState(GameStateInterface):
                 and self.hero_party.light_diameter <= self.win_size_tiles.h)
 
     def is_outside(self) -> bool:
-        return self.game_info.maps[self.map_state.name].is_outside
+        return self.game_info.maps[self.get_map_name()].is_outside
 
     def is_inside(self) -> bool:
         return not self.is_outside()
@@ -563,20 +354,20 @@ class GameState(GameStateInterface):
         if transition is None:
             return False
 
-        map_changing = transition.dest_map != self.map_state.name
-        src_map = self.game_info.maps[self.map_state.name]
+        map_changing = transition.dest_map != self.get_map_name()
+        src_map = self.game_info.maps[self.get_map_name()]
         dest_map = self.game_info.maps[transition.dest_map]
 
         # Find the destination transition corresponding to this transition
         if transition.dest_name is None:
             try:
-                dest_transition = dest_map.transitions_by_map[self.map_state.name]
+                dest_transition = dest_map.transitions_by_map[self.get_map_name()]
             except KeyError:
                 print('Failed to find destination transition by dest_map', flush=True)
                 return False
         else:
             try:
-                dest_transition = dest_map.transitions_by_map_and_name[self.map_state.name][transition.dest_name]
+                dest_transition = dest_map.transitions_by_map_and_name[self.get_map_name()][transition.dest_name]
             except KeyError:
                 try:
                     dest_transition = dest_map.transitions_by_name[transition.dest_name]
@@ -586,7 +377,7 @@ class GameState(GameStateInterface):
 
         # If transitioning from outside to inside, save off last outside position
         if src_map.is_outside and not dest_map.is_outside:
-            self.hero_party.set_last_outside_pos(self.map_state.name,
+            self.hero_party.set_last_outside_pos(self.get_map_name(),
                                                  self.hero_party.get_curr_pos_dat_tile(),
                                                  self.hero_party.get_direction())
 
@@ -599,115 +390,22 @@ class GameState(GameStateInterface):
 
         return True
 
-    def bounds_check_pc_position(self) -> None:
-        # Bounds checking to ensure a valid hero/center position
-        curr_pos_dat_tile = self.hero_party.get_curr_pos_dat_tile()
-        if (curr_pos_dat_tile is None
-                or curr_pos_dat_tile[0] < 1
-                or curr_pos_dat_tile[1] < 1
-                or curr_pos_dat_tile[0] > self.game_info.maps[self.map_state.name].size[0] - 1
-                or curr_pos_dat_tile[1] > self.game_info.maps[self.map_state.name].size[1] - 1):
-            print('ERROR: Invalid hero position, defaulting to middle tile', flush=True)
-            self.hero_party.set_pos(Point(self.game_info.maps[self.map_state.name].size[0] // 2,
-                                          self.game_info.maps[self.map_state.name].size[1] // 2),
-                                    Direction.SOUTH)
-
-    def is_interior(self, pos_dat_tile: Point) -> bool:
-        overlay_dat = self.game_info.maps[self.map_state.name].overlay_dat
-        return (overlay_dat is not None
-                and overlay_dat[int(pos_dat_tile.y)][int(pos_dat_tile.x)] in self.game_info.tile_symbols)
-
-    def is_exterior(self, pos_dat_tile: Point) -> bool:
-        return not self.is_interior(pos_dat_tile)
-
-    def get_map_image(self) -> pygame.surface.Surface:
-        if (self.is_interior(self.hero_party.get_curr_pos_dat_tile()) and
-                self.interior_map_image is not None
-                and self.interior_map_dmg_image is not None):
-            if self.hero_party.has_low_health():
-                return self.interior_map_dmg_image
-            else:
-                return self.interior_map_image
-        if self.hero_party.has_low_health():
-            return self.exterior_map_dmg_image
-        else:
-            return self.exterior_map_image
-
     def is_facing_door(self) -> bool:
-        door_open_dest_dat_tile = self.hero_party.get_curr_pos_dat_tile() \
-                                  + self.hero_party.get_direction().get_vector()
-        for decoration in self.map_decorations:
-            if (door_open_dest_dat_tile == decoration.point
-                    and decoration.type is not None
-                    and decoration.type.remove_with_key):
-                return True
-        return False
+        return self.game_map.is_facing_door()
 
     def open_door(self) -> None:
-        door_open_dest_dat_tile = self.hero_party.get_curr_pos_dat_tile() \
-                                  + self.hero_party.get_direction().get_vector()
-        for decoration in self.map_decorations:
-            if (door_open_dest_dat_tile == decoration.point
-                    and decoration.type is not None
-                    and decoration.type.remove_with_key):
-                if decoration.type.remove_sound is not None:
-                    AudioPlayer().play_sound(decoration.type.remove_sound)
-                self.remove_decoration(decoration)
+        self.game_map.open_door()
 
     def remove_decoration(self, decoration: MapDecoration) -> None:
-        # Remove the decoration from the map (if present)
-        if decoration in self.map_decorations:
-            self.map_decorations.remove(decoration)
-            if self.map_state.name not in self.removed_decorations_by_map:
-                self.removed_decorations_by_map[self.map_state.name] = []
-            self.removed_decorations_by_map[self.map_state.name].append(decoration)
-            self.map_state = self.game_info.get_map_image_info(self.map_state.name,
-                                                               self.image_pad_tiles,
-                                                               self.map_decorations)
-
-            # Get exterior and interior map images
-            self.update_images()
-
-            # Draw the map to the screen
-            self.draw_map()
-
-    def set_clipping_for_light_diameter(self) -> None:
-        # TODO: Rework for parties
-        if self.is_light_restricted() and self.hero_party.light_diameter is not None:
-            self.screen.set_clip(
-                self.get_tile_region_screen_rect(
-                    self.hero_party.get_curr_pos_dat_tile(),
-                    self.hero_party.light_diameter / 2,
-                    self.hero_party.get_curr_pos_offset_img_px()))
-        else:
-            self.set_clipping_for_window()
-
-    def set_clipping_for_window(self) -> None:
-        self.screen.set_clip(pygame.Rect(0,
-                                         0,
-                                         self.win_size_pixels.x,
-                                         self.win_size_pixels.y))
+        self.game_map.remove_decoration(decoration)
 
     def draw_map(self,
                  flip_buffer: bool=True,
                  draw_background: bool=True,
-                 draw_characters: bool=True,
                  draw_combat: bool=True) -> None:
-        # Implement light diameter via clipping
-        if self.is_light_restricted():
-            self.screen.fill(pygame.Color('black'))
-        self.set_clipping_for_light_diameter()
-
         # Draw the map to the screen
         if draw_background:
-            self.screen.blit(self.get_map_image().subsurface(self.get_map_image_rect()), (0, 0))
-
-        # Draw the hero and NPCs to the screen
-        if draw_characters:
-            self.draw_characters()
-
-        # Restore clipping for entire window
-        self.set_clipping_for_window()
+            self.game_map.draw()
 
         # If in combat, refresh the background image and render the monsters.
         if draw_combat and self.combat_encounter is not None:
@@ -718,68 +416,9 @@ class GameState(GameStateInterface):
         if flip_buffer:
             pygame.display.flip()
 
-    def advance_tick(self, characters_erased: bool = False) -> None:
-        phase_changed = False
-        if self.tick_count % GameState.PHASE_TICKS == 0:
-            phase_changed = True
-            self.phase_count += 1
-
-        # Implement light diameter via clipping
-        self.set_clipping_for_light_diameter()
-
-        if phase_changed and not characters_erased:
-            characters_erased = True
-            self.erase_characters()
-
-        redraw_map = False
-        draw_all_characters = characters_erased
-
-        # Move NPCs
-        for npc in self.npcs:
-            if npc.npc_info is None:
-                continue
-
-            if npc.npc_info.walking:
-
-                # Start moving NPC by setting a destination tile
-                if self.tick_count % GameState.NPC_MOVE_STEPS == 0:
-                    # TODO: Determine where to move instead of blindly moving forward
-                    npc.direction = random.choice(list(Direction))
-                    dest_tile = npc.curr_pos_dat_tile + npc.direction.get_vector()
-                    if self.can_move_to_tile(dest_tile, True, True, True, npc.curr_pos_dat_tile):
-                        npc.dest_pos_dat_tile = dest_tile
-
-                # Move the NPC in steps to the destination tile
-                if npc.curr_pos_dat_tile != npc.dest_pos_dat_tile:
-                    if not characters_erased:
-                        self.erase_character(npc)
-                    direction_vector = npc.direction.get_vector()
-                    npc.curr_pos_offset_img_px += direction_vector * self.game_info.image_px_step_size
-                    if npc.curr_pos_offset_img_px / self.game_info.tile_size_pixels == direction_vector:
-                        npc.curr_pos_dat_tile = npc.dest_pos_dat_tile
-                        npc.curr_pos_offset_img_px = Point(0, 0)
-                    if not draw_all_characters:
-                        self.draw_character(npc)
-                        redraw_map = True
-
-            elif npc.direction != npc.npc_info.direction:
-                # Stationary characters should resume looking in the default
-                # direction after talking to the player
-                self.erase_character(npc)
-                npc.direction = npc.npc_info.direction
-                self.draw_character(npc)
-
-        if draw_all_characters:
-            self.draw_characters()
-            redraw_map = True
-
-        # Restore clipping for entire window
-        self.set_clipping_for_window()
-
-        if redraw_map:
-            pygame.display.flip()
-
-        self.tick_count += 1
+    def advance_tick(self) -> None:
+        self.game_map.update()
+        self.draw_map()
         pygame.time.Clock().tick(40)
 
     def get_game_info(self) -> GameInfo:
@@ -795,7 +434,7 @@ class GameState(GameStateInterface):
         variables = DialogReplacementVariables()
         variables.generic['[NAME]'] = self.hero_party.main_character.get_name()
         variables.generic['[NEXT_LEVEL_XP]'] = str(self.hero_party.main_character.calc_xp_to_next_level())
-        map_origin = self.game_info.maps[self.map_state.name].origin
+        map_origin = self.game_info.maps[self.get_map_name()].origin
         if map_origin is not None:
             map_coord = self.hero_party.get_curr_pos_dat_tile() - map_origin
             variables.generic['[X]'] = str(abs(map_coord.x))
@@ -817,7 +456,7 @@ class GameState(GameStateInterface):
         return len(self.get_tile_monsters()) > 0
 
     def get_map_name(self) -> str:
-        return self.map_state.name
+        return self.game_map.map.name
 
     def get_win_size_pixels(self) -> Point:
         return self.win_size_pixels
@@ -852,9 +491,9 @@ class GameState(GameStateInterface):
             return
 
         # A combat encounter requires an encounter image
-        encounter_image = self.game_info.maps[self.map_state.name].encounter_image
+        encounter_image = self.game_info.maps[self.get_map_name()].encounter_image
         if encounter_image is None:
-            print('Failed to initiate combat encounter due to lack of encounter image in map ' + self.map_state.name,
+            print('Failed to initiate combat encounter due to lack of encounter image in map ' + self.get_map_name(),
                   flush=True)
             return
 
@@ -874,7 +513,7 @@ class GameState(GameStateInterface):
         self.combat_encounter = None
 
         # Play the music for the current map
-        AudioPlayer().play_music(self.game_info.maps[self.map_state.name].music)
+        AudioPlayer().play_music(self.game_info.maps[self.get_map_name()].music)
 
         # Clear event queue
         GameEvents.clear_events()

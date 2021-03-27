@@ -2,13 +2,14 @@
 
 from typing import Dict, List, Optional
 
+import math
 import pygame
 import pyscroll
 import random
 
 from AudioPlayer import AudioPlayer
 from GameStateInterface import GameStateInterface
-from GameTypes import CharacterType, Direction, MapDecoration, Tile
+from GameTypes import CharacterType, Direction, MapDecoration, NpcInfo, Tile
 from HeroParty import HeroParty
 from HeroState import HeroState
 from LegacyMapData import LegacyMapData
@@ -82,6 +83,10 @@ class CharacterSprite(MapSprite):
         self.image = self.get_image()
         self.rect = self.get_rect()
 
+    @staticmethod
+    def get_tile_movement_steps() -> int:
+        return int(math.ceil(MapSprite.tile_size_pixels / MapSprite.image_px_step_size))
+
 
 class HeroSprite(CharacterSprite):
     character_types: Dict[str, CharacterType] = {}
@@ -124,9 +129,6 @@ class NpcSprite(CharacterSprite):
                 dest_tile = self.character.curr_pos_dat_tile + self.character.direction.get_vector()
                 if game_map.can_move_to_tile(dest_tile, True, True, True, self.character.curr_pos_dat_tile):
                     self.character.dest_pos_dat_tile = dest_tile
-        else:
-            # Stationary characters should resume looking in the default direction after talking to the player.
-            self.character.direction = self.character.npc_info.direction
 
         super().update(game_map)
 
@@ -135,17 +137,23 @@ class GameMap:
     def __init__(self,
                  game_state: GameStateInterface,
                  map_name: str,
-                 map_decorations: Optional[List[MapDecoration]] = None) -> None:
+                 map_decorations: Optional[List[MapDecoration]] = None,
+                 npcs: Optional[List[NpcState]] = None) -> None:
         self.game_state = game_state
+        print('map_name =', map_name)
         self.map = self.game_state.get_game_info().maps[map_name]
+
+        # Set the decorations
         if map_decorations is None:
             self.map_decorations = self.map.map_decorations
         else:
             self.map_decorations = map_decorations
-        self.npcs: List[NpcState] = []
-        for npc in self.map.npcs:
-            # TODO: Not right as it doesn't take into account progress markers
-            self.npcs.append(NpcState(npc))
+
+        # Set the NPCs
+        self.npcs: List[NpcState] = npcs
+        if self.npcs is None:
+            for npc in self.map.npcs:
+                self.npcs.append(NpcState(npc))
 
         # Create the map data
         if self.map.tiled_filename is not None:
@@ -268,26 +276,6 @@ class GameMap:
                     1.0,
                     1.0)
 
-    '''
-    # Find point transitions for either the specified point or the current position of the player character.
-    # If auto is true, only look for automatic point transitions
-    def get_point_transition(self, tile: Optional[Point] = None,
-                             filter_to_automatic_transitions=False) -> Optional[OutgoingTransition]:
-        if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
-        for point_transition in self.game_info.maps[self.map_state.name].point_transitions:
-            if point_transition.point == tile and self.check_progress_markers(
-                    point_transition.progress_marker, point_transition.inverse_progress_marker):
-                if filter_to_automatic_transitions:
-                    if point_transition.is_automatic is None and not self.is_light_restricted():
-                        # By default, make transitions manual in dark places
-                        return point_transition
-                    elif point_transition.is_automatic:
-                        return point_transition
-                else:
-                    return point_transition
-        return None'''
-
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
         decorations = []
         if tile is None:
@@ -298,15 +286,36 @@ class GameMap:
                 decorations.append(decoration)
         return decorations
 
-    '''def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
-        if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
-        for special_monster in self.game_info.maps[self.map_state.name].special_monsters:
-            if special_monster.point == tile and self.check_progress_markers(
-                    special_monster.progress_marker, special_monster.inverse_progress_marker):
-                print('Found monster at point: ', tile, flush=True)
-                return special_monster
-        return None'''
+    def get_npc_to_talk_to(self) -> Optional[NpcInfo]:
+        talk_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
+                             + self.game_state.hero_party.members[0].direction.get_vector()
+        talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
+        if talk_dest_tile_type.can_talk_over:
+            talk_dest_dat_tile = talk_dest_dat_tile \
+                                 + self.game_state.hero_party.members[0].direction.get_vector()
+
+        for sprite in self.group:
+            if not isinstance(sprite, NpcSprite):
+                continue
+            npc_info = sprite.character.npc_info
+            if (npc_info is not None and
+                    (talk_dest_dat_tile == sprite.character.curr_pos_dat_tile or
+                     talk_dest_dat_tile == sprite.character.dest_pos_dat_tile)):
+                # NPC should turn to face you if they have something to say
+                if npc_info.dialog is not None:
+                    sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = talk_dest_dat_tile
+                    sprite.character.curr_pos_offset_img_px = Point(0, 0)
+                    sprite.character.direction = self.game_state.hero_party.members[0].direction.get_opposite()
+                    sprite.update_count = 0
+                    sprite.update(self)
+
+                    # Stationary characters should resume looking in the default direction after talking to the player.
+                    if not npc_info.walking:
+                        sprite.character.direction = npc_info.direction
+
+                return npc_info
+
+        return None
 
     def get_tile_degrees_of_freedom(self,
                                     tile: Point,
@@ -331,10 +340,9 @@ class GameMap:
         movement_allowed = False
 
         # Check if native tile allows movement
-        if (0 <= tile.x < self.size().w
-                and 0 <= tile.y < self.size().h
-                and self.get_tile_info(tile).walkable):
-            movement_allowed = True
+        if 0 <= tile.x < self.size().w and 0 <= tile.y < self.size().h:
+            movement_allowed = self.get_tile_info(tile).walkable or \
+                not self.get_tile_info(self.game_state.get_hero_party().get_curr_pos_dat_tile()).walkable
 
         # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
@@ -380,15 +388,6 @@ class GameMap:
         #   print('Movement not allowed: tile not walkable', flush=True)
 
         return movement_allowed
-
-    '''def get_tile_monsters(self, tile: Optional[Point] = None) -> List[str]:
-        if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
-        for mz in self.game_info.maps[self.map_state.name].monster_zones:
-            if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
-                # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
-                return self.game_info.monster_sets[mz.name]
-        return []'''
 
     def bounds_check_pc_position(self) -> None:
         # Bounds checking to ensure a valid hero/center position

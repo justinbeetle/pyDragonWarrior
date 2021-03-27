@@ -14,9 +14,9 @@ import GameEvents
 from GameState import GameState
 from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
+from GameMap import CharacterSprite
 from GameTypes import Direction, DialogType, OutgoingTransition, Tool
 from Point import Point
-import SurfaceEffects
 
 
 class Game:
@@ -149,14 +149,11 @@ class Game:
         while self.game_state.is_running:
 
             # Generate the map state a mode or map change
-            if map_name != self.game_state.map_state.name:
-                map_name = self.game_state.map_state.name
+            if map_name != self.game_state.get_map_name():
+                map_name = self.game_state.get_map_name()
 
                 # Play the music for the map
-                AudioPlayer().play_music(self.game_state.game_info.maps[self.game_state.map_state.name].music)
-
-                # Bounds checking to ensure a valid hero/center position
-                self.game_state.bounds_check_pc_position()
+                AudioPlayer().play_music(self.game_state.game_info.maps[self.game_state.get_map_name()].music)
 
                 # Draw the map to the screen
                 self.game_state.draw_map()
@@ -168,14 +165,14 @@ class Game:
             # Process events
             # print(datetime.datetime.now(), 'exploring_loop:  Getting events...', flush=True)
             events = GameEvents.get_events(True)
+            changed_direction = False
 
             for event in events:
                 # print('exploring_loop:  Processing event', event, flush=True)
-                moving = False
+                move_direction: Optional[Direction] = None
                 menu = False
                 talking = False
                 searching = False
-                pc_dir_old = self.game_state.hero_party.members[0].direction
 
                 if event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
@@ -184,20 +181,10 @@ class Game:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
-                    elif event.key == pygame.K_DOWN:
-                        self.game_state.hero_party.members[0].direction = Direction.SOUTH
-                        moving = True
-                    elif event.key == pygame.K_UP:
-                        self.game_state.hero_party.members[0].direction = Direction.NORTH
-                        moving = True
-                    elif event.key == pygame.K_LEFT:
-                        self.game_state.hero_party.members[0].direction = Direction.WEST
-                        moving = True
-                    elif event.key == pygame.K_RIGHT:
-                        self.game_state.hero_party.members[0].direction = Direction.EAST
-                        moving = True
                     elif event.key == pygame.K_F1:
                         self.game_state.save(quick_save=True)
+                    else:
+                        move_direction = Direction.get_direction(event.key)
                 else:
                     # print('exploring_loop:  Ignoring event', event, flush=True)
                     continue
@@ -208,14 +195,17 @@ class Game:
                 GameEvents.clear_events()
                 events = []
 
-                # Allow a change of direction without moving
-                if pc_dir_old != self.game_state.hero_party.members[0].direction:
-                    # print('Change of direction detected (advancing four ticks)', flush=True)
-                    moving = False
-                    self.game_state.advance_tick()
-                    self.game_state.advance_tick()
-                    self.game_state.advance_tick()
-                    self.game_state.advance_tick()
+                if move_direction:
+                    if changed_direction or self.game_state.hero_party.members[0].curr_pos_dat_tile != \
+                                            self.game_state.hero_party.members[0].dest_pos_dat_tile:
+                        print('Ignoring move as another move is already in progress', flush=True)
+                        continue
+                    if move_direction != self.game_state.hero_party.members[0].direction:
+                        self.game_state.hero_party.members[0].direction = move_direction
+                        changed_direction = True
+                    else:
+                        self.game_state.hero_party.members[0].dest_pos_dat_tile = \
+                            self.game_state.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
 
                 if menu:
 
@@ -339,24 +329,13 @@ class Game:
                         talk_dest_dat_tile = talk_dest_dat_tile \
                                              + self.game_state.hero_party.members[0].direction.get_vector()
                     dialog: DialogType = ['There is no one there.']
-                    for npc in self.game_state.npcs:
-                        if (npc.npc_info is not None and
-                                (talk_dest_dat_tile == npc.curr_pos_dat_tile or
-                                 talk_dest_dat_tile == npc.dest_pos_dat_tile)):
-                            if npc.npc_info.dialog is not None:
-                                dialog = npc.npc_info.dialog
-
-                                # NPC should turn to face you
-                                if (npc.direction !=
-                                        self.game_state.hero_party.members[0].direction.get_opposite()):
-                                    self.game_state.erase_character(npc)
-                                    npc.direction =\
-                                        self.game_state.hero_party.members[0].direction.get_opposite()
-                                    self.game_state.draw_character(npc)
-                                    pygame.display.flip()
-                            else:
-                                dialog = ['They pay you no mind.']
-                            break
+                    npc = self.game_state.get_npc_to_talk_to()
+                    if npc:
+                        if npc.dialog is not None:
+                            dialog = npc.dialog
+                            self.game_state.draw_map()
+                        else:
+                            dialog = ['They pay you no mind.']
                     self.gde.dialog_loop(dialog)
 
                 if searching:
@@ -374,23 +353,19 @@ class Game:
 
                     self.gde.dialog_loop(dialog)
 
-                if moving:
-                    self.scroll_tile()
-
-            # print('advancing one tick in exploring_loop', flush=True)
-            self.game_state.advance_tick()
+            if self.game_state.hero_party.members[0].curr_pos_dat_tile != \
+               self.game_state.hero_party.members[0].dest_pos_dat_tile:
+                self.scroll_tile()
+            else:
+                # print('advancing one tick in exploring_loop', flush=True)
+                self.game_state.advance_tick()
 
     def scroll_tile(self) -> None:
 
         transition: Optional[OutgoingTransition] = None
 
-        map_image_rect = self.game_state.get_map_image_rect()
-        orig_map_image_rect = self.game_state.get_map_image_rect()
-        tile_move_steps = self.game_state.game_info.tile_size_pixels // self.game_state.game_info.image_px_step_size
-
         # Determine the destination tile and pixel count for the scroll
-        hero_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
-                             + self.game_state.hero_party.members[0].direction.get_vector()
+        hero_dest_dat_tile = self.game_state.hero_party.members[0].dest_pos_dat_tile
 
         # Validate if the destination tile is navigable
         movement_allowed = self.game_state.can_move_to_tile(hero_dest_dat_tile)
@@ -401,7 +376,6 @@ class Game:
         if movement_allowed:
             dest_tile_type = self.game_state.get_tile_info(hero_dest_dat_tile)
 
-            self.game_state.hero_party.members[0].dest_pos_dat_tile = hero_dest_dat_tile
             for hero_idx in range(1, len(self.game_state.hero_party.members)):
                 hero = self.game_state.hero_party.members[hero_idx]
                 hero.dest_pos_dat_tile = self.game_state.hero_party.members[hero_idx-1].curr_pos_dat_tile
@@ -409,20 +383,19 @@ class Game:
                     hero.direction = Direction.get_direction(hero.dest_pos_dat_tile - hero.curr_pos_dat_tile)
 
             # Determine if the movement should result in a transition to another map
-            if (self.game_state.game_info.maps[self.game_state.map_state.name].leaving_transition is not None
+            map_size = self.game_state.game_map.size()
+            if (self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition is not None
                 and (hero_dest_dat_tile[0] == 0
                      or hero_dest_dat_tile[1] == 0
-                     or hero_dest_dat_tile[0] ==
-                     self.game_state.game_info.maps[self.game_state.map_state.name].size[0] - 1
-                     or hero_dest_dat_tile[1] ==
-                     self.game_state.game_info.maps[self.game_state.map_state.name].size[1] - 1)):
+                     or hero_dest_dat_tile[0] == map_size[0] - 1
+                     or hero_dest_dat_tile[1] == map_size[1] - 1)):
                 # Map leaving transition
                 # print('Leaving map', self.gameState.mapState.mapName, flush=True)
-                transition = self.game_state.game_info.maps[self.game_state.map_state.name].leaving_transition
+                transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
             else:
                 # See if this tile has any associated transitions
                 # TODO: Uncomment following statement to disable coordinate logging
-                # print('Check for transitions at', hero_dest_dat_tile, flush=True)
+                print('Check for transitions at', hero_dest_dat_tile, flush=True)
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,
                                                                   filter_to_automatic_transitions=True)
 
@@ -444,55 +417,23 @@ class Game:
                 self.gde.dialog_loop(dialog_from_inc_step_count)
 
         else:
+            self.game_state.hero_party.members[0].dest_pos_dat_tile = \
+                self.game_state.hero_party.members[0].curr_pos_dat_tile
             audio_player.play_sound('bump.wav')
 
-        for x in range(tile_move_steps):
-
-            if movement_allowed:
-                # Erase the characters
-                self.game_state.erase_characters()
-
-                # Scroll the view
-                SurfaceEffects.scroll_view(self.game_state.screen,
-                                           self.game_state.get_map_image(),
-                                           self.game_state.hero_party.members[0].direction,
-                                           map_image_rect,
-                                           1.0,
-                                           self.game_state.game_info.image_px_step_size)
-                self.game_state.hero_party.members[0].curr_pos_offset_img_px = Point(
-                    map_image_rect.x - orig_map_image_rect.x, map_image_rect.y - orig_map_image_rect.y)
-                for hero in self.game_state.hero_party.members[1:]:
-                    if hero.curr_pos_dat_tile != hero.dest_pos_dat_tile:
-                        hero.curr_pos_offset_img_px = hero.direction.get_vector() * \
-                                                      self.game_state.game_info.image_px_step_size * (x+1)
-
-                if self.game_state.is_light_restricted():
-                    self.game_state.draw_map(False)
-
-                if movement_hp_penalty > 0:
-                    if x == tile_move_steps - 2:
-                        flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
-                        flicker_surface.fill(pygame.Color('red'))
-                        flicker_surface.set_alpha(128)
-                        self.game_state.screen.blit(flicker_surface, (0, 0))
-                    elif x == tile_move_steps - 1:
-                        self.game_state.draw_map(False)
-
+        while self.game_state.hero_party.members[0].curr_pos_dat_tile != \
+              self.game_state.hero_party.members[0].dest_pos_dat_tile:
             # Redraws the characters when movement_allowed is True
             # print('advancing one tick in scroll_tile', flush=True)
-            self.game_state.advance_tick(movement_allowed)
+            self.game_state.advance_tick()
+
+            if movement_allowed and movement_hp_penalty > 0 and x == tile_move_steps - 2:
+                flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
+                flicker_surface.fill(pygame.Color('red'))
+                flicker_surface.set_alpha(128)
+                self.game_state.screen.blit(flicker_surface, (0, 0))
 
         if movement_allowed:
-            prev_pos_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile
-            for hero in self.game_state.hero_party.members:
-                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile
-                hero.curr_pos_offset_img_px = Point(0, 0)
-
-            # Redraw the map on a transition between interior and exterior
-            if (self.game_state.is_interior(prev_pos_dat_tile) !=
-                    self.game_state.is_interior(self.game_state.hero_party.members[0].curr_pos_dat_tile)):
-                self.game_state.draw_map(True)
-
             # Apply health penalty and check for player death
             for hero in self.game_state.hero_party.members:
                 if not hero.is_ignoring_tile_penalties():
@@ -507,6 +448,9 @@ class Game:
                         (len(self.game_state.get_tile_monsters()) > 0 and
                          random.uniform(0, 1) < dest_tile_type.spawn_rate)):
                     self.game_state.initiate_encounter()
+        else:
+            for x in range(CharacterSprite.get_tile_movement_steps()):
+                self.game_state.advance_tick()
 
 
 def main() -> None:
