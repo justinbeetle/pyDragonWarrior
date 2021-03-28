@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" x="66" xp="22000" y="50" hp="15">
+<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" xp="22000" hp="15" location="Rainbow Bridge Formation Point">
    <EquippedItems>
       <Item name="Flame Sword"/>
       <Item name="Magic Armor"/>

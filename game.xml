@@ -209,12 +209,13 @@
 
          <MapDecoration type="cactus" x="73" y="84"/>
 
-         <MapDecoration type="None" x="84" y="114">
+         <MapLocation x="84" y="114" name="Erdrick's Token"/>
+         <MapDecoration type="None" location="Erdrick's Token">
             <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
-         <MapPoint x="66" y="50" name="Rainbow_Bridge_Formation_Point"/>
+         <MapPoint x="66" y="50" name="Rainbow Bridge Formation Point"/>
          <MapDecoration type="bridge" x="65" y="50" progressMarker="PM_Created_Rainbow_Bridge"/>
 
          <Monster name="Golem" x="74" y="101" inverseProgressMarker="PM_Defeated_Golem">
@@ -296,7 +297,7 @@
          </MonsterZones>
       </Map> -->
 
-      <Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44">
+      <Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="46" originY="45">
          <PointTransition decoration="pass"                x="46"  y="45"  dir="SOUTH" toMap="tantegel_lvl1"                 respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="50"  y="44"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="50"  y="45"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
@@ -305,6 +306,7 @@
          <PointTransition decoration="pass"                x="109" y="76"  dir="SOUTH" toMap="rimuldar"                      respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="29"  y="93"  dir="SOUTH" toMap="hauksness"                     respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="79"  y="104" dir="SOUTH" toMap="cantlin"                       respawnDecorations="yes"/>
+
          <PointTransition decoration="pass"                x="31"  y="15"  dir="SOUTH" toMap="erdricks_tomb_lvl1"            respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="32"  y="60"  dir="WEST"  toMap="mountain_cave_lvl1"            respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="111" y="45"  dir="NORTH" toMap="swamp_cave"         toName="N" respawnDecorations="yes"/>
@@ -313,12 +315,13 @@
          <PointTransition decoration="pass"                x="114" y="115" dir="SOUTH" toMap="southern_shrine"               respawnDecorations="yes"/>
          <PointTransition decoration="pass"                x="51"  y="52"  dir="SOUTH" toMap="charlock_lvl1"                 respawnDecorations="yes"/>
 
-         <MapDecoration type="None" x="84" y="119">
+         <MapLocation x="86" y="115" name="Erdrick's Token"/>
+         <MapDecoration type="None" location="Erdrick's Token">
             <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
             <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
             <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
-         <MapPoint x="70" y="53" name="Rainbow_Bridge_Formation_Point"/>
+         <MapLocation x="70" y="53" name="Rainbow Bridge Formation Point"/>
          <MapDecoration type="bridge_left" x="68" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
          <MapDecoration type="bridge_right" x="69" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
 
@@ -2153,7 +2156,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
-            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow_Bridge_Formation_Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert> <!-- TODO: Move all X/Y coordinates into the map - change this to call out an anchor point defined in the Map -->
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>

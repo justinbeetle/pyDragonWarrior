@@ -118,7 +118,7 @@ class DialogCheckEnum(Enum):
     IS_OUTSIDE = 4                     # attributes: count (number, range, or unlimited)
     IS_INSIDE = 5                      # attributes: count (number, range, or unlimited)
     IS_DARK = 6                        # attributes: <none>
-    IS_AT_COORDINATES = 7              # attributes: map, x, y
+    IS_AT_COORDINATES = 7              # attributes: map, x, y (x and y may be pulled from location)
     IS_IN_COMBAT = 8                   # attributes: name
     IS_NOT_IN_COMBAT = 9               # attributes: <none>
     IS_COMBAT_ALLOWED = 10             # attributes: <none>
@@ -373,7 +373,7 @@ class IncomingTransition(NamedTuple):
 class OutgoingTransition(NamedTuple):
     point: Point                       # Location of PC on incoming transit; trigger point for outgoing point transit
     dir: Direction                     # Direction of the PC on incoming transit
-    name: Optional[str]                # Name of transition (where needed due to keep transits unambiguous)
+    name: Optional[str]                # Name of transition (where needed to keep transits unambiguous)
     dest_map: str                      # Name of map to which the transition connects
     dest_name: Optional[str] = None    # Name of destination transition in the destination map
     respawn_decorations: bool = False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
@@ -383,6 +383,8 @@ class OutgoingTransition(NamedTuple):
     # For point transitions, is the transit automatic or must it be player initiated.
     # If None, default behavior is automatic if light not restricted, else manual.
     is_automatic: Optional[bool] = None
+
+    # TODO: Will need to support leaving transitions which support a bounding box
 
 
 AnyTransition = Union[IncomingTransition, OutgoingTransition]
@@ -450,8 +452,8 @@ class Map(NamedTuple):
     transitions_by_map: Dict[str, AnyTransition]
     transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]]
     transitions_by_name: Dict[str, AnyTransition]
-    npcs: List[NpcInfo]
     map_decorations: List[MapDecoration]
+    npcs: List[NpcInfo]
     monster_zones: List[MonsterZone]
     encounter_image: Optional[pygame.surface.Surface]
     special_monsters: List[SpecialMonster]
@@ -547,6 +549,11 @@ class MonsterZone(NamedTuple):
     w: int
     h: int
     name: str
+
+
+class NamedLocation(NamedTuple):
+    name: str
+    point: Point
 
 
 class Level(NamedTuple):

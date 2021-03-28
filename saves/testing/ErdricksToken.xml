@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" x="66" xp="50000" y="50">
+<SaveState dir="WEST" gp="100000" map="overworld" name="Wallace" xp="50000" location="Erdrick's Token">
    <EquippedItems>
       <Item name="Erdrick's Sword"/>
       <Item name="Erdrick's Armor"/>
@@ -16,10 +16,10 @@
       <Item count="1" name="Flame Sword"/>
       <Item count="1" name="Leather Armor"/>
       <Item count="1" name="Rainbow Drop"/>
+      <Item count="1" name="Gwaelin's Love"/>
    </UnequippedItems>
    <ProgressMarkers>
-      <ProgressMarker name="PM_Taken_Initial_Chest_3"/>
-      <ProgressMarker name="PM_Taken_Initial_Chest_2"/>
-      <ProgressMarker name="PM_Taken_Initial_Chest_1"/>
+      <ProgressMarker name="PM_Rescued_Princess"/>
+      <ProgressMarker name="PM_Princess_Returned_To_Castle"/>
    </ProgressMarkers>
 </SaveState>

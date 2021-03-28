@@ -14,7 +14,7 @@ from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterTyp
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
     DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, Level, Map, \
-    MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, NpcInfo, \
+    MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, NamedLocation, NpcInfo, \
     OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
 
 from Point import Point
@@ -72,6 +72,18 @@ class GameInfo:
             self.title_music = title_element.attrib['music']
             title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
             self.title_image = pygame.image.load(title_image_file_name).convert()
+
+        # Parse Map Locations
+        self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
+        for element in xml_root.findall("./Maps/Map"):
+            map_name = element.attrib['name']
+            map_locations: Dict[str, NamedLocation] = {}
+            for location_element in element.findall('MapLocation'):
+                location_name = location_element.attrib['name']
+                map_locations[location_name] = NamedLocation(location_name,
+                                                             Point(int(location_element.attrib['x']),
+                                                                   int(location_element.attrib['y'])))
+            self.locations[map_name] = map_locations
 
         # Parse items
         self.items: Dict[str, ItemType] = {}
@@ -562,8 +574,7 @@ class GameInfo:
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in trans_element.attrib:
                     inverse_progress_marker = trans_element.attrib['inverseProgressMarker']
-                transition = OutgoingTransition(Point(int(trans_element.attrib['x']),
-                                                      int(trans_element.attrib['y'])),
+                transition = OutgoingTransition(self.get_location(map_name, trans_element),
                                                 Direction[trans_element.attrib['dir']],
                                                 name,
                                                 trans_element.attrib['toMap'],
@@ -584,30 +595,12 @@ class GameInfo:
                                                                 progress_marker,
                                                                 inverse_progress_marker))
                 return transition
+
             trans_element = element.find('LeavingTransition')
             if trans_element is not None:
                 leaving_transition = parse_outgoing_transition(trans_element)
             for trans_element in element.findall('PointTransition'):
                 point_transitions.append(parse_outgoing_transition(trans_element))
-
-            # Parse NPCs
-            # print( 'Parse NPCs', flush=True )
-            npcs: List[NpcInfo] = []
-            for npc_element in element.findall('NonPlayerCharacter'):
-                progress_marker = None
-                if 'progressMarker' in npc_element.attrib:
-                    progress_marker = npc_element.attrib['progressMarker']
-                inverse_progress_marker = None
-                if 'inverseProgressMarker' in npc_element.attrib:
-                    inverse_progress_marker = npc_element.attrib['inverseProgressMarker']
-                npcs.append(NpcInfo(self.character_types[npc_element.attrib['type']],
-                                    Point(int(npc_element.attrib['x']),
-                                          int(npc_element.attrib['y'])),
-                                    Direction[npc_element.attrib['dir']],
-                                    npc_element.attrib['walking'] == 'yes',
-                                    self.parse_dialog(npc_element),
-                                    progress_marker,
-                                    inverse_progress_marker))
 
             # Parse standalone decorations
             # print( 'Parse standalone decorations', flush=True )
@@ -623,11 +616,28 @@ class GameInfo:
                     inverse_progress_marker = decoration_element.attrib['inverseProgressMarker']
                 map_decorations.append(MapDecoration.create(
                     decoration,
-                    Point(int(decoration_element.attrib['x']),
-                          int(decoration_element.attrib['y'])),
+                    self.get_location(map_name, decoration_element),
                     self.parse_dialog(decoration_element),
                     progress_marker,
                     inverse_progress_marker))
+
+            # Parse NPCs
+            # print( 'Parse NPCs', flush=True )
+            npcs: List[NpcInfo] = []
+            for npc_element in element.findall('NonPlayerCharacter'):
+                progress_marker = None
+                if 'progressMarker' in npc_element.attrib:
+                    progress_marker = npc_element.attrib['progressMarker']
+                inverse_progress_marker = None
+                if 'inverseProgressMarker' in npc_element.attrib:
+                    inverse_progress_marker = npc_element.attrib['inverseProgressMarker']
+                npcs.append(NpcInfo(self.character_types[npc_element.attrib['type']],
+                                    self.get_location(map_name, npc_element),
+                                    Direction[npc_element.attrib['dir']],
+                                    npc_element.attrib['walking'] == 'yes',
+                                    self.parse_dialog(npc_element),
+                                    progress_marker,
+                                    inverse_progress_marker))
 
             # Parse special monsters
             # print( 'Parse special monsters', flush=True )
@@ -655,8 +665,7 @@ class GameInfo:
                     inverse_progress_marker = monster_element.attrib['inverseProgressMarker']
                 special_monsters.append(SpecialMonster(
                     self.monsters[monster_element.attrib['name']],
-                    Point(int(monster_element.attrib['x']),
-                          int(monster_element.attrib['y'])),
+                    self.get_location(map_name, monster_element),
                     approach_dialog,
                     victory_dialog,
                     run_away_dialog,
@@ -740,8 +749,8 @@ class GameInfo:
                                       transitions_by_map,
                                       transitions_by_map_and_name,
                                       transitions_by_name,
-                                      npcs,
                                       map_decorations,
+                                      npcs,
                                       monster_zones,
                                       encounter_image,
                                       special_monsters,
@@ -760,10 +769,14 @@ class GameInfo:
             print('ERROR: DeathState element is missing', flush=True)
             raise Exception('Missing required DeathState element')
         self.death_map = death_state_element.attrib['map']
-        self.death_hero_pos_dat_tile = Point(int(death_state_element.attrib['x']),
-                                             int(death_state_element.attrib['y']))
+        self.death_hero_pos_dat_tile = self.get_location(self.death_map, death_state_element)
         self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
         self.death_dialog = self.parse_dialog(death_state_element)
+
+    def get_location(self, map_name: Optional[str], element: xml.etree.ElementTree.Element) -> Point:
+        if map_name and 'location' in element.attrib:
+            return self.locations[map_name][element.attrib['location']].point
+        return Point(int(element.attrib['x']), int(element.attrib['y']))
 
     def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information
@@ -789,8 +802,7 @@ class GameInfo:
             raise Exception('Missing required InitialState element')
 
         self.initial_map = initial_state_element.attrib['map']
-        self.initial_hero_pos_dat_tile = Point(int(initial_state_element.attrib['x']),
-                                               int(initial_state_element.attrib['y']))
+        self.initial_hero_pos_dat_tile = self.get_location(self.initial_map, initial_state_element)
         self.initial_hero_pos_dir = Direction[initial_state_element.attrib['dir']]
         self.initial_state_dialog = self.parse_dialog(initial_state_element)
 
@@ -844,8 +856,7 @@ class GameInfo:
                 decoration = self.decorations[decoration_element.attrib['type']]
             self.initial_map_decorations.append(MapDecoration.create(
                 decoration,
-                Point(int(decoration_element.attrib['x']),
-                      int(decoration_element.attrib['y'])),
+                self.get_location(self.initial_map, decoration_element),
                 self.parse_dialog(decoration_element),
                 None,
                 None))
@@ -882,8 +893,8 @@ class GameInfo:
                 map_name = element.attrib['map']
             
             map_pos = None
-            if 'x' in element.attrib and 'y' in element.attrib:
-                map_pos = Point(int(element.attrib['x']), int(element.attrib['y']))
+            if (map_name and 'location' in element.attrib) or ('x' in element.attrib and 'y' in element.attrib):
+                map_pos = self.get_location(map_name, element)
          
             map_dir = None
             if 'dir' in element.attrib:

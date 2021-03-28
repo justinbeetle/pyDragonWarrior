@@ -18,6 +18,8 @@ Images:
    http://www.realmofdarkness.net/dq/games/snes/dq3/maps
    https://www.spriters-resource.com/nes/D.html
    https://www.pinterest.com/pin/551339179352298400
+   Characters:
+      https://vxresource.wordpress.com/category/resources/characters/
 Tilesets:
    https://opengameart.org/content/worldmapoverworld-tileset
    https://opengameart.org/content/cave-tileset-1

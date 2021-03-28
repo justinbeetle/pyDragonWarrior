@@ -114,10 +114,10 @@ class GameState(GameStateInterface):
             npcs = self.game_map.npcs
 
             # Remove any current NPCs which should be missing
-            for npc_char in self.npcs[:]:
+            for npc_char in npcs[:]:
                 if not self.check_progress_markers(npc_char.npc_info.progress_marker,
                                                    npc_char.npc_info.inverse_progress_marker):
-                    self.npcs.remove(npc_char)
+                    npcs.remove(npc_char)
 
             # Add missing NPCs
             for npc in self.game_info.maps[new_map_name].npcs:
@@ -440,13 +440,13 @@ class GameState(GameStateInterface):
             variables.generic['[X]'] = str(abs(map_coord.x))
             variables.generic['[Y]'] = str(abs(map_coord.y))
             if map_coord.x < 0:
-                variables.generic['[X_DIR]'] = 'West'
-            else:
                 variables.generic['[X_DIR]'] = 'East'
-            if map_coord.y < 0:
-                variables.generic['[Y_DIR]'] = 'North'
             else:
+                variables.generic['[X_DIR]'] = 'West'
+            if map_coord.y < 0:
                 variables.generic['[Y_DIR]'] = 'South'
+            else:
+                variables.generic['[Y_DIR]'] = 'North'
         return variables
 
     def is_in_combat(self) -> bool:
