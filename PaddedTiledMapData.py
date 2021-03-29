@@ -167,6 +167,11 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return (layer for layer in self.tmx.visible_layers
                 if isinstance(layer, pytmx.TiledObjectGroup))
 
+    def get_tile_properties(self, x, y, l):
+        if l not in self.base_tile_layers:
+            l = l - 2
+        return self.tmx.get_tile_properties(x, y, l)
+
     def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
         if l not in self.visible_tile_layers and limit_to_visible:
             return None
@@ -207,6 +212,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         track = bool(self._animation_queue)
 
         for l in self.visible_tile_layers:
+            if l not in self.base_tile_layers:
+                l = l - 2
             for y in range(y1, y2+1):
                 row = layers[l].data[min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)]
 

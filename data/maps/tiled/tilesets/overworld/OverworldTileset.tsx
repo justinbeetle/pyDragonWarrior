@@ -9647,16 +9647,86 @@
  <tile id="1527" terrain="12,12,1,12"/>
  <tile id="1528" terrain="12,1,1,1"/>
  <tile id="1529" terrain="1,12,1,1"/>
- <tile id="1530" terrain="12,12,12,13"/>
- <tile id="1531" terrain="12,12,13,13"/>
- <tile id="1532" terrain="12,12,13,12"/>
- <tile id="1533" terrain="12,13,13,13"/>
- <tile id="1534" terrain="13,12,13,13"/>
- <tile id="1535" terrain="13,13,13,14"/>
- <tile id="1536" terrain="13,13,14,14"/>
- <tile id="1537" terrain="13,13,14,13"/>
- <tile id="1538" terrain="13,14,14,14"/>
- <tile id="1539" terrain="14,13,14,14"/>
+ <tile id="1530" terrain="12,12,12,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1531" terrain="12,12,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1532" terrain="12,12,13,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1533" terrain="12,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1534" terrain="13,12,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1535" terrain="13,13,13,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1536" terrain="13,13,14,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1537" terrain="13,13,14,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1538" terrain="13,14,14,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1539" terrain="14,13,14,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1540">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1541">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1542">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1543">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1544">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1545">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
  <tile id="1560" terrain="12,15,12,15"/>
  <tile id="1561" terrain="15,15,15,15"/>
  <tile id="1562" terrain="15,12,15,12"/>
@@ -9666,16 +9736,86 @@
  <tile id="1567" terrain="1,12,1,12"/>
  <tile id="1568" terrain="1,1,12,1"/>
  <tile id="1569" terrain="1,1,1,12"/>
- <tile id="1570" terrain="12,13,12,13"/>
- <tile id="1571" terrain="13,13,13,13"/>
- <tile id="1572" terrain="13,12,13,12"/>
- <tile id="1573" terrain="13,13,12,13"/>
- <tile id="1574" terrain="13,13,13,12"/>
- <tile id="1575" terrain="13,14,13,14"/>
- <tile id="1576" terrain="14,14,14,14"/>
- <tile id="1577" terrain="14,13,14,13"/>
- <tile id="1578" terrain="14,14,13,14"/>
- <tile id="1579" terrain="14,14,14,13"/>
+ <tile id="1570" terrain="12,13,12,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1571" terrain="13,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1572" terrain="13,12,13,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1573" terrain="13,13,12,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1574" terrain="13,13,13,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1575" terrain="13,14,13,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1576" terrain="14,14,14,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1577" terrain="14,13,14,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1578" terrain="14,14,13,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1579" terrain="14,14,14,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1580">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1581">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1582">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1583">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1584">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1585">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
  <tile id="1600" terrain="12,15,12,12"/>
  <tile id="1601" terrain="15,15,12,12"/>
  <tile id="1602" terrain="15,12,12,12"/>
@@ -9686,49 +9826,423 @@
  <tile id="1607" terrain="1,12,12,12"/>
  <tile id="1608" terrain="12,1,1,12"/>
  <tile id="1609" terrain="1,12,12,1"/>
- <tile id="1610" terrain="12,13,12,12"/>
- <tile id="1611" terrain="13,13,12,12"/>
- <tile id="1612" terrain="13,12,12,12"/>
- <tile id="1613" terrain="12,13,13,12"/>
- <tile id="1614" terrain="13,12,12,13"/>
- <tile id="1615" terrain="13,14,13,13"/>
- <tile id="1616" terrain="14,14,13,13"/>
- <tile id="1617" terrain="14,13,13,13"/>
- <tile id="1618" terrain="13,14,14,13"/>
- <tile id="1619" terrain="14,13,13,14"/>
+ <tile id="1610" terrain="12,13,12,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1611" terrain="13,13,12,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1612" terrain="13,12,12,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1613" terrain="12,13,13,12">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1614" terrain="13,12,12,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1615" terrain="13,14,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1616" terrain="14,14,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1617" terrain="14,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1618" terrain="13,14,14,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1619" terrain="14,13,13,14">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1620">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1621">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1622">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1623">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1624">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1625">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
  <tile id="1640" terrain="12,12,12,12"/>
  <tile id="1641" terrain="12,12,12,12" probability="0.03"/>
  <tile id="1642" terrain="12,12,12,12" probability="0.03"/>
- <tile id="1646" terrain="13,13,13,13"/>
- <tile id="1647" terrain="13,13,13,13" probability="0.1"/>
- <tile id="1648" terrain="13,13,13,13" probability="0.1"/>
- <tile id="1649" terrain="13,13,13,13" probability="0.1"/>
- <tile id="1650" terrain="13,13,13,13" probability="0.05"/>
- <tile id="1658" terrain="14,14,14,14" probability="0.025"/>
- <tile id="1659" terrain="14,14,14,14" probability="0.05"/>
- <tile id="1680" terrain="1,1,1,13"/>
- <tile id="1681" terrain="1,1,13,13"/>
- <tile id="1682" terrain="1,1,13,1"/>
- <tile id="1683" terrain="1,13,13,13"/>
- <tile id="1684" terrain="13,1,13,13"/>
- <tile id="1686" terrain="13,13,13,13" probability="0.05"/>
- <tile id="1687" terrain="13,13,13,13" probability="0.05"/>
- <tile id="1688" terrain="13,13,13,13" probability="0.05"/>
- <tile id="1698" terrain="14,14,14,14" probability="0.05"/>
- <tile id="1699" terrain="14,14,14,14" probability="0.05"/>
- <tile id="1720" terrain="1,13,1,13"/>
- <tile id="1721" terrain="13,13,13,13"/>
- <tile id="1722" terrain="13,1,13,1"/>
- <tile id="1723" terrain="13,13,1,13"/>
- <tile id="1724" terrain="13,13,13,1"/>
- <tile id="1760" terrain="1,13,1,1"/>
- <tile id="1761" terrain="13,13,1,1"/>
- <tile id="1762" terrain="13,1,1,1"/>
- <tile id="1763" terrain="1,13,13,1"/>
- <tile id="1764" terrain="13,1,1,13"/>
- <tile id="1800" terrain="1,1,1,13"/>
- <tile id="1802" terrain="1,1,13,1"/>
- <tile id="1880" terrain="1,13,1,1"/>
- <tile id="1882" terrain="13,1,1,1"/>
+ <tile id="1646" terrain="13,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1647" terrain="13,13,13,13" probability="0.1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1648" terrain="13,13,13,13" probability="0.1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1649" terrain="13,13,13,13" probability="0.1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1650" terrain="13,13,13,13" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1651">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1652">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1653">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1654">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1655">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1656">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1657">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1658" terrain="14,14,14,14" probability="0.025">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1659" terrain="14,14,14,14" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1680" terrain="1,1,1,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1681" terrain="1,1,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1682" terrain="1,1,13,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1683" terrain="1,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1684" terrain="13,1,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1686" terrain="13,13,13,13" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1687" terrain="13,13,13,13" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1688" terrain="13,13,13,13" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1689">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1690">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1691">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1692">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1693">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1694">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1695">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1696">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1697">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1698" terrain="14,14,14,14" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1699" terrain="14,14,14,14" probability="0.05">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1720" terrain="1,13,1,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1721" terrain="13,13,13,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1722" terrain="13,1,13,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1723" terrain="13,13,1,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1724" terrain="13,13,13,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1726">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1727">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1728">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1729">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1730">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1760" terrain="1,13,1,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1761" terrain="13,13,1,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1762" terrain="13,1,1,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1763" terrain="1,13,13,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1764" terrain="13,1,1,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1766">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1767">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1768">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1769">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1770">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1800" terrain="1,1,1,13">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1801">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1802" terrain="1,1,13,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1806">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1807">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1808">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1809">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1810">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1840">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1841">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1842">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1880" terrain="1,13,1,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1881">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
+ <tile id="1882" terrain="13,1,1,1">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
  <tile id="1964" terrain=",1,,"/>
 </tileset>

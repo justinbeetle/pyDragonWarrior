@@ -152,6 +152,7 @@ class GameMap:
         # Set the NPCs
         self.npcs: List[NpcState] = npcs
         if self.npcs is None:
+            self.npcs = []
             for npc in self.map.npcs:
                 self.npcs.append(NpcState(npc))
 
@@ -255,7 +256,7 @@ class GameMap:
         if isinstance(self.map_data, PaddedTiledMapData):
             tile_name = None
             for l in self.map_data.visible_tile_layers:
-                tile_properties = self.map_data.tmx.get_tile_properties(tile.x, tile.y, l)
+                tile_properties = self.map_data.get_tile_properties(tile.x, tile.y, l)
                 if tile_properties is not None and 'type' in tile_properties and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
