@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+   <NonPlayerCharacter type="boy" location="boy1" dir="SOUTH" walking="no">
+      <Dialog>"Thou art most welcome in Brecconary."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" location="girl1" dir="SOUTH" walking="no">
+      <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" location="guard1" dir="NORTH" walking="no">
+      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogAssert>
+      <Dialog>"Tell King Lorik that the search for his daughter hath failed.  I am almost gone..."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" location="guard2" dir="SOUTH" walking="no">
+      <Dialog>"See King Lorik when thy experience levels are raised."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" location="boy2" dir="SOUTH" walking="no">
+      <Dialog>"There is a town where magic keys can be purchased."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" location="sage1" dir="SOUTH" walking="no">
+      <Dialog>"If thou art cursed, come again."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" location="warrior1" dir="SOUTH" walking="no">
+      <Dialog>"Beware the bridges!  Danger grows when thou crosses."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" location="boy3" dir="NORTH" walking="no">
+      <Dialog>"Within sight of Tantegel Castle to the south is Charlock, the fortress of the Dragonlord."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" location="girl2" dir="WEST" walking="yes">
+      <Dialog>"No, I am not Princess Gwaelin."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" location="boy4" dir="WEST" walking="yes">
+      <Dialog>"Enter where thou can."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" location="sage2" dir="SOUTH" walking="yes">
+      <Dialog>"Watch thy hit points when in the poisonous marsh."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" location="boy5" dir="EAST" walking="yes">
+      <Dialog>"Go North to the seashore, then follow the coastline West until thou hath reached Garinham."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" location="warrior2" dir="SOUTH" walking="yes">
+      <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" location="warrior3" dir="SOUTH" walking="yes">
+      <Dialog>"Many have been the warriors who have perished on this quest.  But for thee I wish success, [NAME]."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" location="merchant1" dir="WEST" walking="yes">
+      <Dialog>"Please, save us from the minions of the Dragonlord."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" location="warrior4" dir="SOUTH" walking="yes">
+      <Dialog>"Some say that Garin's grave is home to a Silver Harp."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" location="merchant2" dir="SOUTH" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Bamboo Pole" gp="8"/>
+         <Item name="Club"/>
+         <Item name="Clothes"/>
+         <Item name="Leather Armor"/>
+         <Item name="Leather Shield"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" location="girl3" dir="WEST" walking="no">
+      <DialogVariable name="[COST]" value="38"/>
+      <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" location="merchant3" dir="WEST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Herb"/>
+         <Item name="Torch"/>
+         <Item name="Dragon's Scale"/>
+      </DialogVariable>
+      <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" location="merchant4" dir="WEST" walking="no">
+      <DialogVariable name="[COST]" value="6"/>
+      <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+</root>

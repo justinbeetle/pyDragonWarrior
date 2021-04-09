@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Levels xmlns:xi="http://www.w3.org/2001/XInclude">
+   <xi:include href="levels_hero.xml" parse="xml"/>
+   <!--<xi:include href="levels_hero_fast.xml" parse="xml"/>-->
+
+   <CharacterLevels type="cat">
+      <Level name="Kitten" xp="0"  strength="2"  agility="10"  hp="5"   mp="0"/>
+      <Level name="Cat"    xp="50" strength="6"  agility="20"  hp="10"  mp="0"/>
+   </CharacterLevels>
+</Levels>

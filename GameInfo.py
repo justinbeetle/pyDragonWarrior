@@ -5,7 +5,9 @@ from typing import Dict, List, Optional, Union
 import os
 import pygame
 import numpy
-import xml.etree.ElementTree
+import xml.etree.ElementTree as ET
+import xml.etree.ElementInclude
+#import lxml.etree as ET  # May desire to use in future for better xinclude support
 
 from AudioPlayer import AudioPlayer
 import GameEvents
@@ -48,7 +50,8 @@ class GameInfo:
         monster_scale_factor = 4
 
         # Parse XML
-        xml_root = xml.etree.ElementTree.parse(game_xml_path).getroot()
+        xml_root = ET.parse(game_xml_path).getroot()
+        xml.etree.ElementInclude.include(xml_root)
         self.saves_path = os.path.join(base_path, xml_root.attrib['savesPath'])
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
@@ -73,7 +76,7 @@ class GameInfo:
             title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
             self.title_image = pygame.image.load(title_image_file_name).convert()
 
-        # Parse Map Locations
+        # Parse map locations
         self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
         for element in xml_root.findall("./Maps/Map"):
             map_name = element.attrib['name']
@@ -558,7 +561,7 @@ class GameInfo:
             transitions_by_name: Dict[str, AnyTransition] = {}
             map_decorations: List[MapDecoration] = []
 
-            def parse_outgoing_transition(trans_element: xml.etree.ElementTree.Element) -> OutgoingTransition:
+            def parse_outgoing_transition(trans_element: ET.Element) -> OutgoingTransition:
                 name = None
                 if 'name' in trans_element.attrib:
                     name = trans_element.attrib['name']
@@ -596,15 +599,15 @@ class GameInfo:
                                                                 inverse_progress_marker))
                 return transition
 
-            trans_element = element.find('LeavingTransition')
+            trans_element = element.find('.//LeavingTransition')
             if trans_element is not None:
                 leaving_transition = parse_outgoing_transition(trans_element)
-            for trans_element in element.findall('PointTransition'):
+            for trans_element in element.findall('.//PointTransition'):
                 point_transitions.append(parse_outgoing_transition(trans_element))
 
             # Parse standalone decorations
             # print( 'Parse standalone decorations', flush=True )
-            for decoration_element in element.findall('MapDecoration'):
+            for decoration_element in element.findall('.//MapDecoration'):
                 decoration = None
                 if 'type' in decoration_element.attrib and decoration_element.attrib['type'] in self.decorations:
                     decoration = self.decorations[decoration_element.attrib['type']]
@@ -624,7 +627,7 @@ class GameInfo:
             # Parse NPCs
             # print( 'Parse NPCs', flush=True )
             npcs: List[NpcInfo] = []
-            for npc_element in element.findall('NonPlayerCharacter'):
+            for npc_element in element.findall('.//NonPlayerCharacter'):
                 progress_marker = None
                 if 'progressMarker' in npc_element.attrib:
                     progress_marker = npc_element.attrib['progressMarker']
@@ -642,7 +645,7 @@ class GameInfo:
             # Parse special monsters
             # print( 'Parse special monsters', flush=True )
             special_monsters: List[SpecialMonster] = []
-            for monster_element in element.findall('Monster'):
+            for monster_element in element.findall('.//Monster'):
                 # print( 'monster_element =', monster_element, flush=True )
                 # print( 'monster_element.attrib =', monster_element.attrib, flush=True )
                 approach_dialog = None
@@ -718,7 +721,7 @@ class GameInfo:
                                                  999999999,
                                                  element.attrib['monsterSet']))
             else:
-                for monsterZoneElement in element.findall('MonsterZones/MonsterZone'):
+                for monsterZoneElement in element.findall('.//MonsterZones/MonsterZone'):
                     monster_zones.append(MonsterZone(
                         int(monsterZoneElement.attrib['x']),
                         int(monsterZoneElement.attrib['y']),
@@ -773,7 +776,7 @@ class GameInfo:
         self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
         self.death_dialog = self.parse_dialog(death_state_element)
 
-    def get_location(self, map_name: Optional[str], element: xml.etree.ElementTree.Element) -> Point:
+    def get_location(self, map_name: Optional[str], element: ET.Element) -> Point:
         if map_name and 'location' in element.attrib:
             return self.locations[map_name][element.attrib['location']].point
         return Point(int(element.attrib['x']), int(element.attrib['y']))
@@ -791,10 +794,10 @@ class GameInfo:
 
         if save_game_file_path is not None and os.path.isfile(save_game_file_path):
             print('Loading save game from file ' + save_game_file_path, flush=True)
-            initial_state_element = xml.etree.ElementTree.parse(save_game_file_path).getroot()
+            initial_state_element = ET.parse(save_game_file_path).getroot()
         else:
             self.pc_name = pc_name_or_file_name
-            xml_root = xml.etree.ElementTree.parse(self.game_xml_path).getroot()
+            xml_root = ET.parse(self.game_xml_path).getroot()
             initial_state_element = xml_root.find('InitialState')
 
         if initial_state_element is None:
@@ -861,7 +864,7 @@ class GameInfo:
                 None,
                 None))
 
-    def parse_dialog(self, dialog_root_element: Optional[xml.etree.ElementTree.Element]) -> Optional[DialogType]:
+    def parse_dialog(self, dialog_root_element: Optional[ET.Element]) -> Optional[DialogType]:
         if dialog_root_element is None:
             return None
         dialog: DialogType = []

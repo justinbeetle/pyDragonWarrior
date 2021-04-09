@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="brecconary" tiles="brecconary.dat" overlayTiles="brecconary_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <LeavingTransition                                x="1"   y="15"  dir="EAST"  toMap="overworld"/>
+   <MapDecoration type="door" x="22" y="7"/>
+   <MapDecoration type="door" x="6"  y="24"/>
+
+   <MapLocation x="2"  y="14" name="boy1"/>
+   <MapLocation x="5"  y="8"  name="girl1"/>
+   <MapLocation x="11" y="27" name="guard1"/>
+   <MapLocation x="29" y="14" name="guard2"/>
+   <MapLocation x="21" y="11" name="boy2"/>
+   <MapLocation x="25" y="11" name="sage1"/>
+   <MapLocation x="29" y="2"  name="warrior1"/>
+   <MapLocation x="21" y="24" name="boy3"/>
+   <MapLocation x="15" y="26" name="girl2"/>
+   <MapLocation x="25" y="22" name="boy4"/>
+   <MapLocation x="10" y="8"  name="sage2"/>
+   <MapLocation x="6"  y="18" name="boy5"/>
+   <MapLocation x="20" y="17" name="warrior2"/>
+   <MapLocation x="15" y="7"  name="warrior3"/>
+   <MapLocation x="12" y="5"  name="merchant1"/>
+   <MapLocation x="4"  y="23" name="warrior4"/>
+   <MapLocation x="6"  y="5"  name="merchant2"/>
+   <MapLocation x="25" y="5"  name="girl3"/>
+   <MapLocation x="26" y="26" name="merchant3"/>
+   <MapLocation x="11" y="22" name="merchant4"/>
+
+   <xi:include href="map_brecconary_common.xml" parse="xml"/>
+</Map>

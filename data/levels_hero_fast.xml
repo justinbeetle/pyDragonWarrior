@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<CharacterLevels type="hero">
+   <Level name="1"  xp="0"     strength="5"   agility="5"   hp="15"  mp="0"/>
+   <Level name="2"  xp="2"     strength="6"   agility="5"   hp="22"  mp="0"/>
+   <Level name="3"  xp="5"     strength="8"   agility="7"   hp="24"  mp="6"   spell="Heal"/>
+   <Level name="4"  xp="8"     strength="8"   agility="9"   hp="31"  mp="16"  spell="Hurt"/>
+   <Level name="5"  xp="11"    strength="13"  agility="11"  hp="35"  mp="20"/>
+   <Level name="6"  xp="22"    strength="17"  agility="11"  hp="38"  mp="24"/>
+   <Level name="7"  xp="45"    strength="19"  agility="18"  hp="40"  mp="26"  spell="Sleep"/>
+   <Level name="8"  xp="80"    strength="23"  agility="21"  hp="46"  mp="29"/>
+   <Level name="9"  xp="130"   strength="31"  agility="23"  hp="50"  mp="36"  spell="Radiant"/>
+   <Level name="10" xp="200"   strength="36"  agility="32"  hp="54"  mp="40"  spell="Stopspell"/>
+   <Level name="11" xp="290"   strength="41"  agility="36"  hp="62"  mp="50"/>
+   <Level name="12" xp="400"   strength="49"  agility="41"  hp="63"  mp="58"  spell="Outside"/>
+   <Level name="13" xp="550"   strength="53"  agility="49"  hp="70"  mp="64"  spell="Return"/>
+   <Level name="14" xp="750"   strength="61"  agility="56"  hp="78"  mp="70"/>
+   <Level name="15" xp="1000"  strength="69"  agility="65"  hp="86"  mp="72"  spell="Repel"/>
+   <Level name="16" xp="1300"  strength="73"  agility="71"  hp="92"  mp="95"/>
+   <Level name="17" xp="1700"  strength="73"  agility="79"  hp="100" mp="100" spell="Healmore"/>
+   <Level name="18" xp="2100"  strength="86"  agility="85"  hp="115" mp="108"/>
+   <Level name="19" xp="2500"  strength="88"  agility="87"  hp="130" mp="115" spell="Hurtmore"/>
+   <Level name="20" xp="2900"  strength="93"  agility="89"  hp="138" mp="128"/>
+   <Level name="21" xp="3300"  strength="96"  agility="91"  hp="149" mp="135"/>
+   <Level name="22" xp="3700"  strength="98"  agility="91"  hp="158" mp="146"/>
+   <Level name="23" xp="4100"  strength="100" agility="95"  hp="165" mp="153"/>
+   <Level name="24" xp="4500"  strength="104" agility="99"  hp="170" mp="161"/>
+   <Level name="25" xp="4900"  strength="114" agility="101" hp="174" mp="161"/>
+   <Level name="26" xp="5300"  strength="118" agility="106" hp="180" mp="168"/>
+   <Level name="27" xp="5700"  strength="126" agility="108" hp="189" mp="175"/>
+   <Level name="28" xp="6100"  strength="131" agility="116" hp="195" mp="180"/>
+   <Level name="29" xp="6500"  strength="136" agility="121" hp="200" mp="190"/>
+   <Level name="30" xp="7000"  strength="141" agility="131" hp="210" mp="200"/>
+   <Level name="31" xp="7500"  strength="146" agility="140" hp="215" mp="210" spell="Healall"/>/>
+   <Level name="32" xp="8000"  strength="151" agility="150" hp="220" mp="220"/>
+   <Level name="33" xp="8500"  strength="156" agility="160" hp="225" mp="230"/>
+   <Level name="34" xp="9000"  strength="161" agility="170" hp="230" mp="240"/>
+   <Level name="35" xp="9500"  strength="166" agility="180" hp="235" mp="250"/>
+   <Level name="36" xp="10000" strength="171" agility="190" hp="240" mp="260"/>
+   <Level name="37" xp="10500" strength="176" agility="200" hp="245" mp="270"/>
+   <Level name="38" xp="11000" strength="181" agility="210" hp="250" mp="280"/>
+   <Level name="39" xp="11500" strength="186" agility="220" hp="255" mp="290"/>
+   <Level name="40" xp="12000" strength="191" agility="230" hp="260" mp="300"/>
+</CharacterLevels>
