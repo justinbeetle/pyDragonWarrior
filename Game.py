@@ -447,6 +447,7 @@ class Game:
                 if (self.game_state.get_special_monster() is not None or
                         (len(self.game_state.get_tile_monsters()) > 0 and
                          random.uniform(0, 1) < dest_tile_type.spawn_rate)):
+                    # NOTE: Comment out the following line to disable encounters
                     self.game_state.initiate_encounter()
         else:
             for x in range(CharacterSprite.get_tile_movement_steps()):

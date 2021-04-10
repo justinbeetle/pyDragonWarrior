@@ -554,6 +554,7 @@ class MonsterZone(NamedTuple):
 class NamedLocation(NamedTuple):
     name: str
     point: Point
+    dir: Optional[Direction] = None
 
 
 class Level(NamedTuple):

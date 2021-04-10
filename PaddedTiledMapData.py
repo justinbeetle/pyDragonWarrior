@@ -6,7 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import Optional
+from typing import List, Optional
 
 import pygame
 import pyscroll
@@ -42,8 +42,36 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
         self.image_pad_tiles = image_pad_tiles
         self.reload_animations()
+        self.overlay_layer_offset = 0
         self.layers_to_render = self.all_tile_layers
         self.layers_changed = False
+
+        decoration_layer = None
+        character_layer = None
+        for idx, l in enumerate(self.tmx.layers):
+            if 'decoration' == l.name:
+                decoration_layer = idx
+            elif 'character' == l.name:
+                character_layer = idx
+        if decoration_layer is None:
+            self.overlay_layer_offset += 1
+            decoration_layer = self.base_tile_layers[-1] + self.overlay_layer_offset
+        if character_layer is None:
+            self.overlay_layer_offset += 1
+            character_layer = self.base_tile_layers[-1] + self.overlay_layer_offset
+        self._decoration_layer = decoration_layer
+        self._character_layer = character_layer
+
+        '''for idx, l in enumerate(self.tmx.layers):
+            print('layer', idx, '=', l, flush=True)
+        for idx, l in enumerate(self.all_tile_layers):
+            print('all_tile_layers: layer', idx, '=', l, flush=True)
+        for idx, l in enumerate(self.base_tile_layers):
+            print('base_tile_layers: layer', idx, '=', l, flush=True)
+        for idx, l in enumerate(self.overlay_tile_layers):
+            print('overlay_tile_layers: layer', idx, '=', l, flush=True)
+        print('decoration layer', self.decoration_layer, flush=True)
+        print('character layer', self.character_layer, flush=True)'''
 
     def set_tile_layers_to_render(self, layers_to_render):
         if self.layers_to_render != layers_to_render:
@@ -55,7 +83,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         self.layers_changed = False
         return ret_val
 
-    def decrement_layers_to_render(self):
+    def decrement_layers_to_render(self) -> None:
         if len(self.layers_to_render) > 1:
             self.layers_to_render = self.layers_to_render[:-1]
 
@@ -71,11 +99,11 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         self.layers_to_render = new_layers
 
     @property
-    def all_tile_layers(self):
+    def all_tile_layers(self) -> List[int]:
         return self.base_tile_layers + self.overlay_tile_layers
 
     @property
-    def base_tile_layers(self):
+    def base_tile_layers(self) -> List[int]:
         tile_layers = []
         for idx, l in enumerate(self.tmx.layers):
             # Assume base layers are the default
@@ -84,20 +112,20 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return tile_layers
 
     @property
-    def decoration_layer(self):
-        return self.base_tile_layers[-1] + 1
+    def decoration_layer(self) -> int:
+        return self._decoration_layer
 
     @property
-    def character_layer(self):
-        return self.base_tile_layers[-1] + 2
+    def character_layer(self) -> int:
+        return self._character_layer
 
     @property
-    def overlay_tile_layers(self):
+    def overlay_tile_layers(self) -> List[int]:
         tile_layers = []
         for idx, l in enumerate(self.tmx.layers):
             # Assume base layers are the default
             if l.visible and 'is_overlay' in l.properties and l.properties['is_overlay']:
-                tile_layers.append(idx + 2)
+                tile_layers.append(idx + self.overlay_layer_offset)
         return tile_layers
 
     def get_animations(self):
@@ -169,14 +197,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
     def get_tile_properties(self, x, y, l):
         if l not in self.base_tile_layers:
-            l = l - 2
+            l = l - self.overlay_layer_offset
         return self.tmx.get_tile_properties(x, y, l)
 
     def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
         if l not in self.visible_tile_layers and limit_to_visible:
             return None
         if l not in self.base_tile_layers:
-            l = l - 2
+            l = l - self.overlay_layer_offset
         if image_indexing:
             # With image_indexing, coord (0,0) is where the pad starts.
             # Without image_indexing, coord (0,0) is where the Tiled map starts.
@@ -213,7 +241,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
         for l in self.visible_tile_layers:
             if l not in self.base_tile_layers:
-                l = l - 2
+                l = l - self.overlay_layer_offset
             for y in range(y1, y2+1):
                 row = layers[l].data[min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)]
 

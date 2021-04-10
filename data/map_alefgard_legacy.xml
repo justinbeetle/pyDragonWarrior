@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="overworld" tiles="alefgard.dat" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="44" originY="44" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <PointTransition decoration="castle_stone_A"      x="44"  y="44"  dir="SOUTH" toMap="tantegel_lvl1"                 respawnDecorations="yes"/>
-   <PointTransition decoration="town_stone_med_B"    x="49"  y="42"  dir="SOUTH" toMap="brecconary"                    respawnDecorations="yes"/>
-   <PointTransition decoration="town_stone_med_A"    x="3"   y="3"   dir="SOUTH" toMap="garinham"                      respawnDecorations="yes"/>
-   <PointTransition decoration="town_wood_med_B"     x="105" y="11"  dir="SOUTH" toMap="kol"                           respawnDecorations="yes"/>
-   <PointTransition decoration="town_stone_med_A"    x="103" y="73"  dir="SOUTH" toMap="rimuldar"                      respawnDecorations="yes"/>
-   <PointTransition decoration="town_wood_med_A"     x="26"  y="90"  dir="SOUTH" toMap="hauksness"                     respawnDecorations="yes"/>
-   <PointTransition decoration="town_stone_med_A"    x="74"  y="103" dir="SOUTH" toMap="cantlin"                       respawnDecorations="yes"/>
-   <PointTransition decoration="cave"                x="29"  y="13"  dir="SOUTH" toMap="erdricks_tomb_lvl1"            respawnDecorations="yes"/>
-   <PointTransition decoration="cave"                x="30"  y="58"  dir="WEST"  toMap="mountain_cave_lvl1"            respawnDecorations="yes"/>
-   <PointTransition decoration="cave"                x="105" y="45"  dir="NORTH" toMap="swamp_cave"         toName="N" respawnDecorations="yes"/>
-   <PointTransition decoration="cave"                x="105" y="50"  dir="SOUTH" toMap="swamp_cave"         toName="S" respawnDecorations="yes"/>
-   <PointTransition decoration="shrine_stone_A"      x="82"  y="2"   dir="SOUTH" toMap="northern_shrine"               respawnDecorations="yes"/>
-   <PointTransition decoration="shrine_stone_B"      x="109" y="110" dir="SOUTH" toMap="southern_shrine"               respawnDecorations="yes"/>
-   <PointTransition decoration="castle_stone_tall_A" x="49"  y="49"  dir="SOUTH" toMap="charlock_lvl1"                 respawnDecorations="yes"/>
-   <PointTransition decoration="pass"                x="72"  y="84"  dir="EAST"  toMap="bat_cave_lvl1"                 respawnDecorations="yes"/>
+   <PointTransition decoration="castle_stone_A"      x="44"  y="44"  dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
+   <PointTransition decoration="town_stone_med_B"    x="49"  y="42"  dir="SOUTH" toMap="brecconary"            respawnDecorations="yes"/>
+   <PointTransition decoration="town_stone_med_A"    x="3"   y="3"   dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
+   <PointTransition decoration="town_wood_med_B"     x="105" y="11"  dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
+   <PointTransition decoration="town_stone_med_A"    x="103" y="73"  dir="SOUTH" toMap="rimuldar"              respawnDecorations="yes"/>
+   <PointTransition decoration="town_wood_med_A"     x="26"  y="90"  dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
+   <PointTransition decoration="town_stone_med_A"    x="74"  y="103" dir="SOUTH" toMap="cantlin"               respawnDecorations="yes"/>
+   <PointTransition decoration="cave"                x="29"  y="13"  dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
+   <PointTransition decoration="cave"                x="30"  y="58"  dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
+   <PointTransition decoration="cave" name="N"       x="105" y="45"  dir="NORTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
+   <PointTransition decoration="cave" name="S"       x="105" y="50"  dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
+   <PointTransition decoration="shrine_stone_A"      x="82"  y="2"   dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>
+   <PointTransition decoration="shrine_stone_B"      x="109" y="110" dir="SOUTH" toMap="southern_shrine"       respawnDecorations="yes"/>
+   <PointTransition decoration="castle_stone_tall_A" x="49"  y="49"  dir="SOUTH" toMap="charlock_lvl1"         respawnDecorations="yes"/>
+   <PointTransition decoration="pass"                x="72"  y="84"  dir="EAST"  toMap="bat_cave_lvl1"         respawnDecorations="yes"/>
 
    <MapDecoration type="cactus" x="73" y="84"/>
 

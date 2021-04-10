@@ -83,9 +83,13 @@ class GameInfo:
             map_locations: Dict[str, NamedLocation] = {}
             for location_element in element.findall('MapLocation'):
                 location_name = location_element.attrib['name']
+                direction = None
+                if 'dir' in location_element.attrib:
+                    direction = Direction[location_element.attrib['dir']]
                 map_locations[location_name] = NamedLocation(location_name,
                                                              Point(int(location_element.attrib['x']),
-                                                                   int(location_element.attrib['y'])))
+                                                                   int(location_element.attrib['y'])),
+                                                             direction)
             self.locations[map_name] = map_locations
 
         # Parse items
@@ -578,7 +582,7 @@ class GameInfo:
                 if 'inverseProgressMarker' in trans_element.attrib:
                     inverse_progress_marker = trans_element.attrib['inverseProgressMarker']
                 transition = OutgoingTransition(self.get_location(map_name, trans_element),
-                                                Direction[trans_element.attrib['dir']],
+                                                self.get_direction(map_name, trans_element),
                                                 name,
                                                 trans_element.attrib['toMap'],
                                                 dest_name,
@@ -636,7 +640,7 @@ class GameInfo:
                     inverse_progress_marker = npc_element.attrib['inverseProgressMarker']
                 npcs.append(NpcInfo(self.character_types[npc_element.attrib['type']],
                                     self.get_location(map_name, npc_element),
-                                    Direction[npc_element.attrib['dir']],
+                                    self.get_direction(map_name, npc_element),
                                     npc_element.attrib['walking'] == 'yes',
                                     self.parse_dialog(npc_element),
                                     progress_marker,
@@ -773,13 +777,21 @@ class GameInfo:
             raise Exception('Missing required DeathState element')
         self.death_map = death_state_element.attrib['map']
         self.death_hero_pos_dat_tile = self.get_location(self.death_map, death_state_element)
-        self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
+        self.death_hero_pos_dir = self.get_direction(self.death_map, death_state_element)
         self.death_dialog = self.parse_dialog(death_state_element)
 
     def get_location(self, map_name: Optional[str], element: ET.Element) -> Point:
         if map_name and 'location' in element.attrib:
             return self.locations[map_name][element.attrib['location']].point
         return Point(int(element.attrib['x']), int(element.attrib['y']))
+
+    def get_direction(self, map_name: Optional[str], element: ET.Element) -> Direction:
+        if map_name and 'location' in element.attrib:
+            location = self.locations[map_name][element.attrib['location']]
+            if location.dir:
+                print('pulling direction from location')
+                return location.dir
+        return Direction[element.attrib['dir']]
 
     def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information
@@ -806,7 +818,7 @@ class GameInfo:
 
         self.initial_map = initial_state_element.attrib['map']
         self.initial_hero_pos_dat_tile = self.get_location(self.initial_map, initial_state_element)
-        self.initial_hero_pos_dir = Direction[initial_state_element.attrib['dir']]
+        self.initial_hero_pos_dir = self.get_direction(self.initial_map, initial_state_element)
         self.initial_state_dialog = self.parse_dialog(initial_state_element)
 
         if not self.pc_name:
@@ -896,12 +908,16 @@ class GameInfo:
                 map_name = element.attrib['map']
             
             map_pos = None
-            if (map_name and 'location' in element.attrib) or ('x' in element.attrib and 'y' in element.attrib):
+            try:
                 map_pos = self.get_location(map_name, element)
+            except:
+                pass
          
             map_dir = None
-            if 'dir' in element.attrib:
-                map_dir = Direction[element.attrib['dir']]
+            try:
+                map_dir = self.get_direction(map_name, element)
+            except:
+                pass
                
             if element.tag == 'DialogGoTo':
                 if label is not None:

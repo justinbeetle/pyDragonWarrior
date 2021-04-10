@@ -640,7 +640,7 @@
  </tile>
  <tile id="101">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="101" duration="240"/>
@@ -662,7 +662,7 @@
  </tile>
  <tile id="103">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="103" duration="240"/>
@@ -2466,12 +2466,12 @@
  </tile>
  <tile id="403" terrain="1,4,4,4">
   <properties>
-   <property name="type" value="cliff"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="404" terrain="4,1,4,4">
   <properties>
-   <property name="type" value="cliff"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="405">
@@ -3023,7 +3023,7 @@
  </tile>
  <tile id="500" terrain="1,5,1,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="500" duration="240"/>
@@ -3049,7 +3049,7 @@
  </tile>
  <tile id="502" terrain="5,1,1,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="502" duration="240"/>
@@ -3178,12 +3178,12 @@
  </tile>
  <tile id="523" terrain="6,4,4,4">
   <properties>
-   <property name="type" value="cliff"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="524" terrain="4,6,4,4">
   <properties>
-   <property name="type" value="cliff"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="525">
@@ -3735,7 +3735,7 @@
  </tile>
  <tile id="620" terrain="4,5,4,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="620" duration="240"/>
@@ -3761,7 +3761,7 @@
  </tile>
  <tile id="622" terrain="5,4,4,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="plain"/>
   </properties>
   <animation>
    <frame tileid="622" duration="240"/>
@@ -10101,27 +10101,27 @@
  </tile>
  <tile id="1726">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1727">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1728">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1729">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1730">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1760" terrain="1,13,1,1">
@@ -10151,27 +10151,27 @@
  </tile>
  <tile id="1766">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1767">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1768">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1769">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1770">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1800" terrain="1,1,1,13">
@@ -10191,27 +10191,27 @@
  </tile>
  <tile id="1806">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1807">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1808">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1809">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1810">
   <properties>
-   <property name="type" value="path"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1840">

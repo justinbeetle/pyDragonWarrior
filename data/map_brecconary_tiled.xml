@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <LeavingTransition x="1"  y="15" dir="EAST" toMap="overworld"/>
+   <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld"/>
 
    <MapLocation x="13" y="28" name="boy at west gate"/>
    <MapLocation x="19" y="22" name="girl outside blacksmith"/>
    <MapLocation x="28" y="45" name="dying guard"/>
-   <MapLocation x="53" y="28" name="guard at east gate"/>
+   <MapLocation x="53" y="28" dir="WEST" name="guard at east gate"/>
    <MapLocation x="39" y="24" name="boy in house"/>
    <MapLocation x="44" y="25" name="healer"/>
    <MapLocation x="51" y="12" name="warrior in north east corner of town"/>
@@ -20,8 +20,8 @@
    <MapLocation x="20" y="45" name="warrior behind locked door in inn"/>
    <MapLocation x="20" y="18" name="blacksmith"/>
    <MapLocation x="44" y="15" name="fairy water merchant"/>
-   <MapLocation x="45" y="40" name="tool merchant"/>
-   <MapLocation x="25" y="35" name="innkeeper"/>
+   <MapLocation x="45" y="40" dir="SOUTH" name="tool merchant"/>
+   <MapLocation x="25" y="35" dir="SOUTH" name="innkeeper"/>
 
    <xi:include href="map_brecconary_common.xml" parse="xml"/>
 </Map>

@@ -1010,7 +1010,7 @@
  </tile>
  <tile id="200">
   <properties>
-   <property name="type" value="wall"/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="201">
@@ -2265,27 +2265,27 @@
  </tile>
  <tile id="451">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="452">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="453">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="454">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="455">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="456">
@@ -2420,17 +2420,17 @@
  </tile>
  <tile id="482">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="483">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="484">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="485">
@@ -2440,7 +2440,7 @@
  </tile>
  <tile id="486">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="487">
@@ -2730,17 +2730,17 @@
  </tile>
  <tile id="544">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="545">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="546">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="547">
@@ -2870,22 +2870,22 @@
  </tile>
  <tile id="572">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="573">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="574">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="575">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="576">
@@ -3020,47 +3020,47 @@
  </tile>
  <tile id="602">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="603">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="604">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="605">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="606">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="607">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="608">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="609">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="610">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="611">
@@ -3210,7 +3210,7 @@
  </tile>
  <tile id="640">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="641">
@@ -3220,7 +3220,7 @@
  </tile>
  <tile id="642">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="643">

@@ -342,8 +342,7 @@ class GameMap:
 
         # Check if native tile allows movement
         if 0 <= tile.x < self.size().w and 0 <= tile.y < self.size().h:
-            movement_allowed = self.get_tile_info(tile).walkable or \
-                not self.get_tile_info(self.game_state.get_hero_party().get_curr_pos_dat_tile()).walkable
+            movement_allowed = self.get_tile_info(tile).walkable
 
         # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
@@ -387,6 +386,10 @@ class GameMap:
                         break
         # else:
         #   print('Movement not allowed: tile not walkable', flush=True)
+
+        # If the PC is stuck somewhere it shouldn't be able to go, allow it to escape
+        if not movement_allowed and not is_npc and tile != self.game_state.get_hero_party().get_curr_pos_dat_tile():
+            movement_allowed = not self.can_move_to_tile(self.game_state.get_hero_party().get_curr_pos_dat_tile())
 
         return movement_allowed
 
