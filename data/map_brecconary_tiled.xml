@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld"/>
+   <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld" leftX="10" rightX="55" topY="7" bottomY="53"/>
 
    <MapLocation x="13" y="28" name="boy at west gate"/>
    <MapLocation x="19" y="22" name="girl outside blacksmith"/>

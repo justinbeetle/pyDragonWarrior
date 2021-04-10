@@ -581,6 +581,16 @@ class GameInfo:
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in trans_element.attrib:
                     inverse_progress_marker = trans_element.attrib['inverseProgressMarker']
+                bounding_box = None
+                if ('leftX' in trans_element.attrib and
+                        'rightX' in trans_element.attrib and
+                        'topY' in trans_element.attrib and
+                        'bottomY' in trans_element.attrib):
+                    left_x = int(trans_element.attrib['leftX'])
+                    right_x = int(trans_element.attrib['rightX'])
+                    top_y = int(trans_element.attrib['topY'])
+                    bottom_y = int(trans_element.attrib['bottomY'])
+                    bounding_box = pygame.Rect(left_x, top_y, right_x-left_x, bottom_y-top_y)
                 transition = OutgoingTransition(self.get_location(map_name, trans_element),
                                                 self.get_direction(map_name, trans_element),
                                                 name,
@@ -588,7 +598,8 @@ class GameInfo:
                                                 dest_name,
                                                 respawn_decorations,
                                                 progress_marker,
-                                                inverse_progress_marker)
+                                                inverse_progress_marker,
+                                                bounding_box)
                 transitions_by_map[transition.dest_map] = transition
                 if transition.name is not None:
                     if transition.dest_map not in transitions_by_map_and_name:

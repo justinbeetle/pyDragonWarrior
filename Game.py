@@ -384,20 +384,26 @@ class Game:
 
             # Determine if the movement should result in a transition to another map
             map_size = self.game_state.game_map.size()
-            if (self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition is not None
-                and (hero_dest_dat_tile[0] == 0
-                     or hero_dest_dat_tile[1] == 0
-                     or hero_dest_dat_tile[0] == map_size[0] - 1
-                     or hero_dest_dat_tile[1] == map_size[1] - 1)):
-                # Map leaving transition
-                # print('Leaving map', self.gameState.mapState.mapName, flush=True)
-                transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
-            else:
+            if self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition is not None:
+                leaving_transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
+                if leaving_transition.bounding_box:
+                    if not leaving_transition.bounding_box.collidepoint(hero_dest_dat_tile.getAsIntTuple()):
+                        transition = leaving_transition
+                elif (hero_dest_dat_tile[0] == 0
+                      or hero_dest_dat_tile[1] == 0
+                      or hero_dest_dat_tile[0] == map_size[0] - 1
+                      or hero_dest_dat_tile[1] == map_size[1] - 1):
+                    transition = leaving_transition
+            if transition is None:
                 # See if this tile has any associated transitions
                 # TODO: Uncomment following statement to disable coordinate logging
                 print('Check for transitions at', hero_dest_dat_tile, flush=True)
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,
                                                                   filter_to_automatic_transitions=True)
+            else:
+                # Map leaving transition
+                # print('Leaving map', self.gameState.mapState.mapName, flush=True)
+                pass
 
             # Check for tile penalty effects
             if dest_tile_type.hp_penalty > 0 and not self.game_state.hero_party.is_ignoring_tile_penalties():

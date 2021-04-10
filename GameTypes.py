@@ -380,11 +380,12 @@ class OutgoingTransition(NamedTuple):
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
 
+    # Bounding rectangle for the map.  When outside this box, a leaving transition is toggled.
+    bounding_box: Optional[ pygame.Rect] = None
+
     # For point transitions, is the transit automatic or must it be player initiated.
     # If None, default behavior is automatic if light not restricted, else manual.
     is_automatic: Optional[bool] = None
-
-    # TODO: Will need to support leaving transitions which support a bounding box
 
 
 AnyTransition = Union[IncomingTransition, OutgoingTransition]
@@ -463,12 +464,10 @@ class Map(NamedTuple):
     @staticmethod
     def create(name: str,
                dat: List[str]) -> Map:
-        size = Point(len(dat[0]), len(dat))
         return Map(name,
                    None,
                    dat,
                    None,
-                   size,
                    '',
                    None,
                    None,
@@ -481,8 +480,7 @@ class Map(NamedTuple):
                    [],
                    None,
                    [],
-                   False,
-                   size/2)
+                   False)
 
 
 class MonsterAction(NamedTuple):
