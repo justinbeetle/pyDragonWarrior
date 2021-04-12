@@ -2,10 +2,19 @@
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld" leftX="10" rightX="55" topY="7" bottomY="53"/>
 
+   <MapDecoration type="door" x="39" y="27"/>
+   <MapDecoration type="door" x="45" y="27"/>
+   <MapDecoration type="door" x="45" y="43"/>
+   <MapDecoration type="door" x="20" y="21"/>
+   <MapDecoration type="door" x="32" y="37"/>
+   <MapDecoration type="door" x="19" y="39"/> <!-- locked -->
+   <MapDecoration type="door" x="22" y="45"/> <!-- locked -->  <!-- sideways -->
+   <MapDecoration type="door" x="24" y="45"/> <!-- sideways -->
+
    <MapLocation x="13" y="28" name="boy at west gate"/>
    <MapLocation x="19" y="22" name="girl outside blacksmith"/>
-   <MapLocation x="28" y="45" name="dying guard"/>
-   <MapLocation x="53" y="28" dir="WEST" name="guard at east gate"/>
+   <MapLocation x="28" y="45" dir="WEST" name="dying guard"/>
+   <MapLocation x="53" y="28" name="guard at east gate"/>
    <MapLocation x="39" y="24" name="boy in house"/>
    <MapLocation x="44" y="25" name="healer"/>
    <MapLocation x="51" y="12" name="warrior in north east corner of town"/>

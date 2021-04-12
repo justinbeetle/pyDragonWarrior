@@ -41,7 +41,6 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         if self.game_info.maps[map_name].overlay_dat is not None:
             self.overlay_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].overlay_dat)
         self.layers_to_render = self.all_tile_layers
-        self.layers_changed = False
 
     def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.Surface]]]:
 
@@ -89,15 +88,31 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
 
         return map_images
 
+    def set_pc_character_tile(self, pos_dat_tile: Point) -> bool:
+        """
+        :param pos_dat_tile: Tile position of player character
+        :return: If a redraw of the map is needed for the new PC position
+        """
+        layers_to_render_orig = self.visible_tile_layers
+        if self.is_interior(pos_dat_tile):
+            self.set_tile_layers_to_render(self.base_tile_layers)
+        else:
+            self.set_tile_layers_to_render(self.all_tile_layers)
+        return layers_to_render_orig != self.visible_tile_layers
+
+    def is_interior(self, pos_dat_tile: Point) -> bool:
+        for l in self.overlay_tile_layers:
+            if self._get_tile_image(pos_dat_tile.x, pos_dat_tile.y, l,
+                                    image_indexing=False, limit_to_visible=False) is not None:
+                return True
+        return False
+
+    def is_exterior(self, pos_dat_tile: Point) -> bool:
+        return not self.is_interior(pos_dat_tile)
+
     def set_tile_layers_to_render(self, layers_to_render):
         if self.layers_to_render != layers_to_render:
             self.layers_to_render = layers_to_render
-            self.layers_changed = True
-
-    def have_layers_changed(self) -> bool:
-        ret_val = self.layers_changed
-        self.layers_changed = False
-        return ret_val
 
     def decrement_layers_to_render(self):
         self.layers_to_render = self.base_tile_layers

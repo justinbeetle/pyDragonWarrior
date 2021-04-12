@@ -45,7 +45,6 @@ class MapDecorationSprite(MapSprite):
 
 
 class CharacterSprite(MapSprite):
-
     def __init__(self, character: MapCharacterState) -> None:
         super().__init__()
         self.character = character
@@ -209,12 +208,7 @@ class GameMap:
                            self.map_data.tile_size + self.game_state.get_hero_party().get_curr_pos_offset_img_px())
 
         # Detect if the hero is eclipsed by the over layer(s).  If so, do not render those layers.
-        if self.is_interior():
-            layers_to_render = self.map_data.base_tile_layers
-        else:
-            layers_to_render = self.map_data.all_tile_layers
-        if layers_to_render != self.map_data.visible_tile_layers:
-            self.map_data.set_tile_layers_to_render(layers_to_render)
+        if self.map_data.set_pc_character_tile(self.game_state.get_hero_party().get_curr_pos_dat_tile()):
             self.map_layer.redraw_tiles(self.map_layer._buffer)
 
         # tell the map_layer (BufferedRenderer) to draw to the surface
@@ -409,11 +403,7 @@ class GameMap:
     def is_interior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         if pos_dat_tile is None:
             pos_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
-        for l in self.map_data.overlay_tile_layers:
-            if self.map_data._get_tile_image(pos_dat_tile.x, pos_dat_tile.y, l,
-                                             image_indexing=False, limit_to_visible=False) is not None:
-                return True
-        return False
+        return self.map_data.is_interior(pos_dat_tile)
 
     def is_exterior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         return not self.is_interior(pos_dat_tile)
