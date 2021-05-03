@@ -187,7 +187,7 @@ class GameDialog:
             Point(-1, 1),
             None,
             'COMMANDS',
-            ['TALK', 'STAIRS', 'SPELL', 'STATUS', 'SEARCH', 'ITEM'],
+            ['TALK', 'SPELL', 'ITEM', 'STATUS', 'SEARCH', 'OPEN'],
             3)
 
     @staticmethod
@@ -198,7 +198,7 @@ class GameDialog:
         return GameDialog.create_menu_dialog(
             Point(-1, 1),
             Point(
-                GameDialog.get_size_for_menu(['TALK', 'STAIRS', 'SPELL', 'STATUS', 'SEARCH', 'ITEM'], 3, title).w,
+                GameDialog.get_size_for_menu(['TALK', 'SPELL', 'ITEM', 'STATUS', 'SEARCH', 'OPEN'], 3, title).w,
                 GameDialog.get_size_for_menu(options, num_cols, title).h),
             title,
             options,

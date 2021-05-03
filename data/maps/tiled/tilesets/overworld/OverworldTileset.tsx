@@ -10244,5 +10244,169 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1964" terrain=",1,,"/>
+ <tile id="1920">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1921">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1922">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1923">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1924">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1925">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1926">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1927">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1960">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1961">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1962">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1963">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1964" terrain=",1,,">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1965">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1966">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="1967">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2000">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2001">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2002">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2003">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2004">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2005">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2006">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2007">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2040">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2041">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2042">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2043">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2044">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2045">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2046">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2047">
+  <properties>
+   <property name="type" value="walls"/>
+  </properties>
+ </tile>
+ <tile id="2080">
+  <properties>
+   <property name="type" value="path"/>
+  </properties>
+ </tile>
 </tileset>

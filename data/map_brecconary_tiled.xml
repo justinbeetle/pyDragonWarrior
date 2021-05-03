@@ -2,14 +2,15 @@
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld" leftX="10" rightX="55" topY="7" bottomY="53"/>
 
-   <MapDecoration type="door" x="39" y="27"/>
-   <MapDecoration type="door" x="45" y="27"/>
-   <MapDecoration type="door" x="45" y="43"/>
-   <MapDecoration type="door" x="20" y="21"/>
-   <MapDecoration type="door" x="32" y="37"/>
-   <MapDecoration type="door" x="19" y="39"/> <!-- locked -->
-   <MapDecoration type="door" x="22" y="45"/> <!-- locked -->  <!-- sideways -->
-   <MapDecoration type="door" x="24" y="45"/> <!-- sideways -->
+   <MapDecoration type="unlocked_wood_door" x="39" y="27"/>
+   <MapDecoration type="unlocked_wood_door" x="45" y="27"/>
+   <MapDecoration type="unlocked_wood_door" x="45" y="43"/>
+   <MapDecoration type="unlocked_wood_door" x="20" y="21"/>
+   <MapDecoration type="unlocked_wood_door" x="32" y="37"/>
+   <MapDecoration type="unlocked_sideways_wood_door" x="24" y="45"/>
+   <MapDecoration type="locked_wood_door" x="43" y="20"/>
+   <MapDecoration type="locked_wood_door" x="19" y="39"/>
+   <MapDecoration type="locked_sideways_wood_door" x="22" y="45"/>
 
    <MapLocation x="13" y="28" name="boy at west gate"/>
    <MapLocation x="19" y="22" name="girl outside blacksmith"/>
@@ -28,7 +29,7 @@
    <MapLocation x="28" y="17" name="merchant walking around north side of town"/>
    <MapLocation x="20" y="45" name="warrior behind locked door in inn"/>
    <MapLocation x="20" y="18" name="blacksmith"/>
-   <MapLocation x="44" y="15" name="fairy water merchant"/>
+   <MapLocation x="46" y="17" name="fairy water merchant"/>
    <MapLocation x="45" y="40" dir="SOUTH" name="tool merchant"/>
    <MapLocation x="25" y="35" dir="SOUTH" name="innkeeper"/>
 

@@ -36,8 +36,24 @@
       <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <!--<Decoration name="castle_stone_tall_B" image="castle_stone_tall_B.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
       <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeSound="openChest.wav"/>
-      <Decoration name="door" image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+
+      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
+
+      <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="yes" removeWithOpen="no" removeSound="openChest.wav"/>
+      <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="yes" removeWithOpen="no" removeSound="openChest.wav"/>
+
+      <Decoration name="door"                   image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+
+      <Decoration name="locked_wood_door"             image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="locked_sideways_wood_door"    image="door_wood_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="unlocked_wood_door"           image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="unlocked_sideways_wood_door"  image="door_wood_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+
+      <Decoration name="locked_metal_door"            image="door_metal.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="locked_sideways_metal_door"   image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="unlocked_metal_door"          image="door_metal.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+      <Decoration name="unlocked_sideways_metal_door" image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+
       <Decoration name="shrine_stone_A" image="shrine_stone_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="shrine_stone_B" image="shrine_stone_B.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="downstairs" image="stairs_down.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>

@@ -173,6 +173,7 @@ class Game:
                 menu = False
                 talking = False
                 searching = False
+                opening = False
 
                 if event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
@@ -217,6 +218,10 @@ class Game:
                     # print('menu_result =', menu_result, flush=True)
                     if menu_result == 'TALK':
                         talking = True
+                    elif menu_result == 'SEARCH':
+                        searching = True
+                    elif menu_result == 'OPEN':
+                        opening = True
                     elif menu_result == 'STAIRS':
                         if not self.game_state.make_map_transition(self.game_state.get_point_transition()):
                             self.gde.dialog_loop('There are no stairs here.')
@@ -224,8 +229,6 @@ class Game:
                         GameDialog.create_full_status_dialog(
                             self.game_state.hero_party).blit(self.game_state.screen, True)
                         self.gde.wait_for_acknowledgement()
-                    elif menu_result == 'SEARCH':
-                        searching = True
                     elif menu_result == 'SPELL':
                         # TODO: Need to choose the actor (spellcaster)
                         actor = self.game_state.hero_party.main_character
@@ -322,13 +325,6 @@ class Game:
                     pygame.display.flip()
 
                 if talking:
-                    talk_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile\
-                                       + self.game_state.hero_party.members[0].direction.get_vector()
-                    talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
-                    if talk_dest_tile_type.can_talk_over:
-                        talk_dest_dat_tile = talk_dest_dat_tile \
-                                             + self.game_state.hero_party.members[0].direction.get_vector()
-                    dialog: DialogType = ['There is no one there.']
                     npc = self.game_state.get_npc_to_talk_to()
                     if npc:
                         if npc.dialog is not None:
@@ -338,17 +334,33 @@ class Game:
                             dialog = ['They pay you no mind.']
                     self.gde.dialog_loop(dialog)
 
-                if searching:
-                    dialog = ['[NAME] searched the ground and found nothing.']
-                    for decoration in self.game_state.get_decorations():
-                        if (decoration.type is not None
-                                and decoration.type.remove_with_search):
+                if searching or opening:
+                    decorations = self.game_state.get_decorations()
+                    if searching:
+                        dialog = ['[NAME] searched the ground and found nothing.']
+                    else:
+                        dialog = ['[NAME] found nothing to open.']
+                        dest_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile\
+                                    + self.game_state.hero_party.members[0].direction.get_vector()
+                        decorations += self.game_state.get_decorations(dest_tile)
+
+                    for decoration in decorations:
+                        if decoration.type is None:
+                            continue
+
+                        if ((searching and decoration.type.remove_with_search) or
+                            (opening and decoration.type.remove_with_open)):
                             if decoration.type.remove_sound is not None:
                                 AudioPlayer().play_sound(decoration.type.remove_sound)
                             self.game_state.remove_decoration(decoration)
 
-                        if decoration.dialog is not None:
-                            dialog = decoration.dialog
+                            if decoration.dialog is not None:
+                                dialog = decoration.dialog
+                            else:
+                                dialog = []
+                            break
+                        elif decoration.type.remove_with_key:
+                            dialog = ['It is locked.']
                             break
 
                     self.gde.dialog_loop(dialog)

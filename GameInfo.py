@@ -285,6 +285,7 @@ class GameInfo:
             height_tiles = 1
             walkable = True
             remove_with_search = False
+            remove_with_open = False
             remove_with_key = False
             remove_sound = None
             if 'widthTiles' in element.attrib:
@@ -295,6 +296,8 @@ class GameInfo:
                 walkable = element.attrib['walkable'] == 'yes'
             if 'removeWithSearch' in element.attrib:
                 remove_with_search = element.attrib['removeWithSearch'] == 'yes'
+            if 'removeWithOpen' in element.attrib:
+                remove_with_open = element.attrib['removeWithOpen'] == 'yes'
             if 'removeWithKey' in element.attrib:
                 remove_with_key = element.attrib['removeWithKey'] == 'yes'
             if 'removeSound' in element.attrib:
@@ -318,6 +321,7 @@ class GameInfo:
                                                            decoration_image_scaled,
                                                            walkable,
                                                            remove_with_search,
+                                                           remove_with_open,
                                                            remove_with_key,
                                                            remove_sound)
 

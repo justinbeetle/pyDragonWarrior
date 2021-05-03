@@ -348,6 +348,7 @@ class Decoration(NamedTuple):
     image: pygame.surface.Surface
     walkable: bool = True
     remove_with_search: bool = False
+    remove_with_open: bool = False
     remove_with_key: bool = False
     remove_sound: Optional[str] = None
 
@@ -385,7 +386,8 @@ class OutgoingTransition(NamedTuple):
 
     # For point transitions, is the transit automatic or must it be player initiated.
     # If None, default behavior is automatic if light not restricted, else manual.
-    is_automatic: Optional[bool] = None
+    # CHANGED DEFAULT TO TRUE AS THE STAIRS COMMAND HAS BEEN REMOVED
+    is_automatic: Optional[bool] = True
 
 
 AnyTransition = Union[IncomingTransition, OutgoingTransition]
@@ -651,58 +653,6 @@ class Problem(NamedTuple):
     problem: str
     answer: str
     answer_allowed_characters: Optional[str] = None
-
-
-'''
-class GameInfo:
-    def __init__(self, tile_size_pixels: int):
-        self.tile_size_pixels = tile_size_pixels
-        self.saves_path = './'
-
-        self.dialog_sequences: Dict[str, DialogType] = {}
-
-        # Item info
-        self.weapons: Dict[str, Weapon] = {}
-        self.armors: Dict[str, Armor] = {}
-        self.shields: Dict[str, Shield] = {}
-        self.tools: Dict[str, Tool] = {}
-        self.items: Dict[str, ItemType] = {}  # Super set of all of the above
-
-        # Player character info
-        self.spells: Dict[str, Spell] = {}
-        self.character_types: Dict[str, CharacterType] = {}
-
-        # Monster info
-        self.default_monster_action
-        self.monsters: Dict[str, MonsterInfo] = {}
-        self.monster_sets: Dict[str, List[str]] = {}
-
-        # Map info
-        self.tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
-        self.tiles: Dict[str, Tile] = {}
-        self.decorations: Dict[str, Decoration] = {}
-        self.maps: Dict[str, Map] = {}
-
-        # New game info
-        # TODO: Replace most of this with a HeroParty
-        self.pc_name
-        self.initial_map
-        self.initial_hero_pos_dat_tile
-        self.initial_hero_pos_dir = Direction[initial_state_element.attrib['dir']]
-        self.initial_state_dialog
-        self.pc_xp = 0
-        self.pc_gp = 0
-        self.pc_hp = None
-        self.pc_mp = None
-        self.new_game_dialog
-        
-        # Death info
-        self.death_map = death_state_element.attrib['map']
-        self.death_hero_pos_dat_tile = Point(int(death_state_element.attrib['x']),
-                                             int(death_state_element.attrib['y']))
-        self.death_hero_pos_dir = Direction[death_state_element.attrib['dir']]
-        self.death_dialog = self.parse_dialog(death_state_element)
-'''
 
 
 def main() -> None:
