@@ -9979,6 +9979,36 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
+ <tile id="1660">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1661">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1662">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1663">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1664">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1665">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
  <tile id="1680" terrain="1,1,1,13">
   <properties>
    <property name="type" value="path"/>

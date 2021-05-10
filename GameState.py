@@ -402,7 +402,8 @@ class GameState(GameStateInterface):
     def draw_map(self,
                  flip_buffer: bool=True,
                  draw_background: bool=True,
-                 draw_combat: bool=True) -> None:
+                 draw_combat: bool=True,
+                 draw_status: bool=True) -> None:
         # Draw the map to the screen
         if draw_background:
             self.game_map.draw()
@@ -411,15 +412,30 @@ class GameState(GameStateInterface):
         if draw_combat and self.combat_encounter is not None:
             self.combat_encounter.background_image = self.screen.copy()
             self.combat_encounter.render_monsters()
+        elif draw_background and draw_status:
+            # TODO: Do we want to always show a status dialog?  If so, exploring or encounter?
+            GameDialog.create_encounter_status_dialog(
+                self.hero_party).blit(self.screen, False)
 
         # Flip the screen buffer
         if flip_buffer:
             pygame.display.flip()
 
-    def advance_tick(self) -> None:
-        self.game_map.update()
-        self.draw_map()
-        pygame.time.Clock().tick(40)
+    def advance_tick(self,
+                     update_map: bool=True,
+                     draw_map: bool=True,
+                     advance_time: bool=True,
+                     flip_buffer: bool=True) -> None:
+        if update_map:
+            self.game_map.update()
+
+        if draw_map:
+            self.draw_map(flip_buffer=flip_buffer)
+        elif flip_buffer:
+            pygame.display.flip()
+
+        if advance_time:
+            pygame.time.Clock().tick(40)
 
     def get_game_info(self) -> GameInfo:
         return self.game_info

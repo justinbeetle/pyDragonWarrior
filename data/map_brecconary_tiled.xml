@@ -1,37 +1,37 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <LeavingTransition x="11"  y="29" dir="EAST" toMap="overworld" leftX="10" rightX="55" topY="7" bottomY="53"/>
+   <LeavingTransition x="23"  y="29" dir="EAST" toMap="overworld" leftX="10" rightX="67" topY="7" bottomY="53"/>
 
-   <MapDecoration type="unlocked_wood_door" x="39" y="27"/>
-   <MapDecoration type="unlocked_wood_door" x="45" y="27"/>
-   <MapDecoration type="unlocked_wood_door" x="45" y="43"/>
-   <MapDecoration type="unlocked_wood_door" x="20" y="21"/>
-   <MapDecoration type="unlocked_wood_door" x="32" y="37"/>
-   <MapDecoration type="unlocked_sideways_wood_door" x="24" y="45"/>
-   <MapDecoration type="locked_wood_door" x="43" y="20"/>
-   <MapDecoration type="locked_wood_door" x="19" y="39"/>
-   <MapDecoration type="locked_sideways_wood_door" x="22" y="45"/>
+   <MapDecoration type="unlocked_wood_door" x="51" y="27"/>
+   <MapDecoration type="unlocked_wood_door" x="57" y="27"/>
+   <MapDecoration type="unlocked_wood_door" x="57" y="43"/>
+   <MapDecoration type="unlocked_wood_door" x="32" y="21"/>
+   <MapDecoration type="unlocked_wood_door" x="44" y="37"/>
+   <MapDecoration type="unlocked_sideways_wood_door" x="36" y="45"/>
+   <MapDecoration type="locked_wood_door" x="55" y="20"/>
+   <MapDecoration type="locked_wood_door" x="31" y="39"/>
+   <MapDecoration type="locked_sideways_wood_door" x="34" y="45"/>
 
-   <MapLocation x="13" y="28" name="boy at west gate"/>
-   <MapLocation x="19" y="22" name="girl outside blacksmith"/>
-   <MapLocation x="28" y="45" dir="WEST" name="dying guard"/>
-   <MapLocation x="53" y="28" name="guard at east gate"/>
-   <MapLocation x="39" y="24" name="boy in house"/>
-   <MapLocation x="44" y="25" name="healer"/>
-   <MapLocation x="51" y="12" name="warrior in north east corner of town"/>
-   <MapLocation x="45" y="46" name="boy outside tool shop"/>
-   <MapLocation x="33" y="46" name="girl walking around south side of town"/>
-   <MapLocation x="41" y="40" name="boy walking around island"/>
-   <MapLocation x="30" y="24" name="sage walking around north side of town"/>
-   <MapLocation x="28" y="32" name="boy walking around south side of town"/>
-   <MapLocation x="39" y="30" name="warrior walking around south side of town"/>
-   <MapLocation x="34" y="13" name="warrior walking around north side of town"/>
-   <MapLocation x="28" y="17" name="merchant walking around north side of town"/>
-   <MapLocation x="20" y="45" name="warrior behind locked door in inn"/>
-   <MapLocation x="20" y="18" name="blacksmith"/>
-   <MapLocation x="46" y="17" name="fairy water merchant"/>
-   <MapLocation x="45" y="40" dir="SOUTH" name="tool merchant"/>
-   <MapLocation x="25" y="35" dir="SOUTH" name="innkeeper"/>
+   <MapLocation x="25" y="28" name="boy at west gate"/>
+   <MapLocation x="31" y="22" name="girl outside blacksmith"/>
+   <MapLocation x="40" y="45" dir="WEST" name="dying guard"/>
+   <MapLocation x="65" y="28" name="guard at east gate"/>
+   <MapLocation x="51" y="24" name="boy in house"/>
+   <MapLocation x="56" y="25" name="healer"/>
+   <MapLocation x="63" y="13" name="warrior in north east corner of town"/>
+   <MapLocation x="57" y="46" name="boy outside tool shop"/>
+   <MapLocation x="45" y="46" name="girl walking around south side of town"/>
+   <MapLocation x="53" y="40" name="boy walking around island"/>
+   <MapLocation x="42" y="24" name="sage walking around north side of town"/>
+   <MapLocation x="40" y="32" name="boy walking around south side of town"/>
+   <MapLocation x="51" y="30" name="warrior walking around south side of town"/>
+   <MapLocation x="46" y="13" name="warrior walking around north side of town"/>
+   <MapLocation x="40" y="17" name="merchant walking around north side of town"/>
+   <MapLocation x="32" y="45" name="warrior behind locked door in inn"/>
+   <MapLocation x="32" y="18" name="blacksmith"/>
+   <MapLocation x="58" y="17" name="fairy water merchant"/>
+   <MapLocation x="57" y="40" dir="SOUTH" name="tool merchant"/>
+   <MapLocation x="37" y="35" dir="SOUTH" name="innkeeper"/>
 
    <xi:include href="map_brecconary_common.xml" parse="xml"/>
 </Map>
