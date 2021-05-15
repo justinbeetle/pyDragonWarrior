@@ -249,7 +249,7 @@ class GameMap:
 
         if isinstance(self.map_data, PaddedTiledMapData):
             tile_name = None
-            for l in self.map_data.visible_tile_layers:
+            for l in self.map_data.base_tile_layers:
                 tile_properties = self.map_data.get_tile_properties(tile.x, tile.y, l)
                 if tile_properties is not None and 'type' in tile_properties and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
@@ -337,6 +337,7 @@ class GameMap:
         # Check if native tile allows movement
         if 0 <= tile.x < self.size().w and 0 <= tile.y < self.size().h:
             movement_allowed = self.get_tile_info(tile).walkable
+            # print('Tile info =', self.get_tile_info(tile), self.get_tile_info(tile), flush=True)
 
         # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
@@ -379,7 +380,7 @@ class GameMap:
                         # print('Movement not allowed: NPC in the way', flush=True)
                         break
         # else:
-        #   print('Movement not allowed: tile not walkable', flush=True)
+        #     print('Movement not allowed: tile not walkable', flush=True)
 
         # If the PC is stuck somewhere it shouldn't be able to go, allow it to escape
         if not movement_allowed and not is_npc and tile != self.game_state.get_hero_party().get_curr_pos_dat_tile():
@@ -418,7 +419,7 @@ class GameMap:
                 return True
         return False
 
-    def open_door(self) -> None:
+    def open_door(self) ->  Optional[MapDecoration]:
         door_open_dest_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile() \
                                   + self.game_state.get_hero_party().get_direction().get_vector()
         for decoration in self.map_decorations:
@@ -427,9 +428,10 @@ class GameMap:
                     and decoration.type.remove_with_key):
                 if decoration.type.remove_sound is not None:
                     AudioPlayer().play_sound(decoration.type.remove_sound)
-                self.remove_decoration(decoration)
+                return self.remove_decoration(decoration)
+        return None
 
-    def remove_decoration(self, decoration: MapDecoration) -> None:
+    def remove_decoration(self, decoration: MapDecoration) -> Optional[MapDecoration]:
         # Remove the decoration from the map (if present)
         if decoration in self.map_decorations:
             self.map_decorations.remove(decoration)
@@ -437,6 +439,9 @@ class GameMap:
             for sprite in self.group.remove_sprites_of_layer(self.map_data.decoration_layer):
                 if sprite.decoration != decoration:
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
+
+            return decoration
+        return None
 
 
 class MapViewer:

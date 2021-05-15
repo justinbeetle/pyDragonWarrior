@@ -394,10 +394,18 @@ class GameState(GameStateInterface):
         return self.game_map.is_facing_door()
 
     def open_door(self) -> None:
-        self.game_map.open_door()
+        removed_decoration = self.game_map.open_door()
+        if removed_decoration:
+            if self.get_map_name() not in self.removed_decorations_by_map:
+                self.removed_decorations_by_map[self.get_map_name()] = []
+            self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
 
     def remove_decoration(self, decoration: MapDecoration) -> None:
-        self.game_map.remove_decoration(decoration)
+        removed_decoration = self.game_map.remove_decoration(decoration)
+        if removed_decoration:
+            if self.get_map_name() not in self.removed_decorations_by_map:
+                self.removed_decorations_by_map[self.get_map_name()] = []
+            self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
 
     def draw_map(self,
                  flip_buffer: bool=True,
