@@ -78,7 +78,7 @@ class GameInfo:
 
         # Parse map locations
         self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
-        for element in xml_root.findall("./Maps/Map"):
+        for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
             map_locations: Dict[str, NamedLocation] = {}
             for location_element in element.findall('MapLocation'):
@@ -546,7 +546,7 @@ class GameInfo:
 
         # Parse maps
         self.maps: Dict[str, Map] = {}
-        for element in xml_root.findall("./Maps/Map"):
+        for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
             # print( 'mapName =', map_name, flush=True )
             music = element.attrib['music']

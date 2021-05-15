@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations_20" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Tiles>
@@ -76,6 +76,7 @@
    <xi:include href="data/levels.xml" parse="xml"/>
 
    <CharacterTypes>
+      <!-- 
       <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
       <CharacterType type="hero_sword"             image="hero_sword.png"/>
       <CharacterType type="hero_shield"            image="hero_shield.png"/>
@@ -92,8 +93,8 @@
       <CharacterType type="merchant"               image="merchant.png"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
+      -->
 
-      <!-- 
       <CharacterType type="hero"                   image="vx_chara01_b11.png"         phases="3" levels="hero"/>
       <CharacterType type="hero_sword"             image="vx_chara01_b11.png"         phases="3"/>
       <CharacterType type="hero_shield"            image="vx_chara01_b11.png"         phases="3"/>
@@ -110,7 +111,6 @@
       <CharacterType type="merchant"               image="vx_chara02_b13.png"         phases="3"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"              phases="2"/>
       <CharacterType type="dragonlord"             image="vx_chara03_b12.png"         phases="3"/>
-      -->
 
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
       <CharacterType type="mocha"                  image="mocha.png"                  phases="2" levels="cat"/>
@@ -745,17 +745,8 @@
             <Dialog>"Thou may go and search.  From Tantegel Castle travel 70 leagues to the south and 40 to the east."</Dialog></NonPlayerCharacter>
       </Map>
 
-      <Map name="erdricks_tomb_lvl1" tiles="erdricks_tomb_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"            x="2"   y="2"   dir="EAST"  toMap="overworld"/>
-         <PointTransition decoration="downstairs"          x="11"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl2"/>
-      </Map>
-
-      <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
-         <PointTransition decoration="upstairs"            x="10"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl1"/>
-         <MapDecoration type="chest" x="11" y="5">
-            <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
-            <Dialog>The tablet reads as follows:  "I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!"</Dialog></MapDecoration>
-      </Map>
+      <!--<xi:include href="data/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/map_erdricks_tomb_tiled.xml" parse="xml"/>
 
       <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
@@ -1653,7 +1644,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Dialog>[ACTOR] cast the spell of repel.</Dialog>
          <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-         <DialogAction type="REPEL_MONSTERS" decay="12"><FadeDialog><Dialog>Repel has lost its effect.</Dialog></FadeDialog></DialogAction></Spell>
+         <DialogAction type="REPEL_MONSTERS" decay="128"><FadeDialog><Dialog>Repel has lost its effect.</Dialog></FadeDialog></DialogAction></Spell>
 
       <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
          <Dialog>[ACTOR] cast the spell of healmore.</Dialog>

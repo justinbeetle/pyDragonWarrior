@@ -73,7 +73,7 @@ python -m pip install --upgrade numpy
 python -m pip install numpy==1.19.3
 
 python -m mypy Game.py --strict --ignore-missing-imports
-/c/users/justin/appdata/local/programs/python/python37/Scripts/pyinstaller.exe -n pyDragonWarrior --add-data "game.xml;./" --add-data "data;data" Game.py
+/c/users/justin/appdata/local/programs/python/python39/Scripts/pyinstaller.exe -n pyDragonWarrior --add-data "game.xml;./" --add-data "data;data" Game.py
 cd dist
 tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
