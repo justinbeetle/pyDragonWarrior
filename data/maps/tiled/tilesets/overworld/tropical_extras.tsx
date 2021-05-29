@@ -6,67 +6,67 @@
  </terraintypes>
  <tile id="0" terrain=",,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="1" terrain=",,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="2" terrain=",,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="3" terrain=",0,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="4" terrain="0,,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="5" terrain="0,0,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="6">
   <properties>
-   <property name="type" value="mountain"/>
+   <property name="type" value="volcano"/>
   </properties>
  </tile>
  <tile id="7">
   <properties>
-   <property name="type" value="mountain"/>
+   <property name="type" value="volcano"/>
   </properties>
  </tile>
  <tile id="8" terrain=",0,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="9" terrain="0,0,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="10" terrain="0,,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="11" terrain="0,0,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="12" terrain="0,0,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="13">
@@ -76,37 +76,37 @@
  </tile>
  <tile id="14">
   <properties>
-   <property name="type" value="mountain"/>
+   <property name="type" value="volcano"/>
   </properties>
  </tile>
  <tile id="15">
   <properties>
-   <property name="type" value="mountain"/>
+   <property name="type" value="volcano"/>
   </properties>
  </tile>
  <tile id="16" terrain=",0,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="17" terrain="0,0,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="18" terrain="0,,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="19" terrain=",0,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="20" terrain="0,,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="21">
@@ -126,32 +126,32 @@
  </tile>
  <tile id="24">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="25">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="26">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="27">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="28">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="29">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="30">

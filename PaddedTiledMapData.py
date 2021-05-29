@@ -257,6 +257,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
             l = l - self.overlay_layer_offset
         if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
             return None
+        x = min(max(0, x), self.tmx.width-1)
+        y = min(max(0, y), self.tmx.height-1)
         return self.tmx.get_tile_properties(x, y, l)
 
     def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):

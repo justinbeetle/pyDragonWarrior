@@ -15,9 +15,9 @@ from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterTyp
     DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
-    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, GameTypes, ItemType, Level, Map, \
-    MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, NamedLocation, NpcInfo, \
-    OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
+    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, EncounterBackground, GameTypes,\
+    ItemType, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, \
+    NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
 
 from Point import Point
 
@@ -75,6 +75,11 @@ class GameInfo:
             self.title_music = title_element.attrib['music']
             title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
             self.title_image = pygame.image.load(title_image_file_name).convert()
+
+        # Parse the encounter background images
+        self.encounter_backgrounds: Dict[str, EncounterBackground]
+        for image_filename  in os.listdir(encounter_path):
+            print(image_filename)
 
         # Parse map locations
         self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation

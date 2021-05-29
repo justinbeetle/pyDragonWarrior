@@ -3,7 +3,7 @@
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
       <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
       <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
       <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
@@ -11,7 +11,7 @@
       <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
       <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
       <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
+      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/> <!-- spawnRate="1/24" -->
       <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
       <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
       <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
@@ -21,7 +21,20 @@
       <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
       <Tile name="darkness" image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
 
+      <Tile name="beach"                                    walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="beach_walkable"                           walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
+      <Tile name="shore"                                    walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="shore_walkable"                           walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="shore_cliff"                              walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="shore_cliff_walkable"                     walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="river"                                    walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="river_walkable"                           walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
+      <Tile name="volcano"                                  walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="deciduous_forest"                         walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
+      <Tile name="pine_forest"                              walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
+      <Tile name="jungle"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
       <Tile name="cliff"                                    walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="cliff_walkable"                           walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
       <Tile name="gate"                                     walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
       <Tile name="walls"                                    walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
    </Tiles>
@@ -748,7 +761,7 @@
       <!--<xi:include href="data/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
       <xi:include href="data/map_erdricks_tomb_tiled.xml" parse="xml"/>
 
-      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="A"/>
          <PointTransition decoration="downstairs" name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="B"/>
@@ -759,7 +772,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="14"  y="14"  dir="SOUTH" toMap="mountain_cave_lvl1" toName="C"/>
@@ -776,7 +789,7 @@
             <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
 
-      <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="N" x="2"   y="2"   dir="SOUTH" toMap="overworld" toName="N"/>
          <PointTransition decoration="upstairs"   name="S" x="2"   y="32"  dir="EAST"  toMap="overworld" toName="S"/>
          <MapDecoration type="door"  x="7"  y="22"/>
@@ -855,7 +868,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="14" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="8"   y="13"  dir="EAST"  toMap="garinham"/>
          <PointTransition decoration="downstairs"          x="3"   y="20"  dir="WEST"  toMap="garins_grave_lvl2"/>
          <MapDecoration type="door"  x="19" y="19"/>
@@ -868,7 +881,7 @@
          <MapDecoration type="chest" x="15" y="2"><DialogGoTo label="herb_chest"/></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="13"  y="4"   dir="EAST"  toMap="garins_grave_lvl1"/>
          <PointTransition decoration="downstairs" name="C" x="3"   y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="C"/>
          <PointTransition decoration="downstairs" name="B" x="14"  y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="B"/>
@@ -877,7 +890,7 @@
          <PointTransition decoration="downstairs" name="F" x="14"  y="12"  dir="WEST"  toMap="garins_grave_lvl3" toName="F"/>
       </Map>
 
-      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="15" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="C" x="16"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="C"/>
          <PointTransition decoration="upstairs"   name="B" x="20"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="B"/>
          <PointTransition decoration="upstairs"   name="D" x="8"   y="13"  dir="EAST"  toMap="garins_grave_lvl2" toName="D"/>
@@ -895,12 +908,12 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="15" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="15" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="G" x="2"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="G"/>
          <PointTransition decoration="upstairs"   name="H" x="7"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="H"/>
       </Map>
 
-      <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="16" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <LeavingTransition                                x="11"  y="20"  dir="NORTH" toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="11"  y="2"   dir="WEST"  toMap="charlock_lvl2"  toName="A" progressMarker="PM_Found_Secret_Passage"/>
          <PointTransition decoration="downstairs" name="B" x="5"   y="15"  dir="WEST"  toMap="charlock_lvl2"  toName="B"/>
@@ -920,7 +933,7 @@
             <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
       </Map>
 
-      <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="16" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="16" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl1"  toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="10"  y="15"  dir="EAST"  toMap="charlock_lvl1"  toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="19"  y="17"  dir="EAST"  toMap="charlock_lvl1"  toName="C"/>
@@ -933,7 +946,7 @@
          <PointTransition decoration="downstairs" name="J" x="10"  y="21"  dir="WEST"  toMap="charlock_lvl3"  toName="J"/>
       </Map>
 
-      <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="17" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="F" x="10"  y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="F"/>
          <PointTransition decoration="upstairs"   name="D" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="D"/>
          <PointTransition decoration="upstairs"   name="G" x="6"   y="6"   dir="EAST"  toMap="charlock_lvl2"  toName="G"/>
@@ -952,7 +965,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="17" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="K" x="9"   y="2"   dir="EAST"  toMap="charlock_lvl3"  toName="K"/>
          <PointTransition decoration="upstairs"   name="L" x="4"   y="4"   dir="EAST"  toMap="charlock_lvl3"  toName="L"/>
          <PointTransition decoration="upstairs"   name="M" x="7"   y="6"   dir="EAST"  toMap="charlock_lvl3"  toName="M"/>
@@ -961,31 +974,31 @@
          <PointTransition decoration="downstairs" name="P" x="9"   y="9"   dir="WEST"  toMap="charlock_lvl5"  toName="P"/>
       </Map>
 
-      <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="11_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_5).ogg" monsterSet="17" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="11_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_5).ogg" monsterSet="17" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="O" x="2"   y="11"  dir="EAST"  toMap="charlock_lvl4"  toName="O"/>
          <PointTransition decoration="upstairs"   name="P" x="9"   y="9"   dir="EAST"  toMap="charlock_lvl4"  toName="P"/>
          <PointTransition decoration="downstairs" name="R" x="10"  y="3"   dir="WEST"  toMap="charlock_lvl6"  toName="R"/>
          <PointTransition decoration="downstairs" name="Q" x="4"   y="4"   dir="WEST"  toMap="charlock_lvl6"  toName="Q"/>
       </Map>
 
-      <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="12_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_6).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="12_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_6).ogg" monsterSet="18" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="R" x="6"   y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="R"/>
          <PointTransition decoration="upstairs"   name="Q" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="Q"/>
          <PointTransition decoration="downstairs" name="T" x="2"   y="2"   dir="WEST"  toMap="charlock_lvl7a" toName="T"/>
          <PointTransition decoration="downstairs" name="S" x="7"   y="7"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="T" x="2"   y="4"   dir="EAST"  toMap="charlock_lvl6"  toName="T"/>
          <PointTransition decoration="downstairs" name="U" x="11"  y="4"   dir="WEST"  toMap="charlock_lvl8"  toName="U"/>
       </Map>
 
-      <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" encounterBackground="darkness.png" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="S" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl6"  toName="S"/>
          <PointTransition decoration="downstairs"          x="11"  y="2"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" monsterSet="18" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" monsterSet="18" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"   name="U" x="10"  y="29"  dir="NORTH" toMap="charlock_lvl7a" toName="U"/>
 
          <MapDecoration type="door"  x="17" y="12"/>
@@ -1042,7 +1055,7 @@
                   </DialogAction></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
-      <Map name="bat_cave_lvl1" tiles="bat_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="bat_cave_lvl1" tiles="bat_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="1"   y="8"   dir="EAST"  toMap="overworld"/>
          <PointTransition decoration="downstairs"          x="1"   y="1"   dir="SOUTH" toMap="bat_cave_lvl2" toName="A"/>
          <PointTransition decoration="downstairs"          x="7"   y="6"   dir="SOUTH" toMap="bat_cave_lvl2" toName="B"/>
@@ -1053,7 +1066,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="bat_cave_lvl2" tiles="bat_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="cave_battle_background.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="bat_cave_lvl2" tiles="bat_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="1"   y="1"   dir="SOUTH" toMap="bat_cave_lvl1" toName="A"/>
          <PointTransition decoration="upstairs"            x="7"   y="6"   dir="SOUTH" toMap="bat_cave_lvl1" toName="B"/>
          <PointTransition decoration="upstairs"            x="13"  y="13"  dir="SOUTH" toMap="bat_cave_lvl1" toName="C"/>

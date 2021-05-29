@@ -411,7 +411,8 @@ class Game:
             if transition is None:
                 # See if this tile has any associated transitions
                 # TODO: Uncomment following statement to disable coordinate logging
-                print('Check for transitions at', hero_dest_dat_tile, flush=True)
+                encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
+                print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,
                                                                   filter_to_automatic_transitions=True)
             else:

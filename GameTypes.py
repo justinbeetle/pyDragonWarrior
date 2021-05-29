@@ -649,6 +649,11 @@ class MapImageInfo(NamedTuple):
                             Point())
 
 
+class EncounterBackground(NamedTuple):
+    name: str
+    image: pygame.surface.Surface
+
+
 class Problem(NamedTuple):
     problem: str
     answer: str

@@ -121,7 +121,7 @@
  </tile>
  <tile id="20">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="20" duration="240"/>
@@ -132,7 +132,7 @@
  </tile>
  <tile id="21">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="21" duration="240"/>
@@ -143,7 +143,7 @@
  </tile>
  <tile id="22">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="22" duration="240"/>
@@ -154,7 +154,7 @@
  </tile>
  <tile id="23">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="23" duration="240"/>
@@ -375,7 +375,7 @@
  </tile>
  <tile id="60">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="60" duration="240"/>
@@ -386,7 +386,7 @@
  </tile>
  <tile id="61">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="61" duration="240"/>
@@ -397,7 +397,7 @@
  </tile>
  <tile id="62">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="62" duration="240"/>
@@ -408,7 +408,7 @@
  </tile>
  <tile id="63">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="63" duration="240"/>
@@ -629,7 +629,7 @@
  </tile>
  <tile id="100">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="100" duration="240"/>
@@ -640,7 +640,7 @@
  </tile>
  <tile id="101">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="river_walkable"/>
   </properties>
   <animation>
    <frame tileid="101" duration="240"/>
@@ -651,7 +651,7 @@
  </tile>
  <tile id="102">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="102" duration="240"/>
@@ -662,7 +662,7 @@
  </tile>
  <tile id="103">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="river_walkable"/>
   </properties>
   <animation>
    <frame tileid="103" duration="240"/>
@@ -883,7 +883,7 @@
  </tile>
  <tile id="140">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="140" duration="240"/>
@@ -894,7 +894,7 @@
  </tile>
  <tile id="141">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="141" duration="240"/>
@@ -905,7 +905,7 @@
  </tile>
  <tile id="142">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="142" duration="240"/>
@@ -916,7 +916,7 @@
  </tile>
  <tile id="143">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="river"/>
   </properties>
   <animation>
    <frame tileid="143" duration="240"/>
@@ -1131,7 +1131,7 @@
  </tile>
  <tile id="180" terrain="5,5,4,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="180" duration="240"/>
@@ -1144,7 +1144,7 @@
  </tile>
  <tile id="181" terrain="5,5,1,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="181" duration="240"/>
@@ -1157,7 +1157,7 @@
  </tile>
  <tile id="182" terrain="5,4,5,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="182" duration="240"/>
@@ -1170,7 +1170,7 @@
  </tile>
  <tile id="183" terrain="4,5,1,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="183" duration="240"/>
@@ -1369,7 +1369,7 @@
  </tile>
  <tile id="220" terrain="4,1,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="220" duration="240"/>
@@ -1382,7 +1382,7 @@
  </tile>
  <tile id="221" terrain="1,4,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="221" duration="240"/>
@@ -1395,7 +1395,7 @@
  </tile>
  <tile id="222" terrain="5,1,5,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="222" duration="240"/>
@@ -1408,7 +1408,7 @@
  </tile>
  <tile id="223" terrain="1,5,4,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="223" duration="240"/>
@@ -1607,7 +1607,7 @@
  </tile>
  <tile id="260" terrain="5,5,4,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="260" duration="240"/>
@@ -1620,7 +1620,7 @@
  </tile>
  <tile id="261" terrain="5,5,6,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="261" duration="240"/>
@@ -1633,7 +1633,7 @@
  </tile>
  <tile id="262" terrain="5,4,5,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="262" duration="240"/>
@@ -1646,7 +1646,7 @@
  </tile>
  <tile id="263" terrain="4,5,6,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="263" duration="240"/>
@@ -1739,37 +1739,37 @@
  </tile>
  <tile id="280" terrain=",,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="281" terrain=",,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="282" terrain=",,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="283" terrain=",0,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="284" terrain="0,,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="285" terrain="0,0,0,0" probability="0.5">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="286">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="287">
@@ -1839,7 +1839,7 @@
  </tile>
  <tile id="300" terrain="4,6,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="300" duration="240"/>
@@ -1852,7 +1852,7 @@
  </tile>
  <tile id="301" terrain="6,4,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="301" duration="240"/>
@@ -1865,7 +1865,7 @@
  </tile>
  <tile id="302" terrain="5,6,5,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="302" duration="240"/>
@@ -1878,7 +1878,7 @@
  </tile>
  <tile id="303" terrain="6,5,4,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="303" duration="240"/>
@@ -1971,37 +1971,37 @@
  </tile>
  <tile id="320" terrain=",0,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="321" terrain="0,0,0,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="322" terrain="0,,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="323" terrain="0,0,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="324" terrain="0,0,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="325" terrain="0,0,0,0" probability="0.5">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="326">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="327">
@@ -2211,27 +2211,27 @@
  </tile>
  <tile id="360" terrain=",0,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="361" terrain="0,0,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="362" terrain="0,,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="363" terrain=",0,0,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="364" terrain="0,,,0">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
  <tile id="365" terrain=",4,,">
@@ -2466,12 +2466,12 @@
  </tile>
  <tile id="403" terrain="1,4,4,4">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="cliff_walkable"/>
   </properties>
  </tile>
  <tile id="404" terrain="4,1,4,4">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="cliff_walkable"/>
   </properties>
  </tile>
  <tile id="405">
@@ -2551,7 +2551,7 @@
  </tile>
  <tile id="420" terrain="1,1,1,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="420" duration="240"/>
@@ -2564,7 +2564,7 @@
  </tile>
  <tile id="421" terrain="1,1,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="421" duration="240"/>
@@ -2577,7 +2577,7 @@
  </tile>
  <tile id="422" terrain="1,1,5,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="422" duration="240"/>
@@ -2791,7 +2791,7 @@
  </tile>
  <tile id="460" terrain="1,5,1,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="460" duration="240"/>
@@ -2809,7 +2809,7 @@
  </tile>
  <tile id="462" terrain="5,1,5,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="462" duration="240"/>
@@ -3023,7 +3023,7 @@
  </tile>
  <tile id="500" terrain="1,5,1,1">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="shore_walkable"/>
   </properties>
   <animation>
    <frame tileid="500" duration="240"/>
@@ -3036,7 +3036,7 @@
  </tile>
  <tile id="501" terrain="5,5,1,1">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore"/>
   </properties>
   <animation>
    <frame tileid="501" duration="240"/>
@@ -3049,7 +3049,7 @@
  </tile>
  <tile id="502" terrain="5,1,1,1">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="shore_walkable"/>
   </properties>
   <animation>
    <frame tileid="502" duration="240"/>
@@ -3263,7 +3263,7 @@
  </tile>
  <tile id="540" terrain="4,4,4,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="540" duration="240"/>
@@ -3276,7 +3276,7 @@
  </tile>
  <tile id="541" terrain="4,4,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="541" duration="240"/>
@@ -3289,7 +3289,7 @@
  </tile>
  <tile id="542" terrain="4,4,5,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="542" duration="240"/>
@@ -3302,7 +3302,7 @@
  </tile>
  <tile id="543" terrain="4,5,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="543" duration="240"/>
@@ -3315,7 +3315,7 @@
  </tile>
  <tile id="544" terrain="5,4,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="544" duration="240"/>
@@ -3503,7 +3503,7 @@
  </tile>
  <tile id="580" terrain="4,5,4,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="580" duration="240"/>
@@ -3521,7 +3521,7 @@
  </tile>
  <tile id="582" terrain="5,4,5,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="582" duration="240"/>
@@ -3735,7 +3735,7 @@
  </tile>
  <tile id="620" terrain="4,5,4,4">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="shore_cliff_walkable"/>
   </properties>
   <animation>
    <frame tileid="620" duration="240"/>
@@ -3748,7 +3748,7 @@
  </tile>
  <tile id="621" terrain="5,5,4,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="621" duration="240"/>
@@ -3761,7 +3761,7 @@
  </tile>
  <tile id="622" terrain="5,4,4,4">
   <properties>
-   <property name="type" value="plain"/>
+   <property name="type" value="shore_cliff_walkable"/>
   </properties>
   <animation>
    <frame tileid="622" duration="240"/>
@@ -3774,7 +3774,7 @@
  </tile>
  <tile id="623" terrain="4,5,5,4">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="623" duration="240"/>
@@ -3787,7 +3787,7 @@
  </tile>
  <tile id="624" terrain="5,4,4,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="shore_cliff"/>
   </properties>
   <animation>
    <frame tileid="624" duration="240"/>
@@ -3935,37 +3935,37 @@
  </tile>
  <tile id="652" terrain=",,,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="653" terrain=",,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="654" terrain=",,11,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="655" terrain=",11,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="656" terrain="11,,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="657" terrain="11,11,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="658">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="659">
@@ -3975,7 +3975,7 @@
  </tile>
  <tile id="660" terrain="6,6,6,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="660" duration="240"/>
@@ -3988,7 +3988,7 @@
  </tile>
  <tile id="661" terrain="6,6,5,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="661" duration="240"/>
@@ -4001,7 +4001,7 @@
  </tile>
  <tile id="662" terrain="6,6,5,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="662" duration="240"/>
@@ -4165,7 +4165,7 @@
  </tile>
  <tile id="690">
   <properties>
-   <property name="type" value="desert"/>
+   <property name="type" value="cliff"/>
   </properties>
  </tile>
  <tile id="691">
@@ -4175,37 +4175,37 @@
  </tile>
  <tile id="692" terrain=",11,,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="693" terrain="11,11,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="694" terrain="11,,11,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="695" terrain="11,11,,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="696" terrain="11,11,11,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="697" terrain="11,11,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="698">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="699">
@@ -4215,7 +4215,7 @@
  </tile>
  <tile id="700" terrain="6,5,6,5">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="700" duration="240"/>
@@ -4233,7 +4233,7 @@
  </tile>
  <tile id="702" terrain="5,6,5,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="702" duration="240"/>
@@ -4407,32 +4407,32 @@
  </tile>
  <tile id="732" terrain=",11,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="733" terrain="11,11,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="734" terrain="11,,,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="735" terrain=",11,11,">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="736" terrain="11,,,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="737" terrain="11,11,11,11">
   <properties>
-   <property name="type" value="forest"/>
+   <property name="type" value="pine_forest"/>
   </properties>
  </tile>
  <tile id="738">
@@ -4447,7 +4447,7 @@
  </tile>
  <tile id="740" terrain="6,5,6,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach_walkable"/>
   </properties>
   <animation>
    <frame tileid="740" duration="240"/>
@@ -4460,7 +4460,7 @@
  </tile>
  <tile id="741" terrain="5,5,6,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="741" duration="240"/>
@@ -4473,7 +4473,7 @@
  </tile>
  <tile id="742" terrain="5,6,6,6">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach_walkable"/>
   </properties>
   <animation>
    <frame tileid="742" duration="240"/>
@@ -7108,22 +7108,22 @@
  </tile>
  <tile id="1136" terrain="5,5,1,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1137" terrain="5,5,10,1">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1138" terrain="5,1,5,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1139" terrain="1,5,10,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1140">
@@ -7372,22 +7372,22 @@
  </tile>
  <tile id="1176" terrain="1,10,5,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1177" terrain="10,1,5,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1178" terrain="5,10,5,1">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1179" terrain="10,5,1,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1180">
@@ -7637,17 +7637,17 @@
  </tile>
  <tile id="1216" terrain="10,10,10,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1217" terrain="10,10,5,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1218" terrain="10,10,5,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1219">
@@ -7901,7 +7901,7 @@
  </tile>
  <tile id="1256" terrain="10,5,10,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1257" terrain="5,5,5,5">
@@ -7911,7 +7911,7 @@
  </tile>
  <tile id="1258" terrain="5,10,5,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1259">
@@ -8166,17 +8166,17 @@
  </tile>
  <tile id="1296" terrain="10,5,10,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="swamp"/>
   </properties>
  </tile>
  <tile id="1297" terrain="5,5,10,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1298" terrain="5,10,10,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="swamp"/>
   </properties>
  </tile>
  <tile id="1299">
@@ -8430,12 +8430,12 @@
  </tile>
  <tile id="1336" terrain="10,5,5,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1337" terrain="5,10,5,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1338">
@@ -8694,12 +8694,12 @@
  </tile>
  <tile id="1376" terrain="5,5,10,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1377" terrain="5,5,5,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1378">
@@ -8959,12 +8959,12 @@
  </tile>
  <tile id="1416" terrain="10,5,5,10">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1417" terrain="5,10,10,5">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="water"/>
   </properties>
  </tile>
  <tile id="1418">

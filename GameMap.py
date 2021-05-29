@@ -443,6 +443,146 @@ class GameMap:
             return decoration
         return None
 
+    @staticmethod
+    def get_surrounding_points(point: Point, distance: int, include_point: bool = True) -> List[Point]:
+        points = []
+        for x in range(point.x - distance, point.x + distance + 1):
+            for y in range(point.y - distance, point.y + distance + 1):
+                if not include_point and x == point.x and y == point.y:
+                    continue
+                points.append(Point(x, y))
+        return points
+
+    @staticmethod
+    def get_adjacent_points(point: Point, include_point: bool = True) -> List[Point]:
+        points = [Point(point.x - 1, point.y),
+                  Point(point.x + 1, point.y),
+                  Point(point.x, point.y - 1),
+                  Point(point.x, point.y + 1)]
+        if include_point:
+            points.append(point)
+        return points
+
+    def get_tile_type_count(self, tiles: List[Point], tile_types: List[str]) -> int:
+        tile_count = 0
+        for tile in tiles:
+            if self.get_tile_info(tile).name in tile_types:
+                tile_count += 1
+        return tile_count
+
+    def get_tile_type_counts(self, tiles: List[Point], tile_types: List[str]) -> Dict[str, int]:
+        tile_counts = {tile_type: 0 for tile_type in tile_types}
+        for tile in tiles:
+            tile_info = self.get_tile_info(tile)
+            if tile_info.name in tile_counts:
+                tile_counts[tile_info.name] += 1
+        return tile_counts
+
+    def get_surrounding_tile_type_count(self, tile: Point, distance: int, tile_types: List[str]) -> int:
+        return self.get_tile_type_count(self.get_surrounding_points(tile, distance), tile_types)
+
+    def get_surrounding_tile_type_counts(self, tile: Point, distance: int, tile_types: List[str]) -> Dict[str, int]:
+        return self.get_tile_type_counts(self.get_surrounding_points(tile, distance), tile_types)
+
+    def get_adjacent_tile_type_count(self, tile: Point, tile_types: List[str]) -> int:
+        return self.get_tile_type_count(self.get_adjacent_points(tile), tile_types)
+
+    def get_adjacent_tile_type_counts(self, tile: Point, tile_types: List[str]) -> Dict[str, int]:
+        return self.get_tile_type_counts(self.get_adjacent_points(tile), tile_types)
+
+    def get_encounter_background(self, tile: Optional[Point] = None) -> str:
+        # Handle the background for dark maps
+        if self.game_state.get_hero_party().light_diameter is not None:
+            return 'darkness'
+
+        # Determine the base tile
+        if tile is None:
+            tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
+        tile_info = self.get_tile_info(tile)
+        tile_name = tile_info.name.replace('_walkable', '')
+        if tile_name in ['hill', 'cliff']:
+            tile_name = 'plain'
+
+        # Handle background for forested tiles, taking into account if we are deep in the forest or on the perimeter.
+        forested_tiles = ['deciduous_forest', 'pine_forest', 'jungle']
+        if tile_name in forested_tiles:
+            adjacent_tiles_of_same_type = self.get_surrounding_tile_type_count(tile, 1, [tile_name]) - 1
+            if adjacent_tiles_of_same_type >= 7:
+                return tile_name + '_dark'
+            elif adjacent_tiles_of_same_type >= 2:
+                return tile_name
+            else:
+                return tile_name + '_light'
+
+        # Handle shore backgrounds
+        shore_tiles = ['shore', 'shore_walkable', 'shore_cliff', 'shore_cliff_walkable', 'beach', 'beach_walkable']
+        shore_counts = self.get_adjacent_tile_type_counts(tile, shore_tiles)
+        for tile_type, count in shore_counts.items():
+            if count > 0:
+                return tile_type.replace('_walkable', '')
+
+        # Handle backgrounds on some other tile types, taking into account surrounding vegetation and elevation.
+        if tile_name in ['plain', 'desert']:
+            background = tile_name
+
+            # Factor in vegetation
+            vegetation_counts = self.get_surrounding_tile_type_counts(tile, 1, forested_tiles)
+            vegetation = None
+            vegetation_count = 0
+            for tile_type, count in vegetation_counts.items():
+                if count > vegetation_count:
+                    vegetation, vegetation_count = tile_type, count
+            if vegetation is not None:
+                background += '_' + vegetation
+
+            # Factor in elevation
+            elevation = None
+            if self.get_surrounding_tile_type_count(tile, 3, ['volcano']) > 0:
+                elevation = 'volcano'
+            else:
+                mountain_count = self.get_surrounding_tile_type_count(tile, 1, ['mountain'])
+                if mountain_count > 0:
+                    elevation = 'close_mountain'
+                else:
+                    mountain_count = self.get_surrounding_tile_type_count(tile, 3, ['mountain'])
+                    if mountain_count > 15:
+                        elevation = 'distant_mountain'  # 'big_distant_mountain'
+                    elif mountain_count > 5:
+                        elevation = 'distant_mountain'  # 'small_distant_mountain'
+                    else:
+                        cliff_count = self.get_surrounding_tile_type_count(tile, 1, ['cliff', 'cliff_walkable'])
+                        if cliff_count > 1:
+                            elevation = 'cliff'
+                        elif elevation != 'hill':
+                            hill_count = self.get_surrounding_tile_type_count(tile, 1, ['hill'])
+                            if hill_count > 1:
+                                elevation = 'hill'
+            if elevation is not None:
+                background += '_' + elevation
+
+            return background
+
+        # For all other tiles, just use the tile name
+        if tile_name == 'DEFAULT TILE':
+            print('WARN: default time at', tile, flush=True)
+        return tile_name
+
+    def dump_encounter_backgrounds(self) -> None:
+        encounter_background_counts = {}
+        map_size = self.size()
+        for x in range(map_size.x):
+            for y in range(map_size.y):
+                tile = Point(x, y)
+                tile_info = self.get_tile_info(tile)
+                if tile_info.walkable and tile_info.spawn_rate > 0:
+                    encounter_background = self.get_encounter_background(tile)
+                    if encounter_background not in encounter_background_counts:
+                        encounter_background_counts[encounter_background] = 1
+                    else:
+                        encounter_background_counts[encounter_background] += 1
+        for k, v in sorted(encounter_background_counts.items(), key=lambda item: item[1], reverse=True):
+            print(k, v, flush=True)
+
 
 class MapViewer:
     def __init__(self) -> None:
@@ -508,6 +648,7 @@ class MapViewer:
         game_map.bounds_check_pc_position()
 
         done_with_map = False
+        god_mode = False
 
         import GameEvents
         while self.is_running and not done_with_map:
@@ -536,7 +677,10 @@ class MapViewer:
                                     game_map.remove_decoration(decoration)
                                 else:
                                     print('Not removing decoration', decoration, flush=True)
-
+                    elif event.key == pygame.K_b:
+                        game_map.dump_encounter_backgrounds()
+                    elif event.key == pygame.K_g:
+                        god_mode = not god_mode
                     else:
                         move_direction = Direction.get_direction(event.key)
                 elif event.type == pygame.QUIT:
@@ -550,9 +694,12 @@ class MapViewer:
                         self.hero_party.members[0].direction = move_direction
                     else:
                         dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
-                        if game_map.can_move_to_tile(dest_tile):
+                        if god_mode or game_map.can_move_to_tile(dest_tile):
                             self.hero_party.members[0].dest_pos_dat_tile = dest_tile
-                            print('moved to tile of type', game_map.get_tile_info().name, flush=True)
+                            tile_name = game_map.get_tile_info().name
+                            encounter_background = game_map.get_encounter_background(dest_tile)
+                            print(f'Moved to {dest_tile} of type {tile_name} and background {encounter_background}',
+                                  flush=True)
 
             updated = False
             while not updated or \

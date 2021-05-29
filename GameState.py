@@ -273,6 +273,9 @@ class GameState(GameStateInterface):
                     return point_transition
         return None
 
+    def get_encounter_background(self, tile: Optional[Point] = None) -> str:
+        return self.game_map.get_encounter_background(tile)
+
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
         return self.game_map.get_decorations(tile)
 
