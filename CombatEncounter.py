@@ -567,13 +567,28 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product), '0123456789')
 
     @staticmethod
-    def gen_division_problem(min_term: int=0, max_term: int=12) -> Problem:
-        a = random.randrange(min_term, max_term)
-        b = random.randrange(min_term, max_term)
-        dividend = a*b
-        divisor = random.choice((a, b))
+    def gen_division_problem(min_term: int=0,
+                             max_term: int=12,
+                             multiplicand_1_range: Optional[List[int]]=None,
+                             multiplicand_2_range: Optional[List[int]]=None) -> Problem:
+        if multiplicand_1_range is None:
+            multiplicand_1 = random.randrange(min_term, max_term)
+        else:
+            multiplicand_1 = random.choice(multiplicand_1_range)
+
+        if multiplicand_2_range is None:
+            multiplicand_2 = random.randrange(min_term, max_term)
+        else:
+            multiplicand_2 = random.choice(multiplicand_2_range)
+
+        # If using the ranges, swap values half the time to randomize the order of the multiplicands.
+        if (multiplicand_1_range is not None or multiplicand_2_range is not None) and 0 == random.randrange(0, 1):
+            multiplicand_1, multiplicand_2 = multiplicand_2, multiplicand_1
+
+        dividend = multiplicand_1 * multiplicand_2
+        divisor = random.choice((multiplicand_1, multiplicand_2))
         if divisor == 0:
-            divisor = 1
+            divisor = random.randrange(1, max(1, max_term))
         quotient = dividend // divisor
         return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '0123456789')
 
@@ -591,16 +606,17 @@ class CombatEncounter(CombatEncounterInterface):
 
     @staticmethod
     def gen_cam_problem() -> Problem:
-        a = random.randrange(0, 5)
+        a = random.randrange(0, 7)
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term=0, max_term=20)
         elif 1 == a:
             return CombatEncounter.gen_subtraction_problem()
         elif 2 == a:
             return CombatEncounter.gen_subtraction_problem(min_term=5, max_term=9, minuend_min=12, minuend_max=16)
+        elif 3 == a:
+            return CombatEncounter.gen_division_problem(min_term=0, max_term=12, multiplicand_1=[0, 1, 2, 3, 9, 10, 11])
         else:
-            return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=10,
-                                                              multiplicand_1_range=[0, 1, 2, 9, 10, 11])
+            return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
 
 
 def main() -> None:
