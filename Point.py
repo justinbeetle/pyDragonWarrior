@@ -97,6 +97,9 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
     def ceil(self) -> Point:
         return Point(math.ceil(self.x), math.ceil(self.y))
 
+    def round(self) -> Point:
+        return Point(int(round(self.x)), int(round(self.y)))
+
     def mag(self) -> float:
         return abs(self.x + self.y)
 

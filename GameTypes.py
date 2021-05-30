@@ -653,6 +653,9 @@ class EncounterBackground(NamedTuple):
     name: str
     image: pygame.surface.Surface
 
+    def __str__(self) -> int:
+        return self.name
+
 
 class Problem(NamedTuple):
     problem: str

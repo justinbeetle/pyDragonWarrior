@@ -77,9 +77,13 @@ class GameInfo:
             self.title_image = pygame.image.load(title_image_file_name).convert()
 
         # Parse the encounter background images
-        self.encounter_backgrounds: Dict[str, EncounterBackground]
-        for image_filename  in os.listdir(encounter_path):
-            print(image_filename)
+        self.encounter_backgrounds: Dict[str, EncounterBackground] = {}
+        for image_filename in os.listdir(encounter_path):
+            # print('image_filename =', image_filename, flush=True)
+            encounter_background_name = os.path.splitext(image_filename)[0]
+            encounter_background_image = pygame.image.load(os.path.join(encounter_path, image_filename)).convert()
+            self.encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
+                                                                                        encounter_background_image)
 
         # Parse map locations
         self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
@@ -756,7 +760,7 @@ class GameInfo:
             # Load the encounter image
             # print('Load the encounter image', flush=True)
             encounter_image = None
-            if len(monster_zones):
+            if len(monster_zones) and 'encounterBackground' in element:
                 encounter_image_file_name = os.path.join(encounter_path, element.attrib['encounterBackground'])
                 unscaled_encounter_image = pygame.image.load(encounter_image_file_name).convert()
                 encounter_image = pygame.transform.scale(unscaled_encounter_image,
@@ -1085,305 +1089,15 @@ class GameInfo:
             return self.items[name]
         return None
 
-    def get_map_image_info(self,
-                           map_name: str,
-                           image_pad_tiles: Point = Point(0, 0),
-                           map_decorations: Optional[List[MapDecoration]] = None) -> MapImageInfo:
-      
-        # Determine the size of the map image then initialize
-        # The size of the image is padded by imagePad_tiles in all directions
-        map_image_size_tiles = self.maps[map_name].size + 2 * image_pad_tiles
-        map_image_size_pixels = map_image_size_tiles * self.tile_size_pixels
-
-        if map_decorations is None:
-            map_decorations = self.maps[map_name].map_decorations
-      
-        map_image = self.get_map_image(
-            map_name,
-            image_pad_tiles,
-            map_decorations,
-            map_image_size_pixels,
-            self.maps[map_name].dat,
-            pygame.Color('pink'))  # Fill with a color to make is easier to identify any gaps
-
-        map_overlay_image: Optional[pygame.surface.Surface] = None
-        overlay_dat = self.maps[map_name].overlay_dat
-        if overlay_dat is not None:
-            map_overlay_image = self.get_map_image(
-                map_name,
-                image_pad_tiles,
-                [],
-                map_image_size_pixels,
-                overlay_dat,
-                GameInfo.TRANSPARENT_COLOR)
-         
-        # Return the map image info
-        return MapImageInfo(map_name, map_image, map_image_size_tiles, map_image_size_pixels, map_overlay_image)
-
-    def get_map_image(self,
-                      map_name: str,
-                      image_pad_tiles: Point,
-                      map_decorations: Optional[List[MapDecoration]],
-                      map_image_size_pixels: Point,
-                      dat: List[str],
-                      fill_color: pygame.Color) -> pygame.surface.Surface:
-        map_image = pygame.surface.Surface(map_image_size_pixels, flags=pygame.SRCALPHA)
-        map_image.fill(fill_color)
-
-        # Blit the padded portions of the image
-        import zlib
-        numpy.random.seed(zlib.crc32(map_name.encode()) % (2**32 - 1))
-        map_size = (int(self.maps[map_name].size[0]), int(self.maps[map_name].size[1]))
-        last_col = map_size[0] - 1
-        last_row = map_size[1] - 1
-        for x in range(int(image_pad_tiles.x)):
-            x_w_px = int(x * self.tile_size_pixels)
-            x_e_px = int((x + image_pad_tiles.x + map_size[0]) * self.tile_size_pixels)
-            for y in range(int(image_pad_tiles.y)):
-                # Blit corners
-                y_n_px = y * self.tile_size_pixels
-                y_s_px = (y + image_pad_tiles.y + map_size[1]) * self.tile_size_pixels
-                # NW pad
-                if dat[0][0] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[0][0]), (x_w_px, y_n_px))
-                # NE pad
-                if dat[0][last_col] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[0][last_col]), (x_e_px, y_n_px))
-                # SW pad
-                if dat[last_row][0] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_row][0]), (x_w_px, y_s_px))
-                # SE pad
-                if dat[last_row][last_col] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_row][last_col]), (x_e_px, y_s_px))
-            for y in range(map_size[1]):
-                # Blit sides
-                y_px = int((y + image_pad_tiles.y) * self.tile_size_pixels)
-                # W pad
-                if dat[y][0] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[y][0]), (x_w_px, y_px))
-                # E pad
-                if dat[y][last_col] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[y][last_col]), (x_e_px, y_px))
-        for y in range(int(image_pad_tiles.y)):
-            y_n_px = int(y * self.tile_size_pixels)
-            y_s_px = int((y + image_pad_tiles.y + map_size[1]) * self.tile_size_pixels)
-            for x in range(map_size[0]):
-                # Blit the top and bottom
-                x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
-                # N pad
-                if dat[0][x] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[0][x]), (x_px, y_n_px))
-                # S pad
-                if dat[last_row][x] in self.tile_symbols:
-                    map_image.blit(self.random_tile_image(dat[last_row][x]), (x_px, y_s_px))
-
-        # Blit the map data portion of the image
-        for y, row_data in enumerate(dat):
-            y_px = int((y + image_pad_tiles.y) * self.tile_size_pixels)
-            for x, tile_symbol in enumerate(row_data):
-                if tile_symbol not in self.tile_symbols:
-                    continue
-                x_px = int((x + image_pad_tiles.x) * self.tile_size_pixels)
-                # Determine which image to use
-                image_idx = 0
-                # TODO: Fix hardcoded exception for the bridge tile_symbol of 'b'
-                if y > 0 and dat[y-1][x] != tile_symbol and dat[y-1][x] != 'b':
-                    image_idx += 8
-                if y < len(dat)-1 and dat[y+1][x] != tile_symbol and dat[y+1][x] != 'b':
-                    image_idx += 2
-                if x > 0 and row_data[x-1] != tile_symbol and row_data[x-1] != 'b':
-                    image_idx += 1
-                if x < len(row_data)-1 and row_data[x+1] != tile_symbol and row_data[x+1] != 'b':
-                    image_idx += 4
-                map_image.blit(self.random_tile_image(tile_symbol, image_idx), (x_px, y_px))
-
-        # Blit the decoration on the image
-        if map_decorations is not None:
-            for map_decoration in map_decorations:
-                if map_decoration.type is None:
-                    continue
-                tile_position_px = (map_decoration.point + image_pad_tiles) * self.tile_size_pixels
-                x_px = int(tile_position_px.x + (self.tile_size_pixels - map_decoration.type.image.get_width()) / 2)
-                y_px = int(tile_position_px.y + self.tile_size_pixels - map_decoration.type.image.get_height())
-                map_image.blit(map_decoration.type.image, (x_px, y_px))
-
-        return map_image
-
     def random_tile_image(self, symbol: str, idx: int = 0) -> pygame.surface.Surface:
         images = self.tiles[self.tile_symbols[symbol]].images[idx]
         if 1 == len(images):
             return images[0]
-        return numpy.random.choice(images, p=self.tile_probabilities[len(images)-1])
-
-    @staticmethod
-    def get_exterior_image(map_image_info: MapImageInfo) -> pygame.surface.Surface:
-        map_image = map_image_info.image.copy()
-        if map_image_info.overlay_image is not None:
-            map_image.blit(map_image_info.overlay_image, (0, 0))
-        return map_image
-
-    @staticmethod
-    def get_interior_image(map_image_info: MapImageInfo) -> Optional[pygame.surface.Surface]:
-        map_image = None
-        if map_image_info.overlay_image is not None:
-            map_image = map_image_info.image.copy()
-            pygame.transform.threshold(map_image,
-                                       map_image_info.overlay_image,
-                                       search_color=GameInfo.TRANSPARENT_COLOR,
-                                       set_color=pygame.Color('black'),
-                                       inverse_set=True)
-        return map_image
-
-
-class GameInfoMapViewer:
-    def __init__(self) -> None:
-        # Initialize pygame
-        pygame.init()
-        self.audio_player = AudioPlayer()
-
-        # Setup to draw maps
-        self.tile_size_pixels = 20
-        desired_win_size_pixels = Point(2560, 1340)
-        if desired_win_size_pixels is None:
-            self.screen = pygame.display.set_mode(
-                (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
-            self.win_size_pixels = Point(self.screen.get_size())
-            self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).floor()
-        else:
-            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
-            self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(),
-                                                  pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
-        self.image_pad_tiles = self.win_size_tiles // 2 * 4
-        self.clock = pygame.time.Clock()
-
-        # Initialize GameInfo
-        base_path = os.path.split(os.path.abspath(__file__))[0]
-        game_xml_path = os.path.join(base_path, 'game.xml')
-        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels)
-
-        self.is_running = True
-
-    def __del__(self) -> None:
-        # Terminate pygame
-        self.audio_player.terminate()
-        pygame.quit()
-
-    def view_map(self, map_name: str) -> None:
-        if not self.is_running:
-            return
-
-        import SurfaceEffects
-
-        self.audio_player.play_music(self.game_info.maps[map_name].music)
-        map_image_info = self.game_info.get_map_image_info(map_name, self.image_pad_tiles)
-
-        render_types = ['exterior']
-        if map_image_info.overlay_image is not None:
-            render_types.append('interior')
-
-        for render_type in render_types:
-            if render_type == 'exterior':
-                map_image = GameInfo.get_exterior_image(map_image_info)
-            else:
-                interior_map_image = GameInfo.get_interior_image(map_image_info)
-                if interior_map_image is None:
-                    print('ERROR: No interior image for map', map_name, flush=True)
-                    continue
-                map_image = interior_map_image
-
-            # Always rendering to the entire window but need to determine the
-            # rectangle from the image which is to be scaled to the screen
-            zoom_factor = 1.0
-            map_image_size = Point(map_image.get_width(), map_image.get_height())
-            map_image_center_pos = map_image_size // 2
-            map_image_rect_size = self.win_size_pixels // zoom_factor
-            map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
-            map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
-            self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
-            pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                   self.win_size_pixels.getAsIntTuple(),
-                                   self.screen)
-            pygame.display.flip()
-
-            done_with_map = False
-            while self.is_running and not done_with_map:
-                for event in GameEvents.get_events(True):
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            self.is_running = False
-                        elif event.key == pygame.K_RETURN:
-                            done_with_map = True
-                        elif event.key == pygame.K_DOWN:
-                            SurfaceEffects.scroll_view(
-                                self.screen,
-                                map_image,
-                                Direction.SOUTH,
-                                map_image_rect,
-                                zoom_factor,
-                                self.tile_size_pixels,
-                                True)
-                        elif event.key == pygame.K_UP:
-                            SurfaceEffects.scroll_view(
-                                self.screen,
-                                map_image,
-                                Direction.NORTH,
-                                map_image_rect,
-                                zoom_factor,
-                                self.tile_size_pixels,
-                                True)
-                        elif event.key == pygame.K_LEFT:
-                            SurfaceEffects.scroll_view(
-                                self.screen,
-                                map_image,
-                                Direction.WEST,
-                                map_image_rect,
-                                zoom_factor,
-                                self.tile_size_pixels,
-                                True)
-                        elif event.key == pygame.K_RIGHT:
-                            SurfaceEffects.scroll_view(
-                                self.screen,
-                                map_image,
-                                Direction.EAST,
-                                map_image_rect,
-                                zoom_factor,
-                                self.tile_size_pixels,
-                                True)
-                        elif event.key == pygame.K_EQUALS or event.key == pygame.K_MINUS:
-                            map_image_center_pos = Point(map_image_rect.x, map_image_rect.y) + map_image_rect_size // 2
-                            if event.key == pygame.K_EQUALS:
-                                zoom_factor *= 2.0
-                            else:
-                                zoom_factor *= 0.5
-                            if zoom_factor < 0.25:
-                                zoom_factor = 0.25
-
-                            map_image_rect_size = self.win_size_pixels // zoom_factor
-                            map_image_rect_pos = map_image_center_pos - map_image_rect_size // 2
-                            map_image_rect = pygame.Rect(map_image_rect_pos, map_image_rect_size)
-                            self.screen.set_clip(pygame.Rect(0, 0, self.win_size_pixels.x, self.win_size_pixels.y))
-                            pygame.transform.scale(map_image.subsurface(map_image_rect),
-                                                   self.win_size_pixels.getAsIntTuple(),
-                                                   self.screen)
-                            pygame.display.flip()
-                        else:
-                            # print('event.key =', event.key, flush=True)
-                            pass
-                    elif event.type == pygame.QUIT:
-                        self.is_running = False
-                    else:
-                        # print('event.type =', event.type, flush=True)
-                        pass
-                self.clock.tick(30)
+        return numpy.random.choice(images, p=self.tile_probabilities[len(images) - 1])
 
 
 def main() -> None:
-    # Iterate through and render the different maps
-    viewer = GameInfoMapViewer()
-    for map_name in viewer.game_info.maps:
-        viewer.view_map(map_name)
+    pass
 
 
 if __name__ == '__main__':

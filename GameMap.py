@@ -9,7 +9,7 @@ import random
 
 from AudioPlayer import AudioPlayer
 from GameStateInterface import GameStateInterface
-from GameTypes import CharacterType, Direction, MapDecoration, NpcInfo, Tile
+from GameTypes import CharacterType, Direction, EncounterBackground, MapDecoration, NpcInfo, Tile
 from HeroParty import HeroParty
 from HeroState import HeroState
 from LegacyMapData import LegacyMapData
@@ -490,7 +490,7 @@ class GameMap:
     def get_adjacent_tile_type_counts(self, tile: Point, tile_types: List[str]) -> Dict[str, int]:
         return self.get_tile_type_counts(self.get_adjacent_points(tile), tile_types)
 
-    def get_encounter_background(self, tile: Optional[Point] = None) -> str:
+    def get_encounter_background_name(self, tile: Optional[Point] = None) -> str:
         # Handle the background for dark maps
         if self.game_state.get_hero_party().light_diameter is not None:
             return 'darkness'
@@ -566,6 +566,16 @@ class GameMap:
         if tile_name == 'DEFAULT TILE':
             print('WARN: default time at', tile, flush=True)
         return tile_name
+
+    def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
+        if tile is None:
+            tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
+        encounter_background_name = self.get_encounter_background_name(tile)
+        backgrounds = self.game_state.get_game_info().encounter_backgrounds
+        if encounter_background_name in backgrounds:
+            return backgrounds[encounter_background_name]
+        print(f'WARN: No encounter background for {encounter_background_name} at {tile}', flush=True)
+        return None
 
     def dump_encounter_backgrounds(self) -> None:
         encounter_background_counts = {}

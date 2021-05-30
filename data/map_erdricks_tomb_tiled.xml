@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
-   <Map name="erdricks_tomb_lvl1" tiles="tiled/erdricks_tomb_lvl1.tmx" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+   <Map name="erdricks_tomb_lvl1" tiles="tiled/erdricks_tomb_lvl1.tmx" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" lightDiameter="1" isOutside="no">
       <PointTransition                                  x="2"   y="2"   dir="EAST"  toMap="overworld"/>
       <PointTransition                                  x="11"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl2"/>
    </Map>
 
-   <Map name="erdricks_tomb_lvl2" tiles="tiled/erdricks_tomb_lvl2.tmx" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" encounterBackground="cave_battle_background.png" lightDiameter="1" isOutside="no">
+   <Map name="erdricks_tomb_lvl2" tiles="tiled/erdricks_tomb_lvl2.tmx" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" lightDiameter="1" isOutside="no">
       <PointTransition                                  x="10"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl1"/>
 
       <xi:include href="map_erdricks_tomb_common.xml" parse="xml"/>

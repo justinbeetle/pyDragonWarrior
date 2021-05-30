@@ -13,19 +13,17 @@ from CombatEncounter import CombatEncounter
 import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import AnyTransition, DialogReplacementVariables, DialogType, Direction, MapDecoration, MapImageInfo, \
-    MonsterInfo, NpcInfo, OutgoingTransition, SpecialMonster, Tile
+from GameTypes import DialogReplacementVariables, DialogType, EncounterBackground, MapDecoration, MonsterInfo, \
+    NpcInfo, OutgoingTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameMap import GameMap
 from GameStateInterface import GameStateInterface
-from MapCharacterState import MapCharacterState
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
 from MonsterState import MonsterState
 from NpcState import NpcState
 from Point import Point
-import SurfaceEffects
 
 
 class GameState(GameStateInterface):
@@ -273,7 +271,7 @@ class GameState(GameStateInterface):
                     return point_transition
         return None
 
-    def get_encounter_background(self, tile: Optional[Point] = None) -> str:
+    def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
         return self.game_map.get_encounter_background(tile)
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
@@ -520,9 +518,18 @@ class GameState(GameStateInterface):
         # A combat encounter requires an encounter image
         encounter_image = self.game_info.maps[self.get_map_name()].encounter_image
         if encounter_image is None:
-            print('Failed to initiate combat encounter due to lack of encounter image in map ' + self.get_map_name(),
-                  flush=True)
-            return
+            encounter_background = self.get_encounter_background()
+            if encounter_background is None:
+                print('Failed to initiate combat encounter due to lack of encounter image in map ' +
+                      self.get_map_name(), flush=True)
+                return
+            encounter_image = encounter_background.image
+        # Scale the encounter image
+        encounter_image_size_px = Point(encounter_image.get_size())
+        encounter_image_size_px *= min(self.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
+                                       self.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h)
+        encounter_image_size_px = encounter_image_size_px.round()
+        encounter_image = pygame.transform.smoothscale(encounter_image, encounter_image_size_px)
 
         # Perform the combat encounter
         CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')

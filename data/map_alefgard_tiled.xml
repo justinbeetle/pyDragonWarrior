@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes" originX="46" originY="45" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" lightDiameter="unlimited" isOutside="yes" originX="46" originY="45" xmlns:xi="http://www.w3.org/2001/XInclude">
    <PointTransition decoration="pass"          x="46"  y="45"  dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
    <PointTransition decoration="pass"          x="50"  y="44"  dir="SOUTH" toMap="brecconary"            respawnDecorations="yes"/>
    <PointTransition decoration="pass"          x="51"  y="45"  dir="SOUTH" toMap="brecconary"            respawnDecorations="yes"/>
