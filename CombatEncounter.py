@@ -588,7 +588,7 @@ class CombatEncounter(CombatEncounterInterface):
         dividend = multiplicand_1 * multiplicand_2
         divisor = random.choice((multiplicand_1, multiplicand_2))
         if divisor == 0:
-            divisor = random.randrange(1, max(1, max_term))
+            divisor = 1
         quotient = dividend // divisor
         return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '0123456789')
 
@@ -632,7 +632,6 @@ def main() -> None:
     win_size_pixels = win_size_tiles * tile_size_pixels
     screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.HWSURFACE)
     screen.fill(pygame.Color('pink'))
-    GameDialog.static_init(win_size_tiles, tile_size_pixels)
 
     # Initialize GameInfo
     import os
@@ -640,6 +639,7 @@ def main() -> None:
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
+    GameDialog.static_init(win_size_tiles, tile_size_pixels, game_info.font_names)
 
     # Find an encounter image to use
     for map in game_info.maps:

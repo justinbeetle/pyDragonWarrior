@@ -76,6 +76,11 @@ class GameInfo:
             title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
             self.title_image = pygame.image.load(title_image_file_name).convert()
 
+        # Parse font information
+        self.font_names: List[str] = []
+        for element in xml_root.findall("./Fonts//Font"):
+            self.font_names.append(element.attrib['name'])
+
         # Parse the encounter background images
         self.encounter_backgrounds: Dict[str, EncounterBackground] = {}
         for image_filename in os.listdir(encounter_path):

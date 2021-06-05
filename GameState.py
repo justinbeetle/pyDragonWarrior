@@ -382,12 +382,14 @@ class GameState(GameStateInterface):
                                                  self.hero_party.get_curr_pos_dat_tile(),
                                                  self.hero_party.get_direction())
 
-        # Making the transition
+        # Make the transition and draw the map
         AudioPlayer().play_sound('stairs.wav')
         self.hero_party.set_pos(dest_transition.point, dest_transition.dir)
         self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
-        if not map_changing:
-            self.draw_map(True)
+        self.draw_map(True)
+
+        # Slight pause on a map transition
+        pygame.time.Clock().tick(4)
 
         return True
 

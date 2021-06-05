@@ -31,7 +31,7 @@ class Game:
                                     tile_size_pixels)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
-        GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels)
+        GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels, self.game_state.game_info.font_names)
 
     def run_game_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
         self.game_state.is_running = True

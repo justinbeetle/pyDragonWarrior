@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 
 from enum import Enum
 import math
+import os
 import pygame
 
 import GameEvents
@@ -32,7 +33,6 @@ class GameDialog:
 
     win_size_tiles = Point(20, 15)
     tile_size_pixels = 48
-    font_size = 32
     font_color = NOMINAL_HEALTH_FONT_COLOR
     font: pygame.Font
     anti_alias = True
@@ -42,21 +42,43 @@ class GameDialog:
 
     @staticmethod
     def static_init(win_size_tiles: Point,
-                    tile_size_pixels: int) -> None:
+                    tile_size_pixels: int,
+                    font_names: List[str] = []) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
-        # GameDialog.font_size = 1
-        # while pygame.font.SysFont('arial', GameDialog.font_size).get_height() < tile_size_pixels:
-        #   GameDialog.font_size += 1
-        # GameDialog.font_size -= 1
-        # print('GameDialog.font_size =', GameDialog.font_size, flush=True)
+
+        # Determine font
+        font_name = None
+        for name in font_names:
+            if name in pygame.font.get_fonts():
+                font_name = name
+                print('Found system font', name, flush=True)
+                break
+            elif os.path.exists(name):
+                font_name = name
+                print('Found font', name, flush=True)
+                break
+            else:
+                print('Failed to load font', name, flush=True)
+
+        # Log information about available fonts if using the default font
+        if font_name is None:
+            print('pygame.font.get_default_font() =', pygame.font.get_default_font(), flush=True)
+            print('pygame.font.get_fonts() =', pygame.font.get_fonts(), flush=True)
+
+        # Determine font size by sizing it based on the tile size
+        def create_font(name: str, size: int) -> pygame.Font:
+            if name in pygame.font.get_fonts():
+                return pygame.font.SysFont(name, size)
+            return pygame.font.Font(name, size)
+        font_size = 1
+        while create_font(font_name, font_size).get_height() < tile_size_pixels - GameDialog.internal_spacing_pixels:
+            font_size += 1
+        font_size -= 1
+        print('font_size =', font_size, flush=True)
 
         # Create font
-        # TODO: Size font to tile_size_pixels
-        # print('pygame.font.get_default_font() =', pygame.font.get_default_font(), flush=True)
-        # print('pygame.font.get_fonts() =', pygame.font.get_fonts(), flush=True)
-        GameDialog.font = pygame.font.SysFont('arialms', GameDialog.font_size)
-        # GameDialog.font = pygame.font.Font(None, GameDialog.tile_size_pixels)
+        GameDialog.font = create_font(font_name, font_size)
 
     @staticmethod
     def get_size_for_content(longest_string: str,
@@ -119,7 +141,7 @@ class GameDialog:
 
         # Initialize the image
         self.image = pygame.surface.Surface((0, 0))
-        self.intitialize_image()
+        self.initialize_image()
 
         self.displayed_message_lines: List[str] = []
         self.remaining_message_lines: List[str] = []
@@ -139,7 +161,7 @@ class GameDialog:
         self.user_text = ''
         self.input_allowed_characters: Optional[str] = None
 
-    def intitialize_image(self) -> None:
+    def initialize_image(self) -> None:
         self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
         self.image.fill(pygame.Color('black'))
         pygame.draw.rect(self.image, self.font_color,
@@ -439,7 +461,7 @@ class GameDialog:
 
     def refresh_image(self) -> None:
         # Clear the image
-        self.intitialize_image()
+        self.initialize_image()
 
         # Blit lines to dialog
         col_pos_x = GameDialog.outside_spacing_pixels
@@ -667,7 +689,7 @@ class GameDialog:
             col_pos_x = first_col_pos_x + self.menu_col * (
                         self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) / num_cols
         row_pos_y = self.get_row_pos_y(len(self.displayed_message_lines) + self.menu_row) + (
-                    GameDialog.font.get_height() - GameDialog.internal_spacing_pixels) / 3
+                    GameDialog.font.get_height() - GameDialog.selection_indicator_pixels) / 2
         pointlist = (
             (col_pos_x + 1 / 4 * GameDialog.selection_indicator_pixels,
              row_pos_y),
@@ -824,7 +846,7 @@ def main() -> None:
     clock = pygame.time.Clock()
 
     # Test out game dialog
-    GameDialog.static_init(win_size_tiles, tile_size_pixels)
+    GameDialog.static_init(win_size_tiles, tile_size_pixels, ['lucidasans', 'arialms'])
     from HeroState import HeroState
     hero_party = HeroParty(HeroState.create_null())
 

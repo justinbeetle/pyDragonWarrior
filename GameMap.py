@@ -50,13 +50,23 @@ class CharacterSprite(MapSprite):
         self.character = character
         self.phase = 0
         self.update_count = 0
-        self.updates_per_phase_change = 20  # TODO: Make this a parameter of a character
+
+        # TODO: Make updates_per_phase_change a parameter of a character
+        if self.character.character_type.num_phases == 2:
+            self.updates_per_phase_change = 20
+            self.character_phase_progression = [0, 1]
+        else:
+            self.updates_per_phase_change = 15
+            self.character_phase_progression = [0, 1, 2, 1]
 
         self.image = self.get_image()
         self.rect = self.get_rect()
 
+    def get_phase_image_index(self) -> int:
+        return self.character_phase_progression[self.phase]
+
     def get_image(self) -> pygame.Surface:
-        return self.character.character_type.images[self.character.direction][self.phase]
+        return self.character.character_type.images[self.character.direction][self.get_phase_image_index()]
 
     def get_rect(self):
         char_rect = self.image.get_rect()
@@ -76,7 +86,7 @@ class CharacterSprite(MapSprite):
         # Check for phase updates
         self.update_count += 1
         if self.update_count % self.updates_per_phase_change == 0:
-            self.phase = (self.phase + 1) % self.character.character_type.num_phases
+            self.phase = (self.phase + 1) % len(self.character_phase_progression)
 
         # Update the image and rect
         self.image = self.get_image()
@@ -111,13 +121,23 @@ class HeroSprite(CharacterSprite):
                 character_images = HeroSprite.character_types['hero'].images
         else:
             character_images = self.character.character_type.images
-        return character_images[self.character.direction][self.phase]
+        return character_images[self.character.direction][self.get_phase_image_index()]
 
 
 class NpcSprite(CharacterSprite):
     def __init__(self, character: NpcState) -> None:
         self.updates_per_npc_move = 60  # TODO: Make this a parameter of a character
         super().__init__(character)
+
+        # Vary the movement rate across the NPCs
+        move_delta = random.randint(-10, 10)
+        self.updates_per_npc_move += move_delta
+        self.updates_per_phase_change += move_delta // 2
+        self.update_count = random.randint(0, max(0, self.updates_per_npc_move-1))
+
+        # Increase updates_per_phase_change for characters which are not moving
+        if not self.character.npc_info.walking:
+            self.updates_per_phase_change *= 2
 
     def update(self, game_map):
         if self.character.npc_info.walking:
