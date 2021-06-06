@@ -16,13 +16,13 @@ class MapGenCa:
 
 
 def main() -> None:
-    from GameInfo import GameInfoMapViewer
+    from GameMap import MapViewer
     from GameTypes import Map
 
     # Generate and render a map
     map_name = 'mapGenCa'
-    viewer = GameInfoMapViewer()
-    viewer.game_info.maps[map_name] = Map.create(map_name, MapGenCa.genMapDat(50,50))
+    viewer = MapViewer()
+    viewer.game_info.maps[map_name] = Map.create(map_name, MapGenCa.genMapDat(50, 50))
     viewer.view_map(map_name)
 
 

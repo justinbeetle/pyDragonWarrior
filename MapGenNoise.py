@@ -76,12 +76,12 @@ class MapGenNoise:
 
 
 def main() -> None:
-    from GameInfo import GameInfoMapViewer
+    from GameMap import MapViewer
     from GameTypes import Map
 
     # Generate and render a map
     map_name = 'mapGenNoise'
-    viewer = GameInfoMapViewer()
+    viewer = MapViewer()
     elevation_seed = 0      # int(random.random() * 10000)
     moisture_seed = 123456  # int(random.random() * 10000)
     print('elevation_seed =', elevation_seed)
