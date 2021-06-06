@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from typing import List, Optional
-from GameTypes import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo
+from GameTypes import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo, Tile
 
 import abc
 import pygame
@@ -20,6 +20,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_game_info(self) -> GameInfo:
+        pass
+
+    @abc.abstractmethod
+    def get_tile_info(self, tile: Optional[Point]) -> Tile:
         pass
 
     @abc.abstractmethod
@@ -86,8 +90,8 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
     def draw_map(self,
                  flip_buffer: bool = True,
                  draw_background: bool = True,
-                 draw_characters: bool = True,
-                 draw_combat: bool = True) -> None:
+                 draw_combat: bool = True,
+                 draw_status: bool = True) -> None:
         pass
 
     @abc.abstractmethod

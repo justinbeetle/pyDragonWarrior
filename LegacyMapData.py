@@ -6,7 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import List, Optional
+from typing import Iterator, List, Optional, Tuple
 
 import collections
 import pygame
@@ -16,7 +16,7 @@ from GameInfo import GameInfo
 from Point import Point
 
 
-class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
+class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     BASE_MAP_LAYER = 0
     DECORATION_LAYER = 1
     CHARACTER_LAYER = 2
@@ -38,21 +38,23 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         # Load up the images for the base map and overlay
         self.base_map_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].dat)
         self.overlay_images = None
-        if self.game_info.maps[map_name].overlay_dat is not None:
-            self.overlay_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].overlay_dat)
+        overlay_dat = self.game_info.maps[map_name].overlay_dat
+        if overlay_dat is not None:
+            self.overlay_images = self.get_map_images_from_game_info(overlay_dat)
         self.layers_to_render = self.all_tile_layers
 
-    def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.Surface]]]:
+    def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.surface.Surface]]]:
 
         def pad_row(row_to_pad: str) -> str:
-            return row_to_pad[0] * self.image_pad_tiles.w + row_to_pad + row_to_pad[-1] * self.image_pad_tiles.w
+            pad_width = int(self.image_pad_tiles.w)
+            return row_to_pad[0] * pad_width + row_to_pad + row_to_pad[-1] * pad_width
 
         # Pad dat to generate padded_dat
         padded_dat: List[str] = []
 
         # Top padding
         padded_row = pad_row(dat[0])
-        for i in range(self.image_pad_tiles.h):
+        for i in range(int(self.image_pad_tiles.h)):
             padded_dat.append(padded_row)
 
         # Middle
@@ -61,13 +63,13 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
 
         # Bottom padding
         padded_row = pad_row(dat[-1])
-        for i in range(self.image_pad_tiles.h + 1):
+        for i in range(int(self.image_pad_tiles.h) + 1):
             padded_dat.append(padded_row)
 
         # Generate map_images from padded_dat
-        map_images: List[List[Optional[pygame.Surface]]] = []
+        map_images: List[List[Optional[pygame.surface.Surface]]] = []
         for y, row_data in enumerate(padded_dat):
-            map_images_row: List[Optional[pygame.Surface]] = []
+            map_images_row: List[Optional[pygame.surface.Surface]] = []
             for x, tile_symbol in enumerate(row_data):
                 if tile_symbol not in self.game_info.tile_symbols:
                     map_images_row.append(None)
@@ -101,8 +103,9 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         return layers_to_render_orig != self.visible_tile_layers
 
     def is_interior(self, pos_dat_tile: Point) -> bool:
+        tile_x, tile_y = pos_dat_tile.getAsIntTuple()
         for l in self.overlay_tile_layers:
-            if self._get_tile_image(pos_dat_tile.x, pos_dat_tile.y, l,
+            if self._get_tile_image(tile_x, tile_y, l,
                                     image_indexing=False, limit_to_visible=False) is not None:
                 return True
         return False
@@ -110,42 +113,42 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
     def is_exterior(self, pos_dat_tile: Point) -> bool:
         return not self.is_interior(pos_dat_tile)
 
-    def set_tile_layers_to_render(self, layers_to_render):
+    def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
         if self.layers_to_render != layers_to_render:
             self.layers_to_render = layers_to_render
 
-    def decrement_layers_to_render(self):
+    def decrement_layers_to_render(self) -> None:
         self.layers_to_render = self.base_tile_layers
 
-    def increment_layers_to_render(self):
+    def increment_layers_to_render(self) -> None:
         self.layers_to_render = self.all_tile_layers
 
     @property
-    def all_tile_layers(self):
+    def all_tile_layers(self) -> List[int]:
         return self.base_tile_layers + self.overlay_tile_layers
 
     @property
-    def base_tile_layers(self):
+    def base_tile_layers(self) -> List[int]:
         return [LegacyMapData.BASE_MAP_LAYER]
 
     @property
-    def decoration_layer(self):
+    def decoration_layer(self) -> int:
         return LegacyMapData.DECORATION_LAYER
 
     @property
-    def character_layer(self):
+    def character_layer(self) -> int:
         return LegacyMapData.CHARACTER_LAYER
 
     @property
-    def overlay_tile_layers(self):
+    def overlay_tile_layers(self) -> List[int]:
         if self.overlay_images is not None:
             return[LegacyMapData.OVERLAY_MAP_LAYER]
         return []
 
-    def get_animations(self):
-        return None
+    def get_animations(self) -> None:
+        return
 
-    def convert_surfaces(self, parent, alpha=False):
+    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool=False) -> None:
         """ Convert all images in the data to match the parent
 
         :param parent: pygame.Surface
@@ -153,12 +156,12 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         :return: None
         """
 
-        def convert_surfaces_helper(map_images: List[List[Optional[pygame.Surface]]],
-                                    parent: pygame.Surface,
-                                    alpha=False) -> List[List[Optional[pygame.Surface]]]:
-            converted_map_images: List[List[Optional[pygame.Surface]]] = []
+        def convert_surfaces_helper(map_images: List[List[Optional[pygame.surface.Surface]]],
+                                    parent: pygame.surface.Surface,
+                                    alpha: bool=False) -> List[List[Optional[pygame.surface.Surface]]]:
+            converted_map_images: List[List[Optional[pygame.surface.Surface]]] = []
             for map_images_row in map_images:
-                converted_images_row: List[Optional[pygame.Surface]] = []
+                converted_images_row: List[Optional[pygame.surface.Surface]] = []
                 for image in map_images_row:
                     if image is None:
                         converted_images_row.append(None)
@@ -174,7 +177,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
             self.overlay_images = convert_surfaces_helper(self.overlay_images, parent, alpha)
 
     @property
-    def tile_size(self):
+    def tile_size(self) -> Tuple[int, int]:
         """ This is the pixel size of tiles to be rendered
         
         :return: (int, int)
@@ -182,40 +185,45 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         return self.game_info.tile_size_pixels, self.game_info.tile_size_pixels
 
     @property
-    def map_size(self):
+    def map_size(self) -> Tuple[int, int]:
         """ This is the size of the map in tiles
 
         :return: (int, int)
         """
         # This size INCLUDES the padding
-        return self.map_size_tiles.w, self.map_size_tiles.h
+        return self.map_size_tiles.getAsIntTuple()
 
     @property
-    def visible_tile_layers(self):
+    def visible_tile_layers(self) -> List[int]:
         return self.layers_to_render
 
     @property
-    def visible_object_layers(self):
+    def visible_object_layers(self) -> List[int]:
         return []
 
-    def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
+    def _get_tile_image(self,
+                        x: int,
+                        y: int,
+                        l: int,
+                        image_indexing: bool=True,
+                        limit_to_visible: bool=True) -> Optional[pygame.surface.Surface]:
         if l not in self.all_tile_layers or (limit_to_visible and l not in self.layers_to_render):
             return None
 
         if not image_indexing:
             # With image_indexing, coord (0,0) is where the pad starts.
             # Without image_indexing, coord (0,0) is where the Tiled map starts.
-            x = x + self.image_pad_tiles[0]
-            y = y + self.image_pad_tiles[1]
+            x = x + int(self.image_pad_tiles[0])
+            y = y + int(self.image_pad_tiles[1])
 
         if l == LegacyMapData.BASE_MAP_LAYER:
             return self.base_map_images[y][x]
-        elif l == LegacyMapData.OVERLAY_MAP_LAYER:
+        elif l == LegacyMapData.OVERLAY_MAP_LAYER and self.overlay_images is not None:
             return self.overlay_images[y][x]
 
         return None
 
-    def _get_tile_image_by_id(self, id):
+    def _get_tile_image_by_id(self, id: int) -> Optional[pygame.surface.Surface]:
         """ Return Image by a custom ID
 
         Used for animations.  Not required for static maps.
@@ -225,12 +233,13 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):
         """
         return None
 
-    def get_tile_images_by_rect(self, rect):
+    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
         x1, y1, x2, y2 = pyscroll.rect_to_bb(rect)
-        x1 = min(max(x1, 0), self.map_size_tiles.w - 1)
-        x2 = min(max(x2, 0), self.map_size_tiles.w - 1)
-        y1 = min(max(y1, 0), self.map_size_tiles.h - 1)
-        y2 = min(max(y2, 0), self.map_size_tiles.h - 1)
+        tiles_w, tiles_h = self.map_size_tiles.getAsIntTuple()
+        x1 = min(max(x1, 0), tiles_w - 1)
+        x2 = min(max(x2, 0), tiles_w - 1)
+        y1 = min(max(y1, 0), tiles_h - 1)
+        y2 = min(max(y2, 0), tiles_h - 1)
 
         for l in self.visible_tile_layers:
             for y in range(y1, y2+1):
@@ -248,11 +257,11 @@ class ScrollTest:
     For normal use, please see the quest demo, not this.
 
     """
-    def __init__(self, screen: pygame.Surface, game_info: GameInfo, map_name: str):
+    def __init__(self, screen: pygame.surface.Surface, game_info: GameInfo, map_name: str):
         self.screen = screen
 
         # create new data source
-        map_data = LegacyMapData(game_info, map_name, (100, 100))
+        map_data = LegacyMapData(game_info, map_name, Point(100, 100))
 
         # create new renderer
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
@@ -263,21 +272,21 @@ class ScrollTest:
              "arrow keys move"]
 
         # save the rendered text
-        self.text_overlay = [f.render(i, 1, (180, 180, 0)) for i in t]
+        self.text_overlay = [f.render(i, True, (180, 180, 0)) for i in t]
 
         # set our initial viewpoint in the center of the map
         self.center = [self.map_layer.map_rect.width / 2,
                        self.map_layer.map_rect.height / 2]
 
         # the camera vector is used to handle camera movement
-        self.camera_acc = [0, 0, 0]
-        self.camera_vel = [0, 0, 0]
-        self.last_update_time = 0
+        self.camera_acc = [0.0, 0.0, 0.0]
+        self.camera_vel = [0.0, 0.0, 0.0]
+        self.last_update_time = 0.0
 
         # true when running
         self.running = False
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.surface.Surface) -> None:
 
         # tell the map_layer (BufferedRenderer) to draw to the surface
         # the draw function requires a rect to draw to.
@@ -286,13 +295,13 @@ class ScrollTest:
         # blit our text over the map
         self.draw_text(surface)
 
-    def draw_text(self, surface):
+    def draw_text(self, surface: pygame.surface.Surface) -> None:
         y = 0
         for text in self.text_overlay:
             surface.blit(text, (0, y))
             y += text.get_height()
 
-    def handle_input(self):
+    def handle_input(self) -> None:
         """ Simply handle pygame input events
         """
         for event in pygame.event.get():
@@ -341,7 +350,7 @@ class ScrollTest:
         else:
             self.camera_acc[0] = 0
 
-    def update(self, td):
+    def update(self, td: float) -> None:
         self.last_update_time = td
 
         friction = pow(.0001, self.last_update_time)
@@ -381,16 +390,16 @@ class ScrollTest:
         # in a game, you would set center to a playable character
         self.map_layer.center(self.center)
 
-    def run(self):
+    def run(self) -> None:
         clock = pygame.time.Clock()
         self.running = True
-        fps = 60.
-        fps_log = collections.deque(maxlen=20)
+        fps = 60.0
+        fps_log: collections.deque[float] = collections.deque(maxlen=20)
 
         try:
             while self.running:
                 # somewhat smoother way to get fps and limit the framerate
-                clock.tick(fps*2)
+                clock.tick(int(fps*2))
 
                 try:
                     fps_log.append(clock.get_fps())
@@ -419,11 +428,11 @@ class MapViewer:
         self.tile_size_pixels = 20
         desired_win_size_pixels = Point(2560, 1340)
         if desired_win_size_pixels is None:
-            self.screen = pygame.display.set_mode(
+            self.screen: pygame.surface.Surface = pygame.display.set_mode(
                 (0, 0),
                 pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
-            self.win_size_pixels = Point(self.screen.get_size())
-            self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).floor()
+            self.win_size_pixels: Point = Point(self.screen.get_size())
+            self.win_size_tiles: Point = (self.win_size_pixels / self.tile_size_pixels).floor()
         else:
             self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels

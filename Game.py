@@ -44,7 +44,7 @@ class Game:
         title_image_size_px = Point(self.game_state.game_info.title_image.get_size())
         title_image_size_px *= max(1, int(min(self.game_state.get_win_size_pixels().w * 0.8 / title_image_size_px.w,
                                               self.game_state.get_win_size_pixels().h * 0.8 / title_image_size_px.h)))
-        title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px)
+        title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px.getAsIntTuple())
         title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
                                     self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
         self.game_state.screen.fill(pygame.Color('black'))
@@ -398,8 +398,8 @@ class Game:
 
             # Determine if the movement should result in a transition to another map
             map_size = self.game_state.game_map.size()
-            if self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition is not None:
-                leaving_transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
+            leaving_transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
+            if leaving_transition is not None:
                 if leaving_transition.bounding_box:
                     if not leaving_transition.bounding_box.collidepoint(hero_dest_dat_tile.getAsIntTuple()):
                         transition = leaving_transition
@@ -481,6 +481,9 @@ class Game:
 
 
 def main() -> None:
+    # Set the current working directory to the location of this file so that the game can be run from any path
+    os.chdir(os.path.dirname(__file__))
+
     pygame.init()
     pygame.mouse.set_visible(False)
     has_joystick = GameEvents.setup_joystick()

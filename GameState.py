@@ -30,6 +30,8 @@ class GameState(GameStateInterface):
     PHASE_TICKS = 20
     NPC_MOVE_STEPS = 60
 
+    game_map: GameMap
+
     def __init__(self,
                  base_path: str,
                  game_xml_path: str,
@@ -531,7 +533,7 @@ class GameState(GameStateInterface):
         encounter_image_size_px *= min(self.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
                                        self.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h)
         encounter_image_size_px = encounter_image_size_px.round()
-        encounter_image = pygame.transform.smoothscale(encounter_image, encounter_image_size_px)
+        encounter_image = pygame.transform.smoothscale(encounter_image, encounter_image_size_px.getAsIntTuple())
 
         # Perform the combat encounter
         CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')

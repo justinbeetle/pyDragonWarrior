@@ -23,7 +23,7 @@ class HeroParty:
 
         self.repel_monsters = False
         self.repel_monsters_decay_steps_remaining: Optional[int] = None
-        self.repel_monster_fade_dialog = None
+        self.repel_monster_fade_dialog: Optional[DialogType] = None
 
         self.last_outside_map_name = ''
         self.last_outside_pos_dat_tile = Point()

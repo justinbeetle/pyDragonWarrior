@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Dict, List, Optional, Union
+from typing import cast, Dict, List, Optional, Union
 
 import os
 import pygame
@@ -10,13 +10,12 @@ import xml.etree.ElementInclude
 #import lxml.etree as ET  # May desire to use in future for better xinclude support
 
 from AudioPlayer import AudioPlayer
-import GameEvents
 from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterType, Decoration, DialogAction, \
     DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
     DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, EncounterBackground, GameTypes,\
-    ItemType, Level, Map, MapDecoration, MapImageInfo, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, \
+    ItemType, Level, Map, MapDecoration, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, \
     NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
 
 from Point import Point
@@ -233,15 +232,13 @@ class GameInfo:
                 tile_type = element.attrib['type']
 
             # Load the tile image for tile types which are not exclusive to tiled maps
-            if tile_type == 'tiled':
-                tile_images_scaled: List[List[pygame.surface.Surface]] = []
-            else:
+            tile_images_scaled: List[List[pygame.surface.Surface]] = []
+            if tile_type != 'tiled':
                 # print('Loading image', tileImageFileName, flush=True)
                 tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
 
             if tile_type == 'complex':
                 image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
-                tile_images_scaled: List[List[pygame.surface.Surface]] = []
                 for x in range(16):
                     tile_images_scaled.append([])
                 unscaled_size = tile_image_unscaled.get_height()/4
@@ -440,14 +437,14 @@ class GameInfo:
                     y_px = idx * phase_image_size.h
                     direction_character_type_images = {}
                     for phase in range(num_phases):
-                        x_px = phase * phase_image_size.w
+                        x_px = phase * int(phase_image_size.w)
                         image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
                                                        flags=pygame.SRCALPHA)
                         pygame.transform.scale(character_type_image.subsurface(x_px,
                                                                                y_px,
                                                                                phase_image_size.w,
                                                                                phase_image_size.h),
-                                               phase_image_scaled_size,
+                                               phase_image_scaled_size.getAsIntTuple(),
                                                image.subsurface(dest_image_rect))
                         direction_character_type_images[phase] = image
                     character_type_images[direction] = direction_character_type_images
@@ -765,7 +762,7 @@ class GameInfo:
             # Load the encounter image
             # print('Load the encounter image', flush=True)
             encounter_image = None
-            if len(monster_zones) and 'encounterBackground' in element:
+            if len(monster_zones) and 'encounterBackground' in element.attrib:
                 encounter_image_file_name = os.path.join(encounter_path, element.attrib['encounterBackground'])
                 unscaled_encounter_image = pygame.image.load(encounter_image_file_name).convert()
                 encounter_image = pygame.transform.scale(unscaled_encounter_image,
@@ -833,11 +830,13 @@ class GameInfo:
             else:
                 save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + '.xml')
 
+        initial_state_element: Optional[ET.Element] = None
         if save_game_file_path is not None and os.path.isfile(save_game_file_path):
             print('Loading save game from file ' + save_game_file_path, flush=True)
             initial_state_element = ET.parse(save_game_file_path).getroot()
         else:
-            self.pc_name = pc_name_or_file_name
+            if pc_name_or_file_name is not None:
+                self.pc_name = pc_name_or_file_name
             xml_root = ET.parse(self.game_xml_path).getroot()
             initial_state_element = xml_root.find('InitialState')
 
@@ -1098,21 +1097,4 @@ class GameInfo:
         images = self.tiles[self.tile_symbols[symbol]].images[idx]
         if 1 == len(images):
             return images[0]
-        return numpy.random.choice(images, p=self.tile_probabilities[len(images) - 1])
-
-
-def main() -> None:
-    pass
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        import sys
-        import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
-        traceback.print_exc()
+        return cast(pygame.surface.Surface, numpy.random.choice(images, p=self.tile_probabilities[len(images) - 1]))

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
+import abc
 import math
 import pygame
 import pyscroll
@@ -19,7 +20,19 @@ from MapCharacterState import MapCharacterState
 from NpcState import NpcState
 
 
+class GameMapInterface(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def can_move_to_tile(self,
+                         tile: Point,
+                         enforce_npc_hp_penalty_limit: bool = False,
+                         enforce_npc_dof_limit: bool = False,
+                         is_npc: bool = False,
+                         prev_tile: Optional[Point] = None) -> bool:
+        pass
+
+
 class MapSprite(pygame.sprite.Sprite):
+    image: pygame.surface.Surface
     image_pad_tiles = Point()
     tile_size_pixels = 16
     image_px_step_size = 4
@@ -27,7 +40,7 @@ class MapSprite(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
 
-    def get_rect_from_tile(self, tile: Point):
+    def get_rect_from_tile(self, tile: Point) -> pygame.rect.Rect:
         return self.image.get_rect().move((MapSprite.image_pad_tiles + tile) * MapSprite.tile_size_pixels)
 
 
@@ -35,6 +48,8 @@ class MapDecorationSprite(MapSprite):
     def __init__(self, decoration: MapDecoration) -> None:
         super().__init__()
         self.decoration = decoration
+        if self.decoration.type is None or self.decoration.type.image is None:
+            raise AttributeError("All MapSprites require a MapDecoration with an image")
         self.image = self.decoration.type.image
         self.rect = self.get_rect_from_tile(self.decoration.point)
 
@@ -45,6 +60,8 @@ class MapDecorationSprite(MapSprite):
 
 
 class CharacterSprite(MapSprite):
+    character: MapCharacterState
+
     def __init__(self, character: MapCharacterState) -> None:
         super().__init__()
         self.character = character
@@ -65,16 +82,16 @@ class CharacterSprite(MapSprite):
     def get_phase_image_index(self) -> int:
         return self.character_phase_progression[self.phase]
 
-    def get_image(self) -> pygame.Surface:
+    def get_image(self) -> pygame.surface.Surface:
         return self.character.character_type.images[self.character.direction][self.get_phase_image_index()]
 
-    def get_rect(self):
+    def get_rect(self) -> pygame.rect.Rect:
         char_rect = self.image.get_rect()
         char_rect.midbottom = self.get_rect_from_tile(self.character.curr_pos_dat_tile).move(
             self.character.curr_pos_offset_img_px).midbottom
         return char_rect
 
-    def update(self, game_map):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         # Move the character in steps to the destination tile
         if self.character.curr_pos_dat_tile != self.character.dest_pos_dat_tile:
             direction_vector = self.character.direction.get_vector()
@@ -98,13 +115,14 @@ class CharacterSprite(MapSprite):
 
 
 class HeroSprite(CharacterSprite):
+    character: HeroState
     character_types: Dict[str, CharacterType] = {}
 
     def __init__(self, hero: HeroState, hero_party: HeroParty) -> None:
         self.hero_party = hero_party
         super().__init__(hero)
 
-    def get_image(self) -> pygame.Surface:
+    def get_image(self) -> pygame.surface.Surface:
         if self.character.hp <= 0:
             character_images = HeroSprite.character_types['ghost'].images
         elif self.character.character_type.name == 'hero':
@@ -125,7 +143,10 @@ class HeroSprite(CharacterSprite):
 
 
 class NpcSprite(CharacterSprite):
-    def __init__(self, character: NpcState) -> None:
+    character: NpcState
+
+    def __init__(self, character: NpcState, game_map: GameMapInterface) -> None:
+        self.game_map = game_map
         self.updates_per_npc_move = 60  # TODO: Make this a parameter of a character
         super().__init__(character)
 
@@ -139,20 +160,20 @@ class NpcSprite(CharacterSprite):
         if not self.character.npc_info.walking:
             self.updates_per_phase_change *= 2
 
-    def update(self, game_map):
+    def update(self, *args: Any, **kwargs: Any) -> None:
         if self.character.npc_info.walking:
             # Start moving NPC by setting a destination tile
             if (self.update_count % self.updates_per_npc_move) == self.updates_per_npc_move - 1:
                 # TODO: Determine where to move instead of blindly moving forward
                 self.character.direction = random.choice(list(Direction))
                 dest_tile = self.character.curr_pos_dat_tile + self.character.direction.get_vector()
-                if game_map.can_move_to_tile(dest_tile, True, True, True, self.character.curr_pos_dat_tile):
+                if self.game_map.can_move_to_tile(dest_tile, True, True, True, self.character.curr_pos_dat_tile):
                     self.character.dest_pos_dat_tile = dest_tile
 
-        super().update(game_map)
+        super().update()
 
 
-class GameMap:
+class GameMap(GameMapInterface):
     def __init__(self,
                  game_state: GameStateInterface,
                  map_name: str,
@@ -169,8 +190,9 @@ class GameMap:
             self.map_decorations = map_decorations
 
         # Set the NPCs
-        self.npcs: List[NpcState] = npcs
-        if self.npcs is None:
+        if npcs is not None:
+            self.npcs = npcs
+        else:
             self.npcs = []
             for npc in self.map.npcs:
                 self.npcs.append(NpcState(npc))
@@ -205,22 +227,24 @@ class GameMap:
         hero_party = self.game_state.get_hero_party()
         for hero in reversed(hero_party.members):
             self.group.add(HeroSprite(hero, hero_party), layer=self.map_data.character_layer)
-        for npc in self.npcs:
-            self.group.add(NpcSprite(npc), layer=self.map_data.character_layer)
+        for npc_info in self.npcs:
+            self.group.add(NpcSprite(npc_info, self), layer=self.map_data.character_layer)
 
-    def size(self, with_padding=False) -> Point:
+    def size(self, with_padding: bool=False) -> Point:
         # Doesn't include padding, just the size of data size of the map
         if with_padding:
             return Point(self.map_data.map_size)
         else:
             return Point(self.map_data.map_size) - 2 * self.game_state.get_image_pad_tiles()
 
-    def update(self):
-        self.group.update(self)
+    def update(self) -> None:
+        self.group.update()
 
-    def draw(self, surface: Optional[pygame.Surface] = None):
+    def draw(self, surface: Optional[pygame.surface.Surface] = None) -> None:
         if surface is None:
             surface = self.game_state.screen
+            if surface is None:
+                return
 
         # Center the map on the PC
         self.group.center((self.game_state.get_image_pad_tiles() + Point(0.5, 0.5) +
@@ -235,9 +259,9 @@ class GameMap:
         # the draw function requires a rect to draw to.
         self.group.draw(surface)
 
-        if self.game_state.get_hero_party().light_diameter is not None:
-            light_radius_px = self.game_state.get_hero_party().light_diameter \
-                                * self.game_state.get_game_info().tile_size_pixels / 2
+        light_diameter = self.game_state.get_hero_party().light_diameter
+        if light_diameter is not None:
+            light_radius_px = light_diameter * self.game_state.get_game_info().tile_size_pixels / 2
 
             # Left
             surface.fill(pygame.Color('black'), pygame.Rect(0,
@@ -269,8 +293,9 @@ class GameMap:
 
         if isinstance(self.map_data, PaddedTiledMapData):
             tile_name = None
+            tile_x, tile_y = tile.getAsIntTuple()
             for l in self.map_data.base_tile_layers:
-                tile_properties = self.map_data.get_tile_properties(tile.x, tile.y, l)
+                tile_properties = self.map_data.get_tile_properties(tile_x, tile_y, l)
                 if tile_properties is not None and 'type' in tile_properties and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
@@ -302,17 +327,19 @@ class GameMap:
         return decorations
 
     def get_npc_to_talk_to(self) -> Optional[NpcInfo]:
-        talk_dest_dat_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
-                             + self.game_state.hero_party.members[0].direction.get_vector()
+        talk_dest_dat_tile = self.game_state.get_hero_party().members[0].curr_pos_dat_tile \
+                             + self.game_state.get_hero_party().members[0].direction.get_vector()
         talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
         if talk_dest_tile_type.can_talk_over:
             talk_dest_dat_tile = talk_dest_dat_tile \
-                                 + self.game_state.hero_party.members[0].direction.get_vector()
+                                 + self.game_state.get_hero_party().members[0].direction.get_vector()
 
         for sprite in self.group:
-            if not isinstance(sprite, NpcSprite):
+            if isinstance(sprite, NpcSprite):
+                npc_info = sprite.character.npc_info
+            else:
                 continue
-            npc_info = sprite.character.npc_info
+
             if (npc_info is not None and
                     (talk_dest_dat_tile == sprite.character.curr_pos_dat_tile or
                      talk_dest_dat_tile == sprite.character.dest_pos_dat_tile)):
@@ -320,9 +347,9 @@ class GameMap:
                 if npc_info.dialog is not None:
                     sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = talk_dest_dat_tile
                     sprite.character.curr_pos_offset_img_px = Point(0, 0)
-                    sprite.character.direction = self.game_state.hero_party.members[0].direction.get_opposite()
+                    sprite.character.direction = self.game_state.get_hero_party().members[0].direction.get_opposite()
                     sprite.update_count = 0
-                    sprite.update(self)
+                    sprite.update()
 
                     # Stationary characters should resume looking in the default direction after talking to the player.
                     if not npc_info.walking:
@@ -466,9 +493,10 @@ class GameMap:
     @staticmethod
     def get_surrounding_points(point: Point, distance: int, include_point: bool = True) -> List[Point]:
         points = []
-        for x in range(point.x - distance, point.x + distance + 1):
-            for y in range(point.y - distance, point.y + distance + 1):
-                if not include_point and x == point.x and y == point.y:
+        point_x, point_y = point.getAsIntTuple()
+        for x in range(point_x - distance, point_x + distance + 1):
+            for y in range(point_y - distance, point_y + distance + 1):
+                if not include_point and x == point_x and y == point_y:
                     continue
                 points.append(Point(x, y))
         return points
@@ -599,9 +627,9 @@ class GameMap:
 
     def dump_encounter_backgrounds(self) -> None:
         encounter_background_counts = {}
-        map_size = self.size()
-        for x in range(map_size.x):
-            for y in range(map_size.y):
+        map_size_x, map_size_y = self.size().getAsIntTuple()
+        for x in range(map_size_x):
+            for y in range(map_size_y):
                 tile = Point(x, y)
                 tile_info = self.get_tile_info(tile)
                 if tile_info.walkable and tile_info.spawn_rate > 0:
@@ -627,13 +655,13 @@ class MapViewer:
         self.tile_size_pixels = 60
         desired_win_size_pixels = Point(2560, 1340)
         if desired_win_size_pixels is None:
-            self.screen = pygame.display.set_mode(
+            self.screen: pygame.surface.Surface = pygame.display.set_mode(
                 (0, 0),
                 pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)
-            self.win_size_pixels = Point(self.screen.get_size())
-            self.win_size_tiles = (self.win_size_pixels / self.tile_size_pixels).floor()
+            self.win_size_pixels: Point = Point(self.screen.get_size())
+            self.win_size_tiles: Point = self.win_size_pixels // self.tile_size_pixels
         else:
-            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
+            self.win_size_tiles = desired_win_size_pixels // self.tile_size_pixels
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
             self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(), pygame.SRCALPHA)
         self.image_pad_tiles = self.win_size_tiles // 2 * 4

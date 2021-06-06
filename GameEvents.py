@@ -27,15 +27,15 @@ def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: b
             # Convert WASD to Up/Left/Down/Right
             if translate_wasd_to_uldr:
                 if pygame.K_w == event.key:
-                    event.key = pygame.K_UP
+                    event.__dict__['key'] = pygame.K_UP
                 elif pygame.K_a == event.key:
-                    event.key = pygame.K_LEFT
+                    event.__dict__['key'] = pygame.K_LEFT
                 elif pygame.K_s == event.key:
-                    event.key = pygame.K_DOWN
+                    event.__dict__['key'] = pygame.K_DOWN
                 elif pygame.K_d == event.key:
-                    event.key = pygame.K_RIGHT
+                    event.__dict__['key'] = pygame.K_RIGHT
             if pygame.K_KP_ENTER == event.key:
-                event.key = pygame.K_RETURN
+                event.__dict__['key'] = pygame.K_RETURN
 
         elif event.type == pygame.ACTIVEEVENT and event.gain:
             print('Detected gain focus event', flush=True)

@@ -67,7 +67,7 @@ class GameDialog:
             print('pygame.font.get_fonts() =', pygame.font.get_fonts(), flush=True)
 
         # Determine font size by sizing it based on the tile size
-        def create_font(name: str, size: int) -> pygame.Font:
+        def create_font(name: Optional[str], size: int) -> pygame.Font:
             if name in pygame.font.get_fonts():
                 return pygame.font.SysFont(name, size)
             return pygame.font.Font(name, size)
@@ -512,8 +512,8 @@ class GameDialog:
                                     - GameDialog.font.size(self.row_data[row][col])[0]\
                                     - GameDialog.outside_spacing_pixels
                     else:
-                        col_pos_x = first_col_pos_x + col * (
-                                self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) / num_cols
+                        col_pos_x = first_col_pos_x + col * (self.image.get_width() - first_col_pos_x -
+                                                             GameDialog.outside_spacing_pixels) // num_cols
                         if self.is_menu:
                             col_pos_x += GameDialog.selection_indicator_pixels + GameDialog.internal_spacing_pixels
                     self.image.blit(GameDialog.font.render(self.row_data[row][col],
@@ -687,7 +687,7 @@ class GameDialog:
                                  GameDialog.internal_spacing_pixels
         else:
             col_pos_x = first_col_pos_x + self.menu_col * (
-                        self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) / num_cols
+                    self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) // num_cols
         row_pos_y = self.get_row_pos_y(len(self.displayed_message_lines) + self.menu_row) + (
                     GameDialog.font.get_height() - GameDialog.selection_indicator_pixels) / 2
         pointlist = (
@@ -790,7 +790,7 @@ class GameDialog:
         self.input_allowed_characters = input_allowed_characters
 
         if GameDialog.no_keyboard:
-            number_characters = list('7894561230')
+            number_characters = '7894561230'
             import string
             ascii_characters = string.ascii_uppercase + string.ascii_lowercase + '. '
             all_characters = '1234567890' + ascii_characters

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import cast, Optional, List, Union
+from typing import cast, Optional, List, Tuple, Union
 
 import pygame
 import random
@@ -30,12 +30,9 @@ class GameDialogEvaluator:
         self.game_info = game_info
         self.game_state = game_state
         self.combat_encounter = combat_encounter
-        self.hero_party = self.game_state.get_hero_party()
-        self.replacement_variables = self.game_state.get_dialog_replacement_variables()
         self.wait_before_new_text = False
 
-        self.actor: CombatCharacterState = self.hero_party.main_character
-        self.targets: List[CombatCharacterState] = cast(List[CombatCharacterState], self.hero_party.members)
+        self.refresh_game_state()
 
     def refresh_game_state(self) -> None:
         self.hero_party = self.game_state.get_hero_party()
@@ -128,7 +125,7 @@ class GameDialogEvaluator:
     def wait_for_user_input(self,
                             message_dialog: GameDialog,
                             prompt: str,
-                            allowed_input: Optional[str] = None) -> (str, float):
+                            allowed_input: Optional[str] = None) -> Tuple[str, float]:
         message_dialog.prompt_for_user_text(prompt, allowed_input)
         message_dialog.blit(self.game_state.screen, True)
 

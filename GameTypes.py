@@ -87,7 +87,7 @@ class Direction(Enum):
         return opposite
 
     @staticmethod
-    def get_direction(input: Union[Point, int]) -> Optional[Direction]:
+    def get_direction(input: Union[Point, int]) -> Direction:
         if isinstance(input, Point):
             # Input is a vector
             vector = input
@@ -105,7 +105,7 @@ class Direction(Enum):
                 return Direction.EAST
             elif pygame.K_LEFT == pygame_key:
                 return Direction.WEST
-        return None
+        return Direction.NORTH
 
 
 # Conditionals supported for dialog checks
@@ -653,7 +653,7 @@ class EncounterBackground(NamedTuple):
     name: str
     image: pygame.surface.Surface
 
-    def __str__(self) -> int:
+    def __str__(self) -> str:
         return self.name
 
 

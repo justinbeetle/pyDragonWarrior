@@ -6,7 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import List, Optional
+from typing import Any, cast, Dict, Iterator, List, Optional, Tuple
 
 import pygame
 import pyscroll
@@ -15,13 +15,15 @@ import pytmx
 from Point import Point
 
 
-class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
+class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     """ For data loaded from pytmx
 
     Use of this class requires a recent version of pytmx.
     """
 
-    def __init__(self, tmx_filename, image_pad_tiles=(0, 0), desired_tile_size: Optional[int] = None):
+    def __init__(self, tmx_filename: str,
+                 image_pad_tiles: Point=Point(0, 0),
+                 desired_tile_size: Optional[int] = None):
         super(PaddedTiledMapData, self).__init__()
 
         # load data from pytmx
@@ -34,7 +36,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
 
         # Pre-zoom tile images
         if self.pre_zoom != 1.0:
-            images = list()
+            images: List[Optional[pygame.surface.Surface]] = []
             for i in self.tmx.images:
                 if i is not None:
                     images.append(pygame.transform.scale(i, self.tile_size))
@@ -128,7 +130,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
                     return idx
         return None
 
-    def set_tile_layers_to_render(self, layers_to_render):
+    def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
         if self.layers_to_render != layers_to_render:
             self.layers_to_render = layers_to_render
 
@@ -136,7 +138,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         if len(self.layers_to_render) > 1:
             self.layers_to_render = self.layers_to_render[:-1]
 
-    def increment_layers_to_render(self):
+    def increment_layers_to_render(self) -> None:
         layer_added = False
         new_layers = []
         for l in self.all_tile_layers:
@@ -185,7 +187,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
                 tile_layers.append(idx + self.overlay_layer_offset)
         return tile_layers
 
-    def get_animations(self):
+    def get_animations(self) -> Iterator[Tuple[int, Any]]:
         for gid, d in self.tmx.tile_properties.items():
             try:
                 frames = d['frames']
@@ -195,7 +197,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
             if frames:
                 yield gid, frames
 
-    def convert_surfaces(self, parent, alpha=False):
+    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool=False) -> None:
         """ Convert all images in the data to match the parent
 
         :param parent: pygame.Surface
@@ -214,7 +216,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         self.tmx.images = images
 
     @property
-    def tile_size(self):
+    def tile_size(self) -> Tuple[int, int]:
         """ This is the pixel size of tiles to be rendered
         
         :return: (int, int)
@@ -225,7 +227,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
             return int(self.pre_zoom*self.tmx.tilewidth), int(self.pre_zoom*self.tmx.tileheight)
 
     @property
-    def map_size(self):
+    def map_size(self) -> Tuple[int, int]:
         """ This is the size of the map in tiles
         
         :return: (int, int)
@@ -234,7 +236,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return self.tmx.width + 2*self.image_pad_tiles[0], self.tmx.height + 2*self.image_pad_tiles[1]
 
     @property
-    def visible_tile_layers(self):
+    def visible_tile_layers(self) -> List[int]:
         """ This must return layer numbers, not objects
         
         :return: [int, int, ...]
@@ -242,7 +244,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return self.layers_to_render
 
     @property
-    def visible_object_layers(self):
+    def visible_object_layers(self) -> Iterator[pytmx.TiledObjectGroup]:
         """ This must return layer objects
 
         This is not required for custom data formats.
@@ -252,16 +254,21 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         return (layer for layer in self.tmx.visible_layers
                 if isinstance(layer, pytmx.TiledObjectGroup))
 
-    def get_tile_properties(self, x, y, l):
+    def get_tile_properties(self, x: int, y: int, l: int) -> Optional[Dict[str, str]]:
         if l not in self.base_tile_layers:
             l = l - self.overlay_layer_offset
         if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
             return None
         x = min(max(0, x), self.tmx.width-1)
         y = min(max(0, y), self.tmx.height-1)
-        return self.tmx.get_tile_properties(x, y, l)
+        return cast(Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, l))
 
-    def _get_tile_image(self, x, y, l, image_indexing=True, limit_to_visible=True):
+    def _get_tile_image(self,
+                        x: int,
+                        y: int,
+                        l: int,
+                        image_indexing: bool=True,
+                        limit_to_visible: bool=True) -> Optional[pygame.surface.Surface]:
         if l not in self.visible_tile_layers and limit_to_visible:
             return None
         if l not in self.base_tile_layers:
@@ -285,13 +292,13 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
                     render_tile = True
                     break
             if not render_tile:
-                return self.tmx.images[-1]
+                return cast(Optional[pygame.surface.Surface], self.tmx.images[-1])
         try:
-            return self.tmx.get_tile_image(x, y, l)
+            return cast(Optional[pygame.surface.Surface], self.tmx.get_tile_image(x, y, l))
         except ValueError:
             return None
 
-    def _get_tile_image_by_id(self, id):
+    def _get_tile_image_by_id(self, id: int) -> Optional[pygame.surface.Surface]:
         """ Return Image by a custom ID
 
         Used for animations.  Not required for static maps.
@@ -299,9 +306,9 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):
         :param id:
         :return:
         """
-        return self.tmx.images[id]
+        return cast(Optional[pygame.surface.Surface], self.tmx.images[id])
 
-    def get_tile_images_by_rect(self, rect):
+    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
         """ Speed up data access
 
         More efficient because data is accessed and cached locally
@@ -365,11 +372,11 @@ class ScrollTest:
     For normal use, please see the quest demo, not this.
 
     """
-    def __init__(self, screen, filename):
+    def __init__(self, screen: pygame.surface.Surface, filename: str) -> None:
         self.screen = screen
 
         # create new data source
-        map_data = PaddedTiledMapData(filename, (100, 100))
+        map_data = PaddedTiledMapData(filename, Point(100, 100))
 
         # create new renderer
         self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
@@ -380,21 +387,21 @@ class ScrollTest:
              "arrow keys move"]
 
         # save the rendered text
-        self.text_overlay = [f.render(i, 1, (180, 180, 0)) for i in t]
+        self.text_overlay = [f.render(i, True, (180, 180, 0)) for i in t]
 
         # set our initial viewpoint in the center of the map
         self.center = [self.map_layer.map_rect.width / 2,
                        self.map_layer.map_rect.height / 2]
 
         # the camera vector is used to handle camera movement
-        self.camera_acc = [0, 0, 0]
-        self.camera_vel = [0, 0, 0]
-        self.last_update_time = 0
+        self.camera_acc = [0.0, 0.0, 0.0]
+        self.camera_vel = [0.0, 0.0, 0.0]
+        self.last_update_time = 0.0
 
         # true when running
         self.running = False
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.surface.Surface) -> None:
 
         # tell the map_layer (BufferedRenderer) to draw to the surface
         # the draw function requires a rect to draw to.
@@ -403,13 +410,13 @@ class ScrollTest:
         # blit our text over the map
         self.draw_text(surface)
 
-    def draw_text(self, surface):
+    def draw_text(self, surface: pygame.surface.Surface) -> None:
         y = 0
         for text in self.text_overlay:
             surface.blit(text, (0, y))
             y += text.get_height()
 
-    def handle_input(self):
+    def handle_input(self) -> None:
         """ Simply handle pygame input events
         """
         for event in pygame.event.get():
@@ -458,7 +465,7 @@ class ScrollTest:
         else:
             self.camera_acc[0] = 0
 
-    def update(self, td):
+    def update(self, td: float) -> None:
         self.last_update_time = td
 
         friction = pow(.0001, self.last_update_time)
@@ -498,18 +505,18 @@ class ScrollTest:
         # in a game, you would set center to a playable character
         self.map_layer.center(self.center)
 
-    def run(self):
+    def run(self) -> None:
         import collections
 
         clock = pygame.time.Clock()
         self.running = True
-        fps = 60.
-        fps_log = collections.deque(maxlen=20)
+        fps = 60.0
+        fps_log: collections.deque[float] = collections.deque(maxlen=20)
 
         try:
             while self.running:
                 # somewhat smoother way to get fps and limit the framerate
-                clock.tick(fps*2)
+                clock.tick(int(fps*2))
 
                 try:
                     fps_log.append(clock.get_fps())

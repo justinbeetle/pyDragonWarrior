@@ -614,7 +614,8 @@ class CombatEncounter(CombatEncounterInterface):
         elif 2 == a:
             return CombatEncounter.gen_subtraction_problem(min_term=5, max_term=9, minuend_min=12, minuend_max=16)
         elif 3 == a:
-            return CombatEncounter.gen_division_problem(min_term=0, max_term=12, multiplicand_1=[0, 1, 2, 3, 9, 10, 11])
+            return CombatEncounter.gen_division_problem(min_term=0, max_term=12,
+                                                        multiplicand_1_range=[0, 1, 2, 3, 9, 10, 11])
         else:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
 

@@ -106,7 +106,7 @@ def black_red_monochrome_effect(screen: pygame.surface.Surface,
 def rainbow_effect(screen: pygame.surface.Surface,
                    water_tile: pygame.surface.Surface) -> None:
     orig_screen = screen.copy()
-    water_color = pygame.transform.average_color(water_tile)
+    water_color = pygame.transform.average_color(water_tile, None)
     rainbow_colors = [pygame.Color('red'),
                       pygame.Color('orange'),
                       pygame.Color('yellow'),
