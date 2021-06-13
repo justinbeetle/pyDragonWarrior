@@ -357,7 +357,6 @@ class GameState(GameStateInterface):
         if transition is None:
             return False
 
-        map_changing = transition.dest_map != self.get_map_name()
         src_map = self.game_info.maps[self.get_map_name()]
         dest_map = self.game_info.maps[transition.dest_map]
 

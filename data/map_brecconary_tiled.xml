@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="brecconary" tiles="tiled/brecconary.tmx" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <LeavingTransition x="23"  y="29" dir="EAST" toMap="overworld" leftX="22" rightX="67" topY="7" bottomY="53"/>
+   <LeavingTransition x="23"  y="29" dir="EAST" toMap="overworld" leftX="23" rightX="67" topY="7" bottomY="53"/>
    <PointTransition   x="61"  y="10" dir="WEST" name="walls" toMap="brecconary" toName="tower"/>
    <PointTransition   x="65"  y="8"  dir="EAST" name="tower" toMap="brecconary" toName="walls"/>
 

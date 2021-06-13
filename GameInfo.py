@@ -14,9 +14,10 @@ from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterTyp
     DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
-    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, EncounterBackground, GameTypes,\
-    ItemType, Level, Map, MapDecoration, MonsterAction, MonsterActionRule, MonsterInfo, MonsterZone, \
-    NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, Tool, Weapon
+    DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, EncounterBackground, GameTypes, \
+    IncomingTransition, ItemType, Level, Map, MapDecoration, MonsterAction, MonsterActionRule, MonsterInfo, \
+    MonsterZone, NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, \
+    Tool, Weapon
 
 from Point import Point
 
@@ -237,37 +238,37 @@ class GameInfo:
                 # print('Loading image', tileImageFileName, flush=True)
                 tile_image_unscaled = pygame.image.load(tile_image_file_name).convert()
 
-            if tile_type == 'complex':
-                image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
-                for x in range(16):
-                    tile_images_scaled.append([])
-                unscaled_size = tile_image_unscaled.get_height()/4
-                tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
-                max_tile_variants = max(max_tile_variants, tile_variants)
-                for y in range(4):
-                    for x in range(4):
-                        for z in range(tile_variants):
-                            temp_surface = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
-                            pygame.transform.scale(tile_image_unscaled.subsurface(
-                                pygame.Rect(x*unscaled_size + z*tile_image_unscaled.get_height(),
-                                            y*unscaled_size, unscaled_size, unscaled_size)),
-                                (self.tile_size_pixels, self.tile_size_pixels),
-                                temp_surface)
-                            tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
-            elif tile_type == 'simple':
-                tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
-                max_tile_variants = max(max_tile_variants, tile_variants)
-                temp_surface_list: List[pygame.surface.Surface] = []
-                for z in range(tile_variants):
-                    temp_surface_list.append(pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels)))
-                    pygame.transform.scale(tile_image_unscaled.subsurface(
-                        pygame.Rect(z*tile_image_unscaled.get_height(),
-                                    0,
-                                    tile_image_unscaled.get_height(),
-                                    tile_image_unscaled.get_height())),
-                        (self.tile_size_pixels, self.tile_size_pixels),
-                        temp_surface_list[-1])
-                tile_images_scaled = [temp_surface_list] * 16
+                if tile_type == 'complex':
+                    image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
+                    for x in range(16):
+                        tile_images_scaled.append([])
+                    unscaled_size = tile_image_unscaled.get_height()/4
+                    tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
+                    max_tile_variants = max(max_tile_variants, tile_variants)
+                    for y in range(4):
+                        for x in range(4):
+                            for z in range(tile_variants):
+                                temp_surface = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                                pygame.transform.scale(tile_image_unscaled.subsurface(
+                                    pygame.Rect(x*unscaled_size + z*tile_image_unscaled.get_height(),
+                                                y*unscaled_size, unscaled_size, unscaled_size)),
+                                    (self.tile_size_pixels, self.tile_size_pixels),
+                                    temp_surface)
+                                tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
+                elif tile_type == 'simple':
+                    tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
+                    max_tile_variants = max(max_tile_variants, tile_variants)
+                    temp_surface_list: List[pygame.surface.Surface] = []
+                    for z in range(tile_variants):
+                        temp_surface_list.append(pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels)))
+                        pygame.transform.scale(tile_image_unscaled.subsurface(
+                            pygame.Rect(z*tile_image_unscaled.get_height(),
+                                        0,
+                                        tile_image_unscaled.get_height(),
+                                        tile_image_unscaled.get_height())),
+                            (self.tile_size_pixels, self.tile_size_pixels),
+                            temp_surface_list[-1])
+                    tile_images_scaled = [temp_surface_list] * 16
 
             if len(tile_symbol) == 1:
                 self.tile_symbols[tile_symbol] = tile_name
@@ -575,11 +576,52 @@ class GameInfo:
             # print('Parse transitions', flush=True)
             leaving_transition: Optional[OutgoingTransition] = None
             point_transitions: List[OutgoingTransition] = []
+            incoming_transitions: List[IncomingTransition] = []
             transitions_by_map: Dict[str, AnyTransition] = {}
             transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]] = {}
             transitions_by_name: Dict[str, AnyTransition] = {}
             map_decorations: List[MapDecoration] = []
 
+            def parse_incoming_transition(trans_element: ET.Element) -> IncomingTransition:
+                name = None
+                if 'name' in trans_element.attrib:
+                    name = trans_element.attrib['name']
+                progress_marker = None
+                if 'progressMarker' in trans_element.attrib:
+                    progress_marker = trans_element.attrib['progressMarker']
+                inverse_progress_marker = None
+                if 'inverseProgressMarker' in trans_element.attrib:
+                    inverse_progress_marker = trans_element.attrib['inverseProgressMarker']
+                transition = IncomingTransition(self.get_location(map_name, trans_element),
+                                                self.get_direction(map_name, trans_element),
+                                                name,
+                                                trans_element.attrib['toMap'],
+                                                progress_marker,)
+                transitions_by_map[transition.dest_map] = transition
+                if transition.name is not None:
+                    if transition.dest_map not in transitions_by_map_and_name:
+                        transitions_by_map_and_name[transition.dest_map] = {}
+                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
+                    transitions_by_name[transition.name] = transition
+                transition = IncomingTransition(self.get_location(map_name, trans_element),
+                                                self.get_direction(map_name, trans_element),
+                                                name,
+                                                trans_element.attrib['toMap'],
+                                                progress_marker,
+                                                inverse_progress_marker)
+                transitions_by_map[transition.dest_map] = transition
+                if transition.name is not None:
+                    if transition.dest_map not in transitions_by_map_and_name:
+                        transitions_by_map_and_name[transition.dest_map] = {}
+                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
+                    transitions_by_name[transition.name] = transition
+                if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
+                    map_decorations.append(MapDecoration.create(self.decorations[trans_element.attrib['decoration']],
+                                                                transition.point,
+                                                                None,
+                                                                progress_marker,
+                                                                inverse_progress_marker))
+                return transition
             def parse_outgoing_transition(trans_element: ET.Element) -> OutgoingTransition:
                 name = None
                 if 'name' in trans_element.attrib:
@@ -634,6 +676,8 @@ class GameInfo:
                 leaving_transition = parse_outgoing_transition(trans_element)
             for trans_element in element.findall('.//PointTransition'):
                 point_transitions.append(parse_outgoing_transition(trans_element))
+            for trans_element in element.findall('.//IncomingTransition'):
+                incoming_transitions.append(parse_incoming_transition(trans_element))
 
             # Parse standalone decorations
             # print( 'Parse standalone decorations', flush=True )
@@ -779,6 +823,7 @@ class GameInfo:
                                       light_diameter,
                                       leaving_transition,
                                       point_transitions,
+                                      incoming_transitions,
                                       transitions_by_map,
                                       transitions_by_map_and_name,
                                       transitions_by_name,
@@ -817,7 +862,9 @@ class GameInfo:
             if location.dir:
                 print('pulling direction from location')
                 return location.dir
-        return Direction[element.attrib['dir']]
+        if 'dir' in element.attrib:
+            return Direction[element.attrib['dir']]
+        return Direction.NORTH
 
     def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information

@@ -796,7 +796,7 @@
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="123" terrain="0,0,0,0">
+ <tile id="123" terrain="1,2,2,1">
   <properties>
    <property name="type" value="plain"/>
   </properties>

@@ -87,16 +87,16 @@ class Direction(Enum):
         return opposite
 
     @staticmethod
-    def get_direction(input: Union[Point, int]) -> Direction:
-        if isinstance(input, Point):
+    def get_direction(value: Union[Point, int]) -> Direction:
+        if isinstance(value, Point):
             # Input is a vector
-            vector = input
+            vector = value
             for direction in Direction:
                 if direction.get_vector() == vector:
                     return direction
-        elif isinstance(input, int):
+        elif isinstance(value, int):
             # Input is a pygame_key
-            pygame_key = input
+            pygame_key = value
             if pygame.K_UP == pygame_key:
                 return Direction.NORTH
             elif pygame.K_DOWN == pygame_key:
@@ -369,6 +369,8 @@ class IncomingTransition(NamedTuple):
     dir: Direction                     # Direction of the PC on incoming transit
     name: Optional[str]                # Name of transition (where needed due to keep transits unambiguous)
     dest_map: Optional[str] = None     # Name of map to which the transition connects
+    progress_marker: Optional[str] = None
+    inverse_progress_marker: Optional[str] = None
 
 
 class OutgoingTransition(NamedTuple):
@@ -382,7 +384,7 @@ class OutgoingTransition(NamedTuple):
     inverse_progress_marker: Optional[str] = None
 
     # Bounding rectangle for the map.  When outside this box, a leaving transition is toggled.
-    bounding_box: Optional[ pygame.Rect] = None
+    bounding_box: Optional[pygame.Rect] = None
 
     # For point transitions, is the transit automatic or must it be player initiated.
     # If None, default behavior is automatic if light not restricted, else manual.
@@ -452,6 +454,7 @@ class Map(NamedTuple):
     light_diameter: Optional[int]
     leaving_transition: Optional[OutgoingTransition]
     point_transitions: List[OutgoingTransition]
+    incoming_transitions: List[IncomingTransition]
     transitions_by_map: Dict[str, AnyTransition]
     transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]]
     transitions_by_name: Dict[str, AnyTransition]
