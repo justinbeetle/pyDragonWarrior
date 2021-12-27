@@ -1,30 +1,42 @@
 #!/usr/bin/env python
 
-import math
 import pygame
 
-from GameTypes import Direction
+from GameDialog import GameDialog
+from GameStateInterface import GameStateInterface
 
 
 def fade_to_black_and_back(screen: pygame.surface.Surface) -> None:
+    fade_to_color_and_back(screen, pygame.Color('black'))
+
+
+def fade_out_to_black(screen: pygame.surface.Surface) -> None:
+    fade_out_to_color(screen, pygame.Color('black'))
+
+
+def fade_in_from_black(screen: pygame.surface.Surface) -> None:
+    fade_in_from_color(screen, pygame.Color('black'))
+
+
+def fade_to_color_and_back(screen: pygame.surface.Surface, fade_color: pygame.Color) -> None:
     background_surface = screen.copy()
     fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(pygame.Color('black'))
+    fade_surface.fill(fade_color)
     fade_out(screen, background_surface, fade_surface)
     fade_out(screen, fade_surface, background_surface)
 
 
-def fade_out_to_black(screen: pygame.surface.Surface) -> None:
+def fade_out_to_color(screen: pygame.surface.Surface, fade_color: pygame.Color) -> None:
     background_surface = screen.copy()
     fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(pygame.Color('black'))
+    fade_surface.fill(fade_color)
     fade_out(screen, background_surface, fade_surface)
 
 
-def fade_in_from_black(screen: pygame.surface.Surface) -> None:
+def fade_in_from_color(screen: pygame.surface.Surface, fade_color: pygame.Color) -> None:
     background_surface = screen.copy()
     fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(pygame.Color('black'))
+    fade_surface.fill(fade_color)
     fade_out(screen, fade_surface, background_surface)
 
 
@@ -103,18 +115,48 @@ def black_red_monochrome_effect(screen: pygame.surface.Surface,
         pygame.display.flip()
 
 
-def rainbow_effect(screen: pygame.surface.Surface,
-                   water_tile: pygame.surface.Surface) -> None:
+rainbow_colors = [pygame.Color('red'),
+                  pygame.Color('orange'),
+                  pygame.Color('yellow'),
+                  pygame.Color('green'),
+                  pygame.Color('blue'),
+                  #pygame.Color('blueviolet'),  # pygame.Color('indigo'),
+                  pygame.Color('violet')]
+
+def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
+    game_state.draw_map(flip_buffer=False, draw_status=False)
+    background_surface = game_state.screen.copy()
+
+    # Cycle through the rainbow colors
+    for i in range(2):
+        for rainbow_color in rainbow_colors:
+            fade_surface = pygame.surface.Surface(game_state.screen.get_size())
+            fade_surface.fill(rainbow_color)
+
+            def fade_step(alpha: int) -> None:
+                fade_surface.set_alpha(alpha)
+                game_state.screen.blit(background_surface, (0, 0))
+                game_state.screen.blit(fade_surface, (0, 0))
+
+                # Overlay the dialogs
+                game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_background=False, draw_status=True)
+                if not message_dialog.is_empty():
+                    message_dialog.blit(game_state.screen, True)
+
+                # Advance a tick
+                pygame.time.Clock().tick(20)
+
+            for j in range(63, 196, 64):
+                fade_step(j)
+
+            for j in range(63, 196, 64):
+                fade_step(196 - j)
+
+
+def rainbow_effect_on_water(screen: pygame.surface.Surface,
+                            water_tile: pygame.surface.Surface) -> None:
     orig_screen = screen.copy()
-    water_color = pygame.transform.average_color(water_tile, None)
-    rainbow_colors = [pygame.Color('red'),
-                      pygame.Color('orange'),
-                      pygame.Color('yellow'),
-                      pygame.Color('green'),
-                      pygame.Color('blue'),
-                      pygame.Color('green'),
-                      pygame.Color(75, 0, 130),  # pygame.Color('indigo'),
-                      pygame.Color('violet')]
+    water_color = pygame.transform.average_color(water_tile, water_tile.get_rect())
 
     # Cycle through the rainbow colors
     for i in range(4):

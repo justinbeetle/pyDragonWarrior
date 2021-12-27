@@ -1,25 +1,27 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" lightDiameter="unlimited" isOutside="yes" originX="46" originY="45" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <PointTransition    decoration="pass"          x="46"  y="45"  dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="50"  y="44"              toMap="brecconary"            respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="50"  y="45"              toMap="brecconary"            respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="49"  y="45"  dir="WEST"  toMap="brecconary"/>
-   <PointTransition    decoration="pass"          x="3"   y="5"   dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="110" y="13"  dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="109" y="76"              toMap="rimuldar"              respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="110" y="76"  dir="EAST"  toMap="rimuldar"/>
-   <PointTransition    decoration="pass"          x="29"  y="93"  dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="79"  y="104"             toMap="cantlin"               respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="79"  y="103" dir="NORTH" toMap="cantlin"/>
-   <PointTransition    decoration="pass"          x="31"  y="15"  dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="32"  y="60"  dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
-   <PointTransition    decoration="pass" name="N" x="111" y="45"  dir="SOUTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
-   <PointTransition    decoration="pass" name="S" x="111" y="54"  dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="86"  y="3"   dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="114" y="115" dir="SOUTH" toMap="southern_shrine"       respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="51"  y="52"  dir="SOUTH" toMap="charlock_lvl1"         respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="46"  y="45"             dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="50"  y="44"                         toMap="brecconary"            respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="50"  y="45"                         toMap="brecconary"            respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="49"  y="45"             dir="WEST"  toMap="brecconary"/>
+   <PointTransition    decoration="pass"          x="3"   y="5"              dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="110" y="13"             dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="109" y="76"                         toMap="rimuldar"              respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="110" y="76"             dir="EAST"  toMap="rimuldar"/>
+   <PointTransition    decoration="pass"          x="29"  y="93"             dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="79"  y="104"                        toMap="cantlin"               respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="79"  y="103"            dir="NORTH" toMap="cantlin"/>
+   <PointTransition    decoration="pass"          x="31"  y="15"             dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="32"  y="60"             dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
+   <PointTransition    decoration="pass" name="N" x="111" y="45"             dir="SOUTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
+   <PointTransition    decoration="pass" name="S" x="111" y="54"             dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="86"  y="3"              dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          location="Southern Shrine" dir="SOUTH" toMap="southern_shrine"       respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          location="Charlock Castle" dir="SOUTH" toMap="charlock_lvl1"         respawnDecorations="yes"/>
 
    <MapDecoration type="barrier" x="111" y="53"/> <!-- Block access to cliff north of the south swamp cave entrance -->
+
+   <MapLocation x="46" y="46" name="Return Spell Location Point"/>
 
    <MapLocation x="86" y="115" name="Erdrick's Token"/>
    <MapDecoration type="None" location="Erdrick's Token">
@@ -35,7 +37,11 @@
       <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
       <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="79" y="103"/></RunAwayDialog></Monster>
 
+   <MapLocation x="114" y="115" name="Southern Shrine"/>
+   <MapLocation x="51"  y="52"  name="Charlock Castle"/>
+
    <MonsterZones>
+      <!-- TODO: Adjust the monster zones for the Tiled version of the map -->
       <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
       <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
       <MonsterZone x="31"  y="1"   w="15" h="15" set="2"/>

@@ -606,18 +606,15 @@ class CombatEncounter(CombatEncounterInterface):
 
     @staticmethod
     def gen_cam_problem() -> Problem:
-        a = random.randrange(0, 7)
+        a = random.choices([1, 2, 3, 4], weights=(1, 1, 4, 2))[0]
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term=0, max_term=20)
         elif 1 == a:
-            return CombatEncounter.gen_subtraction_problem()
+            return CombatEncounter.gen_subtraction_problem(min_term=0, max_term=20)
         elif 2 == a:
-            return CombatEncounter.gen_subtraction_problem(min_term=5, max_term=9, minuend_min=12, minuend_max=16)
-        elif 3 == a:
-            return CombatEncounter.gen_division_problem(min_term=0, max_term=12,
-                                                        multiplicand_1_range=[0, 1, 2, 3, 9, 10, 11])
-        else:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
+        else:
+            return CombatEncounter.gen_division_problem(min_term=0, max_term=12)
 
 
 def main() -> None:

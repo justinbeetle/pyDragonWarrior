@@ -107,6 +107,17 @@ class Direction(Enum):
                 return Direction.WEST
         return Direction.NORTH
 
+    def __repr__(self) -> str:
+        if Direction.NORTH == self:
+            return 'NORTH'
+        elif Direction.SOUTH == self:
+            return 'SOUTH'
+        elif Direction.EAST == self:
+            return 'EAST'
+        elif Direction.WEST == self:
+            return 'WEST'
+        return 'UNKNOWN'
+
 
 # Conditionals supported for dialog checks
 class DialogCheckEnum(Enum):
@@ -476,6 +487,7 @@ class Map(NamedTuple):
                    '',
                    None,
                    None,
+                   [],
                    [],
                    {},
                    {},

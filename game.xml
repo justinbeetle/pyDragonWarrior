@@ -3,11 +3,17 @@
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Fonts>
-      <!-- <Font name="data/fonts/dragon-warrior-1.ttf"/> -->
+      <!-- <Font name="../assets\itch.io\somepx\hf-free-complete\compass-pro-v1.1/CompassPro.ttf"/> -->
+      <Font name="data/fonts/dragon-warrior-1.ttf"/>
       <Font name="data/fonts/ARIALUNI.TTF"/>
       <Font name="arialms"/>
       <Font name="lucidasans"/>
       <Font name="arial"/>
+
+      <SymbolFont name="data/fonts/ARIALUNI.TTF"/>
+      <SymbolFont name="arialms"/>
+      <SymbolFont name="lucidasans"/>
+      <SymbolFont name="arial"/>
    </Fonts>
 
    <Tiles>
@@ -857,7 +863,7 @@
                <Dialog>"Go now!"</Dialog>
                <DialogAction type="VISUAL_EFFECT" name="flickering"/>
                <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
-               <DialogAction type="GOTO_COORDINATES" map="overworld" x="109" y="110" dir="SOUTH"/></DialogAssert>
+               <DialogAction type="GOTO_COORDINATES" map="overworld" location="Southern Shrine" dir="SOUTH"/></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="Erdrick's Token"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
             <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
@@ -1057,7 +1063,7 @@
                               <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
                               <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
                               <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
-                              <DialogAction type="GOTO_COORDINATES" map="overworld" x="49" y="49" dir="SOUTH"/></VictoryDialog>
+                              <DialogAction type="GOTO_COORDINATES" map="overworld" location="Charlock Castle" dir="SOUTH"/></VictoryDialog>
                            <RunAwayDialog><DialogAction type="SET_LIGHT_DIAMETER" count="unlimited"/></RunAwayDialog>
                         </DialogAction></VictoryDialog>
                   </DialogAction></DialogOption></DialogOptions></NonPlayerCharacter>
@@ -1531,6 +1537,9 @@
 <!--
 TODO: Add strings to have localization support in this file
 
+MC = Main Character
+PC = Party Character - member of the party other than the main character
+
 MC/PC actually different for different party members, or branching based on party size?
 
 Monster approach:                         A [ACTOR] draws near!
@@ -1658,7 +1667,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAssert type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
-         <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
+         <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
          <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Spell>
 
       <Spell name="Repel"     mp="2"  availableInCombat="no"  availableOutsideCombat="yes">
@@ -1779,7 +1788,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogAssert type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
-            <DialogAction type="GOTO_COORDINATES" map="overworld" x="43" y="44" dir="SOUTH"/>
+            <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
             <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
             <Dialog>[ACTOR] was transported to Tantegel Castle.</Dialog></Tool>
 

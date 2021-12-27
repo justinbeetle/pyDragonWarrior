@@ -301,9 +301,12 @@ class GameMap(GameMapInterface):
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
                 return self.game_state.get_game_info().tiles[tile_name]
         else:
-            return self.game_state.get_game_info().tiles[
-                self.game_state.get_game_info().tile_symbols[
-                    self.map.dat[int(tile.y)][int(tile.x)]]]
+            try:
+                return self.game_state.get_game_info().tiles[
+                    self.game_state.get_game_info().tile_symbols[
+                        self.map.dat[int(tile.y)][int(tile.x)]]]
+            except IndexError:
+                pass
 
         # Return a default, walkable tile as a default
         return Tile('DEFAULT TILE',
@@ -538,7 +541,8 @@ class GameMap(GameMapInterface):
     def get_adjacent_tile_type_counts(self, tile: Point, tile_types: List[str]) -> Dict[str, int]:
         return self.get_tile_type_counts(self.get_adjacent_points(tile), tile_types)
 
-    def get_encounter_background_name(self, tile: Optional[Point] = None) -> str:
+    def get_encounter_background_name(self, tile: Optional[Point] = None,
+                                      backgrounds: Optional[List[str]] = None) -> str:
         # Handle the background for dark maps
         if self.game_state.get_hero_party().light_diameter is not None:
             return 'darkness'
@@ -564,16 +568,19 @@ class GameMap(GameMapInterface):
 
         # Handle shore backgrounds
         shore_tiles = ['shore', 'shore_walkable', 'shore_cliff', 'shore_cliff_walkable', 'beach', 'beach_walkable']
+        shore_tile_name_to_tile_name_map = {'shore': 'plain', 'shore_cliff': 'plain', 'beach': 'desert'}
         shore_counts = self.get_adjacent_tile_type_counts(tile, shore_tiles)
         for tile_type, count in shore_counts.items():
             if count > 0:
-                return tile_type.replace('_walkable', '')
+                shore_tile_name = tile_type.replace('_walkable', '')
+                if shore_tile_name in shore_tile_name_to_tile_name_map and tile_name == \
+                        shore_tile_name_to_tile_name_map[shore_tile_name]:
+                    return shore_tile_name
 
         # Handle backgrounds on some other tile types, taking into account surrounding vegetation and elevation.
         if tile_name in ['plain', 'desert']:
-            background = tile_name
-
             # Factor in vegetation
+            vegetation_suffix = ''
             vegetation_counts = self.get_surrounding_tile_type_counts(tile, 1, forested_tiles)
             vegetation = None
             vegetation_count = 0
@@ -581,9 +588,10 @@ class GameMap(GameMapInterface):
                 if count > vegetation_count:
                     vegetation, vegetation_count = tile_type, count
             if vegetation is not None:
-                background += '_' + vegetation
+                vegetation_suffix = '_' + vegetation
 
             # Factor in elevation
+            elevation_suffix = ''
             elevation = None
             if self.get_surrounding_tile_type_count(tile, 3, ['volcano']) > 0:
                 elevation = 'volcano'
@@ -606,9 +614,21 @@ class GameMap(GameMapInterface):
                             if hill_count > 1:
                                 elevation = 'hill'
             if elevation is not None:
-                background += '_' + elevation
+                elevation_suffix = '_' + elevation
 
-            return background
+            background = tile_name + vegetation_suffix + elevation_suffix
+            if backgrounds is not None:
+                if background in backgrounds:
+                    return background
+                print(f'WARN: No encounter background for {background} at {tile}', flush=True)
+
+                background = tile_name + vegetation_suffix
+                if background in backgrounds:
+                    return background
+
+                background = tile_name + elevation_suffix
+                if background in backgrounds:
+                    return background
 
         # For all other tiles, just use the tile name
         if tile_name == 'DEFAULT TILE':
@@ -618,8 +638,8 @@ class GameMap(GameMapInterface):
     def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
         if tile is None:
             tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
-        encounter_background_name = self.get_encounter_background_name(tile)
         backgrounds = self.game_state.get_game_info().encounter_backgrounds
+        encounter_background_name = self.get_encounter_background_name(tile, list(backgrounds.keys()))
         if encounter_background_name in backgrounds:
             return backgrounds[encounter_background_name]
         print(f'WARN: No encounter background for {encounter_background_name} at {tile}', flush=True)

@@ -78,8 +78,11 @@ class GameInfo:
 
         # Parse font information
         self.font_names: List[str] = []
+        self.symbol_font_names: List[str] = []
         for element in xml_root.findall("./Fonts//Font"):
             self.font_names.append(element.attrib['name'])
+        for element in xml_root.findall("./Fonts//SymbolFont"):
+            self.symbol_font_names.append(element.attrib['name'])
 
         # Parse the encounter background images
         self.encounter_backgrounds: Dict[str, EncounterBackground] = {}
@@ -405,7 +408,11 @@ class GameInfo:
                 num_phases = int(element.attrib['phases'])
             character_type_filename = os.path.join(character_path, element.attrib['image'])
             # print('Loading image', character_type_filename, flush=True)
-            character_type_image = pygame.image.load(character_type_filename).convert_alpha()
+            try:
+                character_type_image = pygame.image.load(character_type_filename).convert_alpha()
+            except FileNotFoundError:
+                print('ERROR: Failed to load file', character_type_filename, flush=True)
+                continue
             character_type_images = {}
             if character_type_image.get_width() == character_type_image.get_height() * 8 + 7:
                 # Support for old style character images
@@ -582,6 +589,15 @@ class GameInfo:
             transitions_by_name: Dict[str, AnyTransition] = {}
             map_decorations: List[MapDecoration] = []
 
+            def update_transitions_by_map(transition: AnyTransition) -> None:
+                if transition.dest_map is not None:
+                    transitions_by_map[transition.dest_map] = transition
+                    if transition.name is not None:
+                        if transition.dest_map not in transitions_by_map_and_name:
+                            transitions_by_map_and_name[transition.dest_map] = {}
+                        transitions_by_map_and_name[transition.dest_map][transition.name] = transition
+                        transitions_by_name[transition.name] = transition
+
             def parse_incoming_transition(trans_element: ET.Element) -> IncomingTransition:
                 name = None
                 if 'name' in trans_element.attrib:
@@ -596,25 +612,15 @@ class GameInfo:
                                                 self.get_direction(map_name, trans_element),
                                                 name,
                                                 trans_element.attrib['toMap'],
-                                                progress_marker,)
-                transitions_by_map[transition.dest_map] = transition
-                if transition.name is not None:
-                    if transition.dest_map not in transitions_by_map_and_name:
-                        transitions_by_map_and_name[transition.dest_map] = {}
-                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
-                    transitions_by_name[transition.name] = transition
+                                                progress_marker)
+                update_transitions_by_map(transition)
                 transition = IncomingTransition(self.get_location(map_name, trans_element),
                                                 self.get_direction(map_name, trans_element),
                                                 name,
                                                 trans_element.attrib['toMap'],
                                                 progress_marker,
                                                 inverse_progress_marker)
-                transitions_by_map[transition.dest_map] = transition
-                if transition.name is not None:
-                    if transition.dest_map not in transitions_by_map_and_name:
-                        transitions_by_map_and_name[transition.dest_map] = {}
-                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
-                    transitions_by_name[transition.name] = transition
+                update_transitions_by_map(transition)
                 if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
                     map_decorations.append(MapDecoration.create(self.decorations[trans_element.attrib['decoration']],
                                                                 transition.point,
@@ -622,6 +628,7 @@ class GameInfo:
                                                                 progress_marker,
                                                                 inverse_progress_marker))
                 return transition
+
             def parse_outgoing_transition(trans_element: ET.Element) -> OutgoingTransition:
                 name = None
                 if 'name' in trans_element.attrib:
@@ -657,12 +664,7 @@ class GameInfo:
                                                 progress_marker,
                                                 inverse_progress_marker,
                                                 bounding_box)
-                transitions_by_map[transition.dest_map] = transition
-                if transition.name is not None:
-                    if transition.dest_map not in transitions_by_map_and_name:
-                        transitions_by_map_and_name[transition.dest_map] = {}
-                    transitions_by_map_and_name[transition.dest_map][transition.name] = transition
-                    transitions_by_name[transition.name] = transition
+                update_transitions_by_map(transition)
                 if 'decoration' in trans_element.attrib and trans_element.attrib['decoration'] in self.decorations:
                     map_decorations.append(MapDecoration.create(self.decorations[trans_element.attrib['decoration']],
                                                                 transition.point,
@@ -857,6 +859,12 @@ class GameInfo:
         return Point(int(element.attrib['x']), int(element.attrib['y']))
 
     def get_direction(self, map_name: Optional[str], element: ET.Element) -> Direction:
+        direction = self.get_optional_direction(map_name, element)
+        if direction is None:
+            direction = Direction.NORTH
+        return direction
+
+    def get_optional_direction(self, map_name: Optional[str], element: ET.Element) -> Optional[Direction]:
         if map_name and 'location' in element.attrib:
             location = self.locations[map_name][element.attrib['location']]
             if location.dir:
@@ -864,7 +872,7 @@ class GameInfo:
                 return location.dir
         if 'dir' in element.attrib:
             return Direction[element.attrib['dir']]
-        return Direction.NORTH
+        return None
 
     def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information
@@ -990,7 +998,7 @@ class GameInfo:
          
             map_dir = None
             try:
-                map_dir = self.get_direction(map_name, element)
+                map_dir = self.get_optional_direction(map_name, element)
             except:
                 pass
                

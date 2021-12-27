@@ -174,6 +174,10 @@ class GameState(GameStateInterface):
 
         self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations, init=True)
 
+        # Initialize the default dialog font color based on the state of the hero party
+        gde = GameDialogEvaluator(self.game_info, self)
+        gde.update_default_dialog_font_color()
+
     def save(self, quick_save: bool=False) -> None:
         # TODO: Save data for multiple party members
         xml_root = xml.etree.ElementTree.Element('SaveState')
@@ -424,7 +428,7 @@ class GameState(GameStateInterface):
         if draw_combat and self.combat_encounter is not None:
             self.combat_encounter.background_image = self.screen.copy()
             self.combat_encounter.render_monsters()
-        elif draw_background and draw_status:
+        elif draw_status:
             # TODO: Do we want to always show a status dialog?  If so, exploring or encounter?
             GameDialog.create_encounter_status_dialog(
                 self.hero_party).blit(self.screen, False)

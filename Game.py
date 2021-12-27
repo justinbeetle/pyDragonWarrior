@@ -31,7 +31,10 @@ class Game:
                                     tile_size_pixels)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
-        GameDialog.static_init(self.game_state.win_size_tiles, tile_size_pixels, self.game_state.game_info.font_names)
+        GameDialog.static_init(self.game_state.win_size_tiles,
+                               tile_size_pixels,
+                               self.game_state.game_info.font_names,
+                               self.game_state.game_info.symbol_font_names)
 
     def run_game_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
         self.game_state.is_running = True
@@ -409,10 +412,11 @@ class Game:
                       or hero_dest_dat_tile[1] == map_size[1] - 1):
                     transition = leaving_transition
             if transition is None:
-                # See if this tile has any associated transitions
-                # TODO: Uncomment following statement to disable coordinate logging
+                # TODO: Uncomment following two statements to disable coordinate logging
                 # encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
                 # print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
+
+                # See if this tile has any associated transitions
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,
                                                                   filter_to_automatic_transitions=True)
             else:

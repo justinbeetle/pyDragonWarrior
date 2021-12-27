@@ -623,8 +623,8 @@ class GameDialogEvaluator:
                     elif item.name == 'flickering':
                         SurfaceEffects.flickering(self.game_state.screen)
                     elif item.name == 'rainbowEffect':
-                        SurfaceEffects.rainbow_effect(self.game_state.screen,
-                                                      self.game_info.tiles['water'].images[0][0])
+                        SurfaceEffects.rainbow_effect(self.game_state, message_dialog)
+
                     elif item.name == 'hideDialog':
                         # Before hiding the dialog first ensure the contents are acknowledged then clear them
                         self.wait_for_acknowledgement(message_dialog)
