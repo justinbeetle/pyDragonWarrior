@@ -66,7 +66,7 @@ def fade_out(screen: pygame.surface.Surface,
 def flickering(screen: pygame.surface.Surface) -> None:
     background_surface = screen.copy()
     flicker_surface = pygame.surface.Surface(screen.get_size())
-    flicker_surface.fill(pygame.Color('white'))
+    flicker_surface.fill('white')
     flicker_surface.set_alpha(128)
 
     for flicker_times in range(10):

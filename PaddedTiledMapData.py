@@ -46,7 +46,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         # Add an image of black
         black_tile = self.tmx.images[-1].copy()
-        black_tile.fill(pygame.Color('black'))
+        black_tile.fill('black')
         self.tmx.images.append(black_tile)
 
         self.image_pad_tiles = image_pad_tiles

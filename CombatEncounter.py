@@ -52,7 +52,7 @@ class CombatEncounter(CombatEncounterInterface):
         self.run_away_dialog = run_away_dialog
 
         if self.game_state.is_light_restricted():
-            self.game_state.screen.fill(pygame.Color('black'))
+            self.game_state.screen.fill('black')
         else:
             self.game_state.draw_map(flip_buffer=False, draw_status=False)
         self.background_image = game_state.screen.copy()
@@ -629,7 +629,7 @@ def main() -> None:
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
     screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.HWSURFACE)
-    screen.fill(pygame.Color('pink'))
+    screen.fill('pink')
 
     # Initialize GameInfo
     import os

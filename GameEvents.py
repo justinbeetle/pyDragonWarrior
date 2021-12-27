@@ -4,23 +4,52 @@ from typing import List, Optional, Tuple
 
 import pygame
 
-joysticks = []
+joysticks = {}
 
 
 def setup_joystick() -> bool:
-    print('pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True)
+    if pygame.joystick.get_count() != len(joysticks):
+        print('pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True)
+
+    # Remove uninitialized joysticks
+    for instance_id, joystick in joysticks.copy().items():
+        # Determine if the joystick is still present
+        found_joystick = False
+        for joystickId in range(pygame.joystick.get_count()):
+            if pygame.joystick.Joystick(joystickId).get_instance_id() == instance_id:
+                found_joystick = True
+                break
+
+        # Remove uninitialized joysticks
+        if not found_joystick:
+            print(f'Joystick {instance_id} was uninitialized', flush=True)
+            joystick.quit()
+            del joysticks[instance_id]
+
+    # Add new joysticks
     for joystickId in range(pygame.joystick.get_count()):
         joystick = pygame.joystick.Joystick(joystickId)
+        instance_id = joystick.get_instance_id()
+
+        # Skip previously initialized joysticks
+        if instance_id in joysticks:
+            continue
+
+        print('joystick.get_instance_id() =', instance_id, flush=True)
         print('joystick.get_id() =', joystick.get_id(), flush=True)
         print('joystick.get_name() =', joystick.get_name(), flush=True)
         # if joystick.get_name() == 'Controller (Xbox One For Windows)':
         print('Initializing joystick...', flush=True)
         joystick.init()
-        joysticks.append(joystick)
+        joysticks[instance_id] = joystick
+
     return len(joysticks) > 0
 
 
 def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: bool=True) -> List[pygame.event.Event]:
+    # Allow joysticks to be rediscovered if they get uninitialized.
+    setup_joystick()
+
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:

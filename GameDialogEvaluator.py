@@ -139,7 +139,7 @@ class GameDialogEvaluator:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
-                        if GameDialog.no_keyboard:
+                        if GameDialog.use_menus_for_text_entry():
                             # Get a menu selection and turn that into an event
                             menu_result = message_dialog.get_selected_menu_option()
                             if menu_result == GameDialog.ENTER_UNICODE:

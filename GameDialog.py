@@ -30,7 +30,10 @@ class GameDialog:
     ENTER_UNICODE = '\u21b5'
     UNICODE_CHARACTERS = [SHIFT_UNICODE, CAPSLOCK_UNICODE, BACKSPACE_UNICODE, ENTER_UNICODE]
 
-    no_keyboard = True
+    # True =  Use menus for all text entry
+    # False = Type on keyboard for all text entry
+    # None  = Use menus for all text entry when a gamepad/joystick is present, else use the keyboard
+    force_use_menus_for_text_entry: Optional[bool] = None
 
     win_size_tiles = Point(20, 15)
     tile_size_pixels = 48
@@ -158,6 +161,12 @@ class GameDialog:
                                                      GameDialog.font_color,
                                                      pygame.Color('black')))
 
+    @staticmethod
+    def use_menus_for_text_entry() -> bool:
+        if GameDialog.force_use_menus_for_text_entry is None:
+            return GameEvents.setup_joystick()
+        return GameDialog.force_use_menus_for_text_entry
+
     def __init__(self,
                  pos_tile: Point,
                  size_tiles: Point,
@@ -194,14 +203,14 @@ class GameDialog:
 
     def initialize_image(self) -> None:
         self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
-        self.image.fill(pygame.Color('black'))
+        self.image.fill('black')
         pygame.draw.rect(self.image, self.font_color,
                          pygame.Rect(8, 8, self.image.get_width() - 16, self.image.get_height() - 16), 7)
         if self.title is not None:
             title_image = GameDialog.render_font(self.title)
             title_image_pos_x = (self.image.get_width() - title_image.get_width()) / 2
             self.image.fill(
-                pygame.Color('black'),
+                'black',
                 pygame.Rect(
                     title_image_pos_x - GameDialog.internal_spacing_pixels,
                     0,
@@ -806,7 +815,7 @@ class GameDialog:
         self.user_text = ''
         self.input_allowed_characters = input_allowed_characters
 
-        if GameDialog.no_keyboard:
+        if GameDialog.use_menus_for_text_entry():
             number_characters = '7894561230'
             import string
             ascii_characters = string.ascii_uppercase + string.ascii_lowercase + '. '
@@ -867,9 +876,9 @@ def main() -> None:
     from HeroState import HeroState
     hero_party = HeroParty(HeroState.create_null())
 
-    GameDialog.no_keyboard = True
+    GameDialog.force_use_menus_for_text_entry = True
 
-    screen.fill(pygame.Color('pink'))
+    screen.fill('pink')
     GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog('Hail!')
     message_dialog.add_message('Shift=' + GameDialog.SHIFT_UNICODE)
@@ -896,7 +905,7 @@ def main() -> None:
                 is_awaiting_selection = False
         clock.tick(30)
 
-    screen.fill(pygame.Color('pink'))
+    screen.fill('pink')
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     GameDialog.create_message_dialog(
         'word wrap testing...  Word wrap testing...  word wrap testing...  ' +
@@ -919,7 +928,7 @@ def main() -> None:
                 is_awaiting_selection = False
         clock.tick(30)
 
-    screen.fill(pygame.Color('pink'))
+    screen.fill('pink')
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog(
         'Hail 1!\nHail 2!\nHail 3!\nHail 4!\nHail 5!\nHail 6!\nHail 7!\nHail 8!\nHail 9!\nHail 10!\nHail 11!')

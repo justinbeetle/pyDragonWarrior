@@ -264,28 +264,28 @@ class GameMap(GameMapInterface):
             light_radius_px = light_diameter * self.game_state.get_game_info().tile_size_pixels / 2
 
             # Left
-            surface.fill(pygame.Color('black'), pygame.Rect(0,
-                                                            0,
-                                                            surface.get_width() / 2 - light_radius_px,
-                                                            surface.get_height()))
+            surface.fill('black', pygame.Rect(0,
+                                              0,
+                                              surface.get_width() / 2 - light_radius_px,
+                                              surface.get_height()))
 
             # Right
-            surface.fill(pygame.Color('black'), pygame.Rect(surface.get_width() / 2 + light_radius_px,
-                                                            0,
-                                                            surface.get_width() / 2 - light_radius_px,
-                                                            surface.get_height()))
+            surface.fill('black', pygame.Rect(surface.get_width() / 2 + light_radius_px,
+                                              0,
+                                              surface.get_width() / 2 - light_radius_px,
+                                              surface.get_height()))
 
             # Top
-            surface.fill(pygame.Color('black'), pygame.Rect(0,
-                                                            0,
-                                                            surface.get_width(),
-                                                            surface.get_height() / 2 - light_radius_px))
+            surface.fill('black', pygame.Rect(0,
+                                              0,
+                                              surface.get_width(),
+                                              surface.get_height() / 2 - light_radius_px))
 
             # Bottom
-            surface.fill(pygame.Color('black'), pygame.Rect(0,
-                                                            surface.get_height() / 2 + light_radius_px,
-                                                            surface.get_width(),
-                                                            surface.get_height() / 2 - light_radius_px))
+            surface.fill('black', pygame.Rect(0,
+                                              surface.get_height() / 2 + light_radius_px,
+                                              surface.get_width(),
+                                              surface.get_height() / 2 - light_radius_px))
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         if tile is None:

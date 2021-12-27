@@ -50,7 +50,7 @@ class Game:
         title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px.getAsIntTuple())
         title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
                                     self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
-        self.game_state.screen.fill(pygame.Color('black'))
+        self.game_state.screen.fill('black')
         self.game_state.screen.blit(title_image, title_image_dest_px)
         title_image = GameDialog.font.render('Press any key',
                                              GameDialog.anti_alias,
@@ -413,8 +413,8 @@ class Game:
                     transition = leaving_transition
             if transition is None:
                 # TODO: Uncomment following two statements to disable coordinate logging
-                # encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
-                # print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
+                #encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
+                #print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
 
                 # See if this tile has any associated transitions
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,
@@ -455,7 +455,7 @@ class Game:
 
             if movement_allowed and movement_hp_penalty > 0 and first_frame:
                 flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
-                flicker_surface.fill(pygame.Color('red'))
+                flicker_surface.fill('red')
                 flicker_surface.set_alpha(128)
                 self.game_state.screen.blit(flicker_surface, (0, 0))
                 self.game_state.advance_tick(update_map=True, draw_map=False, advance_time=True, flip_buffer=True)
@@ -490,19 +490,18 @@ def main() -> None:
 
     pygame.init()
     pygame.mouse.set_visible(False)
-    has_joystick = GameEvents.setup_joystick()
 
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gamepad', help='Gamepad (if present) will be used for providing user inputs',
-                        default=has_joystick, action='store_true')
+                        action='store_true', default=None)
     parser.add_argument('-k', '--keyboard', dest='gamepad', help='Keyboard will be used for providing user inputs',
-                        default=not has_joystick, action='store_false')
+                        action='store_false')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
     # print('args =', args, flush=True)
 
-    GameDialog.no_keyboard = args.gamepad
+    GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
     base_path = os.path.split(os.path.abspath(__file__))[0]
