@@ -16,9 +16,6 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
         if isinstance(x, tuple):
             return tuple.__new__(Point, (x[0], x[1]))
         return tuple.__new__(Point, (x, y))
-   
-    def __init__(self, x: ScalarOrPointTupleType = 0, y: PointTypeElemType = 0) -> None:
-        pass
 
     @property
     def x(self) -> PointTypeElemType:
@@ -29,10 +26,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
 
     @property
     def w(self) -> PointTypeElemType:
-        if isinstance(self[0], float) or isinstance(self[0], int):
-            return self[0]
-        else:
-            return float(self[0])
+        return self.x
 
     @property
     def y(self) -> PointTypeElemType:
@@ -43,10 +37,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
 
     @property
     def h(self) -> PointTypeElemType:
-        if isinstance(self[1], float) or isinstance(self[1], int):
-            return self[1]
-        else:
-            return float(self[1])
+        return self.y
 
     # Point addition has a signature which is intentionally incompatible with the supertype 'tuple'
     def __add__(self, p: PointTupleType) -> Point:  # type: ignore

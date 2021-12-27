@@ -151,7 +151,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool=False) -> None:
         """ Convert all images in the data to match the parent
 
-        :param parent: pygame.Surface
+        :param parent: pygame.surface.Surface
         :param alpha: preserve alpha channel or not
         :return: None
         """

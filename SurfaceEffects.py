@@ -124,6 +124,17 @@ rainbow_colors = [pygame.Color('red'),
                   pygame.Color('violet')]
 
 def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
+    game_info = game_state.get_game_info()
+
+    if game_info.maps[game_state.get_map_name()].tiled_filename is None:
+        # On a legacy map, use the original effect
+        rainbow_effect_on_water(game_state.screen, game_info.tiles['water'].images[0][0])
+    else:
+        # On a tiled map, use the new effect
+        rainbow_effect_across_map(game_state, message_dialog)
+
+
+def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
     game_state.draw_map(flip_buffer=False, draw_status=False)
     background_surface = game_state.screen.copy()
 

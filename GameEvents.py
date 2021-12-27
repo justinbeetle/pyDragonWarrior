@@ -37,7 +37,7 @@ def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: b
             if pygame.K_KP_ENTER == event.key:
                 event.__dict__['key'] = pygame.K_RETURN
 
-        elif event.type == pygame.ACTIVEEVENT and event.gain:
+        elif event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
             print('Detected gain focus event', flush=True)
 
         # Translate joystick events to keyboard events

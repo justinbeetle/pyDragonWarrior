@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import List, Optional, Union
+from typing import cast, List, Optional, Union
 
 from enum import Enum
 import math
@@ -151,11 +151,12 @@ class GameDialog:
         return int(GameDialog.get_font(text).size(text)[0])
 
     @staticmethod
-    def render_font(text: str) -> pygame.Surface:
-        return GameDialog.get_font(text).render(text,
-                                                GameDialog.anti_alias,
-                                                GameDialog.font_color,
-                                                pygame.Color('black'))
+    def render_font(text: str) -> pygame.surface.Surface:
+        return cast(pygame.surface.Surface,
+                    GameDialog.get_font(text).render(text,
+                                                     GameDialog.anti_alias,
+                                                     GameDialog.font_color,
+                                                     pygame.Color('black')))
 
     def __init__(self,
                  pos_tile: Point,

@@ -1150,6 +1150,9 @@ class GameInfo:
 
     def random_tile_image(self, symbol: str, idx: int = 0) -> pygame.surface.Surface:
         images = self.tiles[self.tile_symbols[symbol]].images[idx]
-        if 1 == len(images):
-            return images[0]
-        return cast(pygame.surface.Surface, numpy.random.choice(images, p=self.tile_probabilities[len(images) - 1]))
+        num_images = len(images)
+        if 1 == num_images:
+            random_index = 0
+        else:
+            random_index = numpy.random.choice(list(range(num_images)), p=self.tile_probabilities[num_images - 1])
+        return images[random_index]
