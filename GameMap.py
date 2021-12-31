@@ -296,7 +296,8 @@ class GameMap(GameMapInterface):
             tile_x, tile_y = tile.getAsIntTuple()
             for l in self.map_data.base_tile_layers:
                 tile_properties = self.map_data.get_tile_properties(tile_x, tile_y, l)
-                if tile_properties is not None and 'type' in tile_properties and len(tile_properties['type']) > 0:
+                if tile_properties is not None and 'type' in tile_properties and \
+                        tile_properties['type'] is not None and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
                 return self.game_state.get_game_info().tiles[tile_name]

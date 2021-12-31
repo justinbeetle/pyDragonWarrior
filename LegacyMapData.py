@@ -234,7 +234,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return None
 
     def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
-        x1, y1, x2, y2 = pyscroll.rect_to_bb(rect)
+        x1, y1, x2, y2 = pyscroll.common.rect_to_bb(rect)
         tiles_w, tiles_h = self.map_size_tiles.getAsIntTuple()
         x1 = min(max(x1, 0), tiles_w - 1)
         x2 = min(max(x2, 0), tiles_w - 1)

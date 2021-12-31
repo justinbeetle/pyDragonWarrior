@@ -314,7 +314,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         More efficient because data is accessed and cached locally
         """
 
-        x1, y1, x2, y2 = pyscroll.rect_to_bb(rect)
+        x1, y1, x2, y2 = pyscroll.common.rect_to_bb(rect)
         images = self.tmx.images
         layers = self.tmx.layers
         at = self._animated_tile
