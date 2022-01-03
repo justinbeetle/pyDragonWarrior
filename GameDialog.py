@@ -184,8 +184,10 @@ class GameDialog:
         self.initialize_image()
 
         self.displayed_message_lines: List[str] = []
+        self.remainder_of_current_line: str = ''
         self.remaining_message_lines: List[str] = []
         self.acknowledged = True
+        self.lines_since_last_acknowledgement = 0
 
         self.row_data: Optional[List[List[Optional[str]]]] = None
         self.row_data_prompt: Optional[str] = None
@@ -275,7 +277,7 @@ class GameDialog:
             size_tiles = size_tiles_menu
         dialog = GameDialog(pos_tile, size_tiles, title)
         if prompt is not None:
-            dialog.add_message(prompt)
+            dialog.add_message(prompt, fully_populate=True)
         dialog.add_yes_no_prompt()
         return dialog
 
@@ -302,7 +304,7 @@ class GameDialog:
 
     @staticmethod
     def create_exploring_status_dialog(party: HeroParty) -> GameDialog:
-        if 1 == len(party.members):
+        if 1 == len(party.combat_members):
             return GameDialog.create_status_dialog(
                 Point(1, 1),
                 None,
@@ -319,7 +321,7 @@ class GameDialog:
     @staticmethod
     def create_encounter_status_dialog(party: HeroParty, trailing_message: Optional[str] = None) -> GameDialog:
         title: Optional[str] = None
-        if 1 == len(party.members):
+        if 1 == len(party.combat_members):
             title = party.main_character.name
             status_data: List[List[Optional[str]]] = [['Level', party.main_character.level.name],
                                                       ['Health', str(party.main_character.hp)],
@@ -329,7 +331,7 @@ class GameDialog:
                            ['Level'],
                            ['Health'],
                            ['Magic']]
-            for member in party.members:
+            for member in party.combat_members:
                 status_data[0].append(member.get_name())
                 status_data[1].append(member.level.name)
                 status_data[2].append(str(member.hp))
@@ -408,7 +410,8 @@ class GameDialog:
 
     def add_message(self,
                     new_message: str,
-                    append: bool = True) -> None:
+                    append: bool = True,
+                    fully_populate: bool = False) -> None:
 
         self.acknowledged = False
         self.row_data = None
@@ -425,23 +428,38 @@ class GameDialog:
 
         # Merge new message content with old message content
         if append and len(self.displayed_message_lines) > 0:
-            if 0 == len(self.remaining_message_lines):
-                if len(new_message_lines) <= num_rows:
-                    if len(self.displayed_message_lines) + len(new_message_lines) <= num_rows:
-                        self.displayed_message_lines += new_message_lines
+            if fully_populate:
+                if 0 == len(self.remaining_message_lines):
+                    if len(new_message_lines) <= num_rows:
+                        if len(self.displayed_message_lines) + len(new_message_lines) <= num_rows:
+                            self.displayed_message_lines += new_message_lines
+                        else:
+                            self.displayed_message_lines = self.displayed_message_lines[
+                                                           len(self.displayed_message_lines) +
+                                                           len(new_message_lines) - num_rows:] + new_message_lines
                     else:
-                        self.displayed_message_lines = self.displayed_message_lines[
-                            len(self.displayed_message_lines) + len(new_message_lines) - num_rows:] + new_message_lines
+                        self.displayed_message_lines = new_message_lines[0: num_rows]
+                        self.remaining_message_lines = new_message_lines[num_rows:]
                 else:
-                    self.displayed_message_lines = new_message_lines[0: num_rows]
-                    self.remaining_message_lines = new_message_lines[num_rows:]
+                    self.displayed_message_lines = self.remaining_message_lines[0: num_rows]
+                    self.remaining_message_lines = self.remaining_message_lines[num_rows:]
             else:
-                self.remaining_message_lines += new_message_lines
-                self.displayed_message_lines = self.remaining_message_lines[0: num_rows]
-                self.remaining_message_lines = self.remaining_message_lines[num_rows:]
+                if 0 == len(self.remainder_of_current_line) and 0 == len(self.remaining_message_lines):
+                    if len(self.displayed_message_lines) >= num_rows:
+                        self.displayed_message_lines = self.displayed_message_lines[1:]
+                    self.displayed_message_lines += ['']
+                    self.remainder_of_current_line = new_message_lines[0]
+                    self.remaining_message_lines = new_message_lines[1:]
+                else:
+                    self.remaining_message_lines += new_message_lines
         else:
-            self.displayed_message_lines = new_message_lines[0: num_rows]
-            self.remaining_message_lines = new_message_lines[num_rows:]
+            if fully_populate:
+                self.displayed_message_lines = new_message_lines[0: num_rows]
+                self.remaining_message_lines = new_message_lines[num_rows:]
+            else:
+                self.displayed_message_lines = ['']
+                self.remainder_of_current_line = new_message_lines[0]
+                self.remaining_message_lines = new_message_lines[1:]
 
         # Refresh image
         self.refresh_image()
@@ -466,35 +484,59 @@ class GameDialog:
             self.refresh_image()
 
     def is_empty(self) -> bool:
-        return len(self.displayed_message_lines) + len(self.remaining_message_lines) == 0
+        return (len(self.displayed_message_lines) == 0 and
+                len(self.remainder_of_current_line) == 0 and
+                len(self.remaining_message_lines) == 0)
 
     def clear(self) -> None:
         self.displayed_message_lines = []
+        self.remainder_of_current_line = ''
         self.remaining_message_lines = []
         self.row_data = None
 
     def is_last_row_blank(self) -> bool:
         if self.is_empty():
             return True
-        return (self.displayed_message_lines + self.remaining_message_lines)[-1] == ''
+        elif 0 == len(self.remaining_message_lines):
+            return self.displayed_message_lines[-1] + self.remainder_of_current_line == ''
+        else:
+            return self.remaining_message_lines[-1] == ''
 
     def has_more_content(self) -> bool:
-        return len(self.remaining_message_lines) != 0
+        return len(self.remainder_of_current_line) + len(self.remaining_message_lines) != 0
 
-    def advance_content(self) -> None:
+    def advance_content(self) -> bool:
+        '''
+        :return: Whether an acknowledged is required before rolling to the next line of text
+        '''
         if not self.has_more_content():
-            return
+            return False
 
         # Determine the number of lines of text which can be displayed in the dialog
-        num_rows = self.get_num_rows()
+        # Subtract out 1 row to leave room for the waiting indicator
+        num_rows = self.get_num_rows() - 1
 
-        # Shift remainingMessageLines into displayedMessageLines
-        self.displayed_message_lines = self.remaining_message_lines[0: num_rows]
-        self.remaining_message_lines = self.remaining_message_lines[num_rows:]
+        if len(self.remainder_of_current_line) > 0:
+            # Shift in two characters at a time remainder_of_current_line
+            characters_to_advance = 3
+            self.displayed_message_lines[-1] += self.remainder_of_current_line[:characters_to_advance]
+            self.remainder_of_current_line = self.remainder_of_current_line[characters_to_advance:]
+        else:
+            # Shift in one row at a time from remaining_message_lines
+            self.lines_since_last_acknowledgement += 1
+            if len(self.displayed_message_lines) >= num_rows:
+                if self.lines_since_last_acknowledgement >= num_rows:
+                    return True
+                self.displayed_message_lines = self.displayed_message_lines[1:]
+            self.displayed_message_lines += ['']
+            self.remainder_of_current_line = self.remaining_message_lines[0]
+            self.remaining_message_lines = self.remaining_message_lines[1:]
 
         # Refresh image
         self.refresh_image()
         self.acknowledged = False
+
+        return False
 
     def refresh_image(self) -> None:
         # Clear the image
@@ -804,6 +846,7 @@ class GameDialog:
 
     def acknowledge(self) -> None:
         self.acknowledged = True
+        self.lines_since_last_acknowledgement = 0
 
     def is_acknowledged(self) -> bool:
         return self.acknowledged

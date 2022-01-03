@@ -139,7 +139,8 @@ class HeroSprite(CharacterSprite):
                 character_images = HeroSprite.character_types['hero'].images
         else:
             character_images = self.character.character_type.images
-        return character_images[self.character.direction][self.get_phase_image_index()]
+        return character_images[self.character.direction][self.get_phase_image_index() %
+                                                          len(character_images[self.character.direction])]
 
 
 class NpcSprite(CharacterSprite):
@@ -287,6 +288,12 @@ class GameMap(GameMapInterface):
                                               surface.get_width(),
                                               surface.get_height() / 2 - light_radius_px))
 
+    def draw_character_sprites(self) -> None:
+        map_center_offset = self.group._map_layer.get_center_offset()
+        for sprite in self.group.get_sprites_from_layer(self.map_data.character_layer):
+            self.game_state.screen.blit(sprite.get_image(), sprite.get_rect().move(map_center_offset))
+        pygame.display.flip()
+
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         if tile is None:
             tile = self.game_state.get_hero_party().main_character.curr_pos_dat_tile
@@ -330,7 +337,7 @@ class GameMap(GameMapInterface):
                 decorations.append(decoration)
         return decorations
 
-    def get_npc_to_talk_to(self) -> Optional[NpcInfo]:
+    def get_npc_to_talk_to(self) -> Optional[NpcState]:
         talk_dest_dat_tile = self.game_state.get_hero_party().members[0].curr_pos_dat_tile \
                              + self.game_state.get_hero_party().members[0].direction.get_vector()
         talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
@@ -340,7 +347,8 @@ class GameMap(GameMapInterface):
 
         for sprite in self.group:
             if isinstance(sprite, NpcSprite):
-                npc_info = sprite.character.npc_info
+                npc_state = sprite.character
+                npc_info = npc_state.npc_info
             else:
                 continue
 
@@ -359,7 +367,7 @@ class GameMap(GameMapInterface):
                     if not npc_info.walking:
                         sprite.character.direction = npc_info.direction
 
-                return npc_info
+                return npc_state
 
         return None
 

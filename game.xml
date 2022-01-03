@@ -3,8 +3,9 @@
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Fonts>
-      <!-- <Font name="../assets\itch.io\somepx\hf-free-complete\compass-pro-v1.1/CompassPro.ttf"/> -->
-      <Font name="data/fonts/dragon-warrior-1.ttf"/>
+      <!-- TODO: Figure out how to distribute the licensed assets and pull them into the directory structure -->
+      <Font name="../assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/>
+      <!-- <Font name="data/fonts/dragon-warrior-1.ttf"/> -->
       <Font name="data/fonts/ARIALUNI.TTF"/>
       <Font name="arialms"/>
       <Font name="lucidasans"/>
@@ -25,7 +26,7 @@
       <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
       <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
       <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/> <!-- spawnRate="1/24" -->
+      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
       <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
       <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
       <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
@@ -55,8 +56,10 @@
 
    <Decorations>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="bridge_left" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>  <!-- TODO -->
-      <Decoration name="bridge_right" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/> <!-- TODO -->
+      <Decoration name="bridge_left_top" image="bridge_left_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="bridge_right_top" image="bridge_right_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="bridge_left" image="bridge_left.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="bridge_right" image="bridge_right.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_A" image="castle_stone_A.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_B" image="castle_stone_B.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -103,7 +106,7 @@
    <xi:include href="data/levels.xml" parse="xml"/>
 
    <CharacterTypes>
-      <!-- 
+      <!--
       <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
       <CharacterType type="hero_sword"             image="hero_sword.png"/>
       <CharacterType type="hero_shield"            image="hero_shield.png"/>
@@ -122,6 +125,7 @@
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
       -->
 
+      <!-- 
       <CharacterType type="hero"                   image="vx_chara01_b11.png"         phases="3" levels="hero"/>
       <CharacterType type="hero_sword"             image="vx_chara01_b11.png"         phases="3"/>
       <CharacterType type="hero_shield"            image="vx_chara01_b11.png"         phases="3"/>
@@ -138,6 +142,26 @@
       <CharacterType type="merchant"               image="vx_chara02_b13.png"         phases="3"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"              phases="2"/>
       <CharacterType type="dragonlord"             image="vx_chara03_b12.png"         phases="3"/>
+      -->
+
+      <!-- Characters from Tiny Tales character sets -->
+      <!-- TODO: Figure out how to distribute the licensed assets and pull them into the directory structure -->
+      <CharacterType type="hero"                   image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3" levels="hero"/>
+      <CharacterType type="hero_sword"             image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+      <CharacterType type="hero_shield"            image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+      <CharacterType type="hero_sword_and_shield"  image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/> <!-- TODO: Change the princess to join the party and follow instead of being carried. -->
+      <CharacterType type="hero_carrying_princess" image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+      <CharacterType type="ghost"                  image="ghost.png"                                                                                                         phases="2"/>
+      <CharacterType type="king"                   image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Monarch_M1.png"                   phases="3"/>
+      <CharacterType type="princess"               image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Princess_F2.png"                  phases="3"/>
+      <CharacterType type="guard"                  image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4.png"           phases="3"/>
+      <CharacterType type="warrior"                image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M3_B.png"                   phases="3"/>
+      <CharacterType type="sage"                   image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Town2_M4.png"             phases="3"/>
+      <CharacterType type="boy"                    image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M1.png"                     phases="3"/>
+      <CharacterType type="girl"                   image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_F1.png"                     phases="3"/>
+      <CharacterType type="merchant"               image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M2.png"                     phases="3"/>
+      <CharacterType type="trumpeter"              image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4_trumpeter.png" phases="3"/>
+      <CharacterType type="dragonlord"             image="../../../../assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Mage_M1.png"              phases="3"/>
 
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
       <CharacterType type="mocha"                  image="mocha.png"                  phases="2" levels="cat"/>
@@ -184,6 +208,7 @@
                   <DialogOption name="Yes">
                      <Dialog>"I'm so happy!"</Dialog>
                      <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
+                     <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/> 
                      <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call -->
                   <DialogOption name="No">
                       <Dialog>"But thou must."</Dialog>
@@ -322,6 +347,7 @@
                <Dialog>"Farewell, [NAME]."</Dialog>
                <DialogAction type="GAIN_ITEM" name="Gwaelin's Love"/>
                <DialogAction type="LOSE_ITEM" name="PM_Carrying_Princess"/>
+               <DialogAction type="LEAVE_PARTY" name="Princess Gwaelin"/>
                <DialogAction type="GAIN_ITEM" name="PM_Princess_Returned_To_Castle"/>
                <DialogAction type="GOTO_COORDINATES"/></DialogAssert> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
             <Dialog>"I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points."</Dialog>
@@ -822,6 +848,7 @@
                   <Dialog>"I'm so happy!"</Dialog>
                   <DialogAction type="GAIN_ITEM" name="PM_Rescued_Princess"/>
                   <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
+                  <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/>
                   <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess from the map -->
                <DialogOption name="No">
                    <Dialog>"But thou must."</Dialog>
@@ -939,10 +966,10 @@
          <MapDecoration type="throne_evil" x="11" y="4"/>
          <MapDecoration type="pass"        x="11" y="4">
             <Dialog>[NAME] searched the ground all about.</Dialog>
-            <Dialog>Feel the wind blowing from behind the throne.</Dialog></MapDecoration>
+            <Dialog>[NAME] felt the wind blowing from behind the throne.</Dialog></MapDecoration>
          <MapDecoration type="None" x="11" y="2" inprogressMarker="PM_Found_Secret_Passage">
             <Dialog>[NAME] searched the ground all about.</Dialog>
-            <Dialog>[NAME] discovers the secret passage.</Dialog>
+            <Dialog>[NAME] discovered the secret passage.</Dialog>
             <DialogAction type="GAIN_ITEM" name="PM_Found_Secret_Passage"/>
             <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
       </Map>
@@ -1041,10 +1068,11 @@
                      <DialogOption name="Yes">
                         <Dialog>"Then half of this world is thine, half of the darkness, and..."</Dialog>
                         <Dialog>"If thou dies I can bring thee back for another attempt without loss of thy deeds to date."</Dialog>
-                        <Dialog>"Thy journey is over.  Take now a long, long rest.  Hahahaha..."</Dialog>
+                        <Dialog>"Thy journey is over.  Take now a long, long rest."</Dialog>
+                        <Dialog>"Hahahaha..."</Dialog>
                         <DialogAction type="LOSE_ITEM" name="gp" count="unlimited" bypass="yes"/>
                         <DialogAction type="LOSE_ITEM" name="xp" count="unlimited" bypass="yes"/>
-                        <DialogAction type="SET_LEVEL" name="Weak Minion" bypass="yes"/>
+                        <DialogAction type="SET_LEVEL" name="Minion" bypass="yes"/>
                         <DialogAction type="VISUAL_EFFECT" name="evilDeathLoop"/></DialogOption>
                      <DialogOption name="No">
                         <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
@@ -1059,6 +1087,7 @@
                            <VictoryDialog>
                               <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
                               <DialogAction type="GAIN_ITEM" name="Ball of Light"/>
+                              <Dialog>Thou hast done well in defeating the Dragonlord.</Dialog>
                               <Dialog>Thou hast found the Ball of Light.</Dialog>
                               <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
                               <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>

@@ -330,14 +330,14 @@ class Game:
                 if talking:
                     npc = self.game_state.get_npc_to_talk_to()
                     if npc:
-                        if npc.dialog is not None:
-                            dialog = npc.dialog
+                        if npc.npc_info.dialog is not None:
+                            dialog = npc.npc_info.dialog
                             self.game_state.draw_map()
                         else:
                             dialog = ['They pay you no mind.']
                     else:
                         dialog = ['There is no one there.']
-                    self.gde.dialog_loop(dialog)
+                    self.gde.dialog_loop(dialog, npc)
 
                 if searching or opening:
                     decorations = self.game_state.get_decorations()

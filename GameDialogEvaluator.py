@@ -16,8 +16,8 @@ from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, Di
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
 import GameEvents
-from HeroParty import HeroParty
 from HeroState import HeroState
+from MapCharacterState import MapCharacterState
 from Point import Point
 import SurfaceEffects
 
@@ -62,7 +62,7 @@ class GameDialogEvaluator:
     def set_combat_encounter(self, combat_encounter: CombatEncounterInterface) -> None:
         self.combat_encounter = combat_encounter
 
-    def dialog_loop(self, dialog: Union[DialogType, str]) -> None:
+    def dialog_loop(self, dialog: Union[DialogType, str], npc: Optional[MapCharacterState] = None) -> None:
         # Save off initial background image
         background_image = self.game_state.screen.copy()
 
@@ -73,7 +73,7 @@ class GameDialogEvaluator:
         GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
         message_dialog = GameDialog.create_message_dialog()
 
-        self.traverse_dialog(message_dialog, dialog)
+        self.traverse_dialog(message_dialog, dialog, npc=npc)
 
         if self.game_state.is_running:
             # Restore initial background image
@@ -83,11 +83,26 @@ class GameDialogEvaluator:
             self.game_state.draw_map(False)
             pygame.display.flip()
 
+    def add_and_wait_for_message(self, message: str, message_dialog: GameDialog) -> None:
+        message_dialog.add_message(message)
+        self.wait_for_message_to_fully_display(message_dialog)
+
+    def wait_for_message_to_fully_display(self, message_dialog: GameDialog) -> None:
+        message_dialog.blit(self.game_state.screen, True)
+        while self.game_state.is_running and message_dialog.has_more_content():
+            if message_dialog.advance_content():
+                self.wait_for_acknowledgement(message_dialog)
+            message_dialog.blit(self.game_state.screen, True)
+            pygame.time.Clock().tick(30)
+
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
         # was already acknowledged.
         if message_dialog is not None and message_dialog.is_acknowledged():
             return
+
+        # Clear event queue
+        GameEvents.clear_events()
 
         is_awaiting_acknowledgement = True
         is_waiting_indicator_drawn = False
@@ -127,7 +142,7 @@ class GameDialogEvaluator:
                             prompt: str,
                             allowed_input: Optional[str] = None) -> Tuple[str, float]:
         message_dialog.prompt_for_user_text(prompt, allowed_input)
-        message_dialog.blit(self.game_state.screen, True)
+        self.wait_for_message_to_fully_display(message_dialog)
 
         is_waiting_for_user_input = True
         start_time = time.time()
@@ -222,7 +237,14 @@ class GameDialogEvaluator:
                         message_dialog: GameDialog,
                         dialog: Union[DialogType, str],
                         depth: int = 0,
-                        add_spacing: bool = True) -> None:
+                        add_spacing: bool = True,
+                        npc: Optional[MapCharacterState] = None) -> None:
+        def add_message(messages: Union[str, list[str]]) -> None:
+            if isinstance(messages, str):
+                self.add_and_wait_for_message(messages, message_dialog)
+            else:
+                for message in messages:
+                    self.add_and_wait_for_message(message, message_dialog)
 
         if depth == 0:
             self.wait_before_new_text = False
@@ -264,28 +286,23 @@ class GameDialogEvaluator:
                     item = GameDialog.fix_capitalization(item)
 
                 if add_spacing and not message_dialog.is_last_row_blank():
-                    message_dialog.add_message('')
-                message_dialog.add_message(item)
+                    add_message('')
+                add_message(item)
 
-                message_dialog.blit(self.game_state.screen, True)
-                while self.game_state.is_running and message_dialog.has_more_content():
-                    self.wait_for_acknowledgement(message_dialog)
-                    message_dialog.advance_content()
-                    message_dialog.blit(self.game_state.screen, True)
                 self.wait_before_new_text = True
                 # print('Set self.traverse_dialog_wait_before_new_text to True', flush=True)
 
             elif isinstance(item, list):
                 # print( 'Dialog Sub Tree =', item, flush=True )
                 if self.game_state.is_running:
-                    self.traverse_dialog(message_dialog, item, depth + 1)
+                    self.traverse_dialog(message_dialog, item, depth + 1, npc=npc)
 
             elif isinstance(item, DialogGoTo):
                 # print( 'Dialog Go To =', item, flush=True )
                 if item.label in self.game_info.dialog_sequences:
                     if self.game_state.is_running:
                         self.traverse_dialog(message_dialog, self.game_info.dialog_sequences[item.label],
-                                             depth + 1)
+                                             depth + 1, npc=npc)
                 else:
                     print('ERROR: ' + item.label + ' not found in dialogSequences', flush=True)
 
@@ -313,7 +330,7 @@ class GameDialogEvaluator:
                     menu_result = self.get_menu_result(message_dialog)
                 if self.game_state.is_running and menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
-                    self.traverse_dialog(message_dialog, item[menu_result], depth + 1)
+                    self.traverse_dialog(message_dialog, item[menu_result], depth + 1, npc=npc)
 
             elif isinstance(item, DialogVendorBuyOptions):
                 # print('Dialog Vendor Buy Options =', item, flush=True)
@@ -326,7 +343,7 @@ class GameDialogEvaluator:
                     name_and_gp_row_data = []
                 if len(name_and_gp_row_data) == 0:
                     print('ERROR: No options from vendor', flush=True)
-                    self.traverse_dialog(message_dialog, 'Nature calls and I need to run.  Sorry!', depth + 1)
+                    self.traverse_dialog(message_dialog, 'Nature calls and I need to run.  Sorry!', depth + 1, npc=npc)
                     break
                 self.wait_before_new_text = False
                 # print('Set self.traverse_dialog_wait_before_new_text to False', flush=True)
@@ -354,7 +371,7 @@ class GameDialogEvaluator:
                     item_types = []
                 item_row_data = self.hero_party.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
-                    self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1)
+                    self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1, npc=npc)
                     continue
                 self.wait_before_new_text = False
                 # print( 'Set self.traverse_dialog_wait_before_new_text to False', flush=True )
@@ -462,11 +479,11 @@ class GameDialogEvaluator:
                 # On an assert, evaluate the dialog on a failure and then break out.
                 if item.is_assert and not check_result:
                     if item.dialog is not None:
-                        self.traverse_dialog(message_dialog, item.dialog, depth + 1)
+                        self.traverse_dialog(message_dialog, item.dialog, depth + 1, npc=npc)
                     break
                 # On a check, evaluate the dialog on a success and do NOT break out.
                 elif not item.is_assert and check_result and item.dialog is not None:
-                    self.traverse_dialog(message_dialog, item.dialog, depth + 1)
+                    self.traverse_dialog(message_dialog, item.dialog, depth + 1, npc=npc)
 
             elif isinstance(item, DialogAction):
                 # print( 'Dialog Action =', item, flush=True )
@@ -477,7 +494,7 @@ class GameDialogEvaluator:
                 if (ActionCategoryTypeEnum.MAGICAL == item.category
                         and self.game_state.is_in_combat()
                         and self.actor.are_spells_blocked):
-                    message_dialog.add_message('But that spell hath been blocked.')
+                    add_message('But that spell hath been blocked.')
                     continue
 
                 if item.type == DialogActionEnum.SAVE_GAME:
@@ -583,7 +600,7 @@ class GameDialogEvaluator:
                         self.game_state.set_map(item.map_name)
                     else:
                         self.game_state.set_map(self.game_state.get_map_name())
-                    self.game_state.draw_map(flip_buffer=message_dialog.is_empty())
+                    self.game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_combat=False)
                     if not message_dialog.is_empty():
                         message_dialog.blit(self.game_state.screen, True)
 
@@ -593,7 +610,7 @@ class GameDialogEvaluator:
                                                 Direction.get_opposite(self.hero_party.last_outside_dir))
                         self.game_state.set_map(self.hero_party.last_outside_map_name)
                     else:
-                        message_dialog.add_message('But it did not work.')
+                        add_message('But it did not work.')
 
                 elif item.type == DialogActionEnum.PLAY_SOUND:
                     # print( 'Play sound', item.name, flush=True )
@@ -632,7 +649,8 @@ class GameDialogEvaluator:
                         self.game_state.draw_map(flip_buffer=True)
                     elif item.name == 'evilDeathLoop':
                         SurfaceEffects.black_red_monochrome_effect(self.game_state.screen, flip_buffer=False)
-                        self.game_state.draw_map(flip_buffer=True, draw_background=False)
+                        self.game_state.draw_map(draw_only_character_sprites=True)
+
                         # Endless loop where quiting is the only exit
                         while self.game_state.is_running:
                             # Process events
@@ -681,9 +699,9 @@ class GameDialogEvaluator:
                             worked = True
                     if not item.bypass and not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            message_dialog.add_message('But that spell did not work.')
+                            add_message('But that spell did not work.')
                         else:
-                            message_dialog.add_message('But it did nothing.')
+                            add_message('But it did nothing.')
                     else:
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
@@ -697,12 +715,12 @@ class GameDialogEvaluator:
                                 target.hp = min(target.max_hp, target.hp + GameTypes.get_int_value(item.count))
                             worked = True
                             if not item.bypass:
-                                message_dialog.add_message(target.get_name() + ' hath recovered.')
+                                add_message(target.get_name() + ' hath recovered.')
                     if not item.bypass and not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            message_dialog.add_message('But that spell did not work.')
+                            add_message('But that spell did not work.')
                         else:
-                            message_dialog.add_message('But it did nothing.')
+                            add_message('But it did nothing.')
                     else:
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
@@ -712,12 +730,12 @@ class GameDialogEvaluator:
                         if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             target.is_asleep = True
                             worked = True
-                            message_dialog.add_message(target.get_name() + ' is asleep.')
+                            add_message(target.get_name() + ' is asleep.')
                     if not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            message_dialog.add_message('But that spell did not work.')
+                            add_message('But that spell did not work.')
                         else:
-                            message_dialog.add_message('But it did nothing.')
+                            add_message('But it did nothing.')
 
                 elif item.type == DialogActionEnum.STOPSPELL:
                     worked = False
@@ -725,16 +743,17 @@ class GameDialogEvaluator:
                         if self.actor.does_action_work(item.type, item.category, target, item.bypass, item.name):
                             target.are_spells_blocked = True
                             worked = True
-                            message_dialog.add_message(target.get_name() + "'s spells are blocked.")
+                            add_message(target.get_name() + "'s spells are blocked.")
                     if not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            message_dialog.add_message('But that spell did not work.')
+                            add_message('But that spell did not work.')
                         else:
-                            message_dialog.add_message('But it did nothing.')
+                            add_message('But it did nothing.')
 
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
                     damaged_targets = []
+                    combat_messages = []
 
                     if item.problem is not None:
                         # Prompt user for problem and get their answer
@@ -752,10 +771,9 @@ class GameDialogEvaluator:
                                 if user_answer == item.problem.answer:
                                     # TODO: Make 5 second time threshold configurable
                                     is_critical_hit = seconds_waiting < 5.0
-                                    message_dialog.add_message("That's right!")
+                                    combat_messages.append("That's right!")
                                 else:
-                                    message_dialog.add_message('Wrong!  The correct answer is ' +
-                                                               str(item.problem.answer))
+                                    combat_messages.append('Wrong!  The correct answer is ' + str(item.problem.answer))
 
                             if item.count != 'default':
                                 if is_critical_hit is None:
@@ -785,15 +803,15 @@ class GameDialogEvaluator:
                             if 0 < damage:
                                 if is_critical_hit:
                                     if target.allows_critical_hits():
-                                        message_dialog.add_message('Excellent move!')
+                                        combat_messages.append('Excellent move!')
                                     else:
-                                        message_dialog.add_message('Great move!')
+                                        combat_messages.append('Great move!')
 
                                 # Check for a dodge
                                 if allow_dodge and target.is_dodging_attack():
                                     AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
-                                    message_dialog.add_message(
-                                        target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
+                                    combat_messages.append(target.get_name() + ' dodges ' + self.actor.get_name()
+                                                           + "'s strike.")
                                 else:
                                     # TODO: Play different sound based on damage of attack
                                     if is_critical_hit:
@@ -811,25 +829,27 @@ class GameDialogEvaluator:
 
                                     target.hp = max(0, target.hp - damage)
                                     if target == self.hero_party.main_character:
-                                        message_dialog.add_message('Thy hit points reduced by ' + str(damage) + '.')
+                                        combat_messages.append('Thy hit points reduced by ' + str(damage) + '.')
                                     else:
-                                        message_dialog.add_message(target.get_name() + "'s hit points reduced by "
-                                                                   + str(damage) + '.')
+                                        combat_messages.append(target.get_name() + "'s hit points reduced by "
+                                                               + str(damage) + '.')
                             else:
                                 # TODO: Play sound?
                                 AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
                                 if isinstance(target, HeroState):
-                                    message_dialog.add_message(target.get_name() + ' dodges the strike.')
+                                    combat_messages.append(target.get_name() + ' dodges the strike.')
                                 else:
-                                    message_dialog.add_message('A miss! No damage hath been scored!')
+                                    combat_messages.append('A miss! No damage hath been scored!')
                     if not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            message_dialog.add_message('But that spell did not work.')
+                            combat_messages.append('But that spell did not work.')
                         else:
-                            message_dialog.add_message('But it did nothing.')
+                            combat_messages.append('But it did nothing.')
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
+
+                    add_message(combat_messages)
 
                     # Slight pause between turns
                     pygame.time.wait(250)
@@ -851,6 +871,15 @@ class GameDialogEvaluator:
                         hero.hp = min(hero.hp, hero.max_hp)
                         hero.mp = min(hero.mp, hero.max_mp)
                     self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
+
+                elif item.type == DialogActionEnum.JOIN_PARTY:
+                    if npc is not None:
+                        self.hero_party.add_non_combat_member(item.name, npc)
+                    else:
+                        print('ERROR: JOIN_PARTY failed because the NPC is None', flush=True)
+
+                elif item.type == DialogActionEnum.LEAVE_PARTY:
+                    self.hero_party.remove_member(item.name)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

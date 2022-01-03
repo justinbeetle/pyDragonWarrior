@@ -11,21 +11,27 @@ from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, Spell
 
 
 class CombatCharacterState(metaclass=abc.ABCMeta):
-    def __init__(self, hp: int, max_hp: int = 0, mp: int = 0, max_mp: int = 0) -> None:
+    def __init__(self,
+                 hp: int,
+                 max_hp: int = 0,
+                 mp: int = 0,
+                 max_mp: int = 0,
+                 is_combat_character: bool = True) -> None:
         self.hp = hp
         self.max_hp = max(hp, max_hp)
         self.mp = mp
         self.max_mp = max(mp, max_mp)
+        self.is_combat_character = is_combat_character
         self.is_asleep = False
         self.turns_asleep = 0
         self.are_spells_blocked = False
-        self.has_run_away = False
+        self.has_run_away = not self.is_combat_character
 
     def clear_combat_status_affects(self) -> None:
         self.is_asleep = False
         self.turns_asleep = 0
         self.are_spells_blocked = False
-        self.has_run_away = False
+        self.has_run_away = not self.is_combat_character
 
     def is_alive(self) -> bool:
         return self.hp > 0

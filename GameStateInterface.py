@@ -91,7 +91,8 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
                  flip_buffer: bool = True,
                  draw_background: bool = True,
                  draw_combat: bool = True,
-                 draw_status: bool = True) -> None:
+                 draw_status: bool = True,
+                 draw_only_character_sprites: bool = False) -> None:
         pass
 
     @abc.abstractmethod

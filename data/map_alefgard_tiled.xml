@@ -30,6 +30,8 @@
       <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
    <MapLocation x="70" y="53" name="Rainbow Bridge Formation Point"/>
+   <MapDecoration type="bridge_left_top" x="68" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
+   <MapDecoration type="bridge_right_top" x="69" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_left" x="68" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_right" x="69" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
 

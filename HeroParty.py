@@ -6,6 +6,7 @@ from GameTypes import ItemType
 
 from GameTypes import DialogType, Direction
 from HeroState import HeroState
+from MapCharacterState import MapCharacterState
 from MonsterParty import MonsterParty
 from Point import Point
 
@@ -29,6 +30,10 @@ class HeroParty:
         self.last_outside_pos_dat_tile = Point()
         self.last_outside_dir = Direction.SOUTH
 
+    @property
+    def combat_members(self) -> List[HeroState]:
+        return [member for member in self.members if member.is_combat_character]
+
     def add_member(self, member: HeroState, order: Optional[int]=None, is_main_character: bool=False) -> None:
         if is_main_character:
             self.main_character = member
@@ -44,6 +49,13 @@ class HeroParty:
                 self.members.insert(order, member)
         else:
             print('ERROR: Cannot add a member that is already in the party', flush=True)
+
+    def add_non_combat_member(self, name: str, member: MapCharacterState) -> None:
+        self.add_member(HeroState(member.character_type,
+                                  member.curr_pos_dat_tile,
+                                  member.direction,
+                                  name,
+                                  is_combat_character=False))
 
     # Remove party member by name or reference
     def remove_member(self, member: Union[HeroState, str]) -> None:

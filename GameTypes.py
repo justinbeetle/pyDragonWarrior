@@ -167,6 +167,8 @@ class DialogActionEnum(Enum):
     #                                                bypass (to bypass resistances and damage modifiers)
     WAIT = 18                          # attributes: count (number of milliseconds to wait)
     SET_LEVEL = 19                     # attributes: name, bypass (to bypass updating the screen)
+    JOIN_PARTY = 20                    # attributes: name
+    LEAVE_PARTY = 21                   # attributes: name
 
 
 class ActionCategoryTypeEnum(Enum):

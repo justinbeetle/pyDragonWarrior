@@ -7,8 +7,8 @@ from typing import Dict, List, Optional, Tuple
 import math
 import random
 
-from MapCharacterState import MapCharacterState
 from CombatCharacterState import CombatCharacterState
+from MapCharacterState import MapCharacterState
 from Point import Point
 from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, DialogActionEnum, Direction, Helm, ItemType, \
     Level,  Shield, Spell, Tool, Weapon
@@ -20,12 +20,13 @@ class HeroState(MapCharacterState, CombatCharacterState):
                  pos_dat_tile: Point,
                  direction: Direction,
                  name: str,
-                 xp: int = 0) -> None:
+                 xp: int = 0,
+                 is_combat_character: bool = True) -> None:
         MapCharacterState.__init__(self, character_type, pos_dat_tile, direction)
         self.name = name
         self.level = self.calc_level(xp)
         self.xp = xp
-        CombatCharacterState.__init__(self, hp=self.level.hp, mp=self.level.mp)
+        CombatCharacterState.__init__(self, hp=self.level.hp, mp=self.level.mp, is_combat_character=is_combat_character)
 
         self.weapon: Optional[Weapon] = None
         self.helm: Optional[Helm] = None
@@ -419,7 +420,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return leveled_up
 
     def is_ignoring_tile_penalties(self) -> bool:
-        ret_val = False
+        ret_val = not self.is_combat_character
         if not ret_val and self.armor is not None:
             ret_val = self.armor.ignores_tile_penalties
         return ret_val

@@ -87,13 +87,12 @@ class CombatEncounter(CombatEncounterInterface):
         if self.approach_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
         else:
-            self.message_dialog.add_message(self.monster_party.get_default_approach_dialog())
-        self.message_dialog.blit(self.game_state.screen, True)
+            self.add_message(self.monster_party.get_default_approach_dialog())
 
         # Pause for a second, then clear the event queue and wait for user acknowledgement
         pygame.time.Clock().tick(2)
         GameEvents.clear_events()
-        self.gde.wait_for_acknowledgement(self.message_dialog)
+        self.wait_for_acknowledgement()
 
         # Check if monsters run away at the start of the encounter
         last_turn_was_monster_turn = False
@@ -102,9 +101,8 @@ class CombatEncounter(CombatEncounterInterface):
                 if monster.should_run_away(self.hero_party.main_character):
                     last_turn_was_monster_turn = True
                     monster.has_run_away = True
-                    self.message_dialog.add_message(monster.get_name() + ' is running away.')
+                    self.add_message(monster.get_name() + ' is running away.')
                     self.render_monsters()
-                    self.gde.wait_for_acknowledgement(self.message_dialog)
 
         # Iterate through turns in the encounter until the encounter ends
         while self.still_in_encounter():
@@ -112,14 +110,14 @@ class CombatEncounter(CombatEncounterInterface):
                 if combatant.is_still_in_combat():
                     if isinstance(combatant, MonsterState):
                         if last_turn_was_monster_turn:
-                            self.gde.wait_for_acknowledgement(self.message_dialog)
+                            self.wait_for_acknowledgement()
                         last_turn_was_monster_turn = True
                         self.execute_monster_turn(combatant)
-                        self.gde.wait_for_acknowledgement(self.message_dialog)
+                        self.wait_for_acknowledgement()
                     elif isinstance(combatant, HeroState):
                         last_turn_was_monster_turn = False
                         self.execute_player_turn(combatant)
-                        self.gde.wait_for_acknowledgement(self.message_dialog)
+                        self.wait_for_acknowledgement()
                     if not self.still_in_encounter():
                         break
 
@@ -137,7 +135,7 @@ class CombatEncounter(CombatEncounterInterface):
         self.hero_party.clear_combat_status_affects()
 
         # Wait for final acknowledgement
-        self.gde.wait_for_acknowledgement(self.message_dialog)
+        self.wait_for_acknowledgement()
 
         # Restore initial background image
         self.game_state.screen.blit(self.background_image, (0, 0))
@@ -238,10 +236,10 @@ class CombatEncounter(CombatEncounterInterface):
             self.is_first_turn = False
             skip_hero_party = self.monster_party.members[0].has_initiative(self.hero_party.main_character)
         if skip_hero_party:
-            self.message_dialog.add_message(self.monster_party.members[0].get_name() + ' attacked before '
-                                            + self.hero_party.main_character.get_name() + ' was ready.')
+            self.add_message(self.monster_party.members[0].get_name() + ' attacked before '
+                             + self.hero_party.main_character.get_name() + ' was ready.')
         else:
-            for hero in self.hero_party.members:
+            for hero in self.hero_party.combat_members:
                 if hero.is_still_in_combat():
                     turn_order.append(hero)
         for monster in self.monster_party.members:
@@ -257,12 +255,12 @@ class CombatEncounter(CombatEncounterInterface):
     def check_wake_up(self, combatant: CombatCharacterState) -> None:
         if combatant.is_asleep:
             if combatant.is_still_asleep():
-                self.message_dialog.add_message(combatant.get_name() + ' is still asleep.')
+                self.add_message(combatant.get_name() + ' is still asleep.')
             else:
-                self.message_dialog.add_message(combatant.get_name() + ' awakes.')
+                self.add_message(combatant.get_name() + ' awakes.')
 
     def execute_monster_turn(self, monster: MonsterState) -> None:
-        self.message_dialog.add_message('')
+        self.add_message('')
 
         # Check if the monster wakes up
         self.check_wake_up(monster)
@@ -273,7 +271,7 @@ class CombatEncounter(CombatEncounterInterface):
         if monster.should_run_away(self.hero_party.main_character):
             # TODO: Play sound?
             monster.has_run_away = True
-            self.message_dialog.add_message(monster.get_name() + ' is running away.')
+            self.add_message(monster.get_name() + ' is running away.')
             self.render_monsters()
             return
 
@@ -310,12 +308,12 @@ class CombatEncounter(CombatEncounterInterface):
         self.gde.traverse_dialog(self.message_dialog, chosen_monster_action.use_dialog, depth=1, add_spacing=False)
 
     def execute_player_turn(self, hero: HeroState) -> None:
-        self.message_dialog.add_message('')
+        self.add_message('')
 
         # Check if the hero wakes up
         self.check_wake_up(hero)
         if hero.is_asleep:
-            self.gde.wait_for_acknowledgement(self.message_dialog)
+            self.wait_for_acknowledgement()
             return
 
         # Setup for the encounter prompt
@@ -325,7 +323,7 @@ class CombatEncounter(CombatEncounterInterface):
         if 0 < len(hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])):
             options.append('ITEM')
         prompt = 'Command?'
-        if 1 < len(self.hero_party.members):
+        if 1 < len(self.hero_party.combat_members):
             prompt = 'Command ' + hero.get_name() + '?'
 
         use_dialog = None
@@ -360,18 +358,17 @@ class CombatEncounter(CombatEncounterInterface):
                 target = random.choice(self.monster_party.get_still_in_combat_members())
                 if target.is_blocking_escape(hero):
                     # TODO: Play sound?
-                    self.message_dialog.add_message(
-                        hero.get_name() + ' started to run away but was blocked in front.')
+                    self.add_message(hero.get_name() + ' started to run away but was blocked in front.')
                 else:
                     AudioPlayer().play_sound('runAway.wav')
-                    self.message_dialog.add_message(hero.get_name() + ' started to run away.')
+                    self.add_message(hero.get_name() + ' started to run away.')
                     hero.has_run_away = True
                 return
 
             elif menu_result == 'SPELL':
                 available_spell_names = hero.get_available_spell_names()
                 if len(available_spell_names) == 0:
-                    self.message_dialog.add_message('Thou hast not yet learned any spells.')
+                    self.add_message('Thou hast not yet learned any spells.')
                     continue
                 else:
                     menu_dialog = GameDialog.create_menu_dialog(
@@ -393,7 +390,7 @@ class CombatEncounter(CombatEncounterInterface):
                         use_dialog = spell.use_dialog
                         target_type = spell.target_type
                     else:
-                        self.message_dialog.add_message('Thou dost not have enough magic to cast the spell.')
+                        self.add_message('Thou dost not have enough magic to cast the spell.')
                         continue
                     menu_dialog.erase(self.game_state.screen, self.background_image, True)
 
@@ -401,7 +398,7 @@ class CombatEncounter(CombatEncounterInterface):
                 item_cols = 2
                 item_row_data = hero.get_item_row_data(limit_to_unequipped=True, filter_types=['Tool'])
                 if len(item_row_data) == 0:
-                    self.message_dialog.add_message('Thou dost not have any tools.')
+                    self.add_message('Thou dost not have any tools.')
                     continue
                 else:
                     menu_dialog = GameDialog.create_menu_dialog(
@@ -425,7 +422,7 @@ class CombatEncounter(CombatEncounterInterface):
                         use_dialog = item.use_dialog
                         target_type = item.target_type
                     else:
-                        self.message_dialog.add_message(hero.get_name()
+                        self.add_message(hero.get_name()
                                                         + ' studied the object and was confounded by it.')
                         return
             else:
@@ -435,7 +432,7 @@ class CombatEncounter(CombatEncounterInterface):
             break
 
         if use_dialog is None or target_type is None:
-            self.message_dialog.add_message('Thou held back in defense.')
+            self.add_message('Thou held back in defense.')
             return
 
         # Select the target for the selected action
@@ -473,44 +470,49 @@ class CombatEncounter(CombatEncounterInterface):
             xp = self.monster_party.get_xp()
             # TODO: Update text for multiple monster encounters
             if gp != 0 or xp != 0:
-                self.message_dialog.add_message(
+                self.add_message(
                     '\nThou has done well in defeating ' + self.monster_party.get_defeated_monster_summary()
                     + '. Thy experience increases by ' + str(xp) + '. Thy gold increases by ' + str(gp) + '.')
             self.hero_party.gp += gp
-            for hero in self.hero_party.members:
+            for hero in self.hero_party.combat_members:
                 if hero.is_still_in_combat():
                     hero.xp += xp
                     old_level = hero.level
                     old_spells = hero.get_available_spells()
                     if hero.level_up_check():
-                        self.gde.wait_for_acknowledgement(self.message_dialog)
+                        self.wait_for_acknowledgement()
                         AudioPlayer().play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
                         GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
                         # TODO: Update text for multiple hero encounters
-                        self.message_dialog.add_message(
+                        self.add_message(
                             '\nCourage and wit have served thee well. Thou hast been promoted to the next level.')
                         strength_increase = hero.level.strength - old_level.strength
                         agility_increase = hero.level.agility - old_level.agility
                         hp_increase = hero.level.hp - old_level.hp
                         mp_increase = hero.level.mp - old_level.mp
                         if strength_increase > 0:
-                            self.message_dialog.add_message('Thy strength increases by ' + str(strength_increase) + '.')
+                            self.add_message('Thy strength increases by ' + str(strength_increase) + '.')
                         if agility_increase > 0:
-                            self.message_dialog.add_message('Thy agility increases by ' + str(agility_increase) + '.')
+                            self.add_message('Thy agility increases by ' + str(agility_increase) + '.')
                         if hp_increase > 0:
-                            self.message_dialog.add_message('Thy maximum hit points increase by ' +
+                            self.add_message('Thy maximum hit points increase by ' +
                                                             str(hp_increase) + '.')
                         if mp_increase > 0:
-                            self.message_dialog.add_message('Thy maximum magic points increase by ' +
+                            self.add_message('Thy maximum magic points increase by ' +
                                                             str(mp_increase) + '.')
                         print('old_spells =', len(old_spells), flush=True)
                         print('new_spells =', len(hero.get_available_spells()), flush=True)
                         if len(hero.get_available_spells()) > len(old_spells):
-                            self.message_dialog.add_message('Thou hast learned a new spell.')
-                        self.message_dialog.blit(self.game_state.screen, True)
+                            self.add_message('Thou hast learned a new spell.')
 
         if self.victory_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.victory_dialog)
+
+    def add_message(self, message: str):
+        self.gde.add_and_wait_for_message(message, self.message_dialog)
+
+    def wait_for_acknowledgement(self):
+        self.gde.wait_for_acknowledgement(self.message_dialog)
 
     @staticmethod
     def add_problem_to_use_dialog(dialog: DialogType, problem: Optional[Problem] = None) -> None:

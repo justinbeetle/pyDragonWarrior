@@ -241,6 +241,8 @@ class GameState(GameStateInterface):
         save_game_file.write(xml_string)
         save_game_file.close()
 
+        print('Saved game to file', save_game_file_path, flush=True)
+
     def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str='archive') -> None:
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
@@ -283,7 +285,7 @@ class GameState(GameStateInterface):
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
         return self.game_map.get_decorations(tile)
 
-    def get_npc_to_talk_to(self) -> Optional[NpcInfo]:
+    def get_npc_to_talk_to(self) -> Optional[NpcState]:
         return self.game_map.get_npc_to_talk_to()
 
     def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
@@ -419,7 +421,12 @@ class GameState(GameStateInterface):
                  flip_buffer: bool=True,
                  draw_background: bool=True,
                  draw_combat: bool=True,
-                 draw_status: bool=True) -> None:
+                 draw_status: bool=True,
+                 draw_only_character_sprites: bool=False) -> None:
+        if draw_only_character_sprites:
+            self.game_map.draw_character_sprites()
+            return
+
         # Draw the map to the screen
         if draw_background:
             self.game_map.draw()
