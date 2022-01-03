@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import os
 import pygame
 import random
-import xml.etree.ElementTree
+import xml.etree.ElementTree as ET
 import xml.dom.minidom
 
 from AudioPlayer import AudioPlayer
@@ -13,8 +13,8 @@ from CombatEncounter import CombatEncounter
 import GameEvents
 from GameDialog import GameDialog
 from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import DialogReplacementVariables, DialogType, EncounterBackground, MapDecoration, MonsterInfo, \
-    NpcInfo, OutgoingTransition, SpecialMonster, Tile
+from GameTypes import DialogReplacementVariables, DialogType, Direction, EncounterBackground, MapDecoration, \
+    MonsterInfo, OutgoingTransition, SpecialMonster, Tile
 from GameInfo import GameInfo
 from GameMap import GameMap
 from GameStateInterface import GameStateInterface
@@ -141,26 +141,139 @@ class GameState(GameStateInterface):
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game
-        self.game_info.parse_initial_game_state(pc_name_or_file_name)
+        save_game_file_path: Optional[str] = None
+        if pc_name_or_file_name is not None:
+            if os.path.isfile(pc_name_or_file_name):
+                save_game_file_path = pc_name_or_file_name
+            else:
+                save_game_file_path = os.path.join(self.game_info.saves_path, pc_name_or_file_name + '.xml')
 
-        self.pending_dialog = self.game_info.initial_state_dialog
-        pc = HeroState(self.game_info.character_types['hero'],
-                       self.game_info.initial_hero_pos_dat_tile,
-                       self.game_info.initial_hero_pos_dir,
-                       self.game_info.pc_name,
-                       self.game_info.pc_xp)
-        if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
-            pc.hp = self.game_info.pc_hp
-        if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
-            pc.mp = self.game_info.pc_mp
-        pc.weapon = self.game_info.pc_weapon
-        pc.armor = self.game_info.pc_armor
-        pc.shield = self.game_info.pc_shield
-        pc.other_equipped_items = self.game_info.pc_otherEquippedItems
-        pc.unequipped_items = self.game_info.pc_unequippedItems
-        self.hero_party = HeroParty(pc)
-        self.hero_party.gp = self.game_info.pc_gp
-        self.hero_party.progress_markers = self.game_info.pc_progressMarkers
+        if save_game_file_path is None or not os.path.isfile(save_game_file_path):
+            self.game_info.parse_initial_game_state(pc_name_or_file_name)
+
+            self.pending_dialog = self.game_info.initial_state_dialog
+            pc = HeroState(self.game_info.character_types['hero'],
+                           self.game_info.initial_hero_pos_dat_tile,
+                           self.game_info.initial_hero_pos_dir,
+                           self.game_info.pc_name,
+                           self.game_info.pc_xp)
+            if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
+                pc.hp = self.game_info.pc_hp
+            if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
+                pc.mp = self.game_info.pc_mp
+            pc.weapon = self.game_info.pc_weapon
+            pc.armor = self.game_info.pc_armor
+            pc.shield = self.game_info.pc_shield
+            pc.other_equipped_items = self.game_info.pc_otherEquippedItems
+            pc.unequipped_items = self.game_info.pc_unequippedItems
+            self.hero_party = HeroParty(pc)
+            self.hero_party.gp = self.game_info.pc_gp
+            self.hero_party.progress_markers = self.game_info.pc_progressMarkers
+
+            self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations, init=True)
+        else:
+            xml_root = ET.parse(save_game_file_path).getroot()
+
+            map = xml_root.attrib['map']
+            party_members: List[HeroState] = []
+
+            # Local helper method for parsing party members
+            def parse_party_member(member_element: ET.Element) -> None:
+                member_type = self.game_info.character_types['hero']
+                if 'type' in member_element.attrib:
+                    member_type = self.game_info.character_types[member_element.attrib['type']]
+
+                member_is_combat_character = True
+                if 'is_combat_character' in member_element.attrib:
+                    member_is_combat_character = member_element.attrib['is_combat_character'] == 'yes'
+
+                member = HeroState(member_type,
+                                   self.game_info.get_location(map, member_element),
+                                   self.game_info.get_direction(map, member_element),
+                                   member_element.attrib['name'],
+                                   int(member_element.attrib['xp']),
+                                   member_is_combat_character)
+                if 'hp' in member_element.attrib:
+                    member.hp = int(member_element.attrib['hp'])
+                if 'mp' in member_element.attrib:
+                    member.mp = int(member_element.attrib['mp'])
+
+                for item_element in member_element.findall("./EquippedItems/Item"):
+                    item_name = item_element.attrib['name']
+                    if item_name in self.game_info.weapons:
+                        member.weapon = self.game_info.weapons[item_name]
+                    elif item_name in self.game_info.armors:
+                        member.armor = self.game_info.armors[item_name]
+                    elif item_name in self.game_info.shields:
+                        member.shield = self.game_info.shields[item_name]
+                    elif item_name in self.game_info.tools:
+                        member.other_equipped_items.append(self.game_info.tools[item_name])
+                    else:
+                        print('ERROR: Unsupported item', item_name, flush=True)
+
+                for item_element in member_element.findall("./UnequippedItems/Item"):
+                    item_name = item_element.attrib['name']
+                    item_count = 1
+                    if 'count' in item_element.attrib:
+                        item_count = int(item_element.attrib['count'])
+                    if item_name in self.game_info.items:
+                        member.unequipped_items[self.game_info.items[item_name]] = item_count
+                    else:
+                        print('ERROR: Unsupported item', item_name, flush=True)
+
+                party_members.append(member)
+
+            # Parse the party members
+            for member_element in xml_root.findall('./PartyMember'):
+                parse_party_member(member_element)
+            if 0 == len(party_members):
+                # This is an old save, attempt to parse the root element as if it were a PartyMember
+                parse_party_member(xml_root)
+
+            # Create the hero party from the party members
+            self.hero_party = HeroParty(party_members[0])
+            for member in party_members[1:]:
+                self.hero_party.add_member(member)
+            self.hero_party.set_main_character(xml_root.attrib['name'])
+
+            # Parse properties of the entire party
+            self.hero_party.gp = int(xml_root.attrib['gp'])
+
+            # Load state related to repel monsters
+            if 'repel_monsters' in xml_root.attrib:
+                self.hero_party.repel_monsters = xml_root.attrib['repel_monsters'] == 'yes'
+            if 'repel_monsters_decay_steps_remaining' in xml_root.attrib:
+                self.hero_party.repel_monsters_decay_steps_remaining =\
+                    int(xml_root.attrib['repel_monsters_decay_steps_remaining'])
+            if 'repel_monster_fade_dialog' in xml_root.attrib:
+                self.hero_party.repel_monster_fade_dialog = [xml_root.attrib['repel_monster_fade_dialog']]
+
+            # Load state related to last outside position
+            if 'last_outside_map' in xml_root.attrib:
+                self.hero_party.last_outside_map_name = xml_root.attrib['last_outside_map']
+                self.hero_party.last_outside_pos_dat_tile = Point(int(xml_root.attrib['last_outside_x']),
+                                                                  int(xml_root.attrib['last_outside_y']))
+                self.hero_party.last_outside_dir = Direction[xml_root.attrib['last_outside_dir']]
+
+            # Parse the progress markers
+            for progress_marker_element in xml_root.findall("./ProgressMarkers/ProgressMarker"):
+                self.hero_party.progress_markers.append(progress_marker_element.attrib['name'])
+                # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
+
+            self.set_map(map, init=True)
+
+            # Load state related to light diameter
+            if 'light_diameter' in xml_root.attrib:
+                self.hero_party.light_diameter = int(xml_root.attrib['light_diameter'])
+            if 'light_diameter_decay_steps' in xml_root.attrib:
+                self.hero_party.light_diameter_decay_steps = int(xml_root.attrib['light_diameter_decay_steps'])
+            if 'light_diameter_decay_steps_remaining' in xml_root.attrib:
+                self.hero_party.light_diameter_decay_steps_remaining = \
+                    int(xml_root.attrib['light_diameter_decay_steps_remaining'])
+
+            print('GameState: before setting pending_dialog =', self.pending_dialog, flush=True)
+            self.pending_dialog = self.game_info.parse_dialog(xml_root)
+            print('GameState: after setting pending_dialog =', self.pending_dialog, flush=True)
 
         # TODO: Remove Mocha from party
         '''
@@ -172,62 +285,92 @@ class GameState(GameStateInterface):
         self.hero_party.add_member(mocha)
         '''
 
-        self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations, init=True)
-
         # Initialize the default dialog font color based on the state of the hero party
         gde = GameDialogEvaluator(self.game_info, self)
         gde.update_default_dialog_font_color()
 
     def save(self, quick_save: bool=False) -> None:
-        # TODO: Save data for multiple party members
-        xml_root = xml.etree.ElementTree.Element('SaveState')
+        # Save the overall state of the party
+        xml_root = ET.Element('SaveState')
         xml_root.attrib['name'] = self.hero_party.main_character.name
         xml_root.attrib['map'] = self.get_map_name()
-        xml_root.attrib['x'] = str(self.hero_party.main_character.curr_pos_dat_tile.x)
-        xml_root.attrib['y'] = str(self.hero_party.main_character.curr_pos_dat_tile.y)
-        xml_root.attrib['dir'] = self.hero_party.main_character.direction.name
-        xml_root.attrib['xp'] = str(self.hero_party.main_character.xp)
         xml_root.attrib['gp'] = str(self.hero_party.gp)
-        xml_root.attrib['hp'] = str(self.hero_party.main_character.hp)
-        xml_root.attrib['mp'] = str(self.hero_party.main_character.mp)
 
-        items_element = xml.etree.ElementTree.SubElement(xml_root, 'EquippedItems')
-        if self.hero_party.main_character.weapon is not None:
-            item_element = xml.etree.ElementTree.SubElement(items_element, 'Item')
-            item_element.attrib['name'] = self.hero_party.main_character.weapon.name
-        if self.hero_party.main_character.armor is not None:
-            item_element = xml.etree.ElementTree.SubElement(items_element, 'Item')
-            item_element.attrib['name'] = self.hero_party.main_character.armor.name
-        if self.hero_party.main_character.shield is not None:
-            item_element = xml.etree.ElementTree.SubElement(items_element, 'Item')
-            item_element.attrib['name'] = self.hero_party.main_character.shield.name
-        for tool in self.hero_party.main_character.other_equipped_items:
-            item_element = xml.etree.ElementTree.SubElement(items_element, 'Item')
-            item_element.attrib['name'] = tool.name
+        # Save state related to light diameter
+        if self.hero_party.light_diameter is not None:
+            xml_root.attrib['light_diameter'] = str(self.hero_party.light_diameter)
+        if self.hero_party.light_diameter_decay_steps is not None:
+            xml_root.attrib['light_diameter_decay_steps'] = str(self.hero_party.light_diameter_decay_steps)
+        if self.hero_party.light_diameter_decay_steps_remaining is not None:
+            xml_root.attrib['light_diameter_decay_steps_remaining'] =\
+                str(self.hero_party.light_diameter_decay_steps_remaining)
 
-        items_element = xml.etree.ElementTree.SubElement(xml_root, 'UnequippedItems')
-        for item in self.hero_party.main_character.unequipped_items:
-            if self.hero_party.main_character.unequipped_items[item] > 0:
-                item_element = xml.etree.ElementTree.SubElement(items_element, 'Item')
-                item_element.attrib['name'] = item.name
-                item_element.attrib['count'] = str(self.hero_party.main_character.unequipped_items[item])
+        # Save state related to repel monsters
+        xml_root.attrib['repel_monsters'] = 'yes' if self.hero_party.repel_monsters else 'no'
+        if self.hero_party.repel_monsters_decay_steps_remaining is not None:
+            xml_root.attrib['repel_monsters_decay_steps_remaining'] =\
+                str(self.hero_party.repel_monsters_decay_steps_remaining)
+        if (self.hero_party.repel_monster_fade_dialog is not None
+                and isinstance(self.hero_party.repel_monster_fade_dialog, str)):
+            xml_root.attrib['repel_monster_fade_dialog'] = str(self.hero_party.repel_monster_fade_dialog)
 
-        progress_markers_element = xml.etree.ElementTree.SubElement(xml_root, 'ProgressMarkers')
+        # Save state related to last outside position
+        if '' != self.hero_party.last_outside_map_name:
+            xml_root.attrib['last_outside_map'] = self.hero_party.last_outside_map_name
+            xml_root.attrib['last_outside_x'] = str(self.hero_party.last_outside_pos_dat_tile.x)
+            xml_root.attrib['last_outside_y'] = str(self.hero_party.last_outside_pos_dat_tile.y)
+            xml_root.attrib['last_outside_dir'] = self.hero_party.last_outside_dir.name
+
+        # Save state for member of the hero party
+        for member in self.hero_party.members:
+            member_element = ET.SubElement(xml_root, 'PartyMember')
+            member_element.attrib['name'] = member.name
+            member_element.attrib['type'] = member.character_type.name
+            member_element.attrib['x'] = str(member.curr_pos_dat_tile.x)
+            member_element.attrib['y'] = str(member.curr_pos_dat_tile.y)
+            member_element.attrib['dir'] = member.direction.name
+            member_element.attrib['xp'] = str(member.xp)
+            member_element.attrib['hp'] = str(member.hp)
+            member_element.attrib['mp'] = str(member.mp)
+            member_element.attrib['is_combat_character'] = 'yes' if member.is_combat_character else 'no'
+
+            items_element = ET.SubElement(member_element, 'EquippedItems')
+            if member.weapon is not None:
+                item_element = ET.SubElement(items_element, 'Item')
+                item_element.attrib['name'] = member.weapon.name
+            if member.armor is not None:
+                item_element = ET.SubElement(items_element, 'Item')
+                item_element.attrib['name'] = member.armor.name
+            if member.shield is not None:
+                item_element = ET.SubElement(items_element, 'Item')
+                item_element.attrib['name'] = member.shield.name
+            for tool in member.other_equipped_items:
+                item_element = ET.SubElement(items_element, 'Item')
+                item_element.attrib['name'] = tool.name
+
+            items_element = ET.SubElement(member_element, 'UnequippedItems')
+            for item, item_count in member.unequipped_items.items():
+                if item_count > 0:
+                    item_element = ET.SubElement(items_element, 'Item')
+                    item_element.attrib['name'] = item.name
+                    item_element.attrib['count'] = str(item_count)
+
+        progress_markers_element = ET.SubElement(xml_root, 'ProgressMarkers')
         for progress_marker in self.hero_party.progress_markers:
-            progress_marker_element = xml.etree.ElementTree.SubElement(progress_markers_element, 'ProgressMarker')
+            progress_marker_element = ET.SubElement(progress_markers_element, 'ProgressMarker')
             progress_marker_element.attrib['name'] = progress_marker
 
         # TODO: This should all be captured in game.xml
         if not quick_save:
-            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element = ET.SubElement(xml_root, 'Dialog')
             dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
-            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element = ET.SubElement(xml_root, 'Dialog')
             dialog_element.text = '"Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] ' \
                                   'experience points.  See me again when thy level has increased."'
-            dialog_element = xml.etree.ElementTree.SubElement(xml_root, 'Dialog')
+            dialog_element = ET.SubElement(xml_root, 'Dialog')
             dialog_element.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'
 
-        xml_string = xml.dom.minidom.parseString(xml.etree.ElementTree.tostring(xml_root)).toprettyxml(indent="   ")
+        xml_string = xml.dom.minidom.parseString(ET.tostring(xml_root)).toprettyxml(indent="   ")
 
         save_game_file_path = os.path.join(self.game_info.saves_path, self.hero_party.main_character.name + '.xml')
 

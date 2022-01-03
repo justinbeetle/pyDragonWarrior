@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pygame
 
-joysticks = {}
+# Mapping from unique instance IDs to initialized joysticks/gamepads
+joysticks: Dict[int, pygame.joystick.Joystick] = {}
 
 
 def setup_joystick() -> bool:

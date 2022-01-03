@@ -208,8 +208,8 @@
                   <DialogOption name="Yes">
                      <Dialog>"I'm so happy!"</Dialog>
                      <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
-                     <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/> 
-                     <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call -->
+                     <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/> <!-- TODO: This has the king joining the party instead.  Also, want to script the princess moving next to the main character here before she joins the party. -->
+                     <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess as an NPC and add her to the hero party -->
                   <DialogOption name="No">
                       <Dialog>"But thou must."</Dialog>
                       <Dialog>"May I travel as thy companion?"</Dialog>
@@ -849,7 +849,7 @@
                   <DialogAction type="GAIN_ITEM" name="PM_Rescued_Princess"/>
                   <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
                   <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/>
-                  <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess from the map -->
+                  <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess as an NPC and add her to the hero party -->
                <DialogOption name="No">
                    <Dialog>"But thou must."</Dialog>
                    <Dialog>"Will thou take me to the castle?"</Dialog>
@@ -1873,7 +1873,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
       </Tools>
    </Items>
 
-   <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero" xp="0" gp="0">
+   <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero">
       <Dialog>"Descendant of Erdrick, listen now to my words.  It is told that in ages past Erdrick fought demons with a Ball of Light.  Then came the Dragonlord who stole the precious globe and hid it in the darkness."</Dialog>
       <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
       <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>

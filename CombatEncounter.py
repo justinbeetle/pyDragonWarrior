@@ -471,7 +471,7 @@ class CombatEncounter(CombatEncounterInterface):
             # TODO: Update text for multiple monster encounters
             if gp != 0 or xp != 0:
                 self.add_message(
-                    '\nThou has done well in defeating ' + self.monster_party.get_defeated_monster_summary()
+                    '\nThou hast done well in defeating ' + self.monster_party.get_defeated_monster_summary()
                     + '. Thy experience increases by ' + str(xp) + '. Thy gold increases by ' + str(gp) + '.')
             self.hero_party.gp += gp
             for hero in self.hero_party.combat_members:
@@ -508,10 +508,10 @@ class CombatEncounter(CombatEncounterInterface):
         if self.victory_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.victory_dialog)
 
-    def add_message(self, message: str):
+    def add_message(self, message: str) -> None:
         self.gde.add_and_wait_for_message(message, self.message_dialog)
 
-    def wait_for_acknowledgement(self):
+    def wait_for_acknowledgement(self) -> None:
         self.gde.wait_for_acknowledgement(self.message_dialog)
 
     @staticmethod

@@ -357,24 +357,24 @@ class Game:
                                                 decoration.type.remove_with_open or
                                                 decoration.type.remove_with_key)
 
-                        if requires_removal:
-                            if ((searching and decoration.type.remove_with_search) or
-                                    (opening and decoration.type.remove_with_open)):
-                                if decoration.type.remove_sound is not None:
-                                    AudioPlayer().play_sound(decoration.type.remove_sound)
-                                self.game_state.remove_decoration(decoration)
+                            if requires_removal:
+                                if ((searching and decoration.type.remove_with_search) or
+                                        (opening and decoration.type.remove_with_open)):
+                                    if decoration.type.remove_sound is not None:
+                                        AudioPlayer().play_sound(decoration.type.remove_sound)
+                                    self.game_state.remove_decoration(decoration)
 
-                                if decoration.dialog is not None:
-                                    dialog = decoration.dialog
-                                else:
-                                    dialog = []
-                                break
-                            elif decoration.type.remove_with_key:
-                                dialog = ['It is locked.']
-                                break
-                        elif decoration.dialog is not None:
+                                    if decoration.dialog is not None:
+                                        dialog = decoration.dialog
+                                    else:
+                                        dialog = []
+                                    break
+                                elif decoration.type.remove_with_key:
+                                    dialog = ['It is locked.']
+                                    break
+
+                        if not requires_removal and decoration.dialog is not None:
                             dialog = decoration.dialog
-
 
                     self.gde.dialog_loop(dialog)
 

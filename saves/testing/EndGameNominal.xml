@@ -1,4 +1,4 @@
-<SaveState dir="SOUTH" gp="1000000" map="overworld" name="Wallace" x="43" xp="55000" y="44">
+<SaveState dir="SOUTH" gp="1000000" location="Return Spell Location Point" map="overworld" name="Wallace" xp="55000">
    <EquippedItems>
       <Item name="Erdrick's Sword"/>
       <Item name="Erdrick's Armor"/>

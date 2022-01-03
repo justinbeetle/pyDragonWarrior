@@ -609,6 +609,7 @@ class GameDialogEvaluator:
                         self.hero_party.set_pos(self.hero_party.last_outside_pos_dat_tile,
                                                 Direction.get_opposite(self.hero_party.last_outside_dir))
                         self.game_state.set_map(self.hero_party.last_outside_map_name)
+                        self.game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_combat=False)
                     else:
                         add_message('But it did not work.')
 
@@ -873,13 +874,17 @@ class GameDialogEvaluator:
                     self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.JOIN_PARTY:
-                    if npc is not None:
+                    if item.name is not None and npc is not None:
                         self.hero_party.add_non_combat_member(item.name, npc)
                     else:
-                        print('ERROR: JOIN_PARTY failed because the NPC is None', flush=True)
+                        print(f'ERROR: JOIN_PARTY failed because the name ({item.name}) or NPC ({npc}) is None',
+                              flush=True)
 
                 elif item.type == DialogActionEnum.LEAVE_PARTY:
-                    self.hero_party.remove_member(item.name)
+                    if item.name is not None:
+                        self.hero_party.remove_member(item.name)
+                    else:
+                        print('ERROR: LEAVE_PARTY failed because the name is None', flush=True)
 
                 else:
                     print('ERROR: Unsupported DialogActionEnum of', item.type, flush=True)

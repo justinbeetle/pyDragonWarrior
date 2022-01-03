@@ -510,7 +510,7 @@ class GameInfo:
             dmg_image = monster_image.copy()
             for x in range(dmg_image.get_width()):
                 for y in range(dmg_image.get_height()):
-                    if dmg_image.get_at((x, y)).a != 0:
+                    if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
                         dmg_image.set_at((x, y), pygame.Color('red'))
 
             (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
@@ -874,27 +874,18 @@ class GameInfo:
             return Direction[element.attrib['dir']]
         return None
 
-    def parse_initial_game_state(self, pc_name_or_file_name : Optional[str] = None) -> None:
+    def parse_initial_game_state(self, pc_name : Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information
+        # TODO: Better yet, replace this method entirely with GameState.load as this is game state information and not
+        #       generic game info information.
 
         self.pc_name = ''
-        save_game_file_path : Optional[str] = None
-        if pc_name_or_file_name is not None:
-            if os.path.isfile(pc_name_or_file_name):
-                save_game_file_path = pc_name_or_file_name
-            else:
-                save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + '.xml')
 
-        initial_state_element: Optional[ET.Element] = None
-        if save_game_file_path is not None and os.path.isfile(save_game_file_path):
-            print('Loading save game from file ' + save_game_file_path, flush=True)
-            initial_state_element = ET.parse(save_game_file_path).getroot()
-        else:
-            if pc_name_or_file_name is not None:
-                self.pc_name = pc_name_or_file_name
-            xml_root = ET.parse(self.game_xml_path).getroot()
-            initial_state_element = xml_root.find('InitialState')
+        if pc_name is not None:
+            self.pc_name = pc_name
 
+        xml_root = ET.parse(self.game_xml_path).getroot()
+        initial_state_element = xml_root.find('InitialState')
         if initial_state_element is None:
             print('ERROR: InitialState element is missing', flush=True)
             raise Exception('Missing required InitialState element')
@@ -906,8 +897,8 @@ class GameInfo:
 
         if not self.pc_name:
             self.pc_name = initial_state_element.attrib['name']
-        self.pc_xp = int(initial_state_element.attrib['xp'])
-        self.pc_gp = int(initial_state_element.attrib['gp'])
+        self.pc_xp = 0
+        self.pc_gp = 0
         self.pc_hp = None
         self.pc_mp = None
         if 'hp' in initial_state_element.attrib:

@@ -1,17 +1,20 @@
 <?xml version="1.0" ?>
-<SaveState dir="SOUTH" gp="100000" map="swamp_cave" name="Wallace" x="6" xp="16999" y="15">
-   <EquippedItems>
-      <Item name="Broad Sword"/>
-      <Item name="Full Plate"/>
-      <Item name="Iron Shield"/>
-      <Item name="Dragon's Scale"/>
-      <Item name="Fighter's Ring"/>
-   </EquippedItems>
-   <UnequippedItems>
-      <Item count="10" name="Fairy Water"/>
-      <Item count="10" name="Herb"/>
-      <Item count="10" name="Key"/>
-      <Item count="10" name="Torch"/>
-      <Item count="10" name="Wings"/>
-   </UnequippedItems>
+<SaveState name="Wallace" map="swamp_cave" gp="100000" light_diameter="7" light_diameter_decay_steps="70" light_diameter_decay_steps_remaining="51" repel_monsters="no" last_outside_map="overworld" last_outside_x="111" last_outside_y="45" last_outside_dir="NORTH">
+   <PartyMember name="Wallace" type="hero" x="6" y="15" dir="SOUTH" xp="16999" hp="90" mp="89" is_combat_character="yes">
+      <EquippedItems>
+         <Item name="Broad Sword"/>
+         <Item name="Full Plate"/>
+         <Item name="Iron Shield"/>
+         <Item name="Dragon's Scale"/>
+         <Item name="Fighter's Ring"/>
+      </EquippedItems>
+      <UnequippedItems>
+         <Item name="Fairy Water" count="10"/>
+         <Item name="Herb" count="10"/>
+         <Item name="Key" count="10"/>
+         <Item name="Torch" count="10"/>
+         <Item name="Wings" count="10"/>
+      </UnequippedItems>
+   </PartyMember>
+   <ProgressMarkers/>
 </SaveState>
