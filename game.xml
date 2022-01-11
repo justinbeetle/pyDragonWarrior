@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations_20" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Fonts>
-      <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/>
+      <!-- <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/> -->
       <!-- <Font name="data/fonts/dragon-warrior-1.ttf"/> -->
       <Font name="data/fonts/ARIALUNI.TTF"/>
       <Font name="arialms"/>
@@ -11,26 +11,28 @@
       <Font name="arial"/>
 
       <SymbolFont name="data/fonts/ARIALUNI.TTF"/>
+      <SymbolFont name="arialms"/>
+      <SymbolFont name="lucidasans"/>
+      <SymbolFont name="arial"/>
    </Fonts>
 
    <Tiles>
-      <Tile name="water"    image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="mountain" image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="plain"    image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
-      <Tile name="road"     image="road.png"     symbol="r" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
-      <Tile name="forest"   image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16" type="complex"/>
-      <Tile name="hill"     image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
-      <Tile name="desert"   image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
-      <Tile name="swamp"    image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="bridge"   image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
-      <Tile name="stone"    image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="roof"     image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="path"     image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="counter"  image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                           type="complex"/>
-      <Tile name="inn"      image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="armor"    image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="barrier"  image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="darkness" image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="mountain"         image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="plain"            image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
+      <Tile name="deciduous_forest" image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16" type="complex"/>
+      <Tile name="hill"             image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
+      <Tile name="desert"           image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
+      <Tile name="swamp"            image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="bridge"           image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
+      <Tile name="stone"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
+      <Tile name="roof"             image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="path"             image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="counter"          image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                           type="complex"/>
+      <Tile name="inn"              image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="armor"            image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="barrier"          image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
+      <Tile name="darkness"         image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
 
       <Tile name="beach"                                    walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
       <Tile name="beach_walkable"                           walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
@@ -41,7 +43,7 @@
       <Tile name="river"                                    walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
       <Tile name="river_walkable"                           walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
       <Tile name="volcano"                                  walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="deciduous_forest"                         walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
+      <!--<Tile name="deciduous_forest"                         walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>-->
       <Tile name="pine_forest"                              walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
       <Tile name="jungle"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
       <Tile name="cliff"                                    walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
@@ -52,24 +54,25 @@
 
    <Decorations>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <!--
       <Decoration name="bridge_left_top" image="bridge_left_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_right_top" image="bridge_right_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_left" image="bridge_left.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_right" image="bridge_right.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      -->
       <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_A" image="castle_stone_A.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="castle_stone_B" image="castle_stone_B.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <!--<Decoration name="castle_stone_tall_B" image="castle_stone_tall_B.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
       <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
 
       <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
 
-      <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="yes" removeWithOpen="no" removeSound="openChest.wav"/>
-      <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="yes" removeWithOpen="no" removeSound="openChest.wav"/>
+      <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
+      <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
 
       <Decoration name="door"                   image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
 
+      <!--
       <Decoration name="locked_wood_door"             image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="locked_sideways_wood_door"    image="door_wood_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_wood_door"           image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
@@ -79,6 +82,7 @@
       <Decoration name="locked_sideways_metal_door"   image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_metal_door"          image="door_metal.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_sideways_metal_door" image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+      -->
 
       <Decoration name="shrine_stone_A" image="shrine_stone_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="shrine_stone_B" image="shrine_stone_B.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -86,28 +90,22 @@
       <Decoration name="upstairs" image="stairs_up.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="throne" image="throne.png" widthTiles="3" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="throne_evil" image="throne_evil.png" widthTiles="3" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <!--<Decoration name="town_stone_large_A" image="town_stone_large_A.png" widthTiles="3" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="town_stone_large_B" image="town_stone_large_B.png" widthTiles="3" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
       <Decoration name="town_stone_med_A" image="town_stone_med_A.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="town_stone_med_B" image="town_stone_med_B.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="town_wood_med_A" image="town_wood_med_A.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="town_wood_med_B" image="town_wood_med_B.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <!--<Decoration name="town_wood_med_C" image="town_wood_med_C.png" widthTiles="2" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>-->
-      <Decoration name="town_wood_small_A" image="town_wood_small_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
 
-      <Decoration name="pass" image="clear.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <Decoration name="barrier" image="clear.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="pass"    image="clear.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
+      <Decoration name="barrier" image="clear.png" widthTiles="1" heightTiles="1" walkable="no"  boatable="no" removeWithSearch="no" removeWithKey="no"/>
    </Decorations>
 
    <xi:include href="data/levels.xml" parse="xml"/>
 
    <CharacterTypes>
-      <!--
       <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
       <CharacterType type="hero_sword"             image="hero_sword.png"/>
       <CharacterType type="hero_shield"            image="hero_shield.png"/>
       <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
-      <CharacterType type="hero_carrying_princess" image="hero_carrying_princess.png"/>
       <CharacterType type="ghost"                  image="ghost.png"/>
       <CharacterType type="king"                   image="king.png"/>
       <CharacterType type="princess"               image="princess.png"/>
@@ -119,14 +117,12 @@
       <CharacterType type="merchant"               image="merchant.png"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
-      -->
 
       <!-- 
       <CharacterType type="hero"                   image="vx_chara01_b11.png"         phases="3" levels="hero"/>
       <CharacterType type="hero_sword"             image="vx_chara01_b11.png"         phases="3"/>
       <CharacterType type="hero_shield"            image="vx_chara01_b11.png"         phases="3"/>
       <CharacterType type="hero_sword_and_shield"  image="vx_chara01_b12.png"         phases="3"/>
-      <CharacterType type="hero_carrying_princess" image="vx_chara01_b12.png"         phases="3"/>
       <CharacterType type="ghost"                  image="ghost.png"                  phases="2"/>
       <CharacterType type="king"                   image="vx_chara02_c11.png"         phases="3"/>
       <CharacterType type="princess"               image="vx_chara02_c13.png"         phases="3"/>
@@ -141,11 +137,11 @@
       -->
 
       <!-- Characters from Tiny Tales character sets -->
+      <!--
       <CharacterType type="hero"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3" levels="hero"/>
       <CharacterType type="hero_sword"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
       <CharacterType type="hero_shield"            image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
       <CharacterType type="hero_sword_and_shield"  image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
-      <CharacterType type="hero_carrying_princess" image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
       <CharacterType type="ghost"                  image="ghost.png"                                                                                                            phases="2"/>
       <CharacterType type="king"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Monarch_M1.png"                   phases="3"/>
       <CharacterType type="princess"               image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Princess_F2.png"                  phases="3"/>
@@ -157,6 +153,7 @@
       <CharacterType type="merchant"               image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M2.png"                     phases="3"/>
       <CharacterType type="trumpeter"              image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4_trumpeter.png" phases="3"/>
       <CharacterType type="dragonlord"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Mage_M1.png"              phases="3"/>
+      -->
 
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
       <CharacterType type="mocha"                  image="mocha.png"                  phases="2" levels="cat"/>
@@ -164,8 +161,8 @@
    </CharacterTypes>
 
    <Maps>
-      <!--<xi:include href="data/map_alefgard_legacy.xml" parse="xml"/>-->
-      <xi:include href="data/map_alefgard_tiled.xml" parse="xml"/>
+      <xi:include href="data/map_alefgard_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/map_alefgard_tiled.xml" parse="xml"/>-->
 
       <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition                                x="11"  y="30"  dir="NORTH" toMap="overworld"/>
@@ -424,8 +421,8 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
       </Map>
 
-      <!--<xi:include href="data/map_brecconary_legacy.xml" parse="xml"/>-->
-      <xi:include href="data/map_brecconary_tiled.xml" parse="xml"/>
+      <xi:include href="data/map_brecconary_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/map_brecconary_tiled.xml" parse="xml"/>-->
 
       <Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition                                x="20"  y="13"  dir="WEST"  toMap="overworld"/>
