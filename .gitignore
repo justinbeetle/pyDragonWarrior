@@ -111,4 +111,7 @@ data/sounds
 saves/archive
 saves/deleted
 
+# Ignore licensed files
+data/licensed_assets
+
 .idea

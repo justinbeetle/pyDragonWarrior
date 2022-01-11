@@ -35,7 +35,7 @@
       <Dialog>"Watch thy hit points when in the poisonous marsh."</Dialog></NonPlayerCharacter>
 
    <NonPlayerCharacter type="boy" location="boy walking around south side of town" dir="EAST" walking="yes">
-      <Dialog>"Go North to the seashore, then follow the coastline West until thou hath reached Garinham."</Dialog></NonPlayerCharacter>
+      <Dialog>"Go north to the seashore, then follow the coastline west until thou hath reached Garinham."</Dialog></NonPlayerCharacter>
 
    <NonPlayerCharacter type="warrior" location="warrior walking around south side of town" dir="SOUTH" walking="yes">
       <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>

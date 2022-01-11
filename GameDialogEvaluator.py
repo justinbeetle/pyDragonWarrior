@@ -90,7 +90,10 @@ class GameDialogEvaluator:
     def wait_for_message_to_fully_display(self, message_dialog: GameDialog) -> None:
         message_dialog.blit(self.game_state.screen, True)
         while self.game_state.is_running and message_dialog.has_more_content():
-            if message_dialog.advance_content():
+            should_wait_for_acknowledgement, is_new_content_part_of_quotation = message_dialog.advance_content()
+            if is_new_content_part_of_quotation:
+                AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (1).wav')
+            if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
             message_dialog.blit(self.game_state.screen, True)
             pygame.time.Clock().tick(30)

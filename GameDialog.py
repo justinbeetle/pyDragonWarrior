@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Tuple, Union
 
 from enum import Enum
 import math
@@ -188,6 +188,7 @@ class GameDialog:
         self.remaining_message_lines: List[str] = []
         self.acknowledged = True
         self.lines_since_last_acknowledgement = 0
+        self.is_in_quotation = False
 
         self.row_data: Optional[List[List[Optional[str]]]] = None
         self.row_data_prompt: Optional[str] = None
@@ -505,12 +506,17 @@ class GameDialog:
     def has_more_content(self) -> bool:
         return len(self.remainder_of_current_line) + len(self.remaining_message_lines) != 0
 
-    def advance_content(self) -> bool:
+    def advance_content(self) -> Tuple[bool, bool]:
         '''
-        :return: Whether an acknowledged is required before rolling to the next line of text
+        :return (should_wait_for_acknowledgement, is_new_content_part_of_quotation):
+        should_wait_for_acknowledgement = Whether an acknowledged is required before rolling to the next line of text
+        is_new_content_part_of_quotation = Whether the new characters, whether in part or whole, are part of a quotation
         '''
         if not self.has_more_content():
-            return False
+            return False, False
+
+        # Determine if the content being advanced is part of a quote.
+        was_in_quotation = self.is_in_quotation
 
         # Determine the number of lines of text which can be displayed in the dialog
         # Subtract out 1 row to leave room for the waiting indicator
@@ -519,14 +525,17 @@ class GameDialog:
         if len(self.remainder_of_current_line) > 0:
             # Shift in two characters at a time remainder_of_current_line
             characters_to_advance = 3
-            self.displayed_message_lines[-1] += self.remainder_of_current_line[:characters_to_advance]
+            new_content = self.remainder_of_current_line[:characters_to_advance]
+            if '"' in new_content:
+                self.is_in_quotation = not self.is_in_quotation
+            self.displayed_message_lines[-1] += new_content
             self.remainder_of_current_line = self.remainder_of_current_line[characters_to_advance:]
         else:
             # Shift in one row at a time from remaining_message_lines
             self.lines_since_last_acknowledgement += 1
             if len(self.displayed_message_lines) >= num_rows:
                 if self.lines_since_last_acknowledgement >= num_rows:
-                    return True
+                    return True, self.is_in_quotation
                 self.displayed_message_lines = self.displayed_message_lines[1:]
             self.displayed_message_lines += ['']
             self.remainder_of_current_line = self.remaining_message_lines[0]
@@ -536,7 +545,7 @@ class GameDialog:
         self.refresh_image()
         self.acknowledged = False
 
-        return False
+        return False, was_in_quotation or self.is_in_quotation
 
     def refresh_image(self) -> None:
         # Clear the image
