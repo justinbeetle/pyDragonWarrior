@@ -118,8 +118,9 @@ class AudioPlayer:
                     print('ERROR: Failed to load', sound_rel_file_path, flush=True)
                     self.sounds[sound_rel_file_path] = None
 
-            if self.sounds[sound_rel_file_path] is not None:
-                channel = self.sounds[sound_rel_file_path].play()
+            sound = self.sounds[sound_rel_file_path]
+            if sound is not None:
+                channel = sound.play()
                 while self.running and channel.get_busy():
                     pygame.time.wait(10)
 
