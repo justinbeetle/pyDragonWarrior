@@ -271,9 +271,7 @@ class GameState(GameStateInterface):
                 self.hero_party.light_diameter_decay_steps_remaining = \
                     int(xml_root.attrib['light_diameter_decay_steps_remaining'])
 
-            print('GameState: before setting pending_dialog =', self.pending_dialog, flush=True)
             self.pending_dialog = self.game_info.parse_dialog(xml_root)
-            print('GameState: after setting pending_dialog =', self.pending_dialog, flush=True)
 
         # TODO: Remove Mocha from party
         '''

@@ -181,7 +181,6 @@ class GameMap(GameMapInterface):
                  map_decorations: Optional[List[MapDecoration]] = None,
                  npcs: Optional[List[NpcState]] = None) -> None:
         self.game_state = game_state
-        print('map_name =', map_name)
         self.map = self.game_state.get_game_info().maps[map_name]
 
         # Set the decorations

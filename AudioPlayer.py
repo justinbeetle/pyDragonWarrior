@@ -24,7 +24,7 @@ class AudioPlayer:
             self.music_file_start1 = 0.0
             self.music_file_start2 = 0.0
             self.running = True
-            self.sounds: Dict[str, pygame.mixer.Sound] = {}
+            self.sounds: Dict[str, Optional[pygame.mixer.Sound]] = {}
             self.music_thread_lock = threading.RLock()
             self.music_thread = threading.Thread(target=self.__music_thread)
             self.music_thread.start()
@@ -61,6 +61,7 @@ class AudioPlayer:
             first_time = True
             current_music_rel_file_path1: Optional[str] = None
             current_music_rel_file_path2: Optional[str] = None
+            failed_to_play = set()
             while self.running:
                 # TODO: Switch to a more responsive approach which is not polling based
 
@@ -78,22 +79,27 @@ class AudioPlayer:
                     else:
                         self.music_rel_file_path1 = self.music_rel_file_path2
                         self.music_file_start1 = self.music_file_start2
-                    pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
+                    try:
+                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
 
-                    # start playing
-                    pygame.mixer.music.play(start=self.music_file_start1)
+                        # start playing
+                        pygame.mixer.music.play(start=self.music_file_start1)
 
-                    # poll until finished
-                    while (self.running
-                           and pygame.mixer.music.get_busy()
-                           and current_music_rel_file_path1 == self.music_rel_file_path1
-                           and current_music_rel_file_path2 == self.music_rel_file_path2):
-                        # still playing and not changed
-                        self.music_thread_lock.release()
-                        pygame.time.wait(100)
-                        self.music_thread_lock.acquire()
+                        # poll until finished
+                        while (self.running
+                               and pygame.mixer.music.get_busy()
+                               and current_music_rel_file_path1 == self.music_rel_file_path1
+                               and current_music_rel_file_path2 == self.music_rel_file_path2):
+                            # still playing and not changed
+                            self.music_thread_lock.release()
+                            pygame.time.wait(100)
+                            self.music_thread_lock.acquire()
 
-                    pygame.mixer.music.stop()
+                        pygame.mixer.music.stop()
+                    except:
+                        if self.music_rel_file_path1 not in failed_to_play:
+                            print('ERROR: Failed to load', self.music_rel_file_path1, flush=True)
+                            failed_to_play.add(self.music_rel_file_path1)
 
                 self.music_thread_lock.release()
                 pygame.time.wait(100)
@@ -105,12 +111,17 @@ class AudioPlayer:
         def __sound_thread(self, sound_rel_file_path: str) -> None:
             # Load the sound if not previously loaded
             if sound_rel_file_path not in self.sounds:
-                self.sounds[sound_rel_file_path] = pygame.mixer.Sound(
-                    os.path.join(self.sound_path, sound_rel_file_path))
+                try:
+                    self.sounds[sound_rel_file_path] = pygame.mixer.Sound(
+                        os.path.join(self.sound_path, sound_rel_file_path))
+                except:
+                    print('ERROR: Failed to load', sound_rel_file_path, flush=True)
+                    self.sounds[sound_rel_file_path] = None
 
-            channel = self.sounds[sound_rel_file_path].play()
-            while self.running and channel.get_busy():
-                pygame.time.wait(10)
+            if self.sounds[sound_rel_file_path] is not None:
+                channel = self.sounds[sound_rel_file_path].play()
+                while self.running and channel.get_busy():
+                    pygame.time.wait(10)
 
         def stop_music(self) -> None:
             self.music_rel_file_path1 = self.music_rel_file_path2 = None

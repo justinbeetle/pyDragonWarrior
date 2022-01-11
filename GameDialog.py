@@ -59,14 +59,14 @@ class GameDialog:
             for name in font_names:
                 if name in pygame.font.get_fonts():
                     font_name = name
-                    print('Found system font', name, flush=True)
+                    # print('Found system font', name, flush=True)
                     break
                 elif os.path.exists(name):
                     font_name = name
-                    print('Found font', name, flush=True)
+                    # print('Found font', name, flush=True)
                     break
                 else:
-                    print('Failed to load font', name, flush=True)
+                    print('WARN: Failed to load font', name, flush=True)
             return font_name
 
         font_name = find_font_by_name(font_names, None)
@@ -83,7 +83,7 @@ class GameDialog:
             while create_font(font_name, font_size).get_height() < tile_size_pixels - GameDialog.internal_spacing_pixels:
                 font_size += 1
             font_size -= 1
-            print('Calculated font size of {} for font {}'.format(font_name, font_size), flush=True)
+            # print('Calculated font size of {} for font {}'.format(font_name, font_size), flush=True)
             return font_size
 
         # Create fonts

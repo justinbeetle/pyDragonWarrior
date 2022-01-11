@@ -868,7 +868,6 @@ class GameInfo:
         if map_name and 'location' in element.attrib:
             location = self.locations[map_name][element.attrib['location']]
             if location.dir:
-                print('pulling direction from location')
                 return location.dir
         if 'dir' in element.attrib:
             return Direction[element.attrib['dir']]
