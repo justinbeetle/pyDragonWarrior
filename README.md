@@ -6,16 +6,8 @@ A Python based Dragon Warrior clone.  Dragon Warrior was chosen as a game with w
 
 ## Installation
 
-1. Install python: Install the latest Python 3 version from https://www.python.org/downloads/
-2. Install python libraries:
-   1. pygame: pip install pygame
-   2. numpy: pip install numpy
-   3. pytmx:
-      1. git clone https://github.com/justinbeetle/pytmx.git
-      2. pytmx/setup.py install
-   4. pyscroll:
-      1. git clone https://github.com/bitcraft/pyscroll.git
-      2. pyscroll/setup.py install
+1. Install python: Install the latest Python 3 version from https://www.python.org/downloads
+2. Install python libraries: pip install pygame numpy pytmx pyscroll
 3. Install pyDragonWarrior: git clone https://github.com/justinbeetle/pyDragonWarrior.git
 
 ## Running
