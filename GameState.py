@@ -98,6 +98,7 @@ class GameState(GameStateInterface):
             self.removed_decorations_by_map = {}
 
         map_decorations = self.game_info.maps[new_map_name].map_decorations.copy()
+        removed_map_decorations: List[MapDecoration] = []
         if one_time_decorations is not None:
             map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
@@ -109,6 +110,8 @@ class GameState(GameStateInterface):
             for decoration in self.removed_decorations_by_map[new_map_name]:
                 if decoration in map_decorations:
                     map_decorations.remove(decoration)
+                    if decoration.type.removed_image is not None:
+                        removed_map_decorations.append(decoration)
 
         if old_map_name == new_map_name:
             # If loading up the same map, should retain the NPC positions
@@ -138,7 +141,7 @@ class GameState(GameStateInterface):
                 if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     npcs.append(NpcState(npc))
 
-        self.game_map = GameMap(self, new_map_name, map_decorations, npcs)
+        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game

@@ -318,19 +318,26 @@ class GameInfo:
                 remove_with_key = element.attrib['removeWithKey'] == 'yes'
             if 'removeSound' in element.attrib:
                 remove_sound = element.attrib['removeSound']
-            
-            decoration_image_filename = os.path.join(decoration_path, element.attrib['image'])
-            # print('Loading image', decoration_image_filename, flush=True)
-            decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
-            unscaled_size_pixels = Point(decoration_image_unscaled.get_size())
-            max_scaled_size_pixels = Point(width_tiles, height_tiles) * self.tile_size_pixels
-            scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
-            scale_factor = max(scale_factor_point.w, scale_factor_point.h)
-            scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
-            decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
-            pygame.transform.scale(decoration_image_unscaled,
-                                   scaled_size_pixels.getAsIntTuple(),
-                                   decoration_image_scaled)
+
+            def load_decoration_image(image_filename: str) -> pygame.surface.Surface:
+                decoration_image_filename = os.path.join(decoration_path, image_filename)
+                # print('Loading image', decoration_image_filename, flush=True)
+                decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
+                unscaled_size_pixels = Point(decoration_image_unscaled.get_size())
+                max_scaled_size_pixels = Point(width_tiles, height_tiles) * self.tile_size_pixels
+                scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
+                scale_factor = max(scale_factor_point.w, scale_factor_point.h)
+                scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
+                decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
+                pygame.transform.scale(decoration_image_unscaled,
+                                       scaled_size_pixels.getAsIntTuple(),
+                                       decoration_image_scaled)
+                return decoration_image_scaled
+            decoration_image_scaled = load_decoration_image(element.attrib['image'])
+            decoration_removed_image_scaled: Optional[pygame.surface.Surface] = None
+            if 'removed_image' in element.attrib:
+                decoration_removed_image_scaled = load_decoration_image(element.attrib['removed_image'])
+
             self.decorations[decoration_name] = Decoration(decoration_name,
                                                            width_tiles,
                                                            height_tiles,
@@ -339,7 +346,8 @@ class GameInfo:
                                                            remove_with_search,
                                                            remove_with_open,
                                                            remove_with_key,
-                                                           remove_sound)
+                                                           remove_sound,
+                                                           decoration_removed_image_scaled)
 
         # Parse spells
         self.spells: Dict[str, Spell] = {}

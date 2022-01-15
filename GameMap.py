@@ -45,12 +45,21 @@ class MapSprite(pygame.sprite.Sprite):
 
 
 class MapDecorationSprite(MapSprite):
-    def __init__(self, decoration: MapDecoration) -> None:
+    def __init__(self, decoration: MapDecoration, removed: bool = False) -> None:
         super().__init__()
         self.decoration = decoration
-        if self.decoration.type is None or self.decoration.type.image is None:
-            raise AttributeError("All MapSprites require a MapDecoration with an image")
-        self.image = self.decoration.type.image
+
+        if self.decoration.type is None:
+            raise AttributeError("All MapDecorationSprites require a MapDecoration with a type")
+
+        if removed:
+            if not self.remove():
+                raise AttributeError("All removed MapDecorationSprites require a MapDecoration with a removed image")
+        elif self.decoration.type.image is None:
+            raise AttributeError("All MapDecorationSprites require a MapDecoration with an image")
+        else:
+            self.image = self.decoration.type.image
+
         self.rect = self.get_rect_from_tile(self.decoration.point)
 
         # Modified the rect to center the decoration horizontally and to have the base of it aligned with the bottom
@@ -58,6 +67,14 @@ class MapDecorationSprite(MapSprite):
         self.rect.x = int(self.rect.x + (MapSprite.tile_size_pixels - self.image.get_width()) / 2)
         self.rect.y = int(self.rect.y + MapSprite.tile_size_pixels - self.image.get_height())
 
+    def remove(self) -> bool:
+        """
+        :return: True if the map was successfully set to a removed image
+        """
+        if self.decoration.type is not None and self.decoration.type.removed_image is not None:
+            self.image = self.decoration.type.removed_image
+            return True
+        return False
 
 class CharacterSprite(MapSprite):
     character: MapCharacterState
@@ -179,6 +196,7 @@ class GameMap(GameMapInterface):
                  game_state: GameStateInterface,
                  map_name: str,
                  map_decorations: Optional[List[MapDecoration]] = None,
+                 removed_map_decorations: Optional[List[MapDecoration]] = None,
                  npcs: Optional[List[NpcState]] = None) -> None:
         self.game_state = game_state
         self.map = self.game_state.get_game_info().maps[map_name]
@@ -188,6 +206,9 @@ class GameMap(GameMapInterface):
             self.map_decorations = self.map.map_decorations
         else:
             self.map_decorations = map_decorations
+        self.removed_map_decorations: List[MapDecoration] = []
+        if removed_map_decorations is not None:
+            self.removed_map_decorations = removed_map_decorations
 
         # Set the NPCs
         if npcs is not None:
@@ -222,6 +243,9 @@ class GameMap(GameMapInterface):
         for decoration in self.map_decorations:
             if decoration.type is not None:
                 self.group.add(MapDecorationSprite(decoration), layer=self.map_data.decoration_layer)
+        for decoration in self.removed_map_decorations:
+            if decoration.type is not None and decoration.type.removed_image is not None:
+                self.group.add(MapDecorationSprite(decoration, removed=True), layer=self.map_data.decoration_layer)
 
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
@@ -491,11 +515,14 @@ class GameMap(GameMapInterface):
 
     def remove_decoration(self, decoration: MapDecoration) -> Optional[MapDecoration]:
         # Remove the decoration from the map (if present)
-        if decoration in self.map_decorations:
+        if decoration in self.map_decorations and decoration.type is not None:
             self.map_decorations.remove(decoration)
 
             for sprite in self.group.remove_sprites_of_layer(self.map_data.decoration_layer):
                 if sprite.decoration != decoration:
+                    self.group.add(sprite, layer=self.map_data.decoration_layer)
+                elif isinstance(sprite, MapDecorationSprite) and sprite.remove():
+                    self.removed_map_decorations.append(decoration)
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
 
             return decoration
