@@ -76,6 +76,7 @@ class MapDecorationSprite(MapSprite):
             return True
         return False
 
+
 class CharacterSprite(MapSprite):
     character: MapCharacterState
 

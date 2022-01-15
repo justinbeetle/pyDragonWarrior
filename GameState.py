@@ -259,6 +259,25 @@ class GameState(GameStateInterface):
                                                                   int(xml_root.attrib['last_outside_y']))
                 self.hero_party.last_outside_dir = Direction[xml_root.attrib['last_outside_dir']]
 
+            # Load state related to removed decorations
+            for removed_decoration_element in xml_root.findall("./RemovedDecorations/RemovedDecoration"):
+                removed_decoration_map_name = removed_decoration_element.attrib['map']
+                removed_decoration_x = int(removed_decoration_element.attrib['x'])
+                removed_decoration_y = int(removed_decoration_element.attrib['y'])
+                removed_decoration_type_name = None if 'type' not in removed_decoration_element.attrib \
+                    else removed_decoration_element.attrib['type']
+
+                # Find the removed map decoration and insert it into self.removed_decorations_by_map
+                for decoration in self.game_info.maps[removed_decoration_map_name].map_decorations:
+                    decoration_type_name = None if decoration.type is None else decoration.type.name
+                    if decoration_type_name == removed_decoration_type_name \
+                            and decoration.point.x == removed_decoration_x \
+                            and decoration.point.y == removed_decoration_y:
+                        if removed_decoration_map_name not in self.removed_decorations_by_map:
+                            self.removed_decorations_by_map[removed_decoration_map_name] = []
+                        self.removed_decorations_by_map[removed_decoration_map_name].append(decoration)
+                        break
+
             # Parse the progress markers
             for progress_marker_element in xml_root.findall("./ProgressMarkers/ProgressMarker"):
                 self.hero_party.progress_markers.append(progress_marker_element.attrib['name'])
@@ -322,6 +341,17 @@ class GameState(GameStateInterface):
             xml_root.attrib['last_outside_x'] = str(self.hero_party.last_outside_pos_dat_tile.x)
             xml_root.attrib['last_outside_y'] = str(self.hero_party.last_outside_pos_dat_tile.y)
             xml_root.attrib['last_outside_dir'] = self.hero_party.last_outside_dir.name
+
+        # Save state related to removed decorations
+        removed_decorations_element = ET.SubElement(xml_root, 'RemovedDecorations')
+        for map_name in self.removed_decorations_by_map:
+            for decoration in self.removed_decorations_by_map[map_name]:
+                removed_decoration_element = ET.SubElement(removed_decorations_element, 'RemovedDecoration')
+                removed_decoration_element.attrib['map'] = map_name
+                removed_decoration_element.attrib['x'] = str(decoration.point.x)
+                removed_decoration_element.attrib['y'] = str(decoration.point.y)
+                if decoration.type is not None:
+                    removed_decoration_element.attrib['type'] = decoration.type.name
 
         # Save state for member of the hero party
         for member in self.hero_party.members:
