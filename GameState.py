@@ -33,6 +33,7 @@ class GameState(GameStateInterface):
     game_map: GameMap
 
     def __init__(self,
+                 application_path: str,
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
@@ -59,7 +60,7 @@ class GameState(GameStateInterface):
 
         super().__init__(screen)
 
-        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels)
+        self.game_info = GameInfo(application_path, base_path, game_xml_path, tile_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None

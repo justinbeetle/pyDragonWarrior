@@ -53,7 +53,7 @@ def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: b
 
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN:
             # Convert WASD to Up/Left/Down/Right
             if translate_wasd_to_uldr:
                 if pygame.K_w == event.key:

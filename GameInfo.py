@@ -26,6 +26,7 @@ class GameInfo:
     TRANSPARENT_COLOR = pygame.Color(0, 0, 0, 0)
 
     def __init__(self,
+                 application_path: str,
                  base_path: str,
                  game_xml_path: str,
                  tile_size_pixels: int) -> None:
@@ -52,7 +53,7 @@ class GameInfo:
         # Parse XML
         xml_root = ET.parse(game_xml_path).getroot()
         xml.etree.ElementInclude.include(xml_root)
-        self.saves_path = os.path.join(base_path, xml_root.attrib['savesPath'])
+        self.saves_path = os.path.join(application_path, xml_root.attrib['savesPath'])
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
         music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
