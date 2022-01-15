@@ -63,7 +63,7 @@
       <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
 
-      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
+      <Decoration name="chest" image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
 
       <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
       <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
