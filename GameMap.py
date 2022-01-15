@@ -699,7 +699,7 @@ class MapViewer:
         base_path = os.path.split(os.path.abspath(__file__))[0]
         game_xml_path = os.path.join(base_path, 'game.xml')
         from GameInfo import GameInfo
-        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels)
+        self.game_info = GameInfo('', base_path, game_xml_path, self.tile_size_pixels)
 
         # Initialize the hero party
         self.hero_party = HeroParty(

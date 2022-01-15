@@ -7,6 +7,7 @@ import glob
 import os
 import pygame
 import random
+import sys
 
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
@@ -21,11 +22,13 @@ from Point import Point
 
 class Game:
     def __init__(self,
+                 application_path: str,
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
                  tile_size_pixels: int) -> None:
-        self.game_state = GameState(base_path,
+        self.game_state = GameState(application_path,
+                                    base_path,
                                     game_xml_path,
                                     desired_win_size_pixels,
                                     tile_size_pixels)
@@ -188,7 +191,7 @@ class Game:
                     elif event.key == pygame.K_F1:
                         self.game_state.save(quick_save=True)
                     else:
-                        move_direction = Direction.get_direction(event.key)
+                        move_direction = Direction.get_optional_direction(event.key)
                 else:
                     # print('exploring_loop:  Ignoring event', event, flush=True)
                     continue
@@ -493,11 +496,28 @@ class Game:
 
 
 def main() -> None:
+    # Determine if application is a script file or frozen exe
+    if getattr(sys, 'frozen', False):
+        # Executing as a pyinstaller binary executable
+        application_path = os.path.dirname(sys.executable)
+    elif __file__:
+        # Normal execution
+        application_path = os.path.dirname(__file__)
+
     # Set the current working directory to the location of this file so that the game can be run from any path
     os.chdir(os.path.dirname(__file__))
+    base_path = os.path.split(os.path.abspath(__file__))[0]
+    icon_image_filename = os.path.join(base_path, 'icon.png')
 
     pygame.init()
     pygame.mouse.set_visible(False)
+    pygame.display.set_caption('pyDragonWarrior')
+    if os.path.exists(icon_image_filename):
+        try:
+            icon_image = pygame.image.load(icon_image_filename)
+            pygame.display.set_icon(icon_image)
+        except:
+            print('ERROR: Failed to load', icon_image_filename, flush=True)
 
     import argparse
     parser = argparse.ArgumentParser()
@@ -512,11 +532,10 @@ def main() -> None:
     GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
-    base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
-    tile_size_pixels = 20 * 3
-    game = Game(base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+    tile_size_pixels = 16 * 3
+    game = Game(application_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
 
     # Run the game
     game.run_game_loop(args.save)

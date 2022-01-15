@@ -87,7 +87,7 @@ class Direction(Enum):
         return opposite
 
     @staticmethod
-    def get_direction(value: Union[Point, int]) -> Direction:
+    def get_optional_direction(value: Union[Point, int]) -> Optional[Direction]:
         if isinstance(value, Point):
             # Input is a vector
             vector = value
@@ -105,7 +105,14 @@ class Direction(Enum):
                 return Direction.EAST
             elif pygame.K_LEFT == pygame_key:
                 return Direction.WEST
-        return Direction.NORTH
+        return None
+
+    @staticmethod
+    def get_direction(value: Union[Point, int], default: int=NORTH) -> Direction:
+        direction = Direction.get_optional_direction(value)
+        if direction is not None:
+            return direction
+        return default
 
     def __repr__(self) -> str:
         if Direction.NORTH == self:
