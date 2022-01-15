@@ -366,6 +366,7 @@ class Game:
                                     if decoration.type.remove_sound is not None:
                                         AudioPlayer().play_sound(decoration.type.remove_sound)
                                     self.game_state.remove_decoration(decoration)
+                                    self.game_state.draw_map()
 
                                     if decoration.dialog is not None:
                                         dialog = decoration.dialog

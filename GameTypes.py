@@ -371,6 +371,7 @@ class Decoration(NamedTuple):
     remove_with_open: bool = False
     remove_with_key: bool = False
     remove_sound: Optional[str] = None
+    removed_image: Optional[pygame.surface.Surface] = None
 
 
 class CharacterType(NamedTuple):
