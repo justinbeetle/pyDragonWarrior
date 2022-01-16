@@ -492,7 +492,6 @@ class GameMap(GameMapInterface):
 
     def get_tile_monsters(self, pos_dat_tile: Point) -> List[str]:
         monster_set_name = self.map_data.get_monster_set_name(pos_dat_tile)
-        print('monster_set_name =', monster_set_name, flush=True)
         if monster_set_name in self.game_state.get_game_info().monster_sets:
             return self.game_state.get_game_info().monster_sets[monster_set_name]
         return []
