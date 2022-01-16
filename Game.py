@@ -374,7 +374,12 @@ class Game:
                                         dialog = []
                                     break
                                 elif decoration.type.remove_with_key:
-                                    dialog = ['It is locked.']
+                                    if self.game_state.hero_party.has_item('Key'):
+                                        dialog = [['It is locked. Do you want to open it with a key?'],
+                                                  {'Yes': self.game_state.game_info.items['Key'].use_dialog,
+                                                   'No': None}]
+                                    else:
+                                        dialog = ['It is locked.']
                                     break
 
                         if not requires_removal and decoration.dialog is not None:

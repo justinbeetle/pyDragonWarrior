@@ -570,7 +570,6 @@ class GameInfo:
             for monster_element in element.findall("./Monster"):
                 monsters.append(monster_element.attrib['name'])
             self.monster_sets[element.attrib['name']] = monsters
-            self.monster_sets[element.attrib['name']] = monsters
 
         # Parse maps
         self.maps: Dict[str, Map] = {}

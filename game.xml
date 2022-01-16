@@ -65,8 +65,8 @@
 
       <Decoration name="chest" image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
 
-      <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
-      <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
+      <Decoration name="unlocked_chest" image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
+      <Decoration name="locked_chest"   image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
 
       <Decoration name="door"                   image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
 
@@ -1297,7 +1297,6 @@
 
    <Monsters>
       <Monster name="Stopper"                image="stopper.png"                strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
-      <Monster name="Super Shooter"          image="super_shooter.png"          strength="11"  agility="1"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="3"/>
       <Monster name="Slime"                  image="slime.png"                  strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
       <Monster name="Red Slime"              image="red_slime.png"              strength="7"   agility="3"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="2"/>
       <Monster name="Drakee"                 image="drakee.png"                 strength="9"   agility="6"   hp="5-6"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="2"/>
@@ -1383,10 +1382,6 @@
          <Monster name="Stopper"/>
          <Monster name="Stopper"/>
          <Monster name="Stopper"/>
-         <Monster name="Super Shooter"/>
-         <Monster name="Super Shooter"/>
-         <Monster name="Super Shooter"/>
-         <Monster name="Super Shooter"/>
       </MonsterSet>
       <MonsterSet name="1">
          <Monster name="Slime"/>
@@ -1779,15 +1774,15 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogAction type="LOSE_ITEM" name="Herb"/></Tool>
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
-            <DialogAssert type="IS_FACING_DOOR"><Dialog>A key will open a locked door.</Dialog></DialogAssert>
+            <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key will open a lock.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
             <DialogAction type="LOSE_ITEM" name="Key"/>
-            <DialogAction type="OPEN_DOOR"/></Tool>
+            <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
 
          <Tool name="Key Ring"                             gp="1000" droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
-            <DialogAssert type="IS_FACING_DOOR"><Dialog>A key ring will open a locked door.  Unlike a key it is reusable.</Dialog></DialogAssert>
+            <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key ring will open a lock.  Unlike a key it is reusable.</Dialog></DialogAssert>
             <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
-            <DialogAction type="OPEN_DOOR"/></Tool>
+            <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
 
          <Tool name="Torch"                                gp="8"    droppable="yes" equippable="no"  availableInCombat="no">
             <DialogAssert type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogAssert>

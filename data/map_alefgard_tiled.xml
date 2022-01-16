@@ -1,119 +1,44 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" lightDiameter="unlimited" isOutside="yes" originX="46" originY="45" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <PointTransition    decoration="pass"          x="46"  y="45"             dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="50"  y="44"                         toMap="brecconary"            respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="50"  y="45"                         toMap="brecconary"            respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="49"  y="45"             dir="WEST"  toMap="brecconary"/>
-   <PointTransition    decoration="pass"          x="3"   y="5"              dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="110" y="13"             dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="109" y="76"                         toMap="rimuldar"              respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="110" y="76"             dir="EAST"  toMap="rimuldar"/>
-   <PointTransition    decoration="pass"          x="29"  y="93"             dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="79"  y="104"                        toMap="cantlin"               respawnDecorations="yes"/>
-   <IncomingTransition decoration="pass"          x="79"  y="103"            dir="NORTH" toMap="cantlin"/>
-   <PointTransition    decoration="pass"          x="31"  y="15"             dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="32"  y="60"             dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
-   <PointTransition    decoration="pass" name="N" x="111" y="45"             dir="SOUTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
-   <PointTransition    decoration="pass" name="S" x="111" y="54"             dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="86"  y="3"              dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>
+<Map name="overworld" tiles="tiled/alefgard.tmx" music="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg" lightDiameter="unlimited" isOutside="yes" originX="48" originY="47" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <PointTransition    decoration="pass"          x="48"  y="47"             dir="SOUTH" toMap="tantegel_lvl1"         respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="52"  y="46"                         toMap="brecconary"            respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="52"  y="47"                         toMap="brecconary"            respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="51"  y="47"             dir="WEST"  toMap="brecconary"/>
+   <PointTransition    decoration="pass"          x="5"   y="7"              dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="112" y="15"             dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="111" y="78"                         toMap="rimuldar"              respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="112" y="78"             dir="EAST"  toMap="rimuldar"/>
+   <PointTransition    decoration="pass"          x="31"  y="95"             dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="81"  y="106"                        toMap="cantlin"               respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="81"  y="105"            dir="NORTH" toMap="cantlin"/>
+   <PointTransition    decoration="pass"          x="33"  y="17"             dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="34"  y="62"             dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
+   <PointTransition    decoration="pass" name="N" x="113" y="47"             dir="SOUTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
+   <PointTransition    decoration="pass" name="S" x="113" y="56"             dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="88"  y="5"              dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>
    <PointTransition    decoration="pass"          location="Southern Shrine" dir="SOUTH" toMap="southern_shrine"       respawnDecorations="yes"/>
    <PointTransition    decoration="pass"          location="Charlock Castle" dir="SOUTH" toMap="charlock_lvl1"         respawnDecorations="yes"/>
 
-   <MapDecoration type="barrier" x="111" y="53"/> <!-- Block access to cliff north of the south swamp cave entrance -->
+   <MapDecoration type="barrier" x="113" y="55"/> <!-- Block access to cliff north of the south swamp cave entrance -->
 
-   <MapLocation x="46" y="46" name="Return Spell Location Point"/>
+   <MapLocation x="48" y="48" name="Return Spell Location Point"/>
 
-   <MapLocation x="86" y="115" name="Erdrick's Token"/>
+   <MapLocation x="88" y="117" name="Erdrick's Token"/>
    <MapDecoration type="None" location="Erdrick's Token">
       <DialogAssert type="LACKS_ITEM" name="Erdrick's Token"><DialogGoTo label="found_nothing"/></DialogAssert>
       <DialogAction type="GAIN_ITEM" name="Erdrick's Token"/>
       <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
-   <MapLocation x="70" y="53" name="Rainbow Bridge Formation Point"/>
+   <MapLocation x="72" y="55" name="Rainbow Bridge Formation Point"/>
    <MapDecoration type="bridge_left_top" x="68" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_right_top" x="69" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_left" x="68" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_right" x="69" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
 
-   <Monster name="Golem" x="79" y="104" inverseProgressMarker="PM_Defeated_Golem">
+   <Monster name="Golem" x="81" y="106" inverseProgressMarker="PM_Defeated_Golem">
       <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
-      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="79" y="103"/></RunAwayDialog></Monster>
+      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="81" y="105"/></RunAwayDialog></Monster>
 
-   <MapLocation x="114" y="115" name="Southern Shrine"/>
-   <MapLocation x="51"  y="52"  name="Charlock Castle"/>
-
-   <MonsterZones>
-      <!-- TODO: Adjust the monster zones for the Tiled version of the map -->
-      <MonsterZone x="1"   y="1"   w="15" h="15" set="3"/>
-      <MonsterZone x="16"  y="1"   w="15" h="15" set="3"/>
-      <MonsterZone x="31"  y="1"   w="15" h="15" set="2"/>
-      <MonsterZone x="46"  y="1"   w="15" h="15" set="2"/>
-      <MonsterZone x="61"  y="1"   w="15" h="15" set="3"/>
-      <MonsterZone x="76"  y="1"   w="15" h="15" set="5"/>
-      <MonsterZone x="91"  y="1"   w="15" h="15" set="4"/>
-      <MonsterZone x="106" y="1"   w="15" h="15" set="5"/>
-
-      <MonsterZone x="1"   y="16"  w="15" h="15" set="3"/>
-      <MonsterZone x="16"  y="16"  w="15" h="15" set="2"/>
-      <MonsterZone x="31"  y="16"  w="15" h="15" set="1"/>
-      <MonsterZone x="46"  y="16"  w="15" h="15" set="2"/>
-      <MonsterZone x="61"  y="16"  w="15" h="15" set="3"/>
-      <MonsterZone x="76"  y="16"  w="15" h="15" set="3"/>
-      <MonsterZone x="91"  y="16"  w="15" h="15" set="4"/>
-      <MonsterZone x="106" y="16"  w="15" h="15" set="5"/>
-
-      <MonsterZone x="1"   y="31"  w="15" h="15" set="4"/>
-      <MonsterZone x="16"  y="31"  w="15" h="15" set="1"/>
-      <MonsterZone x="31"  y="31"  w="15" h="15" set="0"/>
-      <MonsterZone x="46"  y="31"  w="15" h="15" set="0"/>
-      <MonsterZone x="61"  y="31"  w="15" h="15" set="1"/>
-      <MonsterZone x="76"  y="31"  w="15" h="15" set="3"/>
-      <MonsterZone x="91"  y="31"  w="15" h="15" set="4"/>
-      <MonsterZone x="106" y="31"  w="15" h="15" set="5"/>
-
-      <MonsterZone x="1"   y="46"  w="15" h="15" set="5"/>
-      <MonsterZone x="16"  y="46"  w="15" h="15" set="1"/>
-      <MonsterZone x="31"  y="46"  w="15" h="15" set="1"/>
-      <MonsterZone x="46"  y="46"  w="15" h="15" set="12"/>
-      <MonsterZone x="61"  y="46"  w="15" h="15" set="9"/>
-      <MonsterZone x="76"  y="46"  w="15" h="15" set="6"/>
-      <MonsterZone x="91"  y="46"  w="15" h="15" set="6"/>
-      <MonsterZone x="106" y="46"  w="15" h="15" set="6"/>
-
-      <MonsterZone x="1"   y="61"  w="15" h="15" set="5"/>
-      <MonsterZone x="16"  y="61"  w="15" h="15" set="5"/>
-      <MonsterZone x="31"  y="61"  w="15" h="15" set="4"/>
-      <MonsterZone x="46"  y="61"  w="15" h="15" set="12"/>
-      <MonsterZone x="61"  y="61"  w="15" h="15" set="12"/>
-      <MonsterZone x="76"  y="61"  w="15" h="15" set="7"/>
-      <MonsterZone x="91"  y="61"  w="15" h="15" set="7"/>
-      <MonsterZone x="106" y="61"  w="15" h="15" set="7"/>
-
-      <MonsterZone x="1"   y="76"  w="15" h="15" set="10"/>
-      <MonsterZone x="16"  y="76"  w="15" h="15" set="9"/>
-      <MonsterZone x="31"  y="76"  w="15" h="15" set="8"/>
-      <MonsterZone x="46"  y="76"  w="15" h="15" set="12"/>
-      <MonsterZone x="61"  y="76"  w="15" h="15" set="12"/>
-      <MonsterZone x="76"  y="76"  w="15" h="15" set="12"/>
-      <MonsterZone x="91"  y="76"  w="15" h="15" set="8"/>
-      <MonsterZone x="106" y="76"  w="15" h="15" set="7"/>
-
-      <MonsterZone x="1"   y="91"  w="15" h="15" set="10"/>
-      <MonsterZone x="16"  y="91"  w="15" h="15" set="10"/>
-      <MonsterZone x="31"  y="91"  w="15" h="15" set="11"/>
-      <MonsterZone x="46"  y="91"  w="15" h="15" set="12"/>
-      <MonsterZone x="61"  y="91"  w="15" h="15" set="13"/>
-      <MonsterZone x="76"  y="91"  w="15" h="15" set="13"/>
-      <MonsterZone x="91"  y="91"  w="15" h="15" set="9"/>
-      <MonsterZone x="106" y="91"  w="15" h="15" set="8"/>
-
-      <MonsterZone x="1"   y="106" w="15" h="15" set="11"/>
-      <MonsterZone x="16"  y="106" w="15" h="15" set="11"/>
-      <MonsterZone x="31"  y="106" w="15" h="15" set="12"/>
-      <MonsterZone x="46"  y="106" w="15" h="15" set="13"/>
-      <MonsterZone x="61"  y="106" w="15" h="15" set="13"/>
-      <MonsterZone x="76"  y="106" w="15" h="15" set="12"/>
-      <MonsterZone x="91"  y="106" w="15" h="15" set="9"/>
-      <MonsterZone x="106" y="106" w="15" h="15" set="9"/>
-   </MonsterZones>
+   <MapLocation x="116" y="117" name="Southern Shrine"/>
+   <MapLocation x="53"  y="54"  name="Charlock Castle"/>
 </Map>

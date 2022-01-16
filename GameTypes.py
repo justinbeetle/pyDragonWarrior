@@ -108,11 +108,11 @@ class Direction(Enum):
         return None
 
     @staticmethod
-    def get_direction(value: Union[Point, int], default: int=NORTH) -> Direction:
+    def get_direction(value: Union[Point, int], default: Direction=NORTH) -> Direction:
         direction = Direction.get_optional_direction(value)
         if direction is not None:
             return direction
-        return default
+        return Direction(default)
 
     def __repr__(self) -> str:
         if Direction.NORTH == self:
@@ -132,7 +132,7 @@ class DialogCheckEnum(Enum):
     #                                                count (defaults to 1)
     LACKS_ITEM = 2                     # attributes: name (if unknown name, treated as a progress marker),
     #                                                count (defaults to 1)
-    IS_FACING_DOOR = 3                 # attributes: <none>
+    IS_FACING_LOCKED_ITEM = 3          # attributes: <none>
     IS_OUTSIDE = 4                     # attributes: count (number, range, or unlimited)
     IS_INSIDE = 5                      # attributes: count (number, range, or unlimited)
     IS_DARK = 6                        # attributes: <none>
@@ -167,7 +167,7 @@ class DialogActionEnum(Enum):
     VISUAL_EFFECT = 12                 # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
     START_ENCOUNTER = 13               # attributes: name, approach_dialog, victory_dialog, run_away_dialog,
     #                                                encounterMusic
-    OPEN_DOOR = 14                     # attributes: <none>
+    OPEN_LOCKED_ITEM = 14              # attributes: <none>
     SLEEP = 15                         # attributes: bypass (to bypass resistances), category
     STOPSPELL = 16                     # attributes: bypass (to bypass resistances), category
     DAMAGE_TARGET = 17                 # attributes: count (number, range, unlimited, or default), category

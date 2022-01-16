@@ -7,6 +7,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
 from typing import Any, cast, Dict, Iterator, List, Optional, Tuple
+from collections.abc import Callable
 
 import pygame
 import pyscroll
@@ -20,6 +21,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     Use of this class requires a recent version of pytmx.
     """
+    TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX = 'Monster Set '
 
     def __init__(self, tmx_filename: str,
                  image_pad_tiles: Point=Point(0, 0),
@@ -103,7 +105,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         :return: If a redraw of the map is needed for the new PC position
         """
         object_group_to_bound_rendering_orig = self.object_group_to_bound_rendering
-        self.object_group_to_bound_rendering = self.get_overlapping_object_group_index(pos_dat_tile)
+        self.object_group_to_bound_rendering = self.get_overlapping_overlay_mask_layer_index(pos_dat_tile)
         if self.object_group_to_bound_rendering is not None:
             self.set_tile_layers_to_render(self.base_tile_layers)
         else:
@@ -111,23 +113,51 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return object_group_to_bound_rendering_orig != self.object_group_to_bound_rendering
 
     def is_interior(self, pos_dat_tile: Point) -> bool:
-        return self.get_overlapping_object_group_index(pos_dat_tile) is not None
+        return self.get_overlapping_overlay_mask_layer_index(pos_dat_tile) is not None
 
     def is_exterior(self, pos_dat_tile: Point) -> bool:
         return not self.is_interior(pos_dat_tile)
 
-    def get_overlapping_object_group_index(self, pos_dat_tile: Point) -> Optional[int]:
+    def get_monster_set_name(self, pos_dat_tile: Point) -> Optional[str]:
+        layer_name = self.get_overlapping_monster_set_layer_name(pos_dat_tile)
+        if layer_name:
+            return layer_name[len(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX):]
+        return None
+
+    def get_overlapping_overlay_mask_layer_index(self, pos_dat_tile: Point) -> Optional[int]:
+        def name_filter(name: Optional[str]) -> bool:
+            return not name or not name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
+        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, name_filter)
+        if object_group_info:
+            return object_group_info[0]
+        return None
+
+    def get_overlapping_monster_set_layer_name(self, pos_dat_tile: Point) -> Optional[str]:
+        def name_filter(name: Optional[str]) -> bool:
+            return name and name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
+        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, name_filter)
+        if object_group_info:
+            return object_group_info[1]
+        return None
+
+    def get_overlapping_object_group_info(self,
+                                          pos_dat_tile: Point,
+                                        name_filter: Optional[Callable[Optional[str], bool]]=None) \
+            -> Optional[Tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
         for idx, l in enumerate(self.tmx.layers):
             if not isinstance(l, pytmx.pytmx.TiledObjectGroup):
                 continue
             for obj in l:
+                if name_filter and not name_filter(l.name):
+                    # If a name filter was specified, skip layer names which do not conform to the filter
+                    continue
                 rect = pygame.Rect(obj.x / self.tmx.tilewidth,
                                    obj.y / self.tmx.tileheight,
                                    obj.width / self.tmx.tilewidth,
                                    obj.height / self.tmx.tileheight)
                 if rect.collidepoint(pos_dat_tile.getAsIntTuple()):
-                    return idx
+                    return idx, l.name
         return None
 
     def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
