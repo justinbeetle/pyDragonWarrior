@@ -51,7 +51,10 @@ def main() -> None:
     GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
-    game_xml_path = os.path.join(base_path, 'game.xml')
+    if os.path.exists(os.path.join(base_path, 'data', 'licensed_assets')):
+        game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
+    else:
+        game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 16 * 3
     game_loop = GameLoop(application_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
