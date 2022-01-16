@@ -104,6 +104,10 @@ class CombatEncounter(CombatEncounterInterface):
                     self.add_message(monster.get_name() + ' is running away.')
                     self.render_monsters()
 
+                    # Wait for acknowledgement if all monsters run away
+                    if not self.still_in_encounter():
+                        self.wait_for_acknowledgement()
+
         # Iterate through turns in the encounter until the encounter ends
         while self.still_in_encounter():
             for combatant in self.get_turn_order():

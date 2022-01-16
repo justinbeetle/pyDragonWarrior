@@ -108,7 +108,7 @@ class Direction(Enum):
         return None
 
     @staticmethod
-    def get_direction(value: Union[Point, int], default: Direction=NORTH) -> Direction:
+    def get_direction(value: Union[Point, int], default: int=NORTH) -> Direction:
         direction = Direction.get_optional_direction(value)
         if direction is not None:
             return direction

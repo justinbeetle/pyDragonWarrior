@@ -53,7 +53,7 @@ class MapDecorationSprite(MapSprite):
             raise AttributeError("All MapDecorationSprites require a MapDecoration with a type")
 
         if removed:
-            if not self.remove():
+            if not self.remove_decoration():
                 raise AttributeError("All removed MapDecorationSprites require a MapDecoration with a removed image")
         elif self.decoration.type.image is None:
             raise AttributeError("All MapDecorationSprites require a MapDecoration with an image")
@@ -67,7 +67,7 @@ class MapDecorationSprite(MapSprite):
         self.rect.x = int(self.rect.x + (MapSprite.tile_size_pixels - self.image.get_width()) / 2)
         self.rect.y = int(self.rect.y + MapSprite.tile_size_pixels - self.image.get_height())
 
-    def remove(self) -> bool:
+    def remove_decoration(self) -> bool:
         """
         :return: True if the map was successfully set to a removed image
         """
@@ -526,8 +526,8 @@ class GameMap(GameMapInterface):
         locked_map_decoration = self.get_locked_map_decoration()
 
         if locked_map_decoration is not None:
-            if locked_map_decoration.type.remove_sound is not None:
-                    AudioPlayer().play_sound(locked_map_decoration.type.remove_sound)
+            if locked_map_decoration.type is not None and locked_map_decoration.type.remove_sound is not None:
+                AudioPlayer().play_sound(locked_map_decoration.type.remove_sound)
             self.remove_decoration(locked_map_decoration)
 
         return locked_map_decoration
@@ -540,7 +540,7 @@ class GameMap(GameMapInterface):
             for sprite in self.group.remove_sprites_of_layer(self.map_data.decoration_layer):
                 if sprite.decoration != decoration:
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
-                elif isinstance(sprite, MapDecorationSprite) and sprite.remove():
+                elif isinstance(sprite, MapDecorationSprite) and sprite.remove_decoration():
                     self.removed_map_decorations.append(decoration)
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
 

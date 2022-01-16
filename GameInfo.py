@@ -292,7 +292,7 @@ class GameInfo:
             w = w * numpy.transpose(w)
             w = w * numpy.transpose(w)
             p = w / sum(w)
-            self.tile_probabilities.append(p)
+            self.tile_probabilities.append([float(x) for x in p])
 
         # Parse decorations
         self.decorations: Dict[str, Decoration] = {}
@@ -513,44 +513,47 @@ class GameInfo:
 
             monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
             unscaled_monster_image = pygame.image.load(monster_image_file_name).convert_alpha()
-            '''monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                   (unscaled_monster_image.get_width() * monster_scale_factor,
-                                                    unscaled_monster_image.get_height() * monster_scale_factor))
 
-            dmg_image = monster_image.copy()
-            for x in range(dmg_image.get_width()):
-                for y in range(dmg_image.get_height()):
-                    if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
-                        dmg_image.set_at((x, y), pygame.Color('red'))'''
-
-            # First, scale up the monster images.
-            # Then expand them a few pixels and put a thin black border around them to off contrast.
-            # Also generate a version of the image all in red used in combat encounters when the monster takes damage.
-            scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                          (unscaled_monster_image.get_width() * monster_scale_factor,
-                                                           unscaled_monster_image.get_height() * monster_scale_factor))
             black_border_pixels = 1
-            expanded_monster_image = pygame.Surface((scaled_monster_image.get_width()+2*black_border_pixels,
-                                                     scaled_monster_image.get_height()+2*black_border_pixels),
-                                                    pygame.SRCALPHA)
-            expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
-            dmg_image = expanded_monster_image.copy()
-            monster_image = expanded_monster_image.copy()
-            for x in range(expanded_monster_image.get_width()):
-                xm = max(0, x - black_border_pixels)
-                xp = min(expanded_monster_image.get_width()-1, x + black_border_pixels)
-                for y in range(expanded_monster_image.get_height()):
-                    ym = max(0, y - black_border_pixels)
-                    yp = min(expanded_monster_image.get_height()-1, y + black_border_pixels)
-                    if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
-                        if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
-                            monster_image.set_at((x, y), pygame.Color('black'))
+            if 0 == black_border_pixels:
+                monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                       (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                        unscaled_monster_image.get_height() * monster_scale_factor))
+
+                dmg_image = monster_image.copy()
+                for x in range(dmg_image.get_width()):
+                    for y in range(dmg_image.get_height()):
+                        if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
                             dmg_image.set_at((x, y), pygame.Color('red'))
-                    else:
-                        dmg_image.set_at((x, y), pygame.Color('red'))
+            else:
+                # First, scale up the monster images.
+                # Then expand them a few pixels and put a thin black border around them to off contrast.
+                # Also generate a version of the image all in as the damanage images used in  combat encounters.
+                scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                              (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                               unscaled_monster_image.get_height() * monster_scale_factor))
+                black_border_pixels = 1
+                expanded_monster_image = pygame.Surface((scaled_monster_image.get_width()+2*black_border_pixels,
+                                                         scaled_monster_image.get_height()+2*black_border_pixels),
+                                                        pygame.SRCALPHA)
+                expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
+                dmg_image = expanded_monster_image.copy()
+                monster_image = expanded_monster_image.copy()
+                for x in range(expanded_monster_image.get_width()):
+                    xm = max(0, x - black_border_pixels)
+                    xp = min(expanded_monster_image.get_width()-1, x + black_border_pixels)
+                    for y in range(expanded_monster_image.get_height()):
+                        ym = max(0, y - black_border_pixels)
+                        yp = min(expanded_monster_image.get_height()-1, y + black_border_pixels)
+                        if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
+                            if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
+                                    or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
+                                    or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
+                                    or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
+                                monster_image.set_at((x, y), pygame.Color('black'))
+                                dmg_image.set_at((x, y), pygame.Color('red'))
+                        else:
+                            dmg_image.set_at((x, y), pygame.Color('red'))
 
             (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
             (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])

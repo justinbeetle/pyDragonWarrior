@@ -333,6 +333,7 @@ class GameDialogEvaluator:
                     menu_result = self.get_menu_result(message_dialog)
                 if self.game_state.is_running and menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
+                    # The user just made a dialog choice which is also an implicit acknowledgment
                     message_dialog.acknowledge()
                     if item[menu_result]:
                         self.traverse_dialog(message_dialog, item[menu_result], depth + 1, npc=npc)

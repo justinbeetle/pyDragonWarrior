@@ -6,8 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import Any, cast, Dict, Iterator, List, Optional, Tuple
-from collections.abc import Callable
+from typing import Any, Callable, cast, Dict, Iterator, List, Optional, Tuple
 
 import pygame
 import pyscroll
@@ -134,7 +133,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def get_overlapping_monster_set_layer_name(self, pos_dat_tile: Point) -> Optional[str]:
         def name_filter(name: Optional[str]) -> bool:
-            return name and name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
+            return isinstance(name, str) and name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
         object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, name_filter)
         if object_group_info:
             return object_group_info[1]
@@ -142,7 +141,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def get_overlapping_object_group_info(self,
                                           pos_dat_tile: Point,
-                                        name_filter: Optional[Callable[Optional[str], bool]]=None) \
+                                          name_filter: Optional[Callable[[Optional[str]], bool]]=None) \
             -> Optional[Tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
         for idx, l in enumerate(self.tmx.layers):

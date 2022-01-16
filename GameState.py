@@ -110,7 +110,7 @@ class GameState(GameStateInterface):
             for decoration in self.removed_decorations_by_map[new_map_name]:
                 if decoration in map_decorations:
                     map_decorations.remove(decoration)
-                    if decoration.type.removed_image is not None:
+                    if decoration.type is not None and decoration.type.removed_image is not None:
                         removed_map_decorations.append(decoration)
 
         if old_map_name == new_map_name:
