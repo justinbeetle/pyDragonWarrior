@@ -1,14 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations_20" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" tilePath="tiles_ios_hybrid" decorationPath="decorations" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
    <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
 
    <Fonts>
-      <!-- <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/> -->
+      <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/>
       <!-- <Font name="data/fonts/dragon-warrior-1.ttf"/> -->
-      <!-- <Font name="data/fonts/ARIALUNI.TTF"/> -->
+      <Font name="data/fonts/ARIALUNI.TTF"/>
       <Font name="arialms"/>
       <Font name="lucidasans"/>
       <Font name="arial"/>
+
+      <SymbolFont name="data/fonts/ARIALUNI.TTF"/>
+      <SymbolFont name="arialms"/>
+      <SymbolFont name="lucidasans"/>
+      <SymbolFont name="arial"/>
    </Fonts>
 
    <Tiles>
@@ -49,25 +54,22 @@
 
    <Decorations>
       <Decoration name="bridge" image="bridge.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      <!--
       <Decoration name="bridge_left_top" image="bridge_left_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_right_top" image="bridge_right_top.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_left" image="bridge_left.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="bridge_right" image="bridge_right.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
-      -->
       <Decoration name="cactus" image="cactus.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_A" image="castle_stone_A.png" widthTiles="2" heightTiles="2" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="cave" image="cave.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
 
-      <Decoration name="chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
+      <Decoration name="chest" image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no" removeWithOpen="yes" removeSound="openChest.wav"/>
 
-      <Decoration name="unlocked_chest" image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
-      <Decoration name="locked_chest"   image="chest.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
+      <Decoration name="unlocked_chest" image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
+      <Decoration name="locked_chest"   image="chest.png" removed_image="chest_open.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
 
       <Decoration name="door"                   image="door.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
 
-      <!--
       <Decoration name="locked_wood_door"             image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="locked_sideways_wood_door"    image="door_wood_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_wood_door"           image="door_wood.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
@@ -77,7 +79,6 @@
       <Decoration name="locked_sideways_metal_door"   image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_metal_door"          image="door_metal.png" widthTiles="1" heightTiles="1" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
       <Decoration name="unlocked_sideways_metal_door" image="door_metal_sideways.png" widthTiles="1" heightTiles="2" walkable="no" boatable="no" removeWithSearch="no" removeWithKey="no" removeWithOpen="yes" removeSound="unlockDoor.wav"/>
-      -->
 
       <Decoration name="shrine_stone_A" image="shrine_stone_A.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
       <Decoration name="shrine_stone_B" image="shrine_stone_B.png" widthTiles="1" heightTiles="1" walkable="yes" boatable="no" removeWithSearch="no" removeWithKey="no"/>
@@ -97,6 +98,7 @@
    <xi:include href="data/levels.xml" parse="xml"/>
 
    <CharacterTypes>
+      <!-- 
       <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
       <CharacterType type="hero_sword"             image="hero_sword.png"/>
       <CharacterType type="hero_shield"            image="hero_shield.png"/>
@@ -112,6 +114,7 @@
       <CharacterType type="merchant"               image="merchant.png"/>
       <CharacterType type="trumpeter"              image="trumpeter.png"/>
       <CharacterType type="dragonlord"             image="dragonlord.png"/>
+      -->
 
       <!-- 
       <CharacterType type="hero"                   image="vx_chara01_b11.png"         phases="3" levels="hero"/>
@@ -132,7 +135,6 @@
       -->
 
       <!-- Characters from Tiny Tales character sets -->
-      <!--
       <CharacterType type="hero"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3" levels="hero"/>
       <CharacterType type="hero_sword"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
       <CharacterType type="hero_shield"            image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
@@ -148,7 +150,6 @@
       <CharacterType type="merchant"               image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M2.png"                     phases="3"/>
       <CharacterType type="trumpeter"              image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4_trumpeter.png" phases="3"/>
       <CharacterType type="dragonlord"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Mage_M1.png"              phases="3"/>
-      -->
 
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
       <CharacterType type="mocha"                  image="mocha.png"                  phases="2" levels="cat"/>
@@ -156,8 +157,8 @@
    </CharacterTypes>
 
    <Maps>
-      <xi:include href="data/map_alefgard_legacy.xml" parse="xml"/>
-      <!--<xi:include href="data/map_alefgard_tiled.xml" parse="xml"/>-->
+      <!--<xi:include href="data/map_alefgard_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/map_alefgard_tiled.xml" parse="xml"/>
 
       <Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition                                x="11"  y="30"  dir="NORTH" toMap="overworld"/>
@@ -416,8 +417,8 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
       </Map>
 
-      <xi:include href="data/map_brecconary_legacy.xml" parse="xml"/>
-      <!--<xi:include href="data/map_brecconary_tiled.xml" parse="xml"/>-->
+      <!--<xi:include href="data/map_brecconary_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/map_brecconary_tiled.xml" parse="xml"/>
 
       <Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition                                x="20"  y="13"  dir="WEST"  toMap="overworld"/>

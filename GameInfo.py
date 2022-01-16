@@ -80,11 +80,8 @@ class GameInfo:
 
         # Parse font information
         self.font_names: List[str] = []
-        self.symbol_font_names: List[str] = []
         for element in xml_root.findall("./Fonts//Font"):
             self.font_names.append(element.attrib['name'])
-        for element in xml_root.findall("./Fonts//SymbolFont"):
-            self.symbol_font_names.append(element.attrib['name'])
 
         # Parse the encounter background images
         self.encounter_backgrounds: Dict[str, EncounterBackground] = {}

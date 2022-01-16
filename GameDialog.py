@@ -39,7 +39,7 @@ class GameDialog:
     tile_size_pixels = 48
     font_color = NOMINAL_HEALTH_FONT_COLOR
     font: pygame.Font
-    symbol_font: pygame.Font
+    widest_character: int = 0
     anti_alias = True
     outside_spacing_pixels = 24
     internal_spacing_pixels = 10
@@ -48,8 +48,7 @@ class GameDialog:
     @staticmethod
     def static_init(win_size_tiles: Point,
                     tile_size_pixels: int,
-                    font_names: List[str] = [],
-                    symbol_font_names: List[str] = []) -> None:
+                    font_names: List[str] = []) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
 
@@ -70,7 +69,6 @@ class GameDialog:
             return font_name
 
         font_name = find_font_by_name(font_names, None)
-        symbol_font_name = find_font_by_name(symbol_font_names, font_name)
 
         # Log information about available fonts if using the default font
         if font_name is None:
@@ -95,7 +93,10 @@ class GameDialog:
             return pygame.font.Font(font_name, font_size)
 
         GameDialog.font = create_font(font_name)
-        GameDialog.symbol_font = create_font(symbol_font_name)
+
+        # Determine the widest character
+        for character in GameDialog.get_all_characters():
+            GameDialog.widest_character = max(GameDialog.widest_character, GameDialog.get_font_width(character))
 
     @staticmethod
     def get_size_for_content(longest_string: str,
@@ -145,16 +146,98 @@ class GameDialog:
 
     @staticmethod
     def get_font(text: str) -> pygame.Font:
-        if text in GameDialog.UNICODE_CHARACTERS:
-            return GameDialog.symbol_font
         return GameDialog.font
 
     @staticmethod
     def get_font_width(text: str) -> int:
+        if text in GameDialog.UNICODE_CHARACTERS:
+            return GameDialog.widest_character
         return int(GameDialog.get_font(text).size(text)[0])
 
     @staticmethod
     def render_font(text: str) -> pygame.surface.Surface:
+        if text in GameDialog.UNICODE_CHARACTERS:
+            width = GameDialog.get_font_width(text)
+            height = GameDialog.get_font(text).get_height()
+            font_surface = pygame.Surface((width, height))
+
+            inner_border = 4
+            half_inner_width = 1
+            inner_width = half_inner_width * 2
+
+            quarter_width = width // 4
+            full_width = width - 1
+            quarter_height = height // 4
+            half_height = quarter_height * 2
+            three_quarters_height = quarter_height * 3
+
+            y_coords = (quarter_height + inner_border,
+                        half_height - half_inner_width,
+                        half_height,
+                        half_height + half_inner_width,
+                        three_quarters_height - inner_border)
+
+            if text == GameDialog.BACKSPACE_UNICODE:
+                # Draw the outer shape
+                pointlist = (
+                    (0, half_height),
+                    (quarter_width, quarter_height),
+                    (full_width, quarter_height),
+                    (full_width, three_quarters_height),
+                    (width // 4, three_quarters_height))
+                pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
+                pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
+
+                # Draw the inner shape
+                x_start = quarter_width + inner_border
+                x_mid = quarter_width + (full_width - quarter_width) // 2
+                x_end = x_start + (x_mid - x_start) * 2
+                x_coords = (x_start, x_start + inner_width,
+                            x_mid - half_inner_width, x_mid, x_mid + half_inner_width,
+                            x_end - inner_width, x_end)
+                pointlist = (
+                    (x_coords[0], y_coords[0]),
+                    (x_coords[1], y_coords[0]),
+                    (x_coords[3], y_coords[1]),
+                    (x_coords[5], y_coords[0]),
+                    (x_coords[6], y_coords[0]),
+                    (x_coords[4], y_coords[2]),
+                    (x_coords[6], y_coords[4]),
+                    (x_coords[5], y_coords[4]),
+                    (x_coords[3], y_coords[3]),
+                    (x_coords[1], y_coords[4]),
+                    (x_coords[0], y_coords[4]),
+                    (x_coords[2], y_coords[2]))
+                pygame.draw.aalines(font_surface, 'black', True, pointlist)
+                pygame.draw.polygon(font_surface, 'black', pointlist)
+                return font_surface
+            elif text == GameDialog.ENTER_UNICODE:
+                # Draw the outer shape
+                pointlist = (
+                    (0, quarter_height),
+                    (full_width, quarter_height),
+                    (full_width, three_quarters_height),
+                    (0, three_quarters_height))
+                pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
+                pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
+
+                # Draw the inner shape
+                x_start = inner_border
+                x_end = full_width - inner_border
+                x_coords = (x_start, width // 2, x_end - inner_width, x_end)
+                pointlist = (
+                    (x_coords[0], y_coords[2]),
+                    (x_coords[1], y_coords[0]),
+                    (x_coords[1], y_coords[1]),
+                    (x_coords[2], y_coords[1]),
+                    (x_coords[2], y_coords[0]),
+                    (x_coords[3], y_coords[0]),
+                    (x_coords[3], y_coords[3]),
+                    (x_coords[1], y_coords[3]),
+                    (x_coords[1], y_coords[4]))
+                pygame.draw.aalines(font_surface, 'black', True, pointlist)
+                pygame.draw.polygon(font_surface, 'black', pointlist)
+                return font_surface
         return cast(pygame.surface.Surface,
                     GameDialog.get_font(text).render(text,
                                                      GameDialog.anti_alias,
@@ -860,6 +943,19 @@ class GameDialog:
     def is_acknowledged(self) -> bool:
         return self.acknowledged
 
+    @staticmethod
+    def get_number_characters():
+        return '7894561230'
+
+    @staticmethod
+    def get_text_characters():
+        import string
+        return string.ascii_uppercase + string.ascii_lowercase + '. '
+
+    @staticmethod
+    def get_all_characters():
+        return '1234567890' + GameDialog.get_text_characters()
+
     def prompt_for_user_text(self, prompt: str = '', input_allowed_characters: Optional[str] = None) -> None:
         self.allow_user_typing = True
         self.add_message(prompt)
@@ -868,23 +964,19 @@ class GameDialog:
         self.input_allowed_characters = input_allowed_characters
 
         if GameDialog.use_menus_for_text_entry():
-            number_characters = '7894561230'
-            import string
-            ascii_characters = string.ascii_uppercase + string.ascii_lowercase + '. '
-            all_characters = '1234567890' + ascii_characters
             menu_characters = ''
             menu_cols = 0
             menu_spacing = GameDialogSpacing.EQUAL_COLUMNS
             if input_allowed_characters is not None:
-                if sorted(input_allowed_characters) == sorted(number_characters):
-                    menu_characters = number_characters
+                if sorted(input_allowed_characters) == sorted(GameDialog.get_number_characters()):
+                    menu_characters = GameDialog.get_number_characters
                     menu_cols = 3
                     menu_spacing = GameDialogSpacing.SPACERS
-                elif sorted(input_allowed_characters) == sorted(ascii_characters):
-                    menu_characters = ascii_characters
+                elif sorted(input_allowed_characters) == sorted(GameDialog.get_text_characters()):
+                    menu_characters = GameDialog.get_text_characters()
                     menu_cols = 14
             if 0 == len(menu_characters):
-                menu_characters = all_characters
+                menu_characters = GameDialog.get_all_characters()
                 menu_cols = 17
             self.add_menu_prompt(list(menu_characters) + [GameDialog.BACKSPACE_UNICODE, GameDialog.ENTER_UNICODE],
                                  menu_cols,
