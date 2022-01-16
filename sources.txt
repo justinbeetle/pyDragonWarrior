@@ -108,6 +108,8 @@ Images:
       x desert_distant_mountain:  https://unsplash.com/photos/CUDoVGSfUPg
       x desert_cliff:  https://unsplash.com/photos/6OFxfVuLUEs
 
+      x desert_city_ruins:  https://unsplash.com/photos/uP8Yvwggvmk
+
 
 
 

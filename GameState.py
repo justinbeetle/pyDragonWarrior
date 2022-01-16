@@ -60,7 +60,7 @@ class GameState(GameStateInterface):
 
         super().__init__(screen)
 
-        self.game_info = GameInfo(application_path, base_path, game_xml_path, tile_size_pixels)
+        self.game_info = GameInfo(application_path, base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None
@@ -469,7 +469,7 @@ class GameState(GameStateInterface):
         for special_monster in self.game_info.maps[self.get_map_name()].special_monsters:
             if special_monster.point == tile and self.check_progress_markers(
                     special_monster.progress_marker, special_monster.inverse_progress_marker):
-                print('Found monster at point: ', tile, flush=True)
+                # print('Found monster at point: ', tile, flush=True)
                 return special_monster
         return None
 
