@@ -75,11 +75,11 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def is_facing_door(self) -> bool:
+    def is_facing_locked_item(self) -> bool:
         pass
 
     @abc.abstractmethod
-    def open_door(self) -> None:
+    def open_locked_item(self) -> Optional[MapDecoration]:
         pass
 
     @abc.abstractmethod

@@ -520,7 +520,7 @@ class GameState(GameStateInterface):
             if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
                 # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
                 return self.game_info.monster_sets[mz.name]
-        return []
+        return self.game_map.get_tile_monsters(tile)
 
     def is_light_restricted(self) -> bool:
         return (self.hero_party.light_diameter is not None
@@ -575,15 +575,16 @@ class GameState(GameStateInterface):
 
         return True
 
-    def is_facing_door(self) -> bool:
-        return self.game_map.is_facing_door()
+    def is_facing_locked_item(self) -> bool:
+        return self.game_map.is_facing_locked_item()
 
-    def open_door(self) -> None:
-        removed_decoration = self.game_map.open_door()
+    def open_locked_item(self) -> Optional[MapDecoration]:
+        removed_decoration = self.game_map.open_locked_item()
         if removed_decoration:
             if self.get_map_name() not in self.removed_decorations_by_map:
                 self.removed_decorations_by_map[self.get_map_name()] = []
             self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
+        return removed_decoration
 
     def remove_decoration(self, decoration: MapDecoration) -> None:
         removed_decoration = self.game_map.remove_decoration(decoration)

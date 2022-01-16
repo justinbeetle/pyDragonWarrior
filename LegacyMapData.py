@@ -113,6 +113,9 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def is_exterior(self, pos_dat_tile: Point) -> bool:
         return not self.is_interior(pos_dat_tile)
 
+    def get_monster_set_name(self, pos_dat_tile: Point) -> Optional[str]:
+        return None
+
     def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
         if self.layers_to_render != layers_to_render:
             self.layers_to_render = layers_to_render

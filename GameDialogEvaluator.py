@@ -333,7 +333,9 @@ class GameDialogEvaluator:
                     menu_result = self.get_menu_result(message_dialog)
                 if self.game_state.is_running and menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
-                    self.traverse_dialog(message_dialog, item[menu_result], depth + 1, npc=npc)
+                    message_dialog.acknowledge()
+                    if item[menu_result]:
+                        self.traverse_dialog(message_dialog, item[menu_result], depth + 1, npc=npc)
 
             elif isinstance(item, DialogVendorBuyOptions):
                 # print('Dialog Vendor Buy Options =', item, flush=True)
@@ -430,8 +432,8 @@ class GameDialogEvaluator:
                     if item.type == DialogCheckEnum.LACKS_ITEM:
                         check_result = not check_result
 
-                elif item.type == DialogCheckEnum.IS_FACING_DOOR:
-                    check_result = self.game_state.is_facing_door()
+                elif item.type == DialogCheckEnum.IS_FACING_LOCKED_ITEM:
+                    check_result = self.game_state.is_facing_locked_item()
 
                 elif item.type == DialogCheckEnum.IS_OUTSIDE:
                     check_result = self.game_state.is_outside()
@@ -689,8 +691,13 @@ class GameDialogEvaluator:
                                                            encounter_music=item.encounter_music,
                                                            message_dialog=message_dialog)
 
-                elif item.type == DialogActionEnum.OPEN_DOOR:
-                    self.game_state.open_door()
+                elif item.type == DialogActionEnum.OPEN_LOCKED_ITEM:
+                    removed_map_decoration = self.game_state.open_locked_item()
+                    self.game_state.draw_map(flip_buffer=message_dialog.is_empty())
+                    if not message_dialog.is_empty():
+                        message_dialog.blit(self.game_state.screen, True)
+                    if removed_map_decoration is not None and removed_map_decoration.dialog is not None:
+                        self.traverse_dialog(message_dialog, removed_map_decoration.dialog, depth + 1, npc=npc)
 
                 elif item.type == DialogActionEnum.MAGIC_RESTORE:
                     worked = False

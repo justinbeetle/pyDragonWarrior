@@ -145,9 +145,7 @@ class HeroSprite(CharacterSprite):
             character_images = HeroSprite.character_types['ghost'].images
         elif self.character.character_type.name == 'hero':
             # TODO: Configurable way to handle the PC image mappings
-            if self.character == self.hero_party.main_character and self.hero_party.has_item('PM_Carrying_Princess'):
-                character_images = HeroSprite.character_types['hero_carrying_princess'].images
-            elif self.character.weapon is not None and self.character.shield is not None:
+            if self.character.weapon is not None and self.character.shield is not None:
                 character_images = HeroSprite.character_types['hero_sword_and_shield'].images
             elif self.character.weapon is not None:
                 character_images = HeroSprite.character_types['hero_sword'].images
@@ -492,27 +490,48 @@ class GameMap(GameMapInterface):
     def is_exterior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         return not self.is_interior(pos_dat_tile)
 
-    def is_facing_door(self) -> bool:
-        door_open_dest_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile() \
-                                  + self.game_state.get_hero_party().get_direction().get_vector()
-        for decoration in self.map_decorations:
-            if (door_open_dest_dat_tile == decoration.point
-                    and decoration.type is not None
-                    and decoration.type.remove_with_key):
-                return True
-        return False
+    def get_tile_monsters(self, pos_dat_tile: Point) -> List[str]:
+        monster_set_name = self.map_data.get_monster_set_name(pos_dat_tile)
+        print('monster_set_name =', monster_set_name, flush=True)
+        if monster_set_name in self.game_state.get_game_info().monster_sets:
+            return self.game_state.get_game_info().monster_sets[monster_set_name]
+        return []
 
-    def open_door(self) ->  Optional[MapDecoration]:
-        door_open_dest_dat_tile = self.game_state.get_hero_party().get_curr_pos_dat_tile() \
-                                  + self.game_state.get_hero_party().get_direction().get_vector()
-        for decoration in self.map_decorations:
-            if (door_open_dest_dat_tile == decoration.point
-                    and decoration.type is not None
-                    and decoration.type.remove_with_key):
-                if decoration.type.remove_sound is not None:
-                    AudioPlayer().play_sound(decoration.type.remove_sound)
-                return self.remove_decoration(decoration)
-        return None
+    def get_locked_map_decoration(self, pos_dat_tile: Optional[Point] = None) -> Optional[MapDecoration]:
+        locked_map_decoration = None
+
+        if pos_dat_tile is None:
+            # First look under the hero party
+            locked_map_decoration = self.get_locked_map_decoration(self.game_state.get_hero_party().get_curr_pos_dat_tile())
+
+            # Then look in front the hero party
+            if locked_map_decoration is None:
+                locked_map_decoration = self.get_locked_map_decoration(
+                    self.game_state.get_hero_party().get_curr_pos_dat_tile()
+                    + self.game_state.get_hero_party().get_direction().get_vector())
+        else:
+            # Look at the specified tile position
+            for decoration in self.map_decorations:
+                if (pos_dat_tile == decoration.point
+                        and decoration.type is not None
+                        and decoration.type.remove_with_key):
+                    locked_map_decoration = decoration
+                    break
+
+        return locked_map_decoration
+
+    def is_facing_locked_item(self) -> bool:
+        return self.get_locked_map_decoration() is not None
+
+    def open_locked_item(self) -> Optional[MapDecoration]:
+        locked_map_decoration = self.get_locked_map_decoration()
+
+        if locked_map_decoration is not None:
+            if locked_map_decoration.type.remove_sound is not None:
+                    AudioPlayer().play_sound(locked_map_decoration.type.remove_sound)
+            self.remove_decoration(locked_map_decoration)
+
+        return locked_map_decoration
 
     def remove_decoration(self, decoration: MapDecoration) -> Optional[MapDecoration]:
         # Remove the decoration from the map (if present)
@@ -708,7 +727,7 @@ class MapViewer:
         self.clock = pygame.time.Clock()
 
         # Setup to draw maps
-        self.tile_size_pixels = 60
+        self.tile_size_pixels = 32
         desired_win_size_pixels = Point(2560, 1340)
         if desired_win_size_pixels is None:
             self.screen: pygame.surface.Surface = pygame.display.set_mode(
@@ -781,9 +800,9 @@ class MapViewer:
                         if self.hero_party.light_diameter is not None:
                             self.hero_party.light_diameter = max(1, self.hero_party.light_diameter-1)
                     elif event.key == pygame.K_e:
-                        if game_map.is_facing_door():
+                        if game_map.is_facing_locked_item():
                             print('Opened door', flush=True)
-                            game_map.open_door()
+                            game_map.open_locked_item()
                         else:
                             for decoration in game_map.get_decorations():
                                 if decoration.type is not None and decoration.type.remove_with_search:
@@ -796,7 +815,7 @@ class MapViewer:
                     elif event.key == pygame.K_g:
                         god_mode = not god_mode
                     else:
-                        move_direction = Direction.get_direction(event.key)
+                        move_direction = Direction.get_optional_direction(event.key)
                 elif event.type == pygame.QUIT:
                     self.is_running = False
 
