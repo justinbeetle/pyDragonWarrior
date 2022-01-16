@@ -29,7 +29,8 @@ class GameInfo:
                  application_path: str,
                  base_path: str,
                  game_xml_path: str,
-                 tile_size_pixels: int) -> None:
+                 tile_size_pixels: int,
+                 win_size_pixels: Point) -> None:
 
         self.game_xml_path = game_xml_path
         self.tile_size_pixels = tile_size_pixels
@@ -47,8 +48,8 @@ class GameInfo:
                 else:
                     break
 
-        # TODO: Need to determine a method for determining how much to scale the monster images
-        monster_scale_factor = 4
+        # Scale monster images up assuming they are scaled to a Nintendo resolution of 240 vertical pixels
+        monster_scale_factor = win_size_pixels.y / 240
 
         # Parse XML
         xml_root = ET.parse(game_xml_path).getroot()
@@ -512,7 +513,7 @@ class GameInfo:
 
             monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
             unscaled_monster_image = pygame.image.load(monster_image_file_name).convert_alpha()
-            monster_image = pygame.transform.scale(unscaled_monster_image,
+            '''monster_image = pygame.transform.scale(unscaled_monster_image,
                                                    (unscaled_monster_image.get_width() * monster_scale_factor,
                                                     unscaled_monster_image.get_height() * monster_scale_factor))
 
@@ -520,6 +521,35 @@ class GameInfo:
             for x in range(dmg_image.get_width()):
                 for y in range(dmg_image.get_height()):
                     if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
+                        dmg_image.set_at((x, y), pygame.Color('red'))'''
+
+            # First, scale up the monster images.
+            # Then expand them a few pixels and put a thin black border around them to off contrast.
+            # Also generate a version of the image all in red used in combat encounters when the monster takes damage.
+            scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                          (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                           unscaled_monster_image.get_height() * monster_scale_factor))
+            black_border_pixels = 1
+            expanded_monster_image = pygame.Surface((scaled_monster_image.get_width()+2*black_border_pixels,
+                                                     scaled_monster_image.get_height()+2*black_border_pixels),
+                                                    pygame.SRCALPHA)
+            expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
+            dmg_image = expanded_monster_image.copy()
+            monster_image = expanded_monster_image.copy()
+            for x in range(expanded_monster_image.get_width()):
+                xm = max(0, x - black_border_pixels)
+                xp = min(expanded_monster_image.get_width()-1, x + black_border_pixels)
+                for y in range(expanded_monster_image.get_height()):
+                    ym = max(0, y - black_border_pixels)
+                    yp = min(expanded_monster_image.get_height()-1, y + black_border_pixels)
+                    if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
+                        if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
+                            monster_image.set_at((x, y), pygame.Color('black'))
+                            dmg_image.set_at((x, y), pygame.Color('red'))
+                    else:
                         dmg_image.set_at((x, y), pygame.Color('red'))
 
             (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
@@ -765,7 +795,6 @@ class GameInfo:
             map_tiled_file_name = None
             map_dat = []
             map_overlay_dat = None
-            map_dat_size = Point()
             if map_dat_file_name.endswith('.tmx'):
                 map_tiled_file_name = map_dat_file_name
             else:

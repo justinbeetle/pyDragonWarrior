@@ -666,7 +666,7 @@
             <Dialog>"Good day, I am Howard.  Four steps south of the bath in Kol thou shalt find a magic item."</Dialog></NonPlayerCharacter>
       </Map>
 
-      <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="battle_background.png" lightDiameter="unlimited" isOutside="yes">
+      <Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="desert_city_ruins.jfif" lightDiameter="unlimited" isOutside="yes">
          <LeavingTransition                                x="1"   y="11"  dir="EAST"  toMap="overworld"/>
 
          <Monster name="Axe Knight" x="19" y="13">

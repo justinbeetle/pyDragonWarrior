@@ -638,7 +638,7 @@ def main() -> None:
     from GameInfo import GameInfo
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
-    game_info = GameInfo('', base_path, game_xml_path, tile_size_pixels)
+    game_info = GameInfo('', base_path, game_xml_path, tile_size_pixels, win_size_pixels)
     GameDialog.static_init(win_size_tiles, tile_size_pixels, game_info.font_names)
 
     # Find an encounter image to use
