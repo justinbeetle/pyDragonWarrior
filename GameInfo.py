@@ -59,9 +59,9 @@ class GameInfo:
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
         music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
         sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
-        tile_path = os.path.join(image_path, xml_root.attrib['tilePath'])
+        tile_path = os.path.join(image_path, xml_root.find('Tiles').attrib['imagePath'])
         maps_path = os.path.join(data_path, xml_root.attrib['mapsPath'])
-        decoration_path = os.path.join(image_path, xml_root.attrib['decorationPath'])
+        decoration_path = os.path.join(image_path, xml_root.find('Decorations').attrib['imagePath'])
         character_path = os.path.join(image_path, xml_root.attrib['characterPath'])
         monster_path = os.path.join(image_path, xml_root.attrib['monsterPath'])
         encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
@@ -293,7 +293,7 @@ class GameInfo:
 
         # Parse decorations
         self.decorations: Dict[str, Decoration] = {}
-        for element in xml_root.findall("./Decorations/Decoration"):
+        for element in xml_root.findall("./Decorations//Decoration"):
             decoration_name = element.attrib['name']
             width_tiles = 1
             height_tiles = 1
@@ -383,7 +383,7 @@ class GameInfo:
 
         # Parse levels
         levels: Dict[str, List[Level]] = {}
-        for element in xml_root.findall("./Levels/CharacterLevels"):
+        for element in xml_root.findall("./Levels//CharacterLevels"):
             character_type = element.attrib['type']
             levels[character_type] = []
             for level_element in element.findall("./Level"):
@@ -405,7 +405,7 @@ class GameInfo:
 
         # Parse characters
         self.character_types: Dict[str, CharacterType] = {}
-        for element in xml_root.findall("./CharacterTypes/CharacterType"):
+        for element in xml_root.findall("./CharacterTypes//CharacterType"):
             character_type = element.attrib['type']
             character_levels: List[Level] = []
             if 'levels' in element.attrib and element.attrib['levels'] in levels:

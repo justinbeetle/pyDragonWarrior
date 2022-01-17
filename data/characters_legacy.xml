@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+   <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
+   <CharacterType type="hero_sword"             image="hero_sword.png"/>
+   <CharacterType type="hero_shield"            image="hero_shield.png"/>
+   <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
+   <CharacterType type="ghost"                  image="ghost.png"/>
+   <CharacterType type="king"                   image="king.png"/>
+   <CharacterType type="princess"               image="princess.png"/>
+   <CharacterType type="guard"                  image="guard.png"/>
+   <CharacterType type="warrior"                image="warrior.png"/>
+   <CharacterType type="sage"                   image="sage.png"/>
+   <CharacterType type="boy"                    image="boy.png"/>
+   <CharacterType type="girl"                   image="girl.png"/>
+   <CharacterType type="merchant"               image="merchant.png"/>
+   <CharacterType type="trumpeter"              image="trumpeter.png"/>
+   <CharacterType type="dragonlord"             image="dragonlord.png"/>
+</root>

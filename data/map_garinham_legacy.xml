@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="garinham" tiles="garinham.dat" overlayTiles="garinham_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <LeavingTransition                                x="20"  y="13"  dir="WEST"  toMap="overworld"/>
+   <PointTransition decoration="downstairs"          x="20"  y="1"   dir="WEST"  toMap="garins_grave_lvl1"/>
+
+   <MapDecoration type="door"  x="18" y="11"/>
+   <MapDecoration type="door"  x="5"  y="7"/>
+
+   <MapDecoration type="chest" x="9"  y="6">
+      <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
+      <DialogGoTo label="gold_chest"/></MapDecoration>
+   <MapDecoration type="chest" x="10" y="6"><DialogGoTo label="torch_chest"/></MapDecoration>
+   <MapDecoration type="chest" x="9"  y="7"><DialogGoTo label="herb_chest"/></MapDecoration>
+
+   <NonPlayerCharacter type="girl" x="12" y="13" dir="SOUTH" walking="yes">
+      <Dialog>"Welcome to Garinham.  May thy stay be a peaceful one."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="3" y="11" dir="SOUTH" walking="no">
+      <Dialog>"Garin, a wandering minstrel of legendary fame, is said to have built this town."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="3" y="18" dir="EAST" walking="no">
+      <Dialog>"Many believe that Princess Gwaelin is hidden away in a cave."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" x="7" y="17" dir="NORTH" walking="yes">
+      <Dialog>"I have heard of one named Nester.  Dost thou know such a one?"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="19" y="12" dir="SOUTH" walking="yes">
+      <Dialog>"It is said that the princess was kidnapped and taken eastward."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="11" y="19" dir="NORTH" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Club"/>
+         <Item name="Copper Sword"/>
+         <Item name="Hand Axe"/>
+         <Item name="Leather Armor"/>
+         <Item name="Chain Mail"/>
+         <Item name="Half Plate"/>
+         <Item name="Iron Shield"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="6" y="12" dir="WEST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Herb"/>
+         <Item name="Torch"/>
+         <Item name="Dragon's Scale"/>
+      </DialogVariable>
+      <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="18" y="16" dir="WEST" walking="no">
+      <DialogVariable name="[COST]" value="25"/>
+      <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="13" y="6" dir="EAST" walking="yes">
+      <Dialog>"I hate people! Go! Leave me!"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="4" y="9" dir="WEST" walking="yes">
+      <Dialog>"Once there was a town called Hauksness far to the south, but I do not know if it still exists."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="14" y="9" dir="SOUTH" walking="yes">
+      <Dialog>"They say that Erdrick's armor was hidden long ago."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="10" y="7" dir="SOUTH" walking="no">
+      <Dialog>"I suggest making a map if thy path leads into the darkness."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="4" y="6" dir="EAST" walking="no">
+      <Dialog>"I'm too busy. Ask the other guard."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="6" y="6" dir="WEST" walking="no">
+      <Dialog>"I'm too busy. Ask the other guard."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="15" y="2" dir="SOUTH" walking="no">
+      <Dialog>"The harp attracts enemies. Stay away from the grave in Garinham."</Dialog></NonPlayerCharacter>
+</Map>

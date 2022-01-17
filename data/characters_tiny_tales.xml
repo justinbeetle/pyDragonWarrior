@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+   <!-- Characters from Tiny Tales character sets -->
+   <CharacterType type="hero"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3" levels="hero"/>
+   <CharacterType type="hero_sword"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+   <CharacterType type="hero_shield"            image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+   <CharacterType type="hero_sword_and_shield"  image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M1_A.png"                   phases="3"/>
+   <CharacterType type="king"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Monarch_M1.png"                   phases="3"/>
+   <CharacterType type="princess"               image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Princess_F2.png"                  phases="3"/>
+   <CharacterType type="guard"                  image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4.png"           phases="3"/>
+   <CharacterType type="warrior"                image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Knights_1.0/Original/Knight_M3_B.png"                   phases="3"/>
+   <CharacterType type="sage"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Town2_M4.png"             phases="3"/>
+   <CharacterType type="boy"                    image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M1.png"                     phases="3"/>
+   <CharacterType type="girl"                   image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_F1.png"                     phases="3"/>
+   <CharacterType type="merchant"               image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Nobility_1.0/Original/Noble_M2.png"                     phases="3"/>
+   <CharacterType type="trumpeter"              image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Soldier_M4_trumpeter.png" phases="3"/>
+   <CharacterType type="dragonlord"             image="../../licensed_assets/itch.io/Mega_Tiles/Tiny_Tales_Human_NPC_Advanced_1.0/Original/Sprites/Mage_M1.png"              phases="3"/>
+</root>

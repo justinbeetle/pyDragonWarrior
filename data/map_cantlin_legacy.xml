@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="cantlin" tiles="cantlin.dat" overlayTiles="cantlin_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <LeavingTransition                                x="15"  y="1"   dir="SOUTH" toMap="overworld"/>
+   <MapDecoration type="door"  x="5"  y="22"/>
+   <MapDecoration type="door"  x="9"  y="26"/>
+   <MapDecoration type="door"  x="15" y="26"/>
+   <MapDecoration type="door"  x="16" y="26"/>
+   <MapDecoration type="door"  x="27" y="10"/>
+   <MapDecoration type="chest" x="28" y="26"/>
+   <MapDecoration type="chest" x="28" y="28"/>
+   <MapDecoration type="chest" x="3"  y="28"/>
+
+   <NonPlayerCharacter type="merchant" x="9" y="4" dir="SOUTH" walking="no">
+      <DialogVariable name="[COST]" value="100"/>
+      <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="23" y="6" dir="WEST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Bamboo Pole"/>
+         <Item name="Club"/>
+         <Item name="Copper Sword"/>
+         <Item name="Leather Armor"/>
+         <Item name="Chain Mail"/>
+         <Item name="Iron Shield"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="16" y="7" dir="SOUTH" walking="yes">
+      <Dialog>"Welcome to Cantlin, the castle town."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="28" y="7" dir="SOUTH" walking="no">
+      <DialogVariable name="[COST]" value="98"/>
+      <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="3" y="8" dir="EAST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Herb"/>
+         <Item name="Torch"/>
+      </DialogVariable>
+      <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="6" y="8" dir="SOUTH" walking="yes">
+      <Dialog>"'Tis said that the Dragonlord hath claws that can cleave iron and fiery breath that can melt stone.  Dost thou still wish to go on?"</Dialog>
+      <DialogOptions>
+         <DialogOption name="Yes">
+            <Dialog>"Thou art truly brave."</Dialog></DialogOption>
+         <DialogOption name="No">
+            <Dialog>"That is good.  No one will say thou art afraid."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="23" y="10" dir="SOUTH" walking="yes">
+      <Dialog>"It is said that many have held Erdrick's armor.  The last to have it was a fellow named Wynn."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="3" y="13" dir="EAST" walking="no">
+      <Dialog>"Come buy my radishes!  They are fresh and cheap.  Buy thy radishes today!"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="8" y="13" dir="WEST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Dragon's Scale"/>
+         <Item name="Wings"/>
+      </DialogVariable>
+      <DialogGoTo label="tool_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="25" y="13" dir="EAST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Flame Sword"/>
+         <Item name="Silver Shield"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="23" y="14" dir="WEST" walking="no">
+      <DialogVariable name="[COST]" value="38"/>
+      <DialogGoTo label="fairy_water_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="5" y="15" dir="WEST" walking="yes">
+      <Dialog>"What shall I get for thy dinner?"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="11" y="15" dir="EAST" walking="yes">
+      <Dialog>"I know nothing."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="16" y="17" dir="SOUTH" walking="no">
+      <Dialog>"To learn how proof may be obtained that thy ancestor was the great Erdrick, see a man in this very town."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="26" y="18" dir="SOUTH" walking="yes">
+      <Dialog>"Grandfather used to say that his friend, Wynn, had buried something of great value at the foot of a tree behind his shop."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="21" y="19" dir="SOUTH" walking="yes">
+      <Dialog>"I'm Nester.  Hey, where am I?  No, don't tell me!"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="23" y="23" dir="SOUTH" walking="no">
+      <Dialog>"'Tis said that Erdrick's sword could cleave steel."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="28" y="27" dir="WEST" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Hand Axe"/>
+         <Item name="Broad Sword"/>
+         <Item name="Full Plate"/>
+         <Item name="Magic Armor"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="4" y="28" dir="SOUTH" walking="yes">
+      <Dialog>"My Grandfather Wynn once had a shop on the east side of Hauksness."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="15" y="29" dir="SOUTH" walking="no">
+      <Dialog>"Let us wish the warrior well!  May the light be thy strength!"</Dialog>
+      <Dialog>"Thou may go and search.  From Tantegel Castle travel 70 leagues to the south and 40 to the east."</Dialog></NonPlayerCharacter>
+</Map>

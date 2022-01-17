@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="rimuldar" tiles="rimuldar.dat" overlayTiles="rimuldar_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <LeavingTransition                                x="30"  y="15"  dir="WEST"  toMap="overworld"/>
+
+   <MapDecoration type="door"  x="22" y="22"/>
+   <MapDecoration type="door"  x="23" y="24"/>
+
+   <MapDecoration type="chest" x="25" y="24"><DialogGoTo label="wings_chest"/></MapDecoration>
+
+   <NonPlayerCharacter type="girl" x="23" y="15" dir="SOUTH" walking="yes">
+      <Dialog>"No, I have no tomatoes.  I have no tomatoes today."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="17" y="19" dir="EAST" walking="no">
+      <DialogVariable name="[COST]" value="55"/>
+      <DialogGoTo label="innkeeper"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" x="25" y="20" dir="SOUTH" walking="yes">
+      <Dialog>"You are [NAME]?  It has been long since last we met."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="14" y="13" dir="SOUTH" walking="yes">
+      <Dialog>"Welcome to the town of Rimuldar."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="24" y="8" dir="SOUTH" walking="no">
+      <DialogVariable name="[BUY_ITEMS]" value="ITEM_LIST">
+         <Item name="Copper Sword"/>
+         <Item name="Hand Axe"/>
+         <Item name="Broad Sword"/>
+         <Item name="Half Plate"/>
+         <Item name="Full Plate"/>
+         <Item name="Magic Armor"/>
+      </DialogVariable>
+      <DialogGoTo label="weapon_and_armor_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" x="24" y="12" dir="SOUTH" walking="yes">
+      <Dialog>"The scales of the Dragonlord are as hard as steel."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="12" y="9" dir="NORTH" walking="yes">
+      <Dialog>"Art thou the descendant of Erdrick?  Hast thou any proof?"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="16" y="9" dir="NORTH" walking="no">
+      <Dialog>"Who art thou?  Leave at once or I will call my friends."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="7" y="14" dir="WEST" walking="no">
+      <Dialog>"Over the western part of this island Erdrick created a rainbow. 'Tis also said that he entered the darkness from a hidden entrance in the room of the Dragonlord."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="9" y="16" dir="SOUTH" walking="yes">
+      <Dialog>"Thou shalt find the Stones of Sunlight in Tantegel Castle, if thou has not found them yet."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" x="16" y="27" dir="SOUTH" walking="yes">
+      <DialogAssert type="HAS_ITEM" name="Fighter's Ring" count="1"><Dialog>"All true warriors wear a ring."</Dialog></DialogAssert>
+      <Dialog>"Is that a wedding ring?  Thou seems too young to be married."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="5" y="22" dir="SOUTH" walking="yes">
+      <Dialog>"Before long the enemy will arrive."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="7" y="22" dir="EAST" walking="yes">
+      <Dialog>"Heed my warning!  Travel not to the south for there the monsters are fierce and terrible."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="warrior" x="4" y="27" dir="SOUTH" walking="yes">
+      <Dialog>"In this world is there any sword that can pierce the scales of the Dragonlord?"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="4" y="24" dir="EAST" walking="no">
+      <Dialog>"This is a magic place.  Hast thou found a magic temple?"</Dialog>
+      <DialogOptions>
+         <DialogOption name="Yes">
+            <Dialog>"In this temple do the sun and rain meet."</Dialog></DialogOption>
+         <DialogOption name="No">
+            <Dialog>"Go to the south."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="girl" x="1" y="27" dir="SOUTH" walking="no">
+      <Dialog>"Orwick is late again.  I'm starving."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="boy" x="28" y="1" dir="SOUTH" walking="no">
+      <Dialog>"I am Orwick, and I am waiting for my girlfriend."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="3" y="5" dir="NORTH" walking="no">
+      <Dialog>"Welcome!"</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="merchant" x="5" y="8" dir="NORTH" walking="no">
+      <DialogVariable name="[COST]" value="53"/>
+      <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="sage" x="21" y="24" dir="SOUTH" walking="no">
+      <Dialog>"Good day, I am Howard.  Four steps south of the bath in Kol thou shalt find a magic item."</Dialog></NonPlayerCharacter>
+</Map>

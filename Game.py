@@ -44,6 +44,8 @@ def main() -> None:
                         action='store_true', default=None)
     parser.add_argument('-k', '--keyboard', dest='gamepad', help='Keyboard will be used for providing user inputs',
                         action='store_false')
+    parser.add_argument('-u', '--force-use-unlicensed-assets', help='Force using the unlicensed assets',
+                        action='store_true', default=False)
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
     # print('args =', args, flush=True)
@@ -51,7 +53,7 @@ def main() -> None:
     GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
-    if os.path.exists(os.path.join(base_path, 'data', 'licensed_assets')):
+    if not args.force_use_unlicensed_assets and os.path.exists(os.path.join(base_path, 'data', 'licensed_assets')):
         game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
     else:
         game_xml_path = os.path.join(base_path, 'game.xml')

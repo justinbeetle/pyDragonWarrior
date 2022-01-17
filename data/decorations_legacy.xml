@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Decoration name="chest"               image="chest.png"               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithOpen="yes" removeSound="openChest.wav"/>
+   <Decoration name="door"                image="door.png"                widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes"  removeSound="unlockDoor.wav"/>
+
+   <!-- Bridge decoration needed for Rainbow Bridge -->
+   <Decoration name="bridge"              image="bridge.png"              widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
+
+   <Decoration name="pass"                image="clear.png"               widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="barrier"             image="clear.png"               widthTiles="1" heightTiles="1" walkable="no"/>
+
+   <!-- Decorations used in legacy maps -->
+   <Decoration name="downstairs"          image="stairs_down.png"         widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="upstairs"            image="stairs_up.png"           widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="throne"              image="throne.png"              widthTiles="3" heightTiles="2" walkable="no"/>
+   <Decoration name="throne_evil"         image="throne_evil.png"         widthTiles="3" heightTiles="2" walkable="no"/>
+   <Decoration name="castle_stone_A"      image="castle_stone_A.png"      widthTiles="2" heightTiles="2" walkable="yes"/>
+   <Decoration name="castle_stone_tall_A" image="castle_stone_tall_A.png" widthTiles="2" heightTiles="3" walkable="yes"/>
+   <Decoration name="town_stone_med_A"    image="town_stone_med_A.png"    widthTiles="2" heightTiles="1" walkable="yes"/>
+   <Decoration name="town_stone_med_B"    image="town_stone_med_B.png"    widthTiles="2" heightTiles="1" walkable="yes"/>
+   <Decoration name="town_wood_med_A"     image="town_wood_med_A.png"     widthTiles="2" heightTiles="1" walkable="yes"/>
+   <Decoration name="town_wood_med_B"     image="town_wood_med_B.png"     widthTiles="2" heightTiles="1" walkable="yes"/>
+   <Decoration name="shrine_stone_A"      image="shrine_stone_A.png"      widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="shrine_stone_B"      image="shrine_stone_B.png"      widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="cave"                image="cave.png"                widthTiles="1" heightTiles="1" walkable="yes"/>
+</root>

@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="tantegel_lvl0" tiles="tantegel_lvl0.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <PointTransition decoration="upstairs"            x="2"   y="6"   dir="EAST"  toMap="tantegel_lvl1"/>
+
+   <NonPlayerCharacter type="sage" x="6" y="8" dir="SOUTH" walking="no">
+      <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><Dialog>"Be gone with you!!!"</Dialog></DialogAssert>
+      <Dialog>"I have been waiting long for one such as thee.  Take the treasure chest."</Dialog></NonPlayerCharacter>
+
+   <MapDecoration type="chest" x="6"  y="7">
+      <!-- Using a progress marker so that the quest item can only be obtained once. -->
+      <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Stones_of_Sunlight"><DialogGoTo label="empty_chest"/></DialogAssert>
+      <DialogAction type="GAIN_ITEM" name="PM_Acquired_Stones_of_Sunlight"/>
+      <DialogAction type="GAIN_ITEM" name="Stones of Sunlight"/>
+      <Dialog>Fortune smiles upon thee!  Thou hast found the Stones of Sunlight.</Dialog></MapDecoration>
+</Map>

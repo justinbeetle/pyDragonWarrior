@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <PointTransition decoration="downstairs"          x="9"   y="9"   dir="WEST"  toMap="tantegel_lvl1"/>
+
+   <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" progressMarker="PM_Not_Finished_Preparing">
+      <Dialog>"When thou art finished preparing for thy departure, please see me.  I shall wait."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" progressMarker="not PM_Not_Finished_Preparing and not PM_Defeated_Dragonlord">
+      <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess">
+         <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
+         <Dialog>"Now, Gwaelin, come to my side."</Dialog>
+         <Dialog>Gwaelin then whispers: "Wait a moment, please. I would give a present to [NAME]."</Dialog>
+         <Dialog>"Please accept my love, [NAME]."</Dialog>
+         <Dialog>"Even when we two are parted by great distances, I shall be with thee."</Dialog>
+         <Dialog>"Farewell, [NAME]."</Dialog>
+         <DialogAction type="GAIN_ITEM" name="Gwaelin's Love"/>
+         <DialogAction type="LOSE_ITEM" name="PM_Carrying_Princess"/>
+         <DialogAction type="LEAVE_PARTY" name="Princess Gwaelin"/>
+         <DialogAction type="GAIN_ITEM" name="PM_Princess_Returned_To_Castle"/>
+         <DialogAction type="GOTO_COORDINATES"/></DialogAssert> <!-- The GOTO_COORDINATES forces a setMap call to add the princess to the map -->
+      <Dialog>"I am greatly pleased that thou hast returned, [NAME]. Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] experience points."</Dialog>
+      <Dialog>"Will thou tell me now of thy deeds so they won't be forgotten?"</Dialog>
+      <DialogOptions>
+         <DialogOption name="Yes">
+            <DialogAction type="SAVE_GAME"/>
+            <Dialog>"Thy deeds have been recorded on the Imperial Scrolls of Honor."</Dialog></DialogOption>
+         <DialogOption name="No"/></DialogOptions>
+         <Dialog>"Goodbye now, [NAME].  Take care and tempt not the Fates."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="princess" x="7" y="4" dir="SOUTH" walking="no" progressMarker="PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Defeated_Dragonlord">
+      <DialogAssert type="LACKS_ITEM" name="PM_Given_Princess_Love"><Dialog>"I love thee, [NAME]."</Dialog></DialogAssert>
+      <Dialog>"Dost thou love me, [NAME]?"</Dialog>
+      <DialogOptions label="but_thou_must_love_me">
+         <DialogOption name="Yes">
+            <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
+            <Dialog>"I'm so happy!"</Dialog>
+            <DialogAction type="GAIN_ITEM" name="PM_Given_Princess_Love"/></DialogOption>
+         <DialogOption name="No">
+             <Dialog>"But thou must."</Dialog>
+             <Dialog>"Dost thou love me, [NAME]?"</Dialog>
+             <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
+      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogAssert>
+      <Dialog>"East of this castle is a town where armor, weapons, and many other items may be purchased."</Dialog>
+      <Dialog>"Return to the Inn for a rest if thou art wounded in battle, [NAME].  Sleep heals all."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="6" y="7" dir="WEST" walking="no">
+      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogAssert>
+      <Dialog>"If thou hast collected all the treasure chests, a key will be found."</Dialog>
+      <Dialog>"Once used, the key will disappear, but the door will be open and thou may pass through."</Dialog></NonPlayerCharacter>
+
+   <NonPlayerCharacter type="guard" x="8" y="6" dir="WEST" walking="yes">
+      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogAssert>
+      <Dialog>"Dost thou know about Princess Gwaelin?"</Dialog>
+      <DialogOptions>
+         <DialogOption name="Yes">
+            <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption>
+         <DialogOption name="No">
+            <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
+            <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
+
+   <MapDecoration type="throne" x="4" y="4"/>
+   <MapDecoration type="pass"   x="4" y="4"/>
+
+   <MapDecoration type="throne" x="7" y="4"/>
+   <MapDecoration type="pass"   x="7" y="4"/>
+
+   <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
+      <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
+      <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/>
+      <DialogGoTo label="key_chest"/></MapDecoration>
+   <MapDecoration type="chest" x="8" y="2" progressMarker="PM_Not_Taken_Initial_Chest_2">
+      <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_2"/>
+      <DialogVariable name="[CHEST_GOLD]" value="120"/>
+      <DialogGoTo label="gold_chest"/></MapDecoration>
+   <MapDecoration type="chest" x="6" y="5" progressMarker="PM_Not_Taken_Initial_Chest_3">
+      <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_3"/>
+      <DialogGoTo label="torch_chest"/></MapDecoration>
+
+   <MapDecoration type="None" x="2" y="2">
+      <Dialog>Something here smells foul...</Dialog></MapDecoration>
+</Map>

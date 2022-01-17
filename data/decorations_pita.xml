@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Decoration name="unlocked_chest"               image="../../licensed_assets/itch.io/pita/decorations/chest.png"
+                                           removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
+               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
+   <Decoration name="locked_chest"                 image="../../licensed_assets/itch.io/pita/decorations/chest.png"
+                                           removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
+               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
+
+   <Decoration name="locked_wood_door"             image="../../licensed_assets/itch.io/pita/decorations/door_wood.png"
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+   <Decoration name="locked_sideways_wood_door"    image="../../licensed_assets/itch.io/pita/decorations/door_wood_sideways.png"
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+   <Decoration name="unlocked_wood_door"           image="../../licensed_assets/itch.io/pita/decorations/door_wood.png"
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+   <Decoration name="unlocked_sideways_wood_door"  image="../../licensed_assets/itch.io/pita/decorations/door_wood_sideways.png"
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+
+   <Decoration name="locked_metal_door"            image="../../licensed_assets/itch.io/pita/decorations/door_metal.png"
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+   <Decoration name="locked_sideways_metal_door"   image="../../licensed_assets/itch.io/pita/decorations/door_metal_sideways.png"
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+   <Decoration name="unlocked_metal_door"          image="../../licensed_assets/itch.io/pita/decorations/door_metal.png"
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+   <Decoration name="unlocked_sideways_metal_door" image="../../licensed_assets/itch.io/pita/decorations/door_metal_sideways.png"
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+
+   <!-- Bridge decoration needed for Rainbow Bridge -->
+   <Decoration name="bridge_left_top"              image="../../licensed_assets/itch.io/pita/decorations/bridge_left_top.png"
+               widthTiles="1" heightTiles="1" walkable="no"  boatable="yes"/>
+   <Decoration name="bridge_right_top"             image="../../licensed_assets/itch.io/pita/decorations/bridge_right_top.png"
+               widthTiles="1" heightTiles="1" walkable="no"  boatable="yes"/>
+   <Decoration name="bridge_left"                  image="../../licensed_assets/itch.io/pita/decorations/bridge_left.png"
+               widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
+   <Decoration name="bridge_right"                 image="../../licensed_assets/itch.io/pita/decorations/bridge_right.png"
+               widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
+
+   <Decoration name="pass"                         image="clear.png"
+               widthTiles="1" heightTiles="1" walkable="yes"/>
+   <Decoration name="barrier"                      image="clear.png"
+               widthTiles="1" heightTiles="1" walkable="no"/>
+</root>
