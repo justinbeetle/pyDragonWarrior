@@ -27,40 +27,23 @@ from Point import Point
 
 
 class GameState(GameStateInterface):
-    PHASE_TICKS = 20
-    NPC_MOVE_STEPS = 60
-
     game_map: GameMap
 
     def __init__(self,
-                 application_path: str,
+                 saves_path: str,
                  base_path: str,
                  game_xml_path: str,
-                 desired_win_size_pixels: Optional[Point],
+                 win_size_tiles: Point,
                  tile_size_pixels: int) -> None:
-
-        self.__should_add_math_problems_in_combat = True
-
-        if desired_win_size_pixels is None:
-            screen = pygame.display.set_mode(
-                (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
-            win_size_pixels = Point(screen.get_size())
-            self.win_size_tiles = (win_size_pixels / tile_size_pixels).floor()
-        else:
-            self.win_size_tiles = (desired_win_size_pixels / tile_size_pixels).floor()
-
+        self.saves_path = saves_path
+        self.win_size_tiles = win_size_tiles
         self.image_pad_tiles = self.win_size_tiles // 2
         self.win_size_pixels = self.win_size_tiles * tile_size_pixels
+        self.__should_add_math_problems_in_combat = True
 
-        if desired_win_size_pixels is not None:
-            screen = pygame.display.set_mode(
-                self.win_size_pixels.getAsIntTuple(),
-                pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
+        super().__init__(pygame.display.get_surface())
 
-        super().__init__(screen)
-
-        self.game_info = GameInfo(application_path, base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
+        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None
@@ -150,7 +133,7 @@ class GameState(GameStateInterface):
             if os.path.isfile(pc_name_or_file_name):
                 save_game_file_path = pc_name_or_file_name
             else:
-                save_game_file_path = os.path.join(self.game_info.saves_path, pc_name_or_file_name + '.xml')
+                save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + '.xml')
 
         if save_game_file_path is None or not os.path.isfile(save_game_file_path):
             self.game_info.parse_initial_game_state(pc_name_or_file_name)
@@ -404,33 +387,39 @@ class GameState(GameStateInterface):
 
         xml_string = xml.dom.minidom.parseString(ET.tostring(xml_root)).toprettyxml(indent="   ")
 
-        save_game_file_path = os.path.join(self.game_info.saves_path, self.hero_party.main_character.name + '.xml')
+        save_game_file_path = os.path.join(self.saves_path, self.hero_party.main_character.name + '.xml')
 
         # Archive off the old save, if one is present
         self.archive_saved_game_file(save_game_file_path)
 
         # Save the game
-        if not os.path.isdir(self.game_info.saves_path):
-            os.makedirs(self.game_info.saves_path)
-        save_game_file = open(save_game_file_path, 'w')
-        save_game_file.write(xml_string)
-        save_game_file.close()
+        try:
+            if not os.path.isdir(self.saves_path):
+                os.makedirs(self.saves_path)
+            save_game_file = open(save_game_file_path, 'w')
+            save_game_file.write(xml_string)
+            save_game_file.close()
 
-        print('Saved game to file', save_game_file_path, flush=True)
+            print('Saved game to file', save_game_file_path, flush=True)
+        except Exception as exc:
+            print('ERROR: Exception encountered while attempting to save game file:', exc, flush=True)
 
     def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str='archive') -> None:
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
-            archive_dir = os.path.join(self.game_info.saves_path, archive_dir_name)
+            archive_dir = os.path.join(self.saves_path, archive_dir_name)
             from datetime import datetime
             timestamp = datetime.fromtimestamp(os.path.getmtime(save_game_file_path)).strftime("%Y%m%d%H%M%S")
             rename_file_path = os.path.join(archive_dir, self.hero_party.main_character.name + '_' + timestamp + '.xml')
-            if not os.path.isdir(archive_dir):
-                os.makedirs(archive_dir)
-            if not os.path.isfile(rename_file_path):
-                os.rename(save_game_file_path, rename_file_path)
-            else:
-                print('ERROR: File already exists:', rename_file_path, flush=True)
+            try:
+                if not os.path.isdir(archive_dir):
+                    os.makedirs(archive_dir)
+                if not os.path.isfile(rename_file_path):
+                    os.rename(save_game_file_path, rename_file_path)
+                else:
+                    print('ERROR: File already exists:', rename_file_path, flush=True)
+            except Exception as exc:
+                print('ERROR: Exception encountered while attempting to archived saved game file:', exc, flush=True)
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         return self.game_map.get_tile_info(tile)
@@ -565,7 +554,7 @@ class GameState(GameStateInterface):
                                                  self.hero_party.get_direction())
 
         # Make the transition and draw the map
-        AudioPlayer().play_sound('stairs.wav')
+        AudioPlayer().play_sound('walk_away')
         self.hero_party.set_pos(dest_transition.point, dest_transition.dir)
         self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
         self.draw_map(True)
@@ -722,7 +711,7 @@ class GameState(GameStateInterface):
         encounter_image = pygame.transform.smoothscale(encounter_image, encounter_image_size_px.getAsIntTuple())
 
         # Perform the combat encounter
-        CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
+        CombatEncounter.static_init('combat')
         self.combat_encounter = CombatEncounter(
             game_info=self.game_info,
             game_state=self,
@@ -747,7 +736,7 @@ class GameState(GameStateInterface):
             # Player death
             self.hero_party.main_character.hp = 0
             AudioPlayer().stop_music()
-            AudioPlayer().play_sound('20_-_Dragon_Warrior_-_NES_-_Dead.ogg')
+            AudioPlayer().play_sound('player_died')
             GameDialog.create_exploring_status_dialog(
                 self.hero_party).blit(self.screen, False)
             if message_dialog is None:
@@ -769,6 +758,7 @@ class GameState(GameStateInterface):
             self.set_map(self.game_info.death_map, respawn_decorations=True)
 
     def handle_quit(self, force: bool = False) -> None:
+        AudioPlayer().play_sound('select')
         if force:
             self.is_running = False
 

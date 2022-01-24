@@ -92,7 +92,7 @@ class GameDialogEvaluator:
         while self.game_state.is_running and message_dialog.has_more_content():
             should_wait_for_acknowledgement, is_new_content_part_of_quotation = message_dialog.advance_content()
             if is_new_content_part_of_quotation:
-                AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (1).wav')
+                AudioPlayer().play_sound('talking')
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
             message_dialog.blit(self.game_state.screen, True)
@@ -101,11 +101,13 @@ class GameDialogEvaluator:
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
         # was already acknowledged.
-        if message_dialog is not None and message_dialog.is_acknowledged():
+        if not self.game_state.is_running or (message_dialog is not None and message_dialog.is_acknowledged()):
             return
 
         # Clear event queue
         GameEvents.clear_events()
+
+        # AudioPlayer().play_sound('prompt')
 
         is_awaiting_acknowledgement = True
         is_waiting_indicator_drawn = False
@@ -131,6 +133,8 @@ class GameDialogEvaluator:
                     self.game_state.handle_quit(force=True)
 
         if self.game_state.is_running:
+            AudioPlayer().play_sound('select')
+
             if message_dialog is not None:
                 message_dialog.acknowledge()
                 if is_waiting_indicator_drawn:
@@ -146,6 +150,8 @@ class GameDialogEvaluator:
                             allowed_input: Optional[str] = None) -> Tuple[str, float]:
         message_dialog.prompt_for_user_text(prompt, allowed_input)
         self.wait_for_message_to_fully_display(message_dialog)
+
+        # AudioPlayer().play_sound('prompt')
 
         is_waiting_for_user_input = True
         start_time = time.time()
@@ -177,9 +183,14 @@ class GameDialogEvaluator:
                     self.game_state.handle_quit(force=True)
         stop_time = time.time()
 
+        if self.game_state.is_running:
+            AudioPlayer().play_sound('select')
+
         return message_dialog.get_user_text(), stop_time - start_time
 
     def get_menu_result(self, menu_dialog: GameDialog, allow_quit: bool = True) -> Optional[str]:
+        # AudioPlayer().play_sound('prompt')
+
         menu_result = None
         while self.game_state.is_running and menu_result is None:
             events = GameEvents.get_events()
@@ -203,6 +214,8 @@ class GameDialogEvaluator:
 
         if menu_result == '':
             menu_result = None
+        else:
+            AudioPlayer().play_sound('select')
 
         return menu_result
 
@@ -821,21 +834,24 @@ class GameDialogEvaluator:
 
                                 # Check for a dodge
                                 if allow_dodge and target.is_dodging_attack():
-                                    AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
+                                    AudioPlayer().play_sound('attack_miss_lvl1')
                                     combat_messages.append(target.get_name() + ' dodges ' + self.actor.get_name()
                                                            + "'s strike.")
                                 else:
                                     # TODO: Play different sound based on damage of attack
                                     if is_critical_hit:
-                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (16).wav')
+                                        if damage > 64:
+                                            AudioPlayer().play_sound('critical_hit_lvl_2')
+                                        else:
+                                            AudioPlayer().play_sound('critical_hit_lvl_1')
                                     elif damage > 32:
-                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (12).wav')
+                                        AudioPlayer().play_sound('hit_lvl_4')
                                     elif damage > 16:
-                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (11).wav')
+                                        AudioPlayer().play_sound('hit_lvl_3')
                                     elif damage > 8:
-                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (6).wav')
+                                        AudioPlayer().play_sound('hit_lvl_2')
                                     else:
-                                        AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (5).wav')
+                                        AudioPlayer().play_sound('hit_lvl_1')
 
                                     damaged_targets.append(target)
 
@@ -847,7 +863,7 @@ class GameDialogEvaluator:
                                                                + str(damage) + '.')
                             else:
                                 # TODO: Play sound?
-                                AudioPlayer().play_sound('Dragon Warrior [Dragon Quest] SFX (9).wav')
+                                AudioPlayer().play_sound('attack_miss_lvl2')
                                 if isinstance(target, HeroState):
                                     combat_messages.append(target.get_name() + ' dodges the strike.')
                                 else:

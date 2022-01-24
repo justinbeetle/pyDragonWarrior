@@ -11,56 +11,79 @@ import random
 from AudioPlayer import AudioPlayer
 from CombatCharacterState import CombatCharacterState
 import GameEvents
-from GameState import GameState
 from GameDialog import GameDialog, GameDialogSpacing
 from GameDialogEvaluator import GameDialogEvaluator
+from GameInfo import GameInfo
 from GameMap import CharacterSprite
+from GameState import GameState
 from GameTypes import Direction, OutgoingTransition, Tool
 from Point import Point
 
 
 class GameLoop:
     def __init__(self,
-                 application_path: str,
+                 saves_path: str,
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
                  tile_size_pixels: int) -> None:
-        self.game_state = GameState(application_path,
+        # Determine effective window size in both tiles and pixels
+        # Initialize the pygame displays
+        if desired_win_size_pixels is None:
+            screen = pygame.display.set_mode(
+                (0, 0),
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
+            self.win_size_pixels = Point(screen.get_size())
+            win_size_tiles = (self.win_size_pixels / tile_size_pixels).floor()
+        else:
+            win_size_tiles = (desired_win_size_pixels / tile_size_pixels).floor()
+            self.win_size_pixels = win_size_tiles * tile_size_pixels
+            pygame.display.set_mode(
+                self.win_size_pixels.getAsIntTuple(),
+                pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
+
+        self.title_image, self.title_music = \
+            GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
+
+        self.title_screen('Loading...')
+
+        self.game_state = GameState(saves_path,
                                     base_path,
                                     game_xml_path,
-                                    desired_win_size_pixels,
+                                    win_size_tiles,
                                     tile_size_pixels)
         self.gde = GameDialogEvaluator(self.game_state.game_info, self.game_state)
         self.gde.update_default_dialog_font_color()
-        GameDialog.static_init(self.game_state.win_size_tiles,
-                               tile_size_pixels,
-                               self.game_state.game_info.font_names)
 
     def run(self, pc_name_or_file_name: Optional[str] = None) -> None:
         self.game_state.is_running = True
         self.title_screen_loop(pc_name_or_file_name)
         self.exploring_loop()
 
-    def title_screen_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
+    def title_screen(self, text: str) -> None:
         # Play title music and display title screen
-        AudioPlayer().play_music(self.game_state.game_info.title_music)
-        title_image_size_px = Point(self.game_state.game_info.title_image.get_size())
-        title_image_size_px *= max(1, int(min(self.game_state.get_win_size_pixels().w * 0.8 / title_image_size_px.w,
-                                              self.game_state.get_win_size_pixels().h * 0.8 / title_image_size_px.h)))
-        title_image = pygame.transform.scale(self.game_state.game_info.title_image, title_image_size_px.getAsIntTuple())
-        title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image_size_px.w) / 2,
-                                    self.game_state.get_win_size_pixels().h / 2 - title_image_size_px.h)
-        self.game_state.screen.fill('black')
-        self.game_state.screen.blit(title_image, title_image_dest_px)
-        title_image = GameDialog.font.render('Press any key',
+        AudioPlayer().play_music(self.title_music)
+
+        title_image_size_px = Point(self.title_image.get_size())
+        title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.8 / title_image_size_px.w,
+                                              self.win_size_pixels.h * 0.8 / title_image_size_px.h)))
+        title_image = pygame.transform.scale(self.title_image, title_image_size_px.getAsIntTuple())
+        title_image_dest_px = Point((self.win_size_pixels.w - title_image_size_px.w) / 2,
+                                    self.win_size_pixels.h / 2 - title_image_size_px.h)
+        screen = pygame.display.get_surface()
+        screen.fill('black')
+        screen.blit(title_image, title_image_dest_px)
+        title_image = GameDialog.font.render(text,
                                              GameDialog.anti_alias,
                                              pygame.Color('white'),
                                              pygame.Color('black'))
-        title_image_dest_px = Point((self.game_state.get_win_size_pixels().w - title_image.get_width()) / 2,
-                                    3 * self.game_state.get_win_size_pixels().h / 4)
-        self.game_state.screen.blit(title_image, title_image_dest_px)
+        title_image_dest_px = Point((self.win_size_pixels.w - title_image.get_width()) / 2,
+                                    3 * self.win_size_pixels.h / 4)
+        screen.blit(title_image, title_image_dest_px)
         pygame.display.flip()
+
+    def title_screen_loop(self, pc_name_or_file_name: Optional[str] = None) -> None:
+        self.title_screen('Press any key')
 
         # Wait for user input - any key press
         while self.game_state.is_running:
@@ -69,6 +92,7 @@ class GameLoop:
                 if event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
                 elif event.type == pygame.KEYDOWN:
+                    AudioPlayer().play_sound('select')
                     waiting_for_user_input = False
                     break
             if waiting_for_user_input:
@@ -79,7 +103,7 @@ class GameLoop:
         # Prompt user for new game or to load a saved game
         if pc_name_or_file_name is None:
             # Get a list of the saved games
-            saved_game_files = glob.glob(os.path.join(self.game_state.game_info.saves_path, '*.xml'))
+            saved_game_files = glob.glob(os.path.join(self.game_state.saves_path, '*.xml'))
             saved_games = []
             for saved_game_file in saved_game_files:
                 saved_games.append(os.path.basename(saved_game_file)[:-4])
@@ -120,7 +144,7 @@ class GameLoop:
                         if self.gde.get_menu_result(message_dialog) == 'YES':
                             saved_games.remove(menu_result)
                             # Delete the save game by archiving it off
-                            saved_game_file = os.path.join(self.game_state.game_info.saves_path,
+                            saved_game_file = os.path.join(self.game_state.saves_path,
                                                            menu_result + '.xml')
                             self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
                 elif menu_result == 'Begin a Quest':
@@ -134,7 +158,7 @@ class GameLoop:
                         menu_result = self.gde.get_menu_result(message_dialog)
                         if menu_result == 'YES':
                             # Delete the existing save game by archiving it off
-                            saved_game_file = os.path.join(self.game_state.game_info.saves_path,
+                            saved_game_file = os.path.join(self.game_state.saves_path,
                                                            pc_name_or_file_name + '.xml')
                             self.game_state.archive_saved_game_file(saved_game_file, 'deleted')
                         elif menu_result != 'NO':
@@ -187,6 +211,7 @@ class GameLoop:
                     elif event.key == pygame.K_RETURN:
                         menu = True
                     elif event.key == pygame.K_F1:
+                        AudioPlayer().play_sound('select')
                         self.game_state.save(quick_save=True)
                     else:
                         move_direction = Direction.get_optional_direction(event.key)
@@ -213,7 +238,7 @@ class GameLoop:
                             self.game_state.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
 
                 if menu:
-
+                    AudioPlayer().play_sound('select')
                     GameDialog.create_exploring_status_dialog(
                         self.game_state.hero_party).blit(self.game_state.screen, False)
                     menu_dialog = GameDialog.create_exploring_menu()
@@ -444,7 +469,7 @@ class GameLoop:
 
             # Check for tile penalty effects
             if dest_tile_type.hp_penalty > 0 and not self.game_state.hero_party.is_ignoring_tile_penalties():
-                audio_player.play_sound('walking.wav')
+                audio_player.play_sound('hit_lvl_1')
                 movement_hp_penalty = dest_tile_type.hp_penalty
 
             # Check for any status effect changes or healing to occur as the party moves
@@ -462,7 +487,7 @@ class GameLoop:
         else:
             self.game_state.hero_party.members[0].dest_pos_dat_tile = \
                 self.game_state.hero_party.members[0].curr_pos_dat_tile
-            audio_player.play_sound('bump.wav')
+            audio_player.play_sound('blocked')
 
         first_frame = True
         while self.game_state.hero_party.members[0].curr_pos_dat_tile != \

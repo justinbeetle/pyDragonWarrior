@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters" savesPath="saves">
-   <Title music="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg" image="title.png"/>
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters">
+   <Title music="title" image="title.png"/>
 
    <Fonts>
       <!-- <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/> -->
@@ -9,6 +9,10 @@
       <Font name="lucidasans"/>
       <Font name="arial"/>
    </Fonts>
+
+   <xi:include href="data/music_dw1.xml" parse="xml"/>
+
+   <xi:include href="data/sounds_dw1.xml" parse="xml"/>
 
    <Tiles imagePath="tiles_ios_hybrid">
       <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
@@ -45,7 +49,6 @@
       <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
       <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
    </Tiles>
-
 
    <Decorations imagePath="decorations_20">
       <xi:include href="data/decorations_legacy.xml" parse="xml"/>
@@ -90,7 +93,7 @@
       <!--<xi:include href="data/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
       <xi:include href="data/map_erdricks_tomb_tiled.xml" parse="xml"/>
 
-      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="A"/>
          <PointTransition decoration="downstairs" name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="B"/>
@@ -101,7 +104,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="dungeon_lvl_2" monsterSet="14" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="14"  y="14"  dir="SOUTH" toMap="mountain_cave_lvl1" toName="C"/>
@@ -118,7 +121,7 @@
             <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
 
-      <Map name="swamp_cave" tiles="swamp_cave.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" lightDiameter="1" isOutside="no">
+      <Map name="swamp_cave" tiles="swamp_cave.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="N" x="2"   y="2"   dir="SOUTH" toMap="overworld" toName="N"/>
          <PointTransition decoration="upstairs"   name="S" x="2"   y="32"  dir="EAST"  toMap="overworld" toName="S"/>
          <MapDecoration type="door"  x="7"  y="22"/>
@@ -132,7 +135,7 @@
             <Dialog>"Will thou take me to the castle?"</Dialog>
             <DialogOptions label="but_thou_must_rescue_me">
                <DialogOption name="Yes">
-                  <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
+                  <DialogAction type="PLAY_MUSIC" name="love"/>
                   <Dialog>Princess Gwaelin embraces thee.</Dialog>
                   <Dialog>"I'm so happy!"</Dialog>
                   <DialogAction type="GAIN_ITEM" name="PM_Rescued_Princess"/>
@@ -145,7 +148,7 @@
                    <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
-      <Map name="northern_shrine" tiles="northern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
+      <Map name="northern_shrine" tiles="northern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="6"   y="11"  dir="NORTH" toMap="overworld"/>
 
          <NonPlayerCharacter type="sage" x="6" y="6" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
@@ -169,7 +172,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="southern_shrine" tiles="southern_shrine.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="no">
+      <Map name="southern_shrine" tiles="southern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="6"   dir="EAST"  toMap="overworld"/>
 
          <NonPlayerCharacter type="sage" x="6" y="7" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
@@ -178,7 +181,7 @@
                <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us."</Dialog>
                <Dialog>"Go now!"</Dialog>
                <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-               <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
+               <DialogAction type="PLAY_SOUND" name="walk_away"/>
                <DialogAction type="GOTO_COORDINATES" map="overworld" location="Southern Shrine" dir="SOUTH"/></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
             <DialogAssert type="HAS_ITEM" name="Erdrick's Token"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
@@ -198,7 +201,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="14" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="dungeon_lvl_1" monsterSet="14" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="8"   y="13"  dir="EAST"  toMap="garinham"/>
          <PointTransition decoration="downstairs"          x="3"   y="20"  dir="WEST"  toMap="garins_grave_lvl2"/>
          <MapDecoration type="door"  x="19" y="19"/>
@@ -211,7 +214,7 @@
          <MapDecoration type="chest" x="15" y="2"><DialogGoTo label="herb_chest"/></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="7" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="dungeon_lvl_2" monsterSet="7" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="13"  y="4"   dir="EAST"  toMap="garins_grave_lvl1"/>
          <PointTransition decoration="downstairs" name="C" x="3"   y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="C"/>
          <PointTransition decoration="downstairs" name="B" x="14"  y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="B"/>
@@ -220,7 +223,7 @@
          <PointTransition decoration="downstairs" name="F" x="14"  y="12"  dir="WEST"  toMap="garins_grave_lvl3" toName="F"/>
       </Map>
 
-      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="15" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="dungeon_lvl_3" monsterSet="15" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="C" x="16"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="C"/>
          <PointTransition decoration="upstairs"   name="B" x="20"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="B"/>
          <PointTransition decoration="upstairs"   name="D" x="8"   y="13"  dir="EAST"  toMap="garins_grave_lvl2" toName="D"/>
@@ -238,12 +241,12 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="15" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="dungeon_lvl_4" monsterSet="15" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="G" x="2"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="G"/>
          <PointTransition decoration="upstairs"   name="H" x="7"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="H"/>
       </Map>
 
-      <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="16" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="dungeon_lvl_1" monsterSet="16" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <LeavingTransition                                x="11"  y="20"  dir="NORTH" toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="11"  y="2"   dir="WEST"  toMap="charlock_lvl2"  toName="A" progressMarker="PM_Found_Secret_Passage"/>
          <PointTransition decoration="downstairs" name="B" x="5"   y="15"  dir="WEST"  toMap="charlock_lvl2"  toName="B"/>
@@ -263,7 +266,7 @@
             <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
       </Map>
 
-      <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="16" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="dungeon_lvl_2" monsterSet="16" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl1"  toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="10"  y="15"  dir="EAST"  toMap="charlock_lvl1"  toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="19"  y="17"  dir="EAST"  toMap="charlock_lvl1"  toName="C"/>
@@ -276,7 +279,7 @@
          <PointTransition decoration="downstairs" name="J" x="10"  y="21"  dir="WEST"  toMap="charlock_lvl3"  toName="J"/>
       </Map>
 
-      <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="dungeon_lvl_3" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="F" x="10"  y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="F"/>
          <PointTransition decoration="upstairs"   name="D" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="D"/>
          <PointTransition decoration="upstairs"   name="G" x="6"   y="6"   dir="EAST"  toMap="charlock_lvl2"  toName="G"/>
@@ -295,7 +298,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="dungeon_lvl_4" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="K" x="9"   y="2"   dir="EAST"  toMap="charlock_lvl3"  toName="K"/>
          <PointTransition decoration="upstairs"   name="L" x="4"   y="4"   dir="EAST"  toMap="charlock_lvl3"  toName="L"/>
          <PointTransition decoration="upstairs"   name="M" x="7"   y="6"   dir="EAST"  toMap="charlock_lvl3"  toName="M"/>
@@ -304,31 +307,31 @@
          <PointTransition decoration="downstairs" name="P" x="9"   y="9"   dir="WEST"  toMap="charlock_lvl5"  toName="P"/>
       </Map>
 
-      <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="11_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_5).ogg" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="dungeon_lvl_5" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="O" x="2"   y="11"  dir="EAST"  toMap="charlock_lvl4"  toName="O"/>
          <PointTransition decoration="upstairs"   name="P" x="9"   y="9"   dir="EAST"  toMap="charlock_lvl4"  toName="P"/>
          <PointTransition decoration="downstairs" name="R" x="10"  y="3"   dir="WEST"  toMap="charlock_lvl6"  toName="R"/>
          <PointTransition decoration="downstairs" name="Q" x="4"   y="4"   dir="WEST"  toMap="charlock_lvl6"  toName="Q"/>
       </Map>
 
-      <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="12_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_6).ogg" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="dungeon_lvl_6" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="R" x="6"   y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="R"/>
          <PointTransition decoration="upstairs"   name="Q" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="Q"/>
          <PointTransition decoration="downstairs" name="T" x="2"   y="2"   dir="WEST"  toMap="charlock_lvl7a" toName="T"/>
          <PointTransition decoration="downstairs" name="S" x="7"   y="7"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="T" x="2"   y="4"   dir="EAST"  toMap="charlock_lvl6"  toName="T"/>
          <PointTransition decoration="downstairs" name="U" x="11"  y="4"   dir="WEST"  toMap="charlock_lvl8"  toName="U"/>
       </Map>
 
-      <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="S" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl6"  toName="S"/>
          <PointTransition decoration="downstairs"          x="11"  y="2"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" monsterSet="18" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="dungeon_lvl_8" monsterSet="18" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"   name="U" x="10"  y="29"  dir="NORTH" toMap="charlock_lvl7a" toName="U"/>
 
          <MapDecoration type="door"  x="17" y="12"/>
@@ -371,7 +374,7 @@
                      <ApproachDialog><Dialog>The Dragonlord draws near!</Dialog></ApproachDialog>
                      <VictoryDialog>
                         <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
-                        <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" encounterMusic="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg">
+                        <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" encounterMusic="final_combat">
                            <ApproachDialog><Dialog>The Dragonlord revealed his true self!</Dialog></ApproachDialog>
                            <VictoryDialog>
                               <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
@@ -380,39 +383,11 @@
                               <Dialog>Thou hast found the Ball of Light.</Dialog>
                               <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
                               <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
-                              <DialogAction type="PLAY_SOUND" name="stairs.wav"/>
+                              <DialogAction type="PLAY_SOUND" name="walk_away"/>
                               <DialogAction type="GOTO_COORDINATES" map="overworld" location="Charlock Castle" dir="SOUTH"/></VictoryDialog>
                            <RunAwayDialog><DialogAction type="SET_LIGHT_DIAMETER" count="unlimited"/></RunAwayDialog>
                         </DialogAction></VictoryDialog>
                   </DialogAction></DialogOption></DialogOptions></NonPlayerCharacter>
-      </Map>
-
-      <Map name="bat_cave_lvl1" tiles="bat_cave_lvl1.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="19" lightDiameter="unlimited" isOutside="no">
-         <PointTransition decoration="upstairs"            x="1"   y="8"   dir="EAST"  toMap="overworld"/>
-         <PointTransition decoration="downstairs"          x="1"   y="1"   dir="SOUTH" toMap="bat_cave_lvl2" toName="A"/>
-         <PointTransition decoration="downstairs"          x="7"   y="6"   dir="SOUTH" toMap="bat_cave_lvl2" toName="B"/>
-         <PointTransition decoration="downstairs"          x="13"  y="13"  dir="SOUTH" toMap="bat_cave_lvl2" toName="C"/>
-
-         <MapDecoration type="chest" x="14" y="6">
-            <DialogAction type="GAIN_ITEM" name="Herb"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
-      </Map>
-
-      <Map name="bat_cave_lvl2" tiles="bat_cave_lvl2.dat" music="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" monsterSet="14" lightDiameter="unlimited" isOutside="no">
-         <PointTransition decoration="upstairs"            x="1"   y="1"   dir="SOUTH" toMap="bat_cave_lvl1" toName="A"/>
-         <PointTransition decoration="upstairs"            x="7"   y="6"   dir="SOUTH" toMap="bat_cave_lvl1" toName="B"/>
-         <PointTransition decoration="upstairs"            x="13"  y="13"  dir="SOUTH" toMap="bat_cave_lvl1" toName="C"/>
-
-         <MapDecoration type="chest" x="3" y="3"><DialogGoTo label="torch_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="4" y="3">
-            <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
-            <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
-         <MapDecoration type="chest" x="2" y="7">
-            <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
-            <DialogGoTo label="gold_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="11" y="10"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
-            <DialogVariable name="[CHEST_GOLD]" value="100-131"/>
-            <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
    </Maps>
 
@@ -553,7 +528,7 @@
             <DialogOption name="Yes">
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogAssert>
                <Dialog>"Have a great night!"</Dialog>
-               <DialogAction type="PLAY_MUSIC" name="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"/>
+               <DialogAction type="PLAY_MUSIC" name="night_at_inn"/>
                <DialogAction type="VISUAL_EFFECT" name="fadeOutToBlack"/>
                <DialogAction type="MAGIC_RESTORE" count="unlimited" bypass="yes"/>
                <DialogAction type="HEALTH_RESTORE" count="unlimited" bypass="yes"/>
@@ -821,6 +796,7 @@
 
    <MonsterActions default="Attack">
       <MonsterAction name="Attack"           target="SINGLE_ENEMY">
+         <DialogAction type="PLAY_SOUND" name="attack"/>
          <Dialog>[ACTOR] attacks!</Dialog> <!--In future, say who the monster is attacking <Dialog>[ACTOR] attacks [TARGET]!</Dialog> -->
          <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
 
@@ -838,12 +814,12 @@
 
       <MonsterAction name="BreathFire"       target="ALL_ENEMIES">
          <Dialog>[ACTOR] is breathing fire.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
+         <DialogAction type="PLAY_SOUND" name="fire_attack"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
 
       <MonsterAction name="BreathStrongFire" target="ALL_ENEMIES">
          <Dialog>[ACTOR] is breathing fire.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="fireBreathingAttack.wav"/>
+         <DialogAction type="PLAY_SOUND" name="fire_attack"/>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
    </MonsterActions>
 
@@ -929,13 +905,13 @@ All part members gain # experience points.  You obtain X pieces of gold.
    <Spells>
       <Spell name="Heal"      mp="4"  availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
          <Dialog>[ACTOR] cast the spell of heal.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="HEALTH_RESTORE" count="10-17" category="MAGICAL"/></Spell>
 
       <Spell name="Hurt"      mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></DialogAssert>
@@ -943,14 +919,14 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
       <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="SLEEP" category="MAGICAL"/></Spell>
 
       <Spell name="Radiant"   mp="3"  availableInCombat="no"  availableOutsideCombat="yes">
          <Dialog>[ACTOR] cast the spell of radiant.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogAssert>
@@ -958,46 +934,46 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
       <Spell name="Stopspell" mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of stopspell.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAction type="STOPSPELL" category="MAGICAL"/></Spell>
 
       <Spell name="Outside"   mp="6"  availableInCombat="no"  availableOutsideCombat="yes" availableOutside="no">
          <Dialog>[ACTOR] cast the spell of outside.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_INSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+         <DialogAction type="PLAY_SOUND" name="teleport"/>
          <DialogAction type="GOTO_LAST_OUTSIDE_COORDINATES"/>
          <Dialog>[NAME] was transported outside.</Dialog></Spell>
 
       <Spell name="Return"    mp="8"  availableInCombat="no"  availableOutsideCombat="yes" availableInside="no">
          <Dialog>[ACTOR] cast the spell of return.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
-         <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+         <DialogAction type="PLAY_SOUND" name="teleport"/>
          <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
          <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Spell>
 
       <Spell name="Repel"     mp="2"  availableInCombat="no"  availableOutsideCombat="yes">
          <Dialog>[ACTOR] cast the spell of repel.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="REPEL_MONSTERS" decay="128"><FadeDialog><Dialog>Repel has lost its effect.</Dialog></FadeDialog></DialogAction></Spell>
 
       <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
          <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="HEALTH_RESTORE" count="85-100"/></Spell>
 
       <Spell name="Hurtmore"  mp="5"  availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
          <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></DialogAssert>
@@ -1005,7 +981,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
       <Spell name="Healall"  mp="20" availableInCombat="yes" availableOutsideCombat="yes" target="ALL_ALLIES">
          <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
-         <DialogAction type="PLAY_SOUND" name="castSpell.wav"/>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAction type="HEALTH_RESTORE" count="unlimited"/></Spell>
    </Spells>
@@ -1076,13 +1052,13 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
             <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key will open a lock.</Dialog></DialogAssert>
-            <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
+            <DialogAction type="PLAY_SOUND" name="unlock"/>
             <DialogAction type="LOSE_ITEM" name="Key"/>
             <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
 
          <Tool name="Key Ring"                             gp="1000" droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
             <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key ring will open a lock.  Unlike a key it is reusable.</Dialog></DialogAssert>
-            <DialogAction type="PLAY_SOUND" name="unlockDoor.wav"/>
+            <DialogAction type="PLAY_SOUND" name="unlock"/>
             <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
 
          <Tool name="Torch"                                gp="8"    droppable="yes" equippable="no"  availableInCombat="no">
@@ -1100,7 +1076,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>[ACTOR] threw the Wings of the Wyvern up into the sky.</Dialog>
             <DialogAssert type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
-            <DialogAction type="PLAY_SOUND" name="teleport.wav"/>
+            <DialogAction type="PLAY_SOUND" name="teleport"/>
             <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
             <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
             <Dialog>[ACTOR] was transported to Tantegel Castle.</Dialog></Tool>
@@ -1109,7 +1085,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog></Tool>
 
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no" target="ALL_ENEMIES">
-            <DialogAction type="PLAY_MUSIC" name="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"/>
+            <DialogAction type="PLAY_MUSIC" name="flute"/>
             <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
             <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happended.</Dialog></DialogAssert>
             <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
@@ -1130,7 +1106,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
             <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
-            <DialogAction type="PLAY_MUSIC" name="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"/>
+            <DialogAction type="PLAY_MUSIC" name="rainbow"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>
             <DialogAction type="GAIN_ITEM" name="PM_Created_Rainbow_Bridge"/>
             <DialogAction type="LOSE_ITEM" name="Rainbow Drop"/>
@@ -1138,7 +1114,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <DialogAction type="GOTO_COORDINATES"/></Tool> <!-- The GOTO_COORDINATES forces a setMap call to add the rainbow bridge to the map -->
 
          <Tool name="Silver Harp"                                    droppable="no"  equippable="no">
-            <DialogAction type="PLAY_MUSIC" name="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"/>
+            <DialogAction type="PLAY_MUSIC" name="harp"/>
             <Dialog>[ACTOR] played a sweet melody on the harp.</Dialog>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAssert type="IS_COMBAT_ALLOWED"><Dialog>But nothing happened.</Dialog></DialogAssert>

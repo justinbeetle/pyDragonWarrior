@@ -543,14 +543,15 @@ class MonsterAction(NamedTuple):
 
 class MonsterActionRule(NamedTuple):
     action: MonsterAction
-    probability: float
-    health_ratio_threshold: float
+    probability: float = 1.0
+    health_ratio_threshold: float = 1.0
 
 
 class MonsterInfo(NamedTuple):
     name: str
     image: pygame.surface.Surface
     dmg_image: pygame.surface.Surface
+    # TODO: Add cast_image
     strength: int
     agility: int
     min_hp: int
@@ -566,6 +567,63 @@ class MonsterInfo(NamedTuple):
     monster_action_rules: List[MonsterActionRule]
     allows_critical_hits: bool
     may_run_away: bool
+
+
+class SurfacePickable(NamedTuple):
+    pixels: str
+    size: Tuple[int, int]
+    format: str
+
+    @staticmethod
+    def from_surface(surface: pygame.surface.Surface, format: str='RGBA') -> SurfacePickable:
+        return SurfacePickable(pygame.image.tostring(surface, format),
+                               surface.get_size(),
+                               format)
+
+    def to_surface(self) -> pygame.surface.Surface:
+        return pygame.image.fromstring(self.pixels, self.size, self.format)
+
+
+class MonsterInfoPicklable(NamedTuple):
+    name: str
+    image: SurfacePickable
+    dmg_image: SurfacePickable
+    # TODO: Add cast_image
+    strength: int
+    agility: int
+    min_hp: int
+    max_hp: int
+    sleep_resist: float
+    stopspell_resist: float
+    hurt_resist: float
+    dodge: float
+    block_factor: float
+    xp: int
+    min_gp: int
+    max_gp: int
+    monster_action_rules: List[MonsterActionRule]
+    allows_critical_hits: bool
+    may_run_away: bool
+
+    def to_monster_info(self) -> MonsterInfo:
+        return MonsterInfo(self.name,
+                           self.image.to_surface().convert_alpha(),
+                           self.dmg_image.to_surface().convert_alpha(),
+                           self.strength,
+                           self.agility,
+                           self.min_hp,
+                           self.max_hp,
+                           self.sleep_resist,
+                           self.stopspell_resist,
+                           self.hurt_resist,
+                           self.dodge,
+                           self.block_factor,
+                           self.xp,
+                           self.min_gp,
+                           self.max_gp,
+                           self.monster_action_rules,
+                           self.allows_critical_hits,
+                           self.may_run_away)
 
 
 class MonsterZone(NamedTuple):
@@ -677,6 +735,7 @@ class MapImageInfo(NamedTuple):
 class EncounterBackground(NamedTuple):
     name: str
     image: pygame.surface.Surface
+    credits: str = 'Uncredited'
 
     def __str__(self) -> str:
         return self.name

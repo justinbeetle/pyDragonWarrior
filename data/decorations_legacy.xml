@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
-   <Decoration name="chest"               image="chest.png"               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithOpen="yes" removeSound="openChest.wav"/>
-   <Decoration name="door"                image="door.png"                widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes"  removeSound="unlockDoor.wav"/>
+   <Decoration name="chest"               image="chest.png"               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithOpen="yes" removeSound="chest"/>
+   <Decoration name="door"                image="door.png"                widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes"  removeSound="unlock"/>
 
    <!-- Bridge decoration needed for Rainbow Bridge -->
    <Decoration name="bridge"              image="bridge.png"              widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from typing import cast, Dict, List, Optional, Union
+from typing import cast, Dict, List, Optional, Tuple, Union
 
+import concurrent.futures
 import os
 import pygame
 import numpy
@@ -9,15 +10,16 @@ import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude
 #import lxml.etree as ET  # May desire to use in future for better xinclude support
 
-from AudioPlayer import AudioPlayer
+from AudioPlayer import AudioPlayer, MusicTrack, SoundTrack
+from GameDialog import GameDialog
 from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterType, Decoration, DialogAction, \
     DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
     DialogVendorSellOptionsParamType, DialogVendorSellOptionsVariable, Direction, EncounterBackground, GameTypes, \
     IncomingTransition, ItemType, Level, Map, MapDecoration, MonsterAction, MonsterActionRule, MonsterInfo, \
-    MonsterZone, NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, TargetTypeEnum, Tile, \
-    Tool, Weapon
+    MonsterInfoPicklable, MonsterZone, NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, \
+    SurfacePickable, TargetTypeEnum, Tile, Tool, Weapon
 
 from Point import Point
 
@@ -26,7 +28,6 @@ class GameInfo:
     TRANSPARENT_COLOR = pygame.Color(0, 0, 0, 0)
 
     def __init__(self,
-                 application_path: str,
                  base_path: str,
                  game_xml_path: str,
                  tile_size_pixels: int,
@@ -48,52 +49,188 @@ class GameInfo:
                 else:
                     break
 
-        # Scale monster images up assuming they are scaled to a Nintendo resolution of 240 vertical pixels
-        monster_scale_factor = win_size_pixels.y / 240
-
         # Parse XML
         xml_root = ET.parse(game_xml_path).getroot()
         xml.etree.ElementInclude.include(xml_root)
-        self.saves_path = os.path.join(application_path, xml_root.attrib['savesPath'])
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
+
+        GameInfo.init_audio_player(xml_root, data_path)
+
+        # Parse the encounter background images
+        self.encounter_backgrounds = GameInfo.parse_encounter_backgrounds(xml_root, image_path)
+
+        # Parse map locations - self.locations is a dictionary of Map name -> Location name -> NamedLocation
+        self.locations = GameInfo.parse_map_locations(xml_root)
+
+        # Parse items
+        # TODO: Combine all of these into an items type?
+        self.items: Dict[str, ItemType] = {}
+        self.weapons, self.default_weapon = self.parse_weapons(xml_root)
+        self.armors = GameInfo.parse_armors(xml_root, self.items)
+        self.shields = GameInfo.parse_shields(xml_root, self.items)
+        self.tools = self.parse_tools(xml_root)
+
+        # Parse tiles
+        # TODO: Combine all of these into an tiles type?
+        self.tiles, self.tile_symbols, self.tile_probabilities = \
+            GameInfo.parse_tiles(xml_root, image_path, self.tile_size_pixels)
+
+        # Parse decorations
+        self.decorations = GameInfo.parse_decoration(xml_root, image_path, self.tile_size_pixels)
+
+        # Parse spells
+        self.spells = self.parse_spells(xml_root)
+
+        # Parse characters
+        self.character_types = GameInfo.parse_character_types(xml_root, image_path, self.spells, self.tile_size_pixels)
+
+        # Parse monsters
+        self.monsters = self.parse_monsters(xml_root, image_path, win_size_pixels.y)
+
+        # Parse monster sets
+        self.monster_sets = GameInfo.parse_monster_sets(xml_root)
+        self.monster_sets: Dict[str, List[str]] = {}
+        for element in xml_root.findall("./MonsterSets/MonsterSet"):
+            monsters: List[str] = []
+            for monster_element in element.findall("./Monster"):
+                monsters.append(monster_element.attrib['name'])
+            self.monster_sets[element.attrib['name']] = monsters
+
+        # Parse maps
+        self.maps = self.parse_maps(xml_root, image_path, os.path.join(data_path, xml_root.attrib['mapsPath']))
+
+        # Parse dialog scripts
+        for element in xml_root.findall("./DialogScripts/DialogScript"):
+            dialog_script = self.parse_dialog(element)
+            if dialog_script is not None:
+                self.dialog_sequences[element.attrib['label']] = dialog_script
+
+        # Parse death state
+        death_state_element = xml_root.find('DeathState')
+        if death_state_element is None:
+            print('ERROR: DeathState element is missing', flush=True)
+            raise Exception('Missing required DeathState element')
+        self.death_map = death_state_element.attrib['map']
+        self.death_hero_pos_dat_tile = self.get_location(self.death_map, death_state_element)
+        self.death_hero_pos_dir = self.get_direction(self.death_map, death_state_element)
+        self.death_dialog = self.parse_dialog(death_state_element)
+
+    @staticmethod
+    def static_init(base_path: str, game_xml_path: str, win_size_tiles: Point, tile_size_pixels: int) \
+            -> Tuple[pygame.surface.Surface, str]:
+        xml_root = ET.parse(game_xml_path).getroot()
+        xml.etree.ElementInclude.include(xml_root)
+
+        data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
+        GameInfo.init_audio_player(xml_root, data_path)
+
+        GameDialog.static_init(win_size_tiles,
+                               tile_size_pixels,
+                               GameInfo.parse_font_info(xml_root))
+
+        image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
+        return GameInfo.parse_title_info(xml_root, image_path)
+
+    @staticmethod
+    def init_audio_player(xml_root: ET.Element, data_path: str):
         music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
         sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
-        tile_path = os.path.join(image_path, xml_root.find('Tiles').attrib['imagePath'])
-        maps_path = os.path.join(data_path, xml_root.attrib['mapsPath'])
-        decoration_path = os.path.join(image_path, xml_root.find('Decorations').attrib['imagePath'])
-        character_path = os.path.join(image_path, xml_root.attrib['characterPath'])
-        monster_path = os.path.join(image_path, xml_root.attrib['monsterPath'])
-        encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
 
-        # Initialize the music player
+        # Initialize the audio player
         audio_player = AudioPlayer()
         audio_player.set_music_path(music_path)
         audio_player.set_sound_path(sound_path)
 
-        # Parse title information
+        if 0 != len(audio_player.get_music_tracks()) or 0 != len(audio_player.get_sound_tracks()):
+            # Don't try to add tracks more than once
+            return
+
+        # Parse music mappings and add to the audio player
+        for element in xml_root.findall("./MusicMappings"):
+            name_to_track_mapping: Dict[str, MusicTrack] = {}
+
+            base_path = ''
+            if 'path' in element.attrib:
+                base_path = element.attrib['path']
+
+            for track_element in element.findall("./Track"):
+                name = track_element.attrib['name']
+                source2: Optional[str] = None
+                if 'source2' in track_element.attrib:
+                    source2 = os.path.join(base_path, track_element.attrib['source2'])
+                start_play1_sec = 0.0
+                if 'startPlay1' in track_element.attrib:
+                    start_play1_sec = float(track_element.attrib['startPlay1'])
+                start_play2_sec = 0.0
+                if 'startPlay2' in track_element.attrib:
+                    start_play2_sec = float(track_element.attrib['startPlay2'])
+                name_to_track_mapping[name] = MusicTrack(name,
+                                                         os.path.join(base_path, track_element.attrib['source']),
+                                                         source2,
+                                                         start_play1_sec,
+                                                         start_play2_sec,
+                                                         track_element.attrib['credits'])
+
+            audio_player.add_music_tracks(name_to_track_mapping)
+
+        # Parse sound mappings and add to the audio player
+        for element in xml_root.findall("./SoundMappings"):
+            name_to_track_mapping: Dict[str, SoundTrack] = {}
+
+            base_path = ''
+            if 'path' in element.attrib:
+                base_path = element.attrib['path']
+
+            for track_element in element.findall("./Track"):
+                name = track_element.attrib['name']
+                name_to_track_mapping[name] = SoundTrack(name,
+                                                         os.path.join(base_path, track_element.attrib['source']),
+                                                         track_element.attrib['credits'])
+
+            audio_player.add_sound_tracks(name_to_track_mapping)
+
+    @staticmethod
+    def parse_title_info(xml_root: ET.Element, image_path: str) -> Tuple[pygame.surface.Surface, str]:
         title_element = xml_root.find('Title')
         if title_element is not None:
-            self.title_music = title_element.attrib['music']
+            title_music = title_element.attrib['music']
             title_image_file_name = os.path.join(image_path, title_element.attrib['image'])
-            self.title_image = pygame.image.load(title_image_file_name).convert()
+            title_image = pygame.image.load(title_image_file_name).convert()
 
-        # Parse font information
-        self.font_names: List[str] = []
+        return title_image, title_music
+
+    @staticmethod
+    def parse_font_info(xml_root: ET.Element) -> List[str]:
+        font_names: List[str] = []
         for element in xml_root.findall("./Fonts//Font"):
-            self.font_names.append(element.attrib['name'])
+            font_names.append(element.attrib['name'])
+        return font_names
 
-        # Parse the encounter background images
-        self.encounter_backgrounds: Dict[str, EncounterBackground] = {}
+    @staticmethod
+    def parse_encounter_backgrounds(xml_root: ET.Element, image_path: str) -> Dict[str, EncounterBackground]:
+        # TODO: Rework how this works
+        #       1) Have a distinct directory per image source and accompanying licence
+        #       2) Add a mappings file, like with music and sounds, and add credits information for each image
+        encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
+        encounter_backgrounds: Dict[str, EncounterBackground] = {}
         for image_filename in os.listdir(encounter_path):
+            if image_filename.endswith('.txt'):
+                continue
+
             # print('image_filename =', image_filename, flush=True)
             encounter_background_name = os.path.splitext(image_filename)[0]
-            encounter_background_image = pygame.image.load(os.path.join(encounter_path, image_filename)).convert()
-            self.encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
-                                                                                        encounter_background_image)
+            try:
+                encounter_background_image = pygame.image.load(os.path.join(encounter_path, image_filename)).convert()
+                encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
+                                                                                       encounter_background_image)
+            except:
+                print('ERROR: Failed to load', encounter_background_name, flush=True)
+        return encounter_backgrounds
 
-        # Parse map locations
-        self.locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
+    @staticmethod
+    def parse_map_locations(xml_root: ET.Element) -> Dict[str, Dict[str, NamedLocation]]:
+        locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
             map_locations: Dict[str, NamedLocation] = {}
@@ -106,13 +243,11 @@ class GameInfo:
                                                              Point(int(location_element.attrib['x']),
                                                                    int(location_element.attrib['y'])),
                                                              direction)
-            self.locations[map_name] = map_locations
+            locations[map_name] = map_locations
+        return locations
 
-        # Parse items
-        self.items: Dict[str, ItemType] = {}
-
-        # Parse weapons
-        self.weapons: Dict[str, Weapon] = {}
+    def parse_weapons(self, xml_root: ET.Element) -> Tuple[Dict[str, Weapon], Weapon]:
+        weapons: Dict[str, Weapon] = {}
         for element in xml_root.findall("./Items/Weapons/Weapon"):
             item_name = element.attrib['name']
             use_dialog = self.parse_dialog(element)
@@ -122,26 +257,29 @@ class GameInfo:
             target_type = TargetTypeEnum.SINGLE_ENEMY
             if 'target' in element.attrib:
                 target_type = TargetTypeEnum[element.attrib['target']]
-            self.weapons[item_name] = Weapon(
+            weapons[item_name] = Weapon(
                 item_name,
                 int(element.attrib['attackBonus']),
                 int(element.attrib['gp']),
                 target_type,
                 use_dialog)
-            self.items[item_name] = self.weapons[item_name]
+            self.items[item_name] = weapons[item_name]
 
         # Get default weapon
         weapons_element = xml_root.find('Weapon')
         if weapons_element is not None and 'default' in weapons_element.attrib:
-            self.default_weapon = self.weapons[weapons_element.attrib['default']]
+            default_weapon = weapons[weapons_element.attrib['default']]
         else:
-            self.default_weapon = next(iter(self.weapons.values()))
+            default_weapon = next(iter(weapons.values()))
         # The default weapon isn't actually an item so remove it from the weapon and item lists
-        del self.weapons[self.default_weapon.name]
-        del self.items[self.default_weapon.name]
-         
-        # Parse armors
-        self.armors: Dict[str, Armor] = {}
+        del weapons[default_weapon.name]
+        del self.items[default_weapon.name]
+
+        return weapons, default_weapon
+
+    @staticmethod
+    def parse_armors(xml_root: ET.Element, items: Dict[str, ItemType]) -> Dict[str, Armor]:
+        armors: Dict[str, Armor] = {}
         for element in xml_root.findall("./Items/Armors/Armor"):
             item_name = element.attrib['name']
 
@@ -149,7 +287,7 @@ class GameInfo:
             if 'hpRegenTiles' in element.attrib and 'none' != element.attrib['hpRegenTiles']:
                 hp_regen_tiles = int(element.attrib['hpRegenTiles'])
 
-            self.armors[item_name] = Armor(
+            armors[item_name] = Armor(
                 item_name,
                 int(element.attrib['defenseBonus']),
                 int(element.attrib['gp']),
@@ -158,20 +296,23 @@ class GameInfo:
                 float(element.attrib['fireDmgModifier']),
                 float(element.attrib['stopspellResistance']),
                 hp_regen_tiles)
-            self.items[item_name] = self.armors[item_name]
-         
-        # Parse shields
-        self.shields: Dict[str, Shield] = {}
+            items[item_name] = armors[item_name]
+        return armors
+
+    @staticmethod
+    def parse_shields(xml_root: ET.Element, items: Dict[str, ItemType]) -> Dict[str, Shield]:
+        shields: Dict[str, Shield] = {}
         for element in xml_root.findall("./Items/Shields/Shield"):
             item_name = element.attrib['name']
-            self.shields[item_name] = Shield(
+            shields[item_name] = Shield(
                 item_name,
                 int(element.attrib['defenseBonus']),
                 int(element.attrib['gp']))
-            self.items[item_name] = self.shields[item_name]
-         
-        # Parse tools
-        self.tools: Dict[str, Tool] = {}
+            items[item_name] = shields[item_name]
+        return shields
+
+    def parse_tools(self, xml_root: ET.Element) -> Dict[str, Tool]:
+        tools: Dict[str, Tool] = {}
         for element in xml_root.findall("./Items/Tools/Tool"):
             item_name = element.attrib['name']
             attack_bonus = 0
@@ -187,7 +328,7 @@ class GameInfo:
             if 'target' in element.attrib:
                 target_type = TargetTypeEnum[element.attrib['target']]
 
-            self.tools[item_name] = Tool(
+            tools[item_name] = Tool(
                 item_name,
                 attack_bonus,
                 defense_bonus,
@@ -196,11 +337,16 @@ class GameInfo:
                 element.attrib['equippable'] == 'yes',
                 self.parse_dialog(element),
                 target_type)
-            self.items[item_name] = self.tools[item_name]
+            self.items[item_name] = tools[item_name]
+        return tools
 
-        # Parse tiles
-        self.tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
-        self.tiles: Dict[str, Tile] = {}
+    @staticmethod
+    def parse_tiles(xml_root: ET.Element, image_path: str, tile_size_pixels: int) -> \
+            Tuple[Dict[str, Tile], Dict[str, str], List[List[float]]]:
+        tile_path = os.path.join(image_path, xml_root.find('Tiles').attrib['imagePath'])
+
+        tiles: Dict[str, Tile] = {}
+        tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
         max_tile_variants = 1
         for element in xml_root.findall("./Tiles/Tile"):
             tile_name = element.attrib['name']
@@ -244,17 +390,17 @@ class GameInfo:
                     image_index_translation = [[9, 8, 12, 13], [1, 0, 4, 5], [3, 2, 6, 7], [11, 10, 14, 15]]
                     for x in range(16):
                         tile_images_scaled.append([])
-                    unscaled_size = tile_image_unscaled.get_height()/4
+                    unscaled_size = tile_image_unscaled.get_height() / 4
                     tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
                     max_tile_variants = max(max_tile_variants, tile_variants)
                     for y in range(4):
                         for x in range(4):
                             for z in range(tile_variants):
-                                temp_surface = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels))
+                                temp_surface = pygame.surface.Surface((tile_size_pixels, tile_size_pixels))
                                 pygame.transform.scale(tile_image_unscaled.subsurface(
-                                    pygame.Rect(x*unscaled_size + z*tile_image_unscaled.get_height(),
-                                                y*unscaled_size, unscaled_size, unscaled_size)),
-                                    (self.tile_size_pixels, self.tile_size_pixels),
+                                    pygame.Rect(x * unscaled_size + z * tile_image_unscaled.get_height(),
+                                                y * unscaled_size, unscaled_size, unscaled_size)),
+                                    (tile_size_pixels, tile_size_pixels),
                                     temp_surface)
                                 tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
                 elif tile_type == 'simple':
@@ -262,37 +408,58 @@ class GameInfo:
                     max_tile_variants = max(max_tile_variants, tile_variants)
                     temp_surface_list: List[pygame.surface.Surface] = []
                     for z in range(tile_variants):
-                        temp_surface_list.append(pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels)))
+                        temp_surface_list.append(pygame.surface.Surface((tile_size_pixels, tile_size_pixels)))
                         pygame.transform.scale(tile_image_unscaled.subsurface(
-                            pygame.Rect(z*tile_image_unscaled.get_height(),
+                            pygame.Rect(z * tile_image_unscaled.get_height(),
                                         0,
                                         tile_image_unscaled.get_height(),
                                         tile_image_unscaled.get_height())),
-                            (self.tile_size_pixels, self.tile_size_pixels),
+                            (tile_size_pixels, tile_size_pixels),
                             temp_surface_list[-1])
                     tile_images_scaled = [temp_surface_list] * 16
 
             if len(tile_symbol) == 1:
-                self.tile_symbols[tile_symbol] = tile_name
-            self.tiles[tile_name] = Tile(tile_name,
-                                         tile_symbol,
-                                         tile_images_scaled,
-                                         tile_walkable,
-                                         can_talk_over,
-                                         hp_penalty,
-                                         mp_penalty,
-                                         speed,
-                                         spawn_rate)
-        self.tile_probabilities: List[List[float]] = [[1.0]]
+                tile_symbols[tile_symbol] = tile_name
+            tiles[tile_name] = Tile(tile_name,
+                                    tile_symbol,
+                                    tile_images_scaled,
+                                    tile_walkable,
+                                    can_talk_over,
+                                    hp_penalty,
+                                    mp_penalty,
+                                    speed,
+                                    spawn_rate)
+
+        tile_probabilities: List[List[float]] = [[1.0]]
         for x in range(2, max_tile_variants + 1):
             w = numpy.arange(x, 0, -1)
             w = w * numpy.transpose(w)
             w = w * numpy.transpose(w)
             p = w / sum(w)
-            self.tile_probabilities.append([float(x) for x in p])
+            tile_probabilities.append([float(x) for x in p])
 
-        # Parse decorations
-        self.decorations: Dict[str, Decoration] = {}
+        return tiles, tile_symbols, tile_probabilities
+
+    @staticmethod
+    def parse_decoration(xml_root: ET.Element, image_path: str, tile_size_pixels: int) -> Dict[str, Decoration]:
+        decoration_path = os.path.join(image_path, xml_root.find('Decorations').attrib['imagePath'])
+
+        def load_decoration_image(image_filename: str) -> pygame.surface.Surface:
+            decoration_image_filename = os.path.join(decoration_path, image_filename)
+            # print('Loading image', decoration_image_filename, flush=True)
+            image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
+            unscaled_size_pixels = Point(image_unscaled.get_size())
+            max_scaled_size_pixels = Point(width_tiles, height_tiles) * tile_size_pixels
+            scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
+            scale_factor = max(scale_factor_point.w, scale_factor_point.h)
+            scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
+            image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
+            pygame.transform.scale(image_unscaled,
+                                   scaled_size_pixels.getAsIntTuple(),
+                                   image_scaled)
+            return image_scaled
+
+        decorations: Dict[str, Decoration] = {}
         for element in xml_root.findall("./Decorations//Decoration"):
             decoration_name = element.attrib['name']
             width_tiles = 1
@@ -316,41 +483,27 @@ class GameInfo:
                 remove_with_key = element.attrib['removeWithKey'] == 'yes'
             if 'removeSound' in element.attrib:
                 remove_sound = element.attrib['removeSound']
-
-            def load_decoration_image(image_filename: str) -> pygame.surface.Surface:
-                decoration_image_filename = os.path.join(decoration_path, image_filename)
-                # print('Loading image', decoration_image_filename, flush=True)
-                decoration_image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
-                unscaled_size_pixels = Point(decoration_image_unscaled.get_size())
-                max_scaled_size_pixels = Point(width_tiles, height_tiles) * self.tile_size_pixels
-                scale_factor_point = (max_scaled_size_pixels / unscaled_size_pixels)
-                scale_factor = max(scale_factor_point.w, scale_factor_point.h)
-                scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
-                decoration_image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
-                pygame.transform.scale(decoration_image_unscaled,
-                                       scaled_size_pixels.getAsIntTuple(),
-                                       decoration_image_scaled)
-                return decoration_image_scaled
             decoration_image_scaled = load_decoration_image(element.attrib['image'])
             decoration_removed_image_scaled: Optional[pygame.surface.Surface] = None
             if 'removed_image' in element.attrib:
                 decoration_removed_image_scaled = load_decoration_image(element.attrib['removed_image'])
 
-            self.decorations[decoration_name] = Decoration(decoration_name,
-                                                           width_tiles,
-                                                           height_tiles,
-                                                           decoration_image_scaled,
-                                                           walkable,
-                                                           remove_with_search,
-                                                           remove_with_open,
-                                                           remove_with_key,
-                                                           remove_sound,
-                                                           decoration_removed_image_scaled)
+            decorations[decoration_name] = Decoration(decoration_name,
+                                                      width_tiles,
+                                                      height_tiles,
+                                                      decoration_image_scaled,
+                                                      walkable,
+                                                      remove_with_search,
+                                                      remove_with_open,
+                                                      remove_with_key,
+                                                      remove_sound,
+                                                      decoration_removed_image_scaled)
+        return decorations
 
-        # Parse spells
-        self.spells: Dict[str, Spell] = {}
+    def parse_spells(self, xml_root: ET.Element) -> Dict[str, Spell]:
+        spells: Dict[str, Spell] = {}
         for element in xml_root.findall("./Spells/Spell"):
-            spell_name = element.attrib['name']
+            name = element.attrib['name']
             available_in_combat = True
             available_outside_combat = True
             available_inside = True
@@ -368,11 +521,11 @@ class GameInfo:
                 target_type = TargetTypeEnum[element.attrib['target']]
             use_dialog = self.parse_dialog(element)
             if use_dialog is None:
-                print('ERROR: No use dialog for spell', spell_name, flush=True)
+                print('ERROR: No use dialog for spell', name, flush=True)
                 continue
 
-            self.spells[spell_name] = Spell(
-                spell_name,
+            spells[name] = Spell(
+                name,
                 int(element.attrib['mp']),
                 available_in_combat,
                 available_outside_combat,
@@ -380,8 +533,10 @@ class GameInfo:
                 available_outside,
                 target_type,
                 use_dialog)
+        return spells
 
-        # Parse levels
+    @staticmethod
+    def parse_levels(xml_root: ET.Element, spells: Dict[str, Spell]) -> Dict[str, List[Level]]:
         levels: Dict[str, List[Level]] = {}
         for element in xml_root.findall("./Levels//CharacterLevels"):
             character_type = element.attrib['type']
@@ -390,8 +545,8 @@ class GameInfo:
                 level_name = level_element.attrib['name']
                 level_number = len(levels[character_type])
                 level_spell = None
-                if 'spell' in level_element.attrib and level_element.attrib['spell'] in self.spells:
-                    level_spell = self.spells[level_element.attrib['spell']]
+                if 'spell' in level_element.attrib and level_element.attrib['spell'] in spells:
+                    level_spell = spells[level_element.attrib['spell']]
                 level = Level(
                     level_number,
                     level_name,
@@ -402,9 +557,14 @@ class GameInfo:
                     int(level_element.attrib['mp']),
                     level_spell)
                 levels[character_type].append(level)
+        return levels
 
-        # Parse characters
-        self.character_types: Dict[str, CharacterType] = {}
+    @staticmethod
+    def parse_character_types(xml_root: ET.Element, image_path: str, spells: Dict[str, Spell], tile_size_pixels: int) \
+            -> Dict[str, CharacterType]:
+        character_path = os.path.join(image_path, xml_root.attrib['characterPath'])
+        levels = GameInfo.parse_levels(xml_root, spells)
+        character_types: Dict[str, CharacterType] = {}
         for element in xml_root.findall("./CharacterTypes//CharacterType"):
             character_type = element.attrib['type']
             character_levels: List[Level] = []
@@ -427,13 +587,13 @@ class GameInfo:
                 for direction in [Direction.SOUTH, Direction.EAST, Direction.NORTH, Direction.WEST]:
                     direction_character_type_images = {}
                     for phase in range(num_phases):
-                        image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
+                        image = pygame.surface.Surface((tile_size_pixels, tile_size_pixels),
                                                        flags=pygame.SRCALPHA)
                         pygame.transform.scale(character_type_image.subsurface(x_px,
                                                                                0,
                                                                                character_type_image.get_height(),
                                                                                character_type_image.get_height()),
-                                               (self.tile_size_pixels, self.tile_size_pixels),
+                                               (tile_size_pixels, tile_size_pixels),
                                                image)
                         direction_character_type_images[phase] = image
                         x_px += character_type_image.get_height() + 1
@@ -441,11 +601,11 @@ class GameInfo:
             else:
                 phase_image_size = Point(character_type_image.get_width() // num_phases,
                                          character_type_image.get_height() // 4)
-                scale_factor = self.tile_size_pixels / max(phase_image_size.w, phase_image_size.h)
+                scale_factor = tile_size_pixels / max(phase_image_size.w, phase_image_size.h)
                 phase_image_scaled_size = Point(int(scale_factor * phase_image_size.w),
                                                 int(scale_factor * phase_image_size.h))
-                dest_image_rect = pygame.Rect((self.tile_size_pixels - phase_image_scaled_size.w) // 2,
-                                              (self.tile_size_pixels - phase_image_scaled_size.h) // 2,
+                dest_image_rect = pygame.Rect((tile_size_pixels - phase_image_scaled_size.w) // 2,
+                                              (tile_size_pixels - phase_image_scaled_size.h) // 2,
                                               phase_image_scaled_size.w,
                                               phase_image_scaled_size.h)
                 for (idx, direction) in enumerate([Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.NORTH]):
@@ -453,7 +613,7 @@ class GameInfo:
                     direction_character_type_images = {}
                     for phase in range(num_phases):
                         x_px = phase * int(phase_image_size.w)
-                        image = pygame.surface.Surface((self.tile_size_pixels, self.tile_size_pixels),
+                        image = pygame.surface.Surface((tile_size_pixels, tile_size_pixels),
                                                        flags=pygame.SRCALPHA)
                         pygame.transform.scale(character_type_image.subsurface(x_px,
                                                                                y_px,
@@ -469,8 +629,10 @@ class GameInfo:
                                      levels=character_levels,
                                      num_phases=num_phases)
 
-            self.character_types[character_type] = new_char
+            character_types[character_type] = new_char
+        return character_types
 
+    def parse_monster_actions(self, xml_root: ET.Element) -> Tuple[Dict[str, MonsterAction], MonsterAction]:
         # Parse monster actions
         monster_actions: Dict[str, MonsterAction] = {}
         for element in xml_root.findall("./MonsterActions/MonsterAction"):
@@ -499,110 +661,150 @@ class GameInfo:
         # Get default monster action
         monster_actions_element = xml_root.find('MonsterActions')
         if monster_actions_element is not None and 'default' in monster_actions_element.attrib:
-            self.default_monster_action = monster_actions[monster_actions_element.attrib['default']]
+            default_monster_action = monster_actions[monster_actions_element.attrib['default']]
         else:
-            self.default_monster_action = next(iter(monster_actions.values()))
+            default_monster_action = next(iter(monster_actions.values()))
 
-        # Parse monsters
-        self.monsters: Dict[str, MonsterInfo] = {}
-        for element in xml_root.findall("./Monsters/Monster"):
-            monster_name = element.attrib['name']
+        return monster_actions, default_monster_action
 
-            monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
-            unscaled_monster_image = pygame.image.load(monster_image_file_name).convert_alpha()
+    def parse_monsters(self, xml_root: ET.Element, image_path: str, window_height: int) -> Dict[str, MonsterInfo]:
+        monster_path = os.path.join(image_path, xml_root.attrib['monsterPath'])
 
+        # Parse monster actions
+        monster_actions, default_monster_action = self.parse_monster_actions(xml_root)
+
+        # Scale monster images up assuming they are scaled to a Nintendo resolution of 240 vertical pixels
+        monster_scale_factor = window_height / 240
+
+        # import time
+        # print('Starting to load monsters...', flush=True)
+        # start_time = time.time()
+        monsters: Dict[str, MonsterInfo] = {}
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = {executor.submit(GameInfo.parse_monster,
+                                       element,
+                                       monster_path,
+                                       monster_scale_factor,
+                                       monster_actions,
+                                       default_monster_action):
+                           element for element in xml_root.findall("./Monsters/Monster")}
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    monster = future.result().to_monster_info()
+                    monsters[monster.name] = monster
+                except Exception as exc:
+                    print(f'{futures[future]} throws {exc}', flush=True)
+        # print(f'Time elapsed loading {len(monsters)} monsters: {time.time()-start_time}', flush=True)
+        return monsters
+
+    @staticmethod
+    def parse_monster(element: ET.Element,
+                      monster_path: str,
+                      monster_scale_factor: float,
+                      monster_actions: Dict[str, MonsterAction],
+                      default_monster_action: MonsterAction) -> MonsterInfoPicklable:
+        monster_name = element.attrib['name']
+
+        monster_image_file_name = os.path.join(monster_path, element.attrib['image'])
+        unscaled_monster_image = pygame.image.load(monster_image_file_name)
+
+        black_border_pixels = 1
+        if 0 == black_border_pixels:
+            monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                   (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                    unscaled_monster_image.get_height() * monster_scale_factor))
+
+            dmg_image = monster_image.copy()
+            for x in range(dmg_image.get_width()):
+                for y in range(dmg_image.get_height()):
+                    if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
+                        dmg_image.set_at((x, y), pygame.Color('red'))
+        else:
+            # First, scale up the monster images.
+            # Then expand them a few pixels and put a thin black border around them to off contrast.
+            # Also generate a version of the image all in as the damanage images used in  combat encounters.
+            scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
+                                                          (
+                                                              unscaled_monster_image.get_width() * monster_scale_factor,
+                                                              unscaled_monster_image.get_height() * monster_scale_factor))
             black_border_pixels = 1
-            if 0 == black_border_pixels:
-                monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                       (unscaled_monster_image.get_width() * monster_scale_factor,
-                                                        unscaled_monster_image.get_height() * monster_scale_factor))
-
-                dmg_image = monster_image.copy()
-                for x in range(dmg_image.get_width()):
-                    for y in range(dmg_image.get_height()):
-                        if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
+            expanded_monster_image = pygame.Surface((scaled_monster_image.get_width() + 2 * black_border_pixels,
+                                                     scaled_monster_image.get_height() + 2 * black_border_pixels),
+                                                    pygame.SRCALPHA)
+            expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
+            dmg_image = expanded_monster_image.copy()
+            monster_image = expanded_monster_image.copy()
+            for x in range(expanded_monster_image.get_width()):
+                xm = max(0, x - black_border_pixels)
+                xp = min(expanded_monster_image.get_width() - 1, x + black_border_pixels)
+                for y in range(expanded_monster_image.get_height()):
+                    ym = max(0, y - black_border_pixels)
+                    yp = min(expanded_monster_image.get_height() - 1, y + black_border_pixels)
+                    if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
+                        if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
+                                or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
+                            monster_image.set_at((x, y), pygame.Color('black'))
                             dmg_image.set_at((x, y), pygame.Color('red'))
-            else:
-                # First, scale up the monster images.
-                # Then expand them a few pixels and put a thin black border around them to off contrast.
-                # Also generate a version of the image all in as the damanage images used in  combat encounters.
-                scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                              (unscaled_monster_image.get_width() * monster_scale_factor,
-                                                               unscaled_monster_image.get_height() * monster_scale_factor))
-                black_border_pixels = 1
-                expanded_monster_image = pygame.Surface((scaled_monster_image.get_width()+2*black_border_pixels,
-                                                         scaled_monster_image.get_height()+2*black_border_pixels),
-                                                        pygame.SRCALPHA)
-                expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
-                dmg_image = expanded_monster_image.copy()
-                monster_image = expanded_monster_image.copy()
-                for x in range(expanded_monster_image.get_width()):
-                    xm = max(0, x - black_border_pixels)
-                    xp = min(expanded_monster_image.get_width()-1, x + black_border_pixels)
-                    for y in range(expanded_monster_image.get_height()):
-                        ym = max(0, y - black_border_pixels)
-                        yp = min(expanded_monster_image.get_height()-1, y + black_border_pixels)
-                        if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
-                            if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
-                                    or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
-                                    or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
-                                    or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
-                                monster_image.set_at((x, y), pygame.Color('black'))
-                                dmg_image.set_at((x, y), pygame.Color('red'))
-                        else:
-                            dmg_image.set_at((x, y), pygame.Color('red'))
+                    else:
+                        dmg_image.set_at((x, y), pygame.Color('red'))
 
-            (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
-            (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
+        (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
+        (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
 
-            monster_action_rules = []
-            for monster_action_rules_element in element.findall("./MonsterActionRule"):
-                health_ratio_threshold = 1.0
-                if 'healthRatioThreshold' in monster_action_rules_element.attrib:
-                    health_ratio_threshold = float(monster_action_rules_element.attrib['healthRatioThreshold'])
-                monster_action_rules.append(MonsterActionRule(
-                    monster_actions[monster_action_rules_element.attrib['type']],
-                    float(monster_action_rules_element.attrib['probability']),
-                    health_ratio_threshold))
+        monster_action_rules = []
+        for monster_action_rules_element in element.findall("./MonsterActionRule"):
+            health_ratio_threshold = 1.0
+            if 'healthRatioThreshold' in monster_action_rules_element.attrib:
+                health_ratio_threshold = float(monster_action_rules_element.attrib['healthRatioThreshold'])
+            monster_action_rules.append(MonsterActionRule(
+                monster_actions[monster_action_rules_element.attrib['type']],
+                float(monster_action_rules_element.attrib['probability']),
+                health_ratio_threshold))
+        if 0 == len(monster_action_rules):
+            monster_action_rules.append(MonsterActionRule(default_monster_action))
 
-            allows_critical_hits = True
-            if 'allowsCriticalHits' in element.attrib:
-                allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
+        allows_critical_hits = True
+        if 'allowsCriticalHits' in element.attrib:
+            allows_critical_hits = element.attrib['allowsCriticalHits'] == 'yes'
 
-            may_run_away = True
-            if 'mayRunAway' in element.attrib:
-                may_run_away = element.attrib['mayRunAway'] == 'yes'
+        may_run_away = True
+        if 'mayRunAway' in element.attrib:
+            may_run_away = element.attrib['mayRunAway'] == 'yes'
 
-            self.monsters[monster_name] = MonsterInfo(
-                monster_name,
-                monster_image,
-                dmg_image,
-                int(element.attrib['strength']),
-                int(element.attrib['agility']),
-                min_hp,
-                max_hp,
-                GameTypes.parse_float(element.attrib['sleepResist']),
-                GameTypes.parse_float(element.attrib['stopspellResist']),
-                GameTypes.parse_float(element.attrib['hurtResist']),
-                GameTypes.parse_float(element.attrib['dodge']),
-                GameTypes.parse_float(element.attrib['blockFactor']),
-                int(element.attrib['xp']),
-                min_gp,
-                max_gp,
-                monster_action_rules,
-                allows_critical_hits,
-                may_run_away)
+        return MonsterInfoPicklable(
+            monster_name,
+            SurfacePickable.from_surface(monster_image),
+            SurfacePickable.from_surface(dmg_image),
+            int(element.attrib['strength']),
+            int(element.attrib['agility']),
+            min_hp,
+            max_hp,
+            GameTypes.parse_float(element.attrib['sleepResist']),
+            GameTypes.parse_float(element.attrib['stopspellResist']),
+            GameTypes.parse_float(element.attrib['hurtResist']),
+            GameTypes.parse_float(element.attrib['dodge']),
+            GameTypes.parse_float(element.attrib['blockFactor']),
+            int(element.attrib['xp']),
+            min_gp,
+            max_gp,
+            monster_action_rules,
+            allows_critical_hits,
+            may_run_away)
 
-        # Parse monster sets
-        self.monster_sets: Dict[str, List[str]] = {}
+    @staticmethod
+    def parse_monster_sets(xml_root: ET.Element) -> Dict[str, List[str]]:
+        monster_sets: Dict[str, List[str]] = {}
         for element in xml_root.findall("./MonsterSets/MonsterSet"):
             monsters: List[str] = []
             for monster_element in element.findall("./Monster"):
                 monsters.append(monster_element.attrib['name'])
-            self.monster_sets[element.attrib['name']] = monsters
+            monster_sets[element.attrib['name']] = monsters
+        return monster_sets
 
-        # Parse maps
-        self.maps: Dict[str, Map] = {}
+    def parse_maps(self, xml_root: ET.Element, image_path: str, maps_path: str) -> Dict[str, Map]:
+        maps: Dict[str, Map] = {}
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
             # print( 'mapName =', map_name, flush=True )
@@ -692,7 +894,7 @@ class GameInfo:
                     right_x = int(trans_element.attrib['rightX'])
                     top_y = int(trans_element.attrib['topY'])
                     bottom_y = int(trans_element.attrib['bottomY'])
-                    bounding_box = pygame.Rect(left_x, top_y, right_x-left_x, bottom_y-top_y)
+                    bounding_box = pygame.Rect(left_x, top_y, right_x - left_x, bottom_y - top_y)
                 transition = OutgoingTransition(self.get_location(map_name, trans_element),
                                                 self.get_direction(map_name, trans_element),
                                                 name,
@@ -788,7 +990,7 @@ class GameInfo:
                     run_away_dialog,
                     progress_marker,
                     inverse_progress_marker))
-         
+
             # Load map dat file
             # print('Load map dat file', flush=True)
             map_dat_file_name = os.path.join(maps_path, element.attrib['tiles'])
@@ -846,15 +1048,13 @@ class GameInfo:
             # print('Load the encounter image', flush=True)
             encounter_image = None
             if len(monster_zones) and 'encounterBackground' in element.attrib:
+                encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
                 encounter_image_file_name = os.path.join(encounter_path, element.attrib['encounterBackground'])
-                unscaled_encounter_image = pygame.image.load(encounter_image_file_name).convert()
-                encounter_image = pygame.transform.scale(unscaled_encounter_image,
-                                                         (unscaled_encounter_image.get_width() * monster_scale_factor,
-                                                          unscaled_encounter_image.get_height() * monster_scale_factor))
+                encounter_image = pygame.image.load(encounter_image_file_name).convert()
 
             # Save the map information
             # print('Save the map information', flush=True)
-            self.maps[map_name] = Map(map_name,
+            maps[map_name] = Map(map_name,
                                       map_tiled_file_name,
                                       map_dat,
                                       map_overlay_dat,
@@ -873,22 +1073,7 @@ class GameInfo:
                                       special_monsters,
                                       is_outside,
                                       origin)
-
-        # Parse dialog scripts
-        for element in xml_root.findall("./DialogScripts/DialogScript"):
-            dialog_script = self.parse_dialog(element)
-            if dialog_script is not None:
-                self.dialog_sequences[element.attrib['label']] = dialog_script
-
-        # Parse death state
-        death_state_element = xml_root.find('DeathState')
-        if death_state_element is None:
-            print('ERROR: DeathState element is missing', flush=True)
-            raise Exception('Missing required DeathState element')
-        self.death_map = death_state_element.attrib['map']
-        self.death_hero_pos_dat_tile = self.get_location(self.death_map, death_state_element)
-        self.death_hero_pos_dir = self.get_direction(self.death_map, death_state_element)
-        self.death_dialog = self.parse_dialog(death_state_element)
+        return maps
 
     def get_location(self, map_name: Optional[str], element: ET.Element) -> Point:
         if map_name and 'location' in element.attrib:

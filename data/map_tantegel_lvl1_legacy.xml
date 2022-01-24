@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="tantegel_lvl1" tiles="tantegel_lvl1.dat" music="castle" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition                                x="11"  y="30"  dir="NORTH" toMap="overworld"/>
    <PointTransition decoration="upstairs"            x="8"   y="8"   dir="EAST"  toMap="tantegel_lvl2"/>
    <PointTransition decoration="downstairs"          x="30"  y="30"  dir="SOUTH" toMap="tantegel_lvl0"/>
@@ -146,6 +146,7 @@
 
    <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
       <Dialog>"[NAME]'s coming was foretold by legend.  May the light shine upon this brave warrior."</Dialog>
+      <DialogAction type="PLAY_SOUND" name="cast_spell"/>
       <DialogAction type="VISUAL_EFFECT" name="flickering"/>
       <DialogAction type="MAGIC_RESTORE" count="unlimited"/></NonPlayerCharacter>
 

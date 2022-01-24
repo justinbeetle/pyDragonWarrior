@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="brecconary" tiles="brecconary.dat" overlayTiles="brecconary_overlay.dat" music="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="brecconary" tiles="brecconary.dat" overlayTiles="brecconary_overlay.dat" music="town" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition                                x="1"   y="15"  dir="EAST"  toMap="overworld"/>
    <MapDecoration type="door" x="22" y="7"/>
    <MapDecoration type="door" x="6"  y="24"/>

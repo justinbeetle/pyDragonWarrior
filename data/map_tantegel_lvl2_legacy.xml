@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="tantegel_lvl2" tiles="tantegel_lvl2.dat" music="throne" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <PointTransition decoration="downstairs"          x="9"   y="9"   dir="WEST"  toMap="tantegel_lvl1"/>
 
    <NonPlayerCharacter type="king" x="4" y="4" dir="SOUTH" walking="no" progressMarker="PM_Not_Finished_Preparing">

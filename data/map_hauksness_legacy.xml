@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="hauksness" tiles="hauksness.dat" music="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" monsterSet="13" encounterBackground="desert_city_ruins.jfif" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="hauksness" tiles="hauksness.dat" music="dungeon_lvl_1" monsterSet="13" encounterBackground="desert_city_ruins.jfif" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition                                x="1"   y="11"  dir="EAST"  toMap="overworld"/>
 
    <Monster name="Axe Knight" x="19" y="13">

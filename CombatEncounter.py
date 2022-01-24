@@ -74,9 +74,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def encounter_loop(self) -> None:
         # Start encounter music
-        AudioPlayer().play_music(self.encounter_music, self.encounter_music, music_file_start2=3.0)
-        # AudioPlayer().playMusic('14_Dragon_Quest_1_-_A_Monster_Draws_Near.mp3',
-        #                         '24_Dragon_Quest_1_-_Monster_Battle.mp3')
+        AudioPlayer().play_music(self.encounter_music, self.encounter_music)
 
         # Clear event queue
         GameEvents.clear_events()
@@ -273,7 +271,7 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Check if the monster is going to run away.  Only random monsters should ever run away.
         if monster.should_run_away(self.hero_party.main_character):
-            # TODO: Play sound?
+            AudioPlayer().play_sound('run_away')
             monster.has_run_away = True
             self.add_message(monster.get_name() + ' is running away.')
             self.render_monsters()
@@ -284,7 +282,6 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Determine the monster action
         # TODO: Could move this into the MonsterState class
-        chosen_monster_action = self.game_info.default_monster_action
         for monster_action_rule in monster.monster_info.monster_action_rules:
             monster_health_ratio = monster.hp / monster.max_hp
             if monster_health_ratio > monster_action_rule.health_ratio_threshold:
@@ -364,7 +361,7 @@ class CombatEncounter(CombatEncounterInterface):
                     # TODO: Play sound?
                     self.add_message(hero.get_name() + ' started to run away but was blocked in front.')
                 else:
-                    AudioPlayer().play_sound('runAway.wav')
+                    AudioPlayer().play_sound('run_away')
                     self.add_message(hero.get_name() + ' started to run away.')
                     hero.has_run_away = True
                 return
@@ -469,7 +466,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def handle_victory(self) -> None:
         if 0 < self.monster_party.get_defeated_count():
-            AudioPlayer().play_sound('17_-_Dragon_Warrior_-_NES_-_Enemy_Defeated.ogg')
+            AudioPlayer().play_sound('combat_won')
             gp = self.monster_party.get_gp()
             xp = self.monster_party.get_xp()
             # TODO: Update text for multiple monster encounters
@@ -485,7 +482,7 @@ class CombatEncounter(CombatEncounterInterface):
                     old_spells = hero.get_available_spells()
                     if hero.level_up_check():
                         self.wait_for_acknowledgement()
-                        AudioPlayer().play_sound('18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg')
+                        AudioPlayer().play_sound('level_up')
                         GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
                         # TODO: Update text for multiple hero encounters
                         self.add_message(
@@ -504,8 +501,8 @@ class CombatEncounter(CombatEncounterInterface):
                         if mp_increase > 0:
                             self.add_message('Thy maximum magic points increase by ' +
                                                             str(mp_increase) + '.')
-                        print('old_spells =', len(old_spells), flush=True)
-                        print('new_spells =', len(hero.get_available_spells()), flush=True)
+                        # print('old_spells =', len(old_spells), flush=True)
+                        # print('new_spells =', len(hero.get_available_spells()), flush=True)
                         if len(hero.get_available_spells()) > len(old_spells):
                             self.add_message('Thou hast learned a new spell.')
 
@@ -642,7 +639,7 @@ def main() -> None:
     from GameInfo import GameInfo
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
-    game_info = GameInfo('', base_path, game_xml_path, tile_size_pixels, win_size_pixels)
+    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
     GameDialog.static_init(win_size_tiles, tile_size_pixels, game_info.font_names)
 
     # Find an encounter image to use
@@ -688,7 +685,7 @@ def main() -> None:
         combat_parties.append((hero_party, monster_party))
 
     # Run a series of combat encounters
-    CombatEncounter.static_init('06_-_Dragon_Warrior_-_NES_-_Fight.ogg')
+    CombatEncounter.static_init('combat')
     for (hero_party, monster_party) in combat_parties:
         if not mock_game_state.is_running:
             break

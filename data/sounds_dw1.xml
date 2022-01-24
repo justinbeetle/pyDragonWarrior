@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SoundMappings path="dw1">
+   <!-- <Track name="name of mapping" source="source file" credits="Credit information for credits"/> -->
+
+   <Track name="talking"            source="Dragon Warrior [Dragon Quest] SFX (1).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="select"             source="Dragon Warrior [Dragon Quest] SFX (2).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="hit_lvl_1"          source="Dragon Warrior [Dragon Quest] SFX (3).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="blocked"            source="Dragon Warrior [Dragon Quest] SFX (4).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="hit_lvl_2"          source="Dragon Warrior [Dragon Quest] SFX (5).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="hit_lvl_3"          source="Dragon Warrior [Dragon Quest] SFX (6).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="attack"             source="Dragon Warrior [Dragon Quest] SFX (7).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name=""                   source="Dragon Warrior [Dragon Quest] SFX (8).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="attack_miss_lvl1"   source="Dragon Warrior [Dragon Quest] SFX (9).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="attack_miss_lvl2"   source="Dragon Warrior [Dragon Quest] SFX (10).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="critical_hit_lvl_1" source="Dragon Warrior [Dragon Quest] SFX (11).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="hit_lvl_4"          source="Dragon Warrior [Dragon Quest] SFX (12).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="chest"              source="Dragon Warrior [Dragon Quest] SFX (13).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="prompt"             source="Dragon Warrior [Dragon Quest] SFX (14).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="unlock"             source="Dragon Warrior [Dragon Quest] SFX (15).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="critical_hit_lvl_2" source="Dragon Warrior [Dragon Quest] SFX (16).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="run_away"           source="Dragon Warrior [Dragon Quest] SFX (17).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="cast_spell"         source="Dragon Warrior [Dragon Quest] SFX (18).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="walk_away"          source="Dragon Warrior [Dragon Quest] SFX (19).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="fire_attack"        source="Dragon Warrior [Dragon Quest] SFX (20).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="teleport"           source="Dragon Warrior [Dragon Quest] SFX (21).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="combat_won"         source="Dragon Warrior [Dragon Quest] SFX (22).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+   <Track name="level_up"           source="Dragon Warrior [Dragon Quest] SFX (23).wav" credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>
+</SoundMappings>
+

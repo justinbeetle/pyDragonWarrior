@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MusicMappings path="dw1">
+   <!-- <Track name="name of mapping" source="source file 1" credits="Credit information for credits" source2="source file 2 (optional)" startPlay1="time offset for first playthrough" startPlay2="time offset for second playthrough"/> -->
+
+   <Track name="title"         source="01_-_Dragon_Warrior_-_NES_-_Overture_March.ogg"    credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="throne"        source="02_-_Dragon_Warrior_-_NES_-_Chateau_Ladutorm.ogg"  credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="castle"        source="03_-_Dragon_Warrior_-_NES_-_Tantegel_Castle.ogg"   credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="overworld"     source="04_-_Dragon_Warrior_-_NES_-_Unknown_World.ogg"     credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="town"          source="05_-_Dragon_Warrior_-_NES_-_Townspeople.ogg"       credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="combat"        source="06_-_Dragon_Warrior_-_NES_-_Fight.ogg"             credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori" source2="06_-_Dragon_Warrior_-_NES_-_Fight.ogg" startPlay2="3.0"/>
+   <Track name="dungeon_lvl_1" source="07_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_1).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_2" source="08_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_2).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_3" source="09_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_3).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_4" source="10_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_4).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_5" source="11_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_5).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_6" source="12_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_6).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_7" source="13_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_7).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="dungeon_lvl_8" source="14_-_Dragon_Warrior_-_NES_-_Dungeon_(Level_8).ogg" credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="final_combat"  source="15_-_Dragon_Warrior_-_NES_-_King_Dragon.ogg"       credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="final_victory" source="16_-_Dragon_Warrior_-_NES_-_Finale.ogg"            credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="combat_won"    source="17_-_Dragon_Warrior_-_NES_-_Enemy_Defeated.ogg"    credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="level_up"      source="18_-_Dragon_Warrior_-_NES_-_Level_Up.ogg"          credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="night_at_inn"  source="19_-_Dragon_Warrior_-_NES_-_Inn.ogg"               credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="player_died"   source="20_-_Dragon_Warrior_-_NES_-_Dead.ogg"              credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="flute"         source="21_-_Dragon_Warrior_-_NES_-_Fairies'_Flute.ogg"    credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="harp"          source="22_-_Dragon_Warrior_-_NES_-_Silver_Harp.ogg"       credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="love"          source="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"   credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="rainbow"       source="24_-_Dragon_Warrior_-_NES_-_Rainbow_Bridge.ogg"    credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+   <Track name="curse"         source="25_-_Dragon_Warrior_-_NES_-_Cursed.ogg"            credits="Composed by Koichi Sugiyama and arranged by Takenori Yamamori"/>
+</MusicMappings>

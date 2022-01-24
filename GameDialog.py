@@ -445,21 +445,21 @@ class GameDialog:
         if pc.shield is not None:
             shield_name = pc.shield.name
         row_data: List[List[Optional[str]]] = [
-            ['Level:', pc.level.name],
-            ['Max Hit Points:', str(pc.level.hp)],
-            ['Hit Points:', str(pc.hp)],
-            ['Max Magic Points:', str(pc.level.mp)],
-            ['Magic Points:', str(pc.mp)],
-            ['Experience Points:', str(pc.xp)],
-            ['Gold Pieces:', str(party.gp)],
-            ['Strength:', str(pc.level.strength)],
-            ['Agility:', str(pc.level.agility)],
-            ['Attack Strength:', str(pc.get_attack_strength())],
-            ['Defense Strength:', str(pc.get_defense_strength())],
-            ['Weapon:', weapon_name],
-            ['Helm:', helm_name],
-            ['Armor:', armor_name],
-            ['Shield:', shield_name]]
+            ['Level', pc.level.name],
+            ['Max Hit Points', str(pc.level.hp)],
+            ['Hit Points', str(pc.hp)],
+            ['Max Magic Points', str(pc.level.mp)],
+            ['Magic Points', str(pc.mp)],
+            ['Experience Points', str(pc.xp)],
+            ['Gold Pieces', str(party.gp)],
+            ['Strength', str(pc.level.strength)],
+            ['Agility', str(pc.level.agility)],
+            ['Attack Strength', str(pc.get_attack_strength())],
+            ['Defense Strength', str(pc.get_defense_strength())],
+            ['Weapon', weapon_name],
+            ['Helm', helm_name],
+            ['Armor', armor_name],
+            ['Shield', shield_name]]
         return GameDialog.create_status_dialog(
             Point(1, 1),
             GameDialog.get_size_for_content('Experience Points 1000000000', len(row_data), title),

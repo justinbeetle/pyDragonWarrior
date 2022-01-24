@@ -447,7 +447,7 @@ class MapViewer:
         import os
         base_path = os.path.split(os.path.abspath(__file__))[0]
         game_xml_path = os.path.join(base_path, 'game.xml')
-        self.game_info = GameInfo('', base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
+        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
 
         self.is_running = True
 

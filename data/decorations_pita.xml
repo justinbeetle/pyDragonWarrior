@@ -2,28 +2,28 @@
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
    <Decoration name="unlocked_chest"               image="../../licensed_assets/itch.io/pita/decorations/chest.png"
                                            removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
-               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="openChest.wav"/>
+               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="chest"/>
    <Decoration name="locked_chest"                 image="../../licensed_assets/itch.io/pita/decorations/chest.png"
                                            removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
-               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="openChest.wav"/>
+               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="chest"/>
 
    <Decoration name="locked_wood_door"             image="../../licensed_assets/itch.io/pita/decorations/door_wood.png"
-               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlock"/>
    <Decoration name="locked_sideways_wood_door"    image="../../licensed_assets/itch.io/pita/decorations/door_wood_sideways.png"
-               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlock"/>
    <Decoration name="unlocked_wood_door"           image="../../licensed_assets/itch.io/pita/decorations/door_wood.png"
-               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlock"/>
    <Decoration name="unlocked_sideways_wood_door"  image="../../licensed_assets/itch.io/pita/decorations/door_wood_sideways.png"
-               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlock"/>
 
    <Decoration name="locked_metal_door"            image="../../licensed_assets/itch.io/pita/decorations/door_metal.png"
-               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlock"/>
    <Decoration name="locked_sideways_metal_door"   image="../../licensed_assets/itch.io/pita/decorations/door_metal_sideways.png"
-               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="yes" removeWithOpen="no"  removeSound="unlock"/>
    <Decoration name="unlocked_metal_door"          image="../../licensed_assets/itch.io/pita/decorations/door_metal.png"
-               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlock"/>
    <Decoration name="unlocked_sideways_metal_door" image="../../licensed_assets/itch.io/pita/decorations/door_metal_sideways.png"
-               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlockDoor.wav"/>
+               widthTiles="1" heightTiles="2" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlock"/>
 
    <!-- Bridge decoration needed for Rainbow Bridge -->
    <Decoration name="bridge_left_top"              image="../../licensed_assets/itch.io/pita/decorations/bridge_left_top.png"
