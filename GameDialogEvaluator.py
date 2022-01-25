@@ -92,6 +92,7 @@ class GameDialogEvaluator:
 
     def wait_for_message_to_fully_display(self, message_dialog: GameDialog) -> None:
         message_dialog.blit(self.game_state.screen, True)
+        clock = pygame.time.Clock()
         while self.game_state.is_running and message_dialog.has_more_content():
             should_wait_for_acknowledgement, is_new_content_part_of_quotation = message_dialog.advance_content()
             if is_new_content_part_of_quotation:
@@ -99,7 +100,7 @@ class GameDialogEvaluator:
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
             message_dialog.blit(self.game_state.screen, True)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
 
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
@@ -114,11 +115,12 @@ class GameDialogEvaluator:
 
         is_awaiting_acknowledgement = True
         is_waiting_indicator_drawn = False
+        clock = pygame.time.Clock()
         while self.game_state.is_running and is_awaiting_acknowledgement:
             # Process events
             events = GameEvents.get_events()
             if 0 == len(events):
-                pygame.time.Clock().tick(8)
+                clock.tick(8)
                 if message_dialog is not None:
                     if is_waiting_indicator_drawn:
                         message_dialog.erase_waiting_indicator()
@@ -198,7 +200,7 @@ class GameDialogEvaluator:
         while self.game_state.is_running and menu_result is None:
             events = GameEvents.get_events()
             if 0 == len(events):
-                pygame.time.Clock().tick(30)
+                pygame.time.wait(25)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -679,7 +681,7 @@ class GameDialogEvaluator:
                             # Process events
                             events = GameEvents.get_events()
                             if 0 == len(events):
-                                pygame.time.Clock().tick(8)
+                                pygame.time.wait(25)
                             for event in events:
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:
@@ -880,9 +882,6 @@ class GameDialogEvaluator:
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
-
-                    # Slight pause between turns
-                    # pygame.time.wait(250)  # TODO: Remove this???
 
                 elif item.type == DialogActionEnum.WAIT:
                     if isinstance(item.count, int):

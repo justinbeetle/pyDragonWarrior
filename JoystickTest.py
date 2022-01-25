@@ -36,7 +36,7 @@ def main():
                 print('event.value =', event.value, flush=True)
             elif event.type == pygame.QUIT:
                 is_running = False
-        pygame.time.Clock().tick(30)
+        pygame.time.wait(25)
 
     # Terminate pygame
     pygame.joystick.quit()

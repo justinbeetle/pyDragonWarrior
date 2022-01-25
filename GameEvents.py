@@ -174,7 +174,7 @@ def main() -> None:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 is_running = False
 
-        pygame.time.Clock().tick(5)
+        pygame.time.wait(200)
 
     # Exit the game
     pygame.joystick.quit()

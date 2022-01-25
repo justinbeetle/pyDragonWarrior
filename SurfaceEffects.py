@@ -43,23 +43,25 @@ def fade_in_from_color(screen: pygame.surface.Surface, fade_color: pygame.Color)
 def fade_out(screen: pygame.surface.Surface,
              background_surface: pygame.surface.Surface,
              fade_surface: pygame.surface.Surface) -> None:
+    clock = pygame.time.Clock()
     for i in range(15, 256, 16):
         fade_surface.set_alpha(i)
         screen.blit(background_surface, (0, 0))
         screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
 
 
 '''def fade_in(screen: pygame.surface.Surface,
             background_surface: pygame.surface.Surface,
             fade_surface: pygame.surface.Surface) -> None:
+    clock = pygame.time.Clock()
     for i in range(240, -1, -16):
         fade_surface.set_alpha(i)
         screen.blit(background_surface, (0, 0))
         screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
 '''
 
 
@@ -69,14 +71,15 @@ def flickering(screen: pygame.surface.Surface) -> None:
     flicker_surface.fill('white')
     flicker_surface.set_alpha(128)
 
+    clock = pygame.time.Clock()
     for flicker_times in range(10):
         screen.blit(flicker_surface, (0, 0))
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
 
         screen.blit(background_surface, (0, 0))
         pygame.display.flip()
-        pygame.time.Clock().tick(30)
+        clock.tick(30)
 
 
 def pink_tinge(screen: pygame.surface.Surface,
@@ -123,6 +126,7 @@ rainbow_colors = [pygame.Color('red'),
                   #pygame.Color('blueviolet'),  # pygame.Color('indigo'),
                   pygame.Color('violet')]
 
+
 def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
     game_info = game_state.get_game_info()
 
@@ -139,6 +143,7 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
     background_surface = game_state.screen.copy()
 
     # Cycle through the rainbow colors
+    clock = pygame.time.Clock()
     for i in range(2):
         for rainbow_color in rainbow_colors:
             fade_surface = pygame.surface.Surface(game_state.screen.get_size())
@@ -155,7 +160,7 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
                     message_dialog.blit(game_state.screen, True)
 
                 # Advance a tick
-                pygame.time.Clock().tick(20)
+                clock.tick(15)
 
             for j in range(63, 196, 64):
                 fade_step(j)
@@ -170,6 +175,7 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
     water_color = pygame.transform.average_color(water_tile, water_tile.get_rect())
 
     # Cycle through the rainbow colors
+    clock = pygame.time.Clock()
     for i in range(4):
         for rainbow_color in rainbow_colors:
             try:
@@ -180,7 +186,7 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
                                            set_color=rainbow_color,
                                            inverse_set=True)
                 pygame.display.flip()
-                pygame.time.Clock().tick(15)
+                clock.tick(5)
             except:
                 print('Color not found: ', rainbow_color, flush=True)
 

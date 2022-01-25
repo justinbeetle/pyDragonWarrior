@@ -65,8 +65,9 @@ class AudioPlayer:
                 if not os.path.exists(path):
                     print(f'ERROR: Failed to add music track {name} because {path} does not exist', flush=True)
                     continue
-                if name_to_track_mapping[name].file_path2 is not None:
-                    path = os.path.join(self.music_path, name_to_track_mapping[name].file_path2)
+                file_path2 = name_to_track_mapping[name].file_path2
+                if file_path2 is not None:
+                    path = os.path.join(self.music_path, file_path2)
                     if not os.path.exists(path):
                         print(f'ERROR: Failed to add music track {name} because {path} does not exist', flush=True)
                         continue
@@ -195,8 +196,6 @@ class AudioPlayer:
             sound = self.sounds[sound_file_path]
             if sound is not None:
                 channel = sound.play()
-                while self.running and channel.get_busy():
-                    pygame.time.wait(10)
 
         def stop_music(self) -> None:
             self.music_rel_file_path1 = self.music_rel_file_path2 = None
@@ -218,7 +217,7 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.add_music_tracks(name_to_track_mapping)
 
-    def get_music_tracks(self) -> Dict[str, SoundTrack]:
+    def get_music_tracks(self) -> Dict[str, MusicTrack]:
         if self.instance is not None:
             return self.instance.name_to_music_track_mapping
         return {}

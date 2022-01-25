@@ -179,12 +179,12 @@ class GameDialog:
 
             if text == GameDialog.BACKSPACE_UNICODE:
                 # Draw the outer shape
-                pointlist = (
+                pointlist = [
                     (0, half_height),
                     (quarter_width, quarter_height),
                     (full_width, quarter_height),
                     (full_width, three_quarters_height),
-                    (width // 4, three_quarters_height))
+                    (width // 4, three_quarters_height)]
                 pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
                 pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
 
@@ -192,10 +192,10 @@ class GameDialog:
                 x_start = quarter_width + inner_border
                 x_mid = quarter_width + (full_width - quarter_width) // 2
                 x_end = x_start + (x_mid - x_start) * 2
-                x_coords = (x_start, x_start + inner_width,
+                x_coords = [x_start, x_start + inner_width,
                             x_mid - half_inner_width, x_mid, x_mid + half_inner_width,
-                            x_end - inner_width, x_end)
-                pointlist = (
+                            x_end - inner_width, x_end]
+                pointlist = [
                     (x_coords[0], y_coords[0]),
                     (x_coords[1], y_coords[0]),
                     (x_coords[3], y_coords[1]),
@@ -207,25 +207,25 @@ class GameDialog:
                     (x_coords[3], y_coords[3]),
                     (x_coords[1], y_coords[4]),
                     (x_coords[0], y_coords[4]),
-                    (x_coords[2], y_coords[2]))
+                    (x_coords[2], y_coords[2])]
                 pygame.draw.aalines(font_surface, 'black', True, pointlist)
                 pygame.draw.polygon(font_surface, 'black', pointlist)
                 return font_surface
             elif text == GameDialog.ENTER_UNICODE:
                 # Draw the outer shape
-                pointlist = (
+                pointlist = [
                     (0, quarter_height),
                     (full_width, quarter_height),
                     (full_width, three_quarters_height),
-                    (0, three_quarters_height))
+                    (0, three_quarters_height)]
                 pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
                 pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
 
                 # Draw the inner shape
                 x_start = inner_border
                 x_end = full_width - inner_border
-                x_coords = (x_start, width // 2, x_end - inner_width, x_end)
-                pointlist = (
+                x_coords = [x_start, width // 2, x_end - inner_width, x_end]
+                pointlist = [
                     (x_coords[0], y_coords[2]),
                     (x_coords[1], y_coords[0]),
                     (x_coords[1], y_coords[1]),
@@ -234,7 +234,7 @@ class GameDialog:
                     (x_coords[3], y_coords[0]),
                     (x_coords[3], y_coords[3]),
                     (x_coords[1], y_coords[3]),
-                    (x_coords[1], y_coords[4]))
+                    (x_coords[1], y_coords[4])]
                 pygame.draw.aalines(font_surface, 'black', True, pointlist)
                 pygame.draw.polygon(font_surface, 'black', pointlist)
                 return font_surface
@@ -944,16 +944,16 @@ class GameDialog:
         return self.acknowledged
 
     @staticmethod
-    def get_number_characters():
+    def get_number_characters() -> str:
         return '7894561230'
 
     @staticmethod
-    def get_text_characters():
+    def get_text_characters() -> str:
         import string
         return string.ascii_uppercase + string.ascii_lowercase + '. '
 
     @staticmethod
-    def get_all_characters():
+    def get_all_characters() -> str:
         return '1234567890' + GameDialog.get_text_characters()
 
     def prompt_for_user_text(self, prompt: str = '', input_allowed_characters: Optional[str] = None) -> None:
@@ -969,7 +969,7 @@ class GameDialog:
             menu_spacing = GameDialogSpacing.EQUAL_COLUMNS
             if input_allowed_characters is not None:
                 if sorted(input_allowed_characters) == sorted(GameDialog.get_number_characters()):
-                    menu_characters = GameDialog.get_number_characters
+                    menu_characters = GameDialog.get_number_characters()
                     menu_cols = 3
                     menu_spacing = GameDialogSpacing.SPACERS
                 elif sorted(input_allowed_characters) == sorted(GameDialog.get_text_characters()):

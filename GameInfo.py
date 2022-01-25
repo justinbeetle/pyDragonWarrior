@@ -86,16 +86,10 @@ class GameInfo:
         self.character_types = GameInfo.parse_character_types(xml_root, image_path, self.spells, self.tile_size_pixels)
 
         # Parse monsters
-        self.monsters = self.parse_monsters(xml_root, image_path, win_size_pixels.y)
+        self.monsters = self.parse_monsters(xml_root, image_path, int(win_size_pixels.y))
 
         # Parse monster sets
         self.monster_sets = GameInfo.parse_monster_sets(xml_root)
-        self.monster_sets: Dict[str, List[str]] = {}
-        for element in xml_root.findall("./MonsterSets/MonsterSet"):
-            monsters: List[str] = []
-            for monster_element in element.findall("./Monster"):
-                monsters.append(monster_element.attrib['name'])
-            self.monster_sets[element.attrib['name']] = monsters
 
         # Parse maps
         self.maps = self.parse_maps(xml_root, image_path, os.path.join(data_path, xml_root.attrib['mapsPath']))
@@ -133,7 +127,7 @@ class GameInfo:
         return GameInfo.parse_title_info(xml_root, image_path)
 
     @staticmethod
-    def init_audio_player(xml_root: ET.Element, data_path: str):
+    def init_audio_player(xml_root: ET.Element, data_path: str) -> None:
         music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
         sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
 
@@ -148,7 +142,7 @@ class GameInfo:
 
         # Parse music mappings and add to the audio player
         for element in xml_root.findall("./MusicMappings"):
-            name_to_track_mapping: Dict[str, MusicTrack] = {}
+            name_to_music_track_mapping: Dict[str, MusicTrack] = {}
 
             base_path = ''
             if 'path' in element.attrib:
@@ -165,18 +159,19 @@ class GameInfo:
                 start_play2_sec = 0.0
                 if 'startPlay2' in track_element.attrib:
                     start_play2_sec = float(track_element.attrib['startPlay2'])
-                name_to_track_mapping[name] = MusicTrack(name,
-                                                         os.path.join(base_path, track_element.attrib['source']),
-                                                         source2,
-                                                         start_play1_sec,
-                                                         start_play2_sec,
-                                                         track_element.attrib['credits'])
 
-            audio_player.add_music_tracks(name_to_track_mapping)
+                name_to_music_track_mapping[name] = MusicTrack(name,
+                                                               os.path.join(base_path, track_element.attrib['source']),
+                                                               source2,
+                                                               start_play1_sec,
+                                                               start_play2_sec,
+                                                               track_element.attrib['credits'])
+
+            audio_player.add_music_tracks(name_to_music_track_mapping)
 
         # Parse sound mappings and add to the audio player
         for element in xml_root.findall("./SoundMappings"):
-            name_to_track_mapping: Dict[str, SoundTrack] = {}
+            name_to_sound_track_mapping: Dict[str, SoundTrack] = {}
 
             base_path = ''
             if 'path' in element.attrib:
@@ -184,11 +179,11 @@ class GameInfo:
 
             for track_element in element.findall("./Track"):
                 name = track_element.attrib['name']
-                name_to_track_mapping[name] = SoundTrack(name,
-                                                         os.path.join(base_path, track_element.attrib['source']),
-                                                         track_element.attrib['credits'])
+                name_to_sound_track_mapping[name] = SoundTrack(name,
+                                                               os.path.join(base_path, track_element.attrib['source']),
+                                                               track_element.attrib['credits'])
 
-            audio_player.add_sound_tracks(name_to_track_mapping)
+            audio_player.add_sound_tracks(name_to_sound_track_mapping)
 
     @staticmethod
     def parse_title_info(xml_root: ET.Element, image_path: str) -> Tuple[pygame.surface.Surface, str]:
@@ -343,10 +338,19 @@ class GameInfo:
     @staticmethod
     def parse_tiles(xml_root: ET.Element, image_path: str, tile_size_pixels: int) -> \
             Tuple[Dict[str, Tile], Dict[str, str], List[List[float]]]:
-        tile_path = os.path.join(image_path, xml_root.find('Tiles').attrib['imagePath'])
-
         tiles: Dict[str, Tile] = {}
         tile_symbols: Dict[str, str] = {}  # tile symbol to tile name map
+        tile_probabilities: List[List[float]] = [[1.0]]
+
+        element = xml_root.find('Tiles')
+        if element is None:
+            print('ERROR: Failed to parse any tiles', flush=True)
+            return tiles, tile_symbols, tile_probabilities
+        if 'imagePath' in element.attrib:
+            tile_path = os.path.join(image_path, element.attrib['imagePath'])
+        else:
+            tile_path = image_path
+
         max_tile_variants = 1
         for element in xml_root.findall("./Tiles/Tile"):
             tile_name = element.attrib['name']
@@ -361,7 +365,7 @@ class GameInfo:
             tile_type = 'simple'
             if 'symbol' in element.attrib:
                 tile_symbol = element.attrib['symbol']
-            if 'image' in element.attrib:
+            if 'image' in element.attrib and tile_path is not None:
                 tile_image_file_name = os.path.join(tile_path, element.attrib['image'])
             else:
                 tile_type = 'tiled'
@@ -430,7 +434,6 @@ class GameInfo:
                                     speed,
                                     spawn_rate)
 
-        tile_probabilities: List[List[float]] = [[1.0]]
         for x in range(2, max_tile_variants + 1):
             w = numpy.arange(x, 0, -1)
             w = w * numpy.transpose(w)
@@ -442,7 +445,16 @@ class GameInfo:
 
     @staticmethod
     def parse_decoration(xml_root: ET.Element, image_path: str, tile_size_pixels: int) -> Dict[str, Decoration]:
-        decoration_path = os.path.join(image_path, xml_root.find('Decorations').attrib['imagePath'])
+        decorations: Dict[str, Decoration] = {}
+
+        element = xml_root.find('Decorations')
+        if element is None:
+            print('ERROR: Failed to parse any decorations', flush=True)
+            return decorations
+        if 'imagePath' in element.attrib:
+            decoration_path = os.path.join(image_path, element.attrib['imagePath'])
+        else:
+            decoration_path = image_path
 
         def load_decoration_image(image_filename: str) -> pygame.surface.Surface:
             decoration_image_filename = os.path.join(decoration_path, image_filename)
@@ -459,7 +471,6 @@ class GameInfo:
                                    image_scaled)
             return image_scaled
 
-        decorations: Dict[str, Decoration] = {}
         for element in xml_root.findall("./Decorations//Decoration"):
             decoration_name = element.attrib['name']
             width_tiles = 1
@@ -639,6 +650,7 @@ class GameInfo:
             action_name = element.attrib['name']
             spell = None
             target_type = TargetTypeEnum.SINGLE_ENEMY
+            use_dialog: Optional[DialogType] = None
             if 'spell' in element.attrib and element.attrib['spell'] in self.spells:
                 spell = self.spells[element.attrib['spell']]
                 target_type = spell.target_type

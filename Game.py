@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+from multiprocessing import freeze_support
 import os
 import pathlib
 import subprocess
@@ -18,10 +19,12 @@ def get_saves_path(application_path: str, application_name: str) -> str:
             saves_base_path = os.environ['APPDATA']
         else:
             # Default to a base path in the user's home directory
-            saves_base_path = pathlib.Path.home()
+            saves_base_path = str(pathlib.Path.home())
 
         # Default to using the home directory
         saves_path = os.path.join(saves_base_path, f'.{application_name}', 'saves')
+
+        print('Running with a save path of', saves_path, flush=True)
 
     if (os.path.exists(saves_path) and not os.access(saves_path, os.W_OK)) or not os.access(saves_base_path, os.W_OK):
         print('ERROR: Failed to identify a save path to which the current user has write access', flush=True)
@@ -101,6 +104,7 @@ def main() -> None:
 
 
 if __name__ == '__main__':
+    freeze_support()  # This allows pyinstaller Windows executables to support the use of concurrent.futures
     try:
         main()
     except Exception as e:

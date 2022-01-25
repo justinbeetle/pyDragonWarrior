@@ -53,6 +53,9 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self.image_pad_tiles = image_pad_tiles
         self.reload_animations()
         self.overlay_layer_offset = 0
+        self._base_tile_layers = self.calc_base_tile_layers()
+        self._overlay_tile_layers = self.calc_overlay_tile_layers()
+        self._all_tile_layers = self._base_tile_layers + self._overlay_tile_layers
         self.layers_to_render = self.all_tile_layers
         self.object_group_to_bound_rendering: Optional[int] = None
 
@@ -180,10 +183,16 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def all_tile_layers(self) -> List[int]:
-        return self.base_tile_layers + self.overlay_tile_layers
+        return self._all_tile_layers
+
+    def calc_all_tile_layers(self) -> List[int]:
+        return self.calc_base_tile_layers() + self.calc_overlay_tile_layers()
 
     @property
     def base_tile_layers(self) -> List[int]:
+        return self._base_tile_layers
+
+    def calc_base_tile_layers(self) -> List[int]:
         tile_layers = []
         for idx, l in enumerate(self.tmx.layers):
             # Skip non-tile layers
@@ -205,6 +214,9 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def overlay_tile_layers(self) -> List[int]:
+        return self._overlay_tile_layers
+
+    def calc_overlay_tile_layers(self) -> List[int]:
         tile_layers = []
         for idx, l in enumerate(self.tmx.layers):
             # Skip non-tile layers
@@ -285,7 +297,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def get_tile_properties(self, x: int, y: int, l: int) -> Optional[Dict[str, str]]:
         if l not in self.base_tile_layers:
-            l = l - self.overlay_layer_offset
+            l -= self.overlay_layer_offset
         if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
             return None
         x = min(max(0, x), self.tmx.width-1)
@@ -301,14 +313,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         if l not in self.visible_tile_layers and limit_to_visible:
             return None
         if l not in self.base_tile_layers:
-            l = l - self.overlay_layer_offset
+            l -= self.overlay_layer_offset
         if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
             return None
         if image_indexing:
             # With image_indexing, coord (0,0) is where the pad starts.
             # Without image_indexing, coord (0,0) is where the Tiled map starts.
-            x = min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)
-            y = min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)
+            x = min(max(0, x-self.image_pad_tiles.x), self.tmx.width-1)
+            y = min(max(0, y-self.image_pad_tiles.y), self.tmx.height-1)
         if self.object_group_to_bound_rendering is not None:
             render_tile = False
             for obj in self.tmx.layers[self.object_group_to_bound_rendering]:
@@ -353,7 +365,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         for l in self.visible_tile_layers:
             if l not in self.base_tile_layers:
-                l = l - self.overlay_layer_offset
+                l -= self.overlay_layer_offset
 
             if not isinstance(layers[l], pytmx.pytmx.TiledTileLayer):
                 continue

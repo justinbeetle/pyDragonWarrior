@@ -30,10 +30,10 @@
       <Dialog>Fortune smiles upon thee!  Thou hast found Erdrick's Token.</Dialog></MapDecoration>
 
    <MapLocation x="72" y="55" name="Rainbow Bridge Formation Point"/>
-   <MapDecoration type="bridge_left_top" x="68" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
-   <MapDecoration type="bridge_right_top" x="69" y="52" progressMarker="PM_Created_Rainbow_Bridge"/>
-   <MapDecoration type="bridge_left" x="68" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
-   <MapDecoration type="bridge_right" x="69" y="53" progressMarker="PM_Created_Rainbow_Bridge"/>
+   <MapDecoration type="bridge_left_top" x="70" y="54" progressMarker="PM_Created_Rainbow_Bridge"/>
+   <MapDecoration type="bridge_right_top" x="71" y="54" progressMarker="PM_Created_Rainbow_Bridge"/>
+   <MapDecoration type="bridge_left" x="70" y="55" progressMarker="PM_Created_Rainbow_Bridge"/>
+   <MapDecoration type="bridge_right" x="71" y="55" progressMarker="PM_Created_Rainbow_Bridge"/>
 
    <Monster name="Golem" x="81" y="106" inverseProgressMarker="PM_Defeated_Golem">
       <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>

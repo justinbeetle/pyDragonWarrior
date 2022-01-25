@@ -49,6 +49,9 @@ class GameState(GameStateInterface):
         self.pending_dialog: Optional[DialogType] = None
         self.load()
 
+        self.clock = pygame.time.Clock()
+        self.tick_count = 0
+
         # TODO: Migrate these to here
         # self.message_dialog: Optional[GameDialog] = None
         self.combat_encounter: Optional[CombatEncounter] = None
@@ -560,7 +563,7 @@ class GameState(GameStateInterface):
         self.draw_map(True)
 
         # Slight pause on a map transition
-        pygame.time.Clock().tick(4)
+        pygame.time.wait(250)
 
         return True
 
@@ -623,7 +626,10 @@ class GameState(GameStateInterface):
             pygame.display.flip()
 
         if advance_time:
-            pygame.time.Clock().tick(40)
+            self.clock.tick(30)
+            # self.tick_count += 1
+            # if 10 == self.tick_count % 100:
+            #     print(f'FPS = {self.clock.get_fps()}', flush=True)
 
     def get_game_info(self) -> GameInfo:
         return self.game_info

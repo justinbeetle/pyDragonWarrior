@@ -87,8 +87,8 @@ class CombatEncounter(CombatEncounterInterface):
         else:
             self.add_message(self.monster_party.get_default_approach_dialog())
 
-        # Pause for a second, then clear the event queue and wait for user acknowledgement
-        pygame.time.Clock().tick(2)
+        # Pause for a bit, then clear the event queue and wait for user acknowledgement
+        pygame.time.wait(500)
         GameEvents.clear_events()
 
         # Check if monsters run away at the start of the encounter
@@ -198,14 +198,15 @@ class CombatEncounter(CombatEncounterInterface):
             self.render_damage_to_hero_party()
 
     def render_damage_to_monster_party(self, targets: List[CombatCharacterState]) -> None:
+        clock = pygame.time.Clock()
         for flickerTimes in range(10):
             self.render_monsters(targets, targets)
             pygame.display.flip()
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
 
             self.render_monsters([], targets)
             pygame.display.flip()
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
 
         # Final render to drop any of the targets which were killed
         self.render_monsters()
@@ -213,6 +214,7 @@ class CombatEncounter(CombatEncounterInterface):
     def render_damage_to_hero_party(self) -> None:
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
         # TODO: Flicker red on a death blow
+        clock = pygame.time.Clock()
         for flickerTimes in range(10):
             offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
             self.game_state.screen.blit(self.background_image, (0, 0))
@@ -220,12 +222,12 @@ class CombatEncounter(CombatEncounterInterface):
             status_dialog.blit(self.game_state.screen, False, offset_pixels)
             self.message_dialog.blit(self.game_state.screen, True, offset_pixels)
 
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
             self.game_state.screen.blit(self.background_image, (0, 0))
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen, False)
             self.message_dialog.blit(self.game_state.screen, True)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
 
     def get_monsters_still_in_combat(self) -> List[MonsterState]:
         return self.monster_party.get_still_in_combat_members()
@@ -651,8 +653,8 @@ def main() -> None:
     from GameInfo import GameInfo
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
+    GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
-    GameDialog.static_init(win_size_tiles, tile_size_pixels, game_info.font_names)
 
     # Find an encounter image to use
     for map in game_info.maps:

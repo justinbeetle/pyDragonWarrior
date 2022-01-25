@@ -96,7 +96,7 @@ class GameLoop:
                     waiting_for_user_input = False
                     break
             if waiting_for_user_input:
-                pygame.time.Clock().tick(40)
+                pygame.time.wait(25)
             else:
                 break
 
@@ -228,7 +228,7 @@ class GameLoop:
                 if move_direction:
                     if changed_direction or self.game_state.hero_party.members[0].curr_pos_dat_tile != \
                                             self.game_state.hero_party.members[0].dest_pos_dat_tile:
-                        print('Ignoring move as another move is already in progress', flush=True)
+                        # print('Ignoring move as another move is already in progress', flush=True)
                         continue
                     if move_direction != self.game_state.hero_party.members[0].direction:
                         self.game_state.hero_party.members[0].direction = move_direction

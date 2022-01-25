@@ -126,6 +126,9 @@ python -m mypy Game.py --strict --ignore-missing-imports
 cd dist
 tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
+pip install snakeviz --user
+python -m cProfile -o <name>.profile ./Game.py <args>
+/c/users/justin/appdata/roaming/python/Python39/Scripts/snakeviz.exe <name>.profile
 
 cd C:\Users\Justin\Desktop\Adventure\Adventure
 C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts\pyinstaller Game.py
