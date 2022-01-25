@@ -50,10 +50,13 @@ class GameDialogEvaluator:
     # When the target is singular, it may be called out in the dialog associated with the action
     def set_targets(self, targets: List[CombatCharacterState]) -> None:
         self.targets = targets
+        self.replacement_variables.generic['[TARGET]'] = ''
         if 1 == len(targets):
-            self.replacement_variables.generic['[TARGET]'] = targets[0].get_name()
-        elif '[TARGET]' in self.replacement_variables.generic:
-            del self.replacement_variables.generic['[TARGET]']
+            if targets[0] in self.game_state.get_hero_party().combat_members:
+                if 1 != len(self.game_state.get_hero_party().combat_members):
+                    self.replacement_variables.generic['[TARGET]'] = targets[0].get_name()
+            elif self.combat_encounter is not None and 1 != len(self.combat_encounter.get_monsters_still_in_combat()):
+                self.replacement_variables.generic['[TARGET]'] = targets[0].get_name()
 
     def restore_default_actor_and_targets(self) -> None:
         self.set_actor(self.hero_party.main_character)
@@ -183,8 +186,8 @@ class GameDialogEvaluator:
                     self.game_state.handle_quit(force=True)
         stop_time = time.time()
 
-        if self.game_state.is_running:
-            AudioPlayer().play_sound('select')
+        # if self.game_state.is_running:
+        #    AudioPlayer().play_sound('select')
 
         return message_dialog.get_user_text(), stop_time - start_time
 
@@ -778,7 +781,6 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.DAMAGE_TARGET:
                     worked = False
                     damaged_targets = []
-                    combat_messages = []
 
                     if item.problem is not None:
                         # Prompt user for problem and get their answer
@@ -796,9 +798,8 @@ class GameDialogEvaluator:
                                 if user_answer == item.problem.answer:
                                     # TODO: Make 5 second time threshold configurable
                                     is_critical_hit = seconds_waiting < 5.0
-                                    combat_messages.append("That's right!")
                                 else:
-                                    combat_messages.append('Wrong!  The correct answer is ' + str(item.problem.answer))
+                                    add_message('Wrong!  The correct answer is ' + str(item.problem.answer))
 
                             if item.count != 'default':
                                 if is_critical_hit is None:
@@ -815,36 +816,39 @@ class GameDialogEvaluator:
                                                                                          is_critical_hit)
                                 # print('Using self.actor.get_attack_damage(...) damage', flush=True)
 
-                            # Ensure their is damage if the user was correct and no damage if the user was wrong
+                            if is_critical_hit:
+                                if damage > 64:
+                                    AudioPlayer().play_sound('critical_hit_lvl_2')
+                                else:
+                                    AudioPlayer().play_sound('critical_hit_lvl_1')
+
+                            # Ensure there is damage if the user was correct and no damage if the user was wrong
                             if item.problem is not None:
                                 if user_answer == item.problem.answer:
                                     damage = max(1, damage)
                                     allow_dodge = False
+                                    if is_critical_hit:
+
+                                        if target.allows_critical_hits():
+                                            add_message("That's right! Excellent move!")
+                                        else:
+                                            add_message("That's right! Excellent move!!!")
+                                    else:
+                                        add_message("That's right!")
                                 else:
                                     damage = 0
                             else:
                                 allow_dodge = ActionCategoryTypeEnum.PHYSICAL == item.category
+                                if is_critical_hit:
+                                    add_message('Excellent move!')
 
                             if 0 < damage:
-                                if is_critical_hit:
-                                    if target.allows_critical_hits():
-                                        combat_messages.append('Excellent move!')
-                                    else:
-                                        combat_messages.append('Great move!')
-
                                 # Check for a dodge
                                 if allow_dodge and target.is_dodging_attack():
                                     AudioPlayer().play_sound('attack_miss_lvl1')
-                                    combat_messages.append(target.get_name() + ' dodges ' + self.actor.get_name()
-                                                           + "'s strike.")
+                                    add_message(target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
                                 else:
-                                    # TODO: Play different sound based on damage of attack
-                                    if is_critical_hit:
-                                        if damage > 64:
-                                            AudioPlayer().play_sound('critical_hit_lvl_2')
-                                        else:
-                                            AudioPlayer().play_sound('critical_hit_lvl_1')
-                                    elif damage > 32:
+                                    if damage > 32:
                                         AudioPlayer().play_sound('hit_lvl_4')
                                     elif damage > 16:
                                         AudioPlayer().play_sound('hit_lvl_3')
@@ -857,30 +861,28 @@ class GameDialogEvaluator:
 
                                     target.hp = max(0, target.hp - damage)
                                     if target == self.hero_party.main_character:
-                                        combat_messages.append('Thy hit points reduced by ' + str(damage) + '.')
+                                        add_message('Thy hit points reduced by ' + str(damage) + '.')
                                     else:
-                                        combat_messages.append(target.get_name() + "'s hit points reduced by "
+                                        add_message(target.get_name() + "'s hit points reduced by "
                                                                + str(damage) + '.')
                             else:
                                 # TODO: Play sound?
                                 AudioPlayer().play_sound('attack_miss_lvl2')
                                 if isinstance(target, HeroState):
-                                    combat_messages.append(target.get_name() + ' dodges the strike.')
+                                    add_message(target.get_name() + ' dodges the strike.')
                                 else:
-                                    combat_messages.append('A miss! No damage hath been scored!')
+                                    add_message('A miss! No damage hath been scored!')
                     if not worked:
                         if ActionCategoryTypeEnum.MAGICAL == item.category:
-                            combat_messages.append('But that spell did not work.')
+                            add_message('But that spell did not work.')
                         else:
-                            combat_messages.append('But it did nothing.')
+                            add_message('But it did nothing.')
                     elif 0 < len(damaged_targets) and self.combat_encounter is not None:
                         self.update_status_dialog(False, message_dialog)
                         self.combat_encounter.render_damage_to_targets(damaged_targets)
 
-                    add_message(combat_messages)
-
                     # Slight pause between turns
-                    pygame.time.wait(250)
+                    # pygame.time.wait(250)  # TODO: Remove this???
 
                 elif item.type == DialogActionEnum.WAIT:
                     if isinstance(item.count, int):

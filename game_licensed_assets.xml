@@ -797,7 +797,7 @@
    <MonsterActions default="Attack">
       <MonsterAction name="Attack"           target="SINGLE_ENEMY">
          <DialogAction type="PLAY_SOUND" name="attack"/>
-         <Dialog>[ACTOR] attacks!</Dialog> <!--In future, say who the monster is attacking <Dialog>[ACTOR] attacks [TARGET]!</Dialog> -->
+         <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
          <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
 
       <MonsterAction name="Heal"             spell="Heal"/>
@@ -813,13 +813,13 @@
       <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
 
       <MonsterAction name="BreathFire"       target="ALL_ENEMIES">
-         <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="PLAY_SOUND" name="fire_attack"/>
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
 
       <MonsterAction name="BreathStrongFire" target="ALL_ENEMIES">
-         <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="PLAY_SOUND" name="fire_attack"/>
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
          <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
    </MonsterActions>
 
@@ -989,35 +989,43 @@ All part members gain # experience points.  You obtain X pieces of gold.
    <Items>
       <Weapons default="Hands">
          <Weapon name="Hands"            attackBonus="0"   gp="0"   target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"   target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Club"             attackBonus="4"   gp="60"   target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Copper Sword"     attackBonus="10"  gp="180"  target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Hand Axe"         attackBonus="15"  gp="560"  target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Broad Sword"      attackBonus="20"  gp="1500" target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Flame Sword"      attackBonus="28"  gp="9800" target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
 
          <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"    target="SINGLE_ENEMY">
-            <Dialog>[ACTOR] attacks!</Dialog>
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
             <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
       </Weapons>
       <Armors>

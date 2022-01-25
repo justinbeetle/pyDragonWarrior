@@ -13,8 +13,8 @@ from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
-from GameTypes import DialogAction, DialogActionEnum, DialogType, GameTypes, MonsterInfo, Problem, SpecialMonster, \
-    TargetTypeEnum, Tool
+from GameTypes import DialogAction, DialogActionEnum, DialogType, GameTypes, MonsterAction, MonsterInfo, Problem, \
+    SpecialMonster, TargetTypeEnum, Tool
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
@@ -90,7 +90,6 @@ class CombatEncounter(CombatEncounterInterface):
         # Pause for a second, then clear the event queue and wait for user acknowledgement
         pygame.time.Clock().tick(2)
         GameEvents.clear_events()
-        self.wait_for_acknowledgement()
 
         # Check if monsters run away at the start of the encounter
         last_turn_was_monster_turn = False
@@ -115,11 +114,9 @@ class CombatEncounter(CombatEncounterInterface):
                             self.wait_for_acknowledgement()
                         last_turn_was_monster_turn = True
                         self.execute_monster_turn(combatant)
-                        self.wait_for_acknowledgement()
                     elif isinstance(combatant, HeroState):
                         last_turn_was_monster_turn = False
                         self.execute_player_turn(combatant)
-                        self.wait_for_acknowledgement()
                     if not self.still_in_encounter():
                         break
 
@@ -230,6 +227,9 @@ class CombatEncounter(CombatEncounterInterface):
             self.message_dialog.blit(self.game_state.screen, True)
             pygame.time.Clock().tick(30)
 
+    def get_monsters_still_in_combat(self) -> List[MonsterState]:
+        return self.monster_party.get_still_in_combat_members()
+
     def get_turn_order(self) -> List[Union[HeroState, MonsterState]]:
         # TODO: In the future rework this method to better support parties with multiple members
         turn_order: List[Union[HeroState, MonsterState]] = []
@@ -238,8 +238,14 @@ class CombatEncounter(CombatEncounterInterface):
             self.is_first_turn = False
             skip_hero_party = self.monster_party.members[0].has_initiative(self.hero_party.main_character)
         if skip_hero_party:
-            self.add_message(self.monster_party.members[0].get_name() + ' attacked before '
-                             + self.hero_party.main_character.get_name() + ' was ready.')
+            if 1 == len(self.monster_party.members):
+                monster_names = self.monster_party.members[0].get_name()
+            else:
+                monster_names = 'They'
+            hero_names = MonsterParty.concatenate_string_list(
+                [hero.get_name() for hero in self.hero_party.get_still_in_combat_members()])
+            was_were = 'was' if 1 == len(self.hero_party.get_still_in_combat_members()) else 'were'
+            self.add_message(f'{monster_names} attacked before {hero_names} {was_were} ready.')
         else:
             for hero in self.hero_party.combat_members:
                 if hero.is_still_in_combat():
@@ -281,6 +287,7 @@ class CombatEncounter(CombatEncounterInterface):
         target = random.choice(self.hero_party.get_still_in_combat_members())
 
         # Determine the monster action
+        chosen_monster_action: Optional[MonsterAction] = None
         # TODO: Could move this into the MonsterState class
         for monster_action_rule in monster.monster_info.monster_action_rules:
             monster_health_ratio = monster.hp / monster.max_hp
@@ -290,9 +297,14 @@ class CombatEncounter(CombatEncounterInterface):
                 continue
             if monster_action_rule.action.is_stopspell_action() and target.are_spells_blocked:
                 continue
-            if random.uniform(0, 1) < monster_action_rule.probability:
+            if random.uniform(0, 1) <= monster_action_rule.probability:
                 chosen_monster_action = monster_action_rule.action
                 break
+
+        if chosen_monster_action is None:
+            print('ERROR: Failed to select action for monster ', monster, flush=True)
+            self.add_message(monster.get_name() + ' stares at ' + target.get_name() + ' with evil eyes.')
+            return
 
         # Revise the target for the selected action
         self.gde.set_actor(monster)

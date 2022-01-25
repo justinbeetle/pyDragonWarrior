@@ -6315,17 +6315,17 @@
  </tile>
  <tile id="1016" terrain="1,10,1,1">
   <properties>
-   <property name="type" value="swamp"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1017" terrain="10,10,1,1">
   <properties>
-   <property name="type" value="swamp"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1018" terrain="10,1,1,1">
   <properties>
-   <property name="type" value="swamp"/>
+   <property name="type" value="plain"/>
   </properties>
  </tile>
  <tile id="1019">

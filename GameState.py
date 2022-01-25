@@ -739,12 +739,12 @@ class GameState(GameStateInterface):
             AudioPlayer().play_sound('player_died')
             GameDialog.create_exploring_status_dialog(
                 self.hero_party).blit(self.screen, False)
+            gde = GameDialogEvaluator(self.game_info, self)
             if message_dialog is None:
                 message_dialog = GameDialog.create_message_dialog()
             else:
                 message_dialog.add_message('')
-            message_dialog.add_message('Thou art dead.')
-            gde = GameDialogEvaluator(self.game_info, self)
+            gde.add_and_wait_for_message('Thou art dead.', message_dialog)
             gde.wait_for_acknowledgement(message_dialog)
             for hero in self.hero_party.members:
                 hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_info.death_hero_pos_dat_tile

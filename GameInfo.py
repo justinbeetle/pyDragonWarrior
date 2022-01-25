@@ -762,8 +762,7 @@ class GameInfo:
                 monster_actions[monster_action_rules_element.attrib['type']],
                 float(monster_action_rules_element.attrib['probability']),
                 health_ratio_threshold))
-        if 0 == len(monster_action_rules):
-            monster_action_rules.append(MonsterActionRule(default_monster_action))
+        monster_action_rules.append(MonsterActionRule(default_monster_action))
 
         allows_critical_hits = True
         if 'allowsCriticalHits' in element.attrib:

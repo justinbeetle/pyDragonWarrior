@@ -75,11 +75,6 @@ class MonsterParty:
         return MonsterParty.get_monster_summary(self.members) + ' draw near!'
 
     def get_defeated_monster_summary(self) -> str:
-        #defeated_monsters = []
-        #for monster in self.members:
-        #    if monster.is_dead():
-        #        defeated_monsters.append(monster)
-        #return MonsterParty.get_monster_summary(defeated_monsters)
         terms = []
         for monster in self.members:
             if monster.is_dead():

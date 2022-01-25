@@ -991,14 +991,18 @@ class GameDialog:
         for punctuation in ['.', '!', '?']:
             sentences = []
             for sentence in message.split(punctuation):
-                start_of_sentence_index = len(sentence) - len(sentence.lstrip())
-                if start_of_sentence_index < len(sentence):
-                    sentence = (sentence[0:start_of_sentence_index]
-                                + sentence[start_of_sentence_index].upper()
-                                + sentence[start_of_sentence_index+1:])
+                # Trim out any duplicated spaces between words
+                words = [word for word in sentence.split(' ') if word != '']
+                sentence = ' '.join(words)
+
+                # Capitalize first letter
+                if len(sentence) > 0:
+                    sentence = sentence[0].upper() + sentence[1:]
+
                 sentences.append(sentence)
-            message = punctuation.join(sentences)
-        return message
+            # Join the sentences back together
+            message = f'{punctuation} '.join(sentences)
+        return message.strip()
 
 
 def main() -> None:
