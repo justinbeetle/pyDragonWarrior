@@ -1,18 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounters">
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounter_backgrounds">
    <Title music="title" image="title.png"/>
 
    <Fonts>
-      <!-- <Font name="data/licensed_assets/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf"/> -->
-      <!-- <Font name="data/licensed_assets/fontstruct/dragon-warrior-1.ttf"/> -->
+      <Font name="data/fonts/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf" credits="somepx - https://itch.io/profile/somepx"/>
       <Font name="arialms"/>
       <Font name="lucidasans"/>
       <Font name="arial"/>
    </Fonts>
 
-   <xi:include href="data/music_dw1.xml" parse="xml"/>
+   <xi:include href="data/music/music_dw1.xml" parse="xml"/>
 
-   <xi:include href="data/sounds_dw1.xml" parse="xml"/>
+   <xi:include href="data/sounds/sounds_dw1.xml" parse="xml"/>
+
+   <xi:include href="data/images/encounter_backgrounds/encounter_backgrounds_unsplash.xml" parse="xml"/>
+   <xi:include href="data/images/encounter_backgrounds/encounter_backgrounds_custom.xml" parse="xml"/>
 
    <Tiles imagePath="tiles_ios_hybrid">
       <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
@@ -68,32 +70,32 @@
    </CharacterTypes>
 
    <Maps>
-      <xi:include href="data/map_alefgard_legacy.xml" parse="xml"/>
-      <!--<xi:include href="data/map_alefgard_tiled.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_alefgard_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_alefgard_tiled.xml" parse="xml"/>-->
 
-      <xi:include href="data/map_tantegel_lvl2_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_tantegel_lvl2_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_tantegel_lvl1_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_tantegel_lvl1_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_tantegel_lvl0_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_tantegel_lvl0_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_brecconary_legacy.xml" parse="xml"/>
-      <!--<xi:include href="data/map_brecconary_tiled.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_brecconary_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_brecconary_tiled.xml" parse="xml"/>-->
 
-      <xi:include href="data/map_garinham_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_garinham_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_kol_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_kol_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_rimuldar_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_rimuldar_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_hauksness_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_hauksness_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/map_cantlin_legacy.xml" parse="xml"/>
+      <xi:include href="data/maps/map_cantlin_legacy.xml" parse="xml"/>
 
-      <!--<xi:include href="data/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
-      <xi:include href="data/map_erdricks_tomb_tiled.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_erdricks_tomb_tiled.xml" parse="xml"/>
 
-      <Map name="mountain_cave_lvl1" tiles="mountain_cave_lvl1.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl1" tiles="legacy/mountain_cave_lvl1.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="A"/>
          <PointTransition decoration="downstairs" name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="B"/>
@@ -104,7 +106,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="mountain_cave_lvl2" tiles="mountain_cave_lvl2.dat" music="dungeon_lvl_2" monsterSet="14" lightDiameter="1" isOutside="no">
+      <Map name="mountain_cave_lvl2" tiles="legacy/mountain_cave_lvl2.dat" music="dungeon_lvl_2" monsterSet="14" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="14"  y="14"  dir="SOUTH" toMap="mountain_cave_lvl1" toName="C"/>
@@ -121,7 +123,7 @@
             <DialogGoTo label="gold_chest"/></MapDecoration>
       </Map>
 
-      <Map name="swamp_cave" tiles="swamp_cave.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
+      <Map name="swamp_cave" tiles="legacy/swamp_cave.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="N" x="2"   y="2"   dir="SOUTH" toMap="overworld" toName="N"/>
          <PointTransition decoration="upstairs"   name="S" x="2"   y="32"  dir="EAST"  toMap="overworld" toName="S"/>
          <MapDecoration type="door"  x="7"  y="22"/>
@@ -148,7 +150,7 @@
                    <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
       </Map>
 
-      <Map name="northern_shrine" tiles="northern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
+      <Map name="northern_shrine" tiles="legacy/northern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="6"   y="11"  dir="NORTH" toMap="overworld"/>
 
          <NonPlayerCharacter type="sage" x="6" y="6" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
@@ -172,7 +174,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="southern_shrine" tiles="southern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
+      <Map name="southern_shrine" tiles="legacy/southern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="6"   dir="EAST"  toMap="overworld"/>
 
          <NonPlayerCharacter type="sage" x="6" y="7" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
@@ -201,7 +203,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl1" tiles="garins_grave_lvl1.dat" music="dungeon_lvl_1" monsterSet="14" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl1" tiles="legacy/garins_grave_lvl1.dat" music="dungeon_lvl_1" monsterSet="14" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="8"   y="13"  dir="EAST"  toMap="garinham"/>
          <PointTransition decoration="downstairs"          x="3"   y="20"  dir="WEST"  toMap="garins_grave_lvl2"/>
          <MapDecoration type="door"  x="19" y="19"/>
@@ -214,7 +216,7 @@
          <MapDecoration type="chest" x="15" y="2"><DialogGoTo label="herb_chest"/></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl2" tiles="garins_grave_lvl2.dat" music="dungeon_lvl_2" monsterSet="7" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl2" tiles="legacy/garins_grave_lvl2.dat" music="dungeon_lvl_2" monsterSet="7" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="13"  y="4"   dir="EAST"  toMap="garins_grave_lvl1"/>
          <PointTransition decoration="downstairs" name="C" x="3"   y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="C"/>
          <PointTransition decoration="downstairs" name="B" x="14"  y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="B"/>
@@ -223,7 +225,7 @@
          <PointTransition decoration="downstairs" name="F" x="14"  y="12"  dir="WEST"  toMap="garins_grave_lvl3" toName="F"/>
       </Map>
 
-      <Map name="garins_grave_lvl3" tiles="garins_grave_lvl3.dat" music="dungeon_lvl_3" monsterSet="15" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl3" tiles="legacy/garins_grave_lvl3.dat" music="dungeon_lvl_3" monsterSet="15" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="C" x="16"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="C"/>
          <PointTransition decoration="upstairs"   name="B" x="20"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="B"/>
          <PointTransition decoration="upstairs"   name="D" x="8"   y="13"  dir="EAST"  toMap="garins_grave_lvl2" toName="D"/>
@@ -241,12 +243,12 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="garins_grave_lvl4" tiles="garins_grave_lvl4.dat" music="dungeon_lvl_4" monsterSet="15" lightDiameter="1" isOutside="no">
+      <Map name="garins_grave_lvl4" tiles="legacy/garins_grave_lvl4.dat" music="dungeon_lvl_4" monsterSet="15" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="G" x="2"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="G"/>
          <PointTransition decoration="upstairs"   name="H" x="7"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="H"/>
       </Map>
 
-      <Map name="charlock_lvl1" tiles="charlock_lvl1.dat" music="dungeon_lvl_1" monsterSet="16" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl1" tiles="legacy/charlock_lvl1.dat" music="dungeon_lvl_1" monsterSet="16" encounterBackground="darkness" lightDiameter="unlimited" isOutside="no">
          <LeavingTransition                                x="11"  y="20"  dir="NORTH" toMap="overworld"/>
          <PointTransition decoration="downstairs" name="A" x="11"  y="2"   dir="WEST"  toMap="charlock_lvl2"  toName="A" progressMarker="PM_Found_Secret_Passage"/>
          <PointTransition decoration="downstairs" name="B" x="5"   y="15"  dir="WEST"  toMap="charlock_lvl2"  toName="B"/>
@@ -266,7 +268,7 @@
             <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
       </Map>
 
-      <Map name="charlock_lvl2" tiles="charlock_lvl2.dat" music="dungeon_lvl_2" monsterSet="16" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl2" tiles="legacy/charlock_lvl2.dat" music="dungeon_lvl_2" monsterSet="16" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="A" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl1"  toName="A"/>
          <PointTransition decoration="upstairs"   name="B" x="10"  y="15"  dir="EAST"  toMap="charlock_lvl1"  toName="B"/>
          <PointTransition decoration="upstairs"   name="C" x="19"  y="17"  dir="EAST"  toMap="charlock_lvl1"  toName="C"/>
@@ -279,7 +281,7 @@
          <PointTransition decoration="downstairs" name="J" x="10"  y="21"  dir="WEST"  toMap="charlock_lvl3"  toName="J"/>
       </Map>
 
-      <Map name="charlock_lvl3" tiles="charlock_lvl3.dat" music="dungeon_lvl_3" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl3" tiles="legacy/charlock_lvl3.dat" music="dungeon_lvl_3" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="F" x="10"  y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="F"/>
          <PointTransition decoration="upstairs"   name="D" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="D"/>
          <PointTransition decoration="upstairs"   name="G" x="6"   y="6"   dir="EAST"  toMap="charlock_lvl2"  toName="G"/>
@@ -298,7 +300,7 @@
             <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
       </Map>
 
-      <Map name="charlock_lvl4" tiles="charlock_lvl4.dat" music="dungeon_lvl_4" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl4" tiles="legacy/charlock_lvl4.dat" music="dungeon_lvl_4" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="K" x="9"   y="2"   dir="EAST"  toMap="charlock_lvl3"  toName="K"/>
          <PointTransition decoration="upstairs"   name="L" x="4"   y="4"   dir="EAST"  toMap="charlock_lvl3"  toName="L"/>
          <PointTransition decoration="upstairs"   name="M" x="7"   y="6"   dir="EAST"  toMap="charlock_lvl3"  toName="M"/>
@@ -307,31 +309,31 @@
          <PointTransition decoration="downstairs" name="P" x="9"   y="9"   dir="WEST"  toMap="charlock_lvl5"  toName="P"/>
       </Map>
 
-      <Map name="charlock_lvl5" tiles="charlock_lvl5.dat" music="dungeon_lvl_5" monsterSet="17" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl5" tiles="legacy/charlock_lvl5.dat" music="dungeon_lvl_5" monsterSet="17" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="O" x="2"   y="11"  dir="EAST"  toMap="charlock_lvl4"  toName="O"/>
          <PointTransition decoration="upstairs"   name="P" x="9"   y="9"   dir="EAST"  toMap="charlock_lvl4"  toName="P"/>
          <PointTransition decoration="downstairs" name="R" x="10"  y="3"   dir="WEST"  toMap="charlock_lvl6"  toName="R"/>
          <PointTransition decoration="downstairs" name="Q" x="4"   y="4"   dir="WEST"  toMap="charlock_lvl6"  toName="Q"/>
       </Map>
 
-      <Map name="charlock_lvl6" tiles="charlock_lvl6.dat" music="dungeon_lvl_6" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl6" tiles="legacy/charlock_lvl6.dat" music="dungeon_lvl_6" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="R" x="6"   y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="R"/>
          <PointTransition decoration="upstairs"   name="Q" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="Q"/>
          <PointTransition decoration="downstairs" name="T" x="2"   y="2"   dir="WEST"  toMap="charlock_lvl7a" toName="T"/>
          <PointTransition decoration="downstairs" name="S" x="7"   y="7"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl7a" tiles="charlock_lvl7a.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7a" tiles="legacy/charlock_lvl7a.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="T" x="2"   y="4"   dir="EAST"  toMap="charlock_lvl6"  toName="T"/>
          <PointTransition decoration="downstairs" name="U" x="11"  y="4"   dir="WEST"  toMap="charlock_lvl8"  toName="U"/>
       </Map>
 
-      <Map name="charlock_lvl7b" tiles="charlock_lvl7b.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
+      <Map name="charlock_lvl7b" tiles="legacy/charlock_lvl7b.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"   name="S" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl6"  toName="S"/>
          <PointTransition decoration="downstairs"          x="11"  y="2"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
       </Map>
 
-      <Map name="charlock_lvl8" tiles="charlock_lvl8.dat" music="dungeon_lvl_8" monsterSet="18" encounterBackground="darkness.png" lightDiameter="unlimited" isOutside="no">
+      <Map name="charlock_lvl8" tiles="legacy/charlock_lvl8.dat" music="dungeon_lvl_8" monsterSet="18" encounterBackground="darkness" lightDiameter="unlimited" isOutside="no">
          <PointTransition decoration="upstairs"   name="U" x="10"  y="29"  dir="NORTH" toMap="charlock_lvl7a" toName="U"/>
 
          <MapDecoration type="door"  x="17" y="12"/>

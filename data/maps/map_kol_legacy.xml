@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Map name="kol" tiles="kol.dat" music="town" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+<Map name="kol" tiles="legacy/kol.dat" music="town" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
    <LeavingTransition                                x="20"  y="24"  dir="NORTH" toMap="overworld"/>
    <MapDecoration type="door"  x="8"  y="13"/>
    <MapDecoration type="door"  x="2"  y="15"/>

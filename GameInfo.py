@@ -204,23 +204,28 @@ class GameInfo:
 
     @staticmethod
     def parse_encounter_backgrounds(xml_root: ET.Element, image_path: str) -> Dict[str, EncounterBackground]:
-        # TODO: Rework how this works
-        #       1) Have a distinct directory per image source and accompanying licence
-        #       2) Add a mappings file, like with music and sounds, and add credits information for each image
         encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
         encounter_backgrounds: Dict[str, EncounterBackground] = {}
-        for image_filename in os.listdir(encounter_path):
-            if image_filename.endswith('.txt'):
-                continue
-
-            # print('image_filename =', image_filename, flush=True)
-            encounter_background_name = os.path.splitext(image_filename)[0]
-            try:
-                encounter_background_image = pygame.image.load(os.path.join(encounter_path, image_filename)).convert()
-                encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
-                                                                                       encounter_background_image)
-            except:
-                print('ERROR: Failed to load', encounter_background_name, flush=True)
+        for mappings_element in xml_root.findall("./EncounterBackgroundMappings"):
+            element_encounter_path = os.path.join(encounter_path, mappings_element.attrib['path'])
+            for image_element in mappings_element.findall("./Image"):
+                encounter_background_name = image_element.attrib['name']
+                if encounter_background_name in encounter_backgrounds:
+                    # Favor the first image added
+                    continue
+                image_filename = image_element.attrib['source']
+                credits = 'Uncredited'
+                if 'credits' in image_element.attrib:
+                    credits = image_element.attrib['credits']
+                # print('Loading', encounter_background_name, flush=True)
+                try:
+                    encounter_background_image = pygame.image.load(
+                        os.path.join(element_encounter_path, image_filename)).convert()
+                    encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
+                                                                                           encounter_background_image,
+                                                                                           credits)
+                except:
+                    print('ERROR: Failed to load', encounter_background_name, flush=True)
         return encounter_backgrounds
 
     @staticmethod
@@ -1059,9 +1064,7 @@ class GameInfo:
             # print('Load the encounter image', flush=True)
             encounter_image = None
             if len(monster_zones) and 'encounterBackground' in element.attrib:
-                encounter_path = os.path.join(image_path, xml_root.attrib['encounterPath'])
-                encounter_image_file_name = os.path.join(encounter_path, element.attrib['encounterBackground'])
-                encounter_image = pygame.image.load(encounter_image_file_name).convert()
+                encounter_image = self.encounter_backgrounds[element.attrib['encounterBackground']]
 
             # Save the map information
             # print('Save the map information', flush=True)
