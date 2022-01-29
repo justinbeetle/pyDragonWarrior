@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<SoundMappings path="dw1">
+<SoundMappings path="dw1" name="NES - Dragon Warrior - Sound Effects.zip" link="https://www.sounds-resource.com/download/4229/">
    <!-- <Track name="name of mapping" source="source file" credits="Credit information for credits"/> -->
 
    <Track name="talking"            source="Dragon Warrior [Dragon Quest] SFX (1).wav"  credits="Dragon Warrior developed by Chunsoft Co., Ltd."/>

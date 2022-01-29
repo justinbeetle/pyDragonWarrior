@@ -117,6 +117,13 @@ class AudioPlayer:
                 elif not interrupt:
                     self.music_rel_file_path2 = music_rel_file_path1
                     self.music_file_start2_sec = music_file_start1_sec
+
+            if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
+                self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
+
+            if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
+                self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
+
             self.music_thread_lock.release()
 
         def __music_thread(self) -> None:
@@ -141,8 +148,9 @@ class AudioPlayer:
                     else:
                         self.music_rel_file_path1 = self.music_rel_file_path2
                         self.music_file_start1_sec = self.music_file_start2_sec
+
                     try:
-                        pygame.mixer.music.load(os.path.join(self.music_path, self.music_rel_file_path1))
+                        pygame.mixer.music.load(self.music_rel_file_path1)
 
                         # start playing
                         pygame.mixer.music.play(start=self.music_file_start1_sec)
@@ -170,16 +178,16 @@ class AudioPlayer:
             # Can play either a sound or music track as a sound track - it just won't loop.
 
             if from_music_tracks_first and sound_rel_file_path in self.name_to_music_track_mapping:
-                sound_file_path = os.path.join(self.music_path,
-                                               self.name_to_music_track_mapping[sound_rel_file_path].file_path1)
+                sound_file_path = self.name_to_music_track_mapping[sound_rel_file_path].file_path1
             elif sound_rel_file_path in self.name_to_sound_track_mapping:
-                sound_file_path = os.path.join(self.sound_path,
-                                               self.name_to_sound_track_mapping[sound_rel_file_path].file_path)
+                sound_file_path = self.name_to_sound_track_mapping[sound_rel_file_path].file_path
             elif sound_rel_file_path in self.name_to_music_track_mapping:
-                sound_file_path = os.path.join(self.music_path,
-                                               self.name_to_music_track_mapping[sound_rel_file_path].file_path1)
+                sound_file_path = self.name_to_music_track_mapping[sound_rel_file_path].file_path1
             else:
-                sound_file_path = os.path.join(self.sound_path, sound_rel_file_path)
+                sound_file_path = sound_rel_file_path
+
+            if not os.path.exists(sound_file_path):
+                sound_file_path = os.path.join(self.sound_path, sound_file_path)
 
             sound_thread = threading.Thread(target=self.__sound_thread, args=[sound_file_path])
             sound_thread.start()
