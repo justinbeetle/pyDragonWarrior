@@ -210,6 +210,14 @@ class GameLoop:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
+                    elif event.key in (pygame.K_e, pygame.K_SPACE):
+                        # Fast, smart interactions - skip launching the menu
+                        if self.game_state.get_npc_to_talk_to() is not None:
+                            talking = True
+                        elif self.game_state.is_facing_openable_item():
+                            opening = True
+                        else:
+                            searching = True
                     elif event.key == pygame.K_F1:
                         AudioPlayer().play_sound('select')
                         self.game_state.save(quick_save=True)

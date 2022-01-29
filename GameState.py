@@ -570,6 +570,9 @@ class GameState(GameStateInterface):
     def is_facing_locked_item(self) -> bool:
         return self.game_map.is_facing_locked_item()
 
+    def is_facing_openable_item(self) -> bool:
+        return self.game_map.is_facing_openable_item()
+
     def open_locked_item(self) -> Optional[MapDecoration]:
         removed_decoration = self.game_map.open_locked_item()
         if removed_decoration:

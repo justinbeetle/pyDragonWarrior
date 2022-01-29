@@ -64,8 +64,10 @@ def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: b
                     event.__dict__['key'] = pygame.K_DOWN
                 elif pygame.K_d == event.key:
                     event.__dict__['key'] = pygame.K_RIGHT
-            if pygame.K_KP_ENTER == event.key:
+            if event.key in (pygame.K_KP_ENTER, pygame.K_e):
                 event.__dict__['key'] = pygame.K_RETURN
+            elif pygame.K_q == event.key:
+                event.__dict__['key'] = pygame.K_SPACE
 
         #elif event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
         #    print('Detected gain focus event', flush=True)

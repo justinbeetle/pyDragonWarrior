@@ -132,7 +132,7 @@ class GameDialogEvaluator:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
-                    elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                         is_awaiting_acknowledgement = False
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)

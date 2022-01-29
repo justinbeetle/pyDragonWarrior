@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import abc
 import math
@@ -349,15 +349,46 @@ class GameMap(GameMapInterface):
                     1.0,
                     1.0)
 
-    def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
+    def get_decorations(
+            self,
+            tile: Optional[Point]=None,
+            decoration_filter: Optional[Callable[[MapDecoration], bool]]=None,
+            stop_after_first: bool=False) -> List[MapDecoration]:
         decorations = []
         if tile is None:
             tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
         for decoration in self.map_decorations:
             if decoration.point == tile and self.game_state.check_progress_markers(
                     decoration.progress_marker, decoration.inverse_progress_marker):
-                decorations.append(decoration)
+                if decoration_filter is None or decoration_filter(decoration):
+                    decorations.append(decoration)
+                    if stop_after_first:
+                        break
         return decorations
+
+    def get_decoration_for_interaction(
+            self,
+            pos_dat_tile: Optional[Point]=None,
+            decoration_filter: Optional[Callable[[MapDecoration], bool]]=None) -> Optional[MapDecoration]:
+        decoration = None
+
+        if pos_dat_tile is None:
+            # First look under the hero party
+            decoration = self.get_decoration_for_interaction(
+                self.game_state.get_hero_party().get_curr_pos_dat_tile(), decoration_filter)
+
+            # Then look in front the hero party
+            if decoration is None:
+                decoration = self.get_decoration_for_interaction(
+                    self.game_state.get_hero_party().get_curr_pos_dat_tile()
+                    + self.game_state.get_hero_party().get_direction().get_vector(), decoration_filter)
+        else:
+            # Look at the specified tile position
+            decorations = self.get_decorations(pos_dat_tile, decoration_filter, stop_after_first=True)
+            if 0 < len(decorations):
+                decoration = decorations[0]
+
+        return decoration
 
     def get_npc_to_talk_to(self) -> Optional[NpcState]:
         talk_dest_dat_tile = self.game_state.get_hero_party().members[0].curr_pos_dat_tile \
@@ -497,30 +528,20 @@ class GameMap(GameMapInterface):
         return []
 
     def get_locked_map_decoration(self, pos_dat_tile: Optional[Point] = None) -> Optional[MapDecoration]:
-        locked_map_decoration = None
+        def is_locked(decoration: MapDecoration) -> bool:
+            return decoration.type is not None and decoration.type.remove_with_key
+        return self.get_decoration_for_interaction(pos_dat_tile, is_locked)
 
-        if pos_dat_tile is None:
-            # First look under the hero party
-            locked_map_decoration = self.get_locked_map_decoration(self.game_state.get_hero_party().get_curr_pos_dat_tile())
-
-            # Then look in front the hero party
-            if locked_map_decoration is None:
-                locked_map_decoration = self.get_locked_map_decoration(
-                    self.game_state.get_hero_party().get_curr_pos_dat_tile()
-                    + self.game_state.get_hero_party().get_direction().get_vector())
-        else:
-            # Look at the specified tile position
-            for decoration in self.map_decorations:
-                if (pos_dat_tile == decoration.point
-                        and decoration.type is not None
-                        and decoration.type.remove_with_key):
-                    locked_map_decoration = decoration
-                    break
-
-        return locked_map_decoration
+    def get_openable_map_decoration(self, pos_dat_tile: Optional[Point] = None) -> Optional[MapDecoration]:
+        def is_openable(decoration: MapDecoration) -> bool:
+            return decoration.type is not None and (decoration.type.remove_with_key or decoration.type.remove_with_open)
+        return self.get_decoration_for_interaction(pos_dat_tile, is_openable)
 
     def is_facing_locked_item(self) -> bool:
         return self.get_locked_map_decoration() is not None
+
+    def is_facing_openable_item(self) -> bool:
+        return self.get_openable_map_decoration() is not None
 
     def open_locked_item(self) -> Optional[MapDecoration]:
         locked_map_decoration = self.get_locked_map_decoration()

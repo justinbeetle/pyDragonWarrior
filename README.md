@@ -17,13 +17,12 @@ Note: Running Game.py runs a subshell command to install the required Python lib
 
 ## Controls
 
-| Control        | Keyboard Bindings  | Gamepad Bindings |
-| -------------- | ------------------ | ---------------- |
-| Move           | WASD or Arrow Keys | D-Pad            |
-| Enter Menu     | Enter              | A                |
-| Make Selection | Enter              | A                |
-| Leave Menu     | Space              | B                |
-| Exit           | Escape             | Select           |
-| Quick Save     | F1                 | Menu             |
+| Control                      | Keyboard Bindings  | Gamepad Bindings |
+| ---------------------------- | ------------------ | ---------------- |
+| Move                         | WASD or Arrow Keys | D-Pad            |
+| Enter Menu or Make Selection | Enter or E         | A                |
+| Interact or Leave Menu       | Space or Q         | B                |
+| Exit                         | Escape             | Select           |
+| Quick Save                   | F1                 | Menu             |
 
 Note: Gamepad support has only been tested with an XBox One controller.
