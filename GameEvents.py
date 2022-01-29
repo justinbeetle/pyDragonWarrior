@@ -47,7 +47,9 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
-def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: bool=True) -> List[pygame.event.Event]:
+def get_events(is_keyboard_repeat_enabled: bool=False,
+               translate_wasd_to_uldr: bool=True,
+               translate_e_to_enter: bool=True) -> List[pygame.event.Event]:
     # Allow joysticks to be rediscovered if they get uninitialized.
     setup_joystick()
 
@@ -64,8 +66,11 @@ def get_events(is_keyboard_repeat_enabled: bool=False, translate_wasd_to_uldr: b
                     event.__dict__['key'] = pygame.K_DOWN
                 elif pygame.K_d == event.key:
                     event.__dict__['key'] = pygame.K_RIGHT
-            if event.key in (pygame.K_KP_ENTER, pygame.K_e):
+            if pygame.K_KP_ENTER == event.key:
                 event.__dict__['key'] = pygame.K_RETURN
+            elif pygame.K_e == event.key:
+                if translate_e_to_enter:
+                    event.__dict__['key'] = pygame.K_RETURN
             elif pygame.K_q == event.key:
                 event.__dict__['key'] = pygame.K_SPACE
 

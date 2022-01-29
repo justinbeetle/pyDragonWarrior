@@ -162,7 +162,7 @@ class GameDialogEvaluator:
         start_time = time.time()
         while self.game_state.is_running and is_waiting_for_user_input:
             # Process events
-            events = GameEvents.get_events()
+            events = GameEvents.get_events(translate_e_to_enter=GameDialog.use_menus_for_text_entry())
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:

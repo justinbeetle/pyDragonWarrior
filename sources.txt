@@ -1,16 +1,8 @@
-Music:
-   http://www.vgmpf.com/Wiki/index.php/Dragon_Warrior_(NES)
-   http://www.woodus.com/den/music/mp3.php?desc=dq1nes
-   http://ultimacodex.com/archive/ftp/sound/
-
-
-Sound Effects:
-   https://www.sounds-resource.com/nes/dragonwarrior/sound/4229/
-   https://www.sounds-resource.com/nes/dragonwarrioriv/sound/4232/
 Ultima Music:
    http://ultimacodex.com/archive/ftp/sound/
    http://www.moongates.com/music/
 Images:
+   Splitting:  https://pinetools.com/split-image
    https://github.com/bmoriya/DragonWarrior/tree/master/data
    https://github.com/bobbylight/DragonWarriorJS/tree/master/src/res
    http://mikesrpgcenter.com/dw1/index.html
@@ -86,20 +78,6 @@ Level Info:   https://www.gamefaqs.com/nes/563408-dragon-warrior/faqs/18342
 Monster Info: http://www.woodus.com/den/games/dw1nes/monsters.php
 Gameplay:     https://www.youtube.com/watch?v=jmzHrNVelL0&t=551s
 Dialog:       https://gamefaqs.gamespot.com/nes/563408-dragon-warrior/faqs/54647
-
-
-
-
-Python 3.6.3 (v3.6.3:2c5fed8, Oct  3 2017, 17:26:49) [MSC v.1900 32 bit (Intel)] on win32
-
-
-C:\Users\Justin\AppData\Roaming\Python\Python36\site-packages\pygame\examples
-http://www.py2exe.org/
-http://www.pyinstaller.org/
-
-
-
-
 
 
 

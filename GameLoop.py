@@ -210,7 +210,7 @@ class GameLoop:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
                         menu = True
-                    elif event.key in (pygame.K_e, pygame.K_SPACE):
+                    elif event.key == pygame.K_SPACE:
                         # Fast, smart interactions - skip launching the menu
                         if self.game_state.get_npc_to_talk_to() is not None:
                             talking = True

@@ -62,6 +62,7 @@
    <CharacterTypes>
       <xi:include href="data/characters_legacy.xml" parse="xml"/>
       <!--<xi:include href="data/characters_tiny_tales.xml" parse="xml"/>-->
+      <!--<xi:include href="data/characters_time_fantasy.xml" parse="xml"/>-->
 
       <CharacterType type="ghost"                  image="ghost.png"                  phases="2"/>
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
