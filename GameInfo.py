@@ -2,16 +2,12 @@
 
 from typing import cast, Dict, List, Optional, Tuple, Union
 
-import certifi
 import concurrent.futures
 import os
 import pygame
 import numpy
-import ssl
-import urllib.request
 import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude
-import zipfile
 #import lxml.etree as ET  # May desire to use in future for better xinclude support
 
 from AudioPlayer import AudioPlayer, MusicTrack, SoundTrack
@@ -131,26 +127,6 @@ class GameInfo:
         return GameInfo.parse_title_info(xml_root, image_path)
 
     @staticmethod
-    def download_file(url: str, filepath: str) -> bool:
-        print(f'Downloading {url} to {filepath}...', flush=True)
-        try:
-            if url.startswith('https://'):
-                ssl_context = ssl.create_default_context(cafile=certifi.where())
-                with urllib.request.urlopen(url, context=ssl_context) as resp, open(filepath, 'wb') as file:
-                    file.write(resp.read())
-            else:
-                urllib.request.urlretrieve(url, filepath)
-
-            # If the download file was a zip, extract the contents
-            if filepath.endswith('.zip'):
-                with zipfile.ZipFile(filepath, 'r') as zip_ref:
-                    zip_ref.extractall(os.path.dirname(filepath))
-            return True
-        except:
-            print(f'ERROR: Failed to download {url}', flush=True)
-        return False
-
-    @staticmethod
     def init_audio_player(xml_root: ET.Element, data_path: str) -> None:
         music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
         sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
@@ -177,12 +153,25 @@ class GameInfo:
             except:
                 print('ERROR: Failed to create directory', base_path)
 
+            package_name: Optional[str] = None
+            if 'name' in element.attrib:
+                package_name = os.path.join(base_path, element.attrib['name'])
+            package_link: Optional[str] = None
+            if 'link' in element.attrib:
+                package_link = element.attrib['link']
+
             for track_element in element.findall("./Track"):
                 name = track_element.attrib['name']
                 source = os.path.join(base_path, track_element.attrib['source'])
                 source2: Optional[str] = None
                 if 'source2' in track_element.attrib:
                     source2 = os.path.join(base_path, track_element.attrib['source2'])
+                link: Optional[str] = None
+                if 'link' in track_element.attrib:
+                    link = track_element.attrib['link']
+                link2: Optional[str] = None
+                if 'link2' in track_element.attrib:
+                    link2 = track_element.attrib['link2']
                 start_play1_sec = 0.0
                 if 'startPlay1' in track_element.attrib:
                     start_play1_sec = float(track_element.attrib['startPlay1'])
@@ -190,25 +179,16 @@ class GameInfo:
                 if 'startPlay2' in track_element.attrib:
                     start_play2_sec = float(track_element.attrib['startPlay2'])
 
-                # Attempt to download source if it isn't present
-                if not os.path.exists(source) and 'link' in track_element.attrib:
-                    GameInfo.download_file(track_element.attrib['link'], source)
-
-                # Attempt to download source2 if it isn't present
-                if source2 is not None and not os.path.exists(source2) and 'link2' in track_element.attrib:
-                    GameInfo.download_file(track_element.attrib['link2'], source2)
-
-                # Attempt to download the overall package if either source or source2 is still not present
-                if (not os.path.exists(source) or (source2 is not None and not os.path.exists(source2))) and \
-                        ('link' in element.attrib and 'name' in element.attrib):
-                    GameInfo.download_file(element.attrib['link'], os.path.join(base_path, element.attrib['name']))
-
                 name_to_music_track_mapping[name] = MusicTrack(name,
                                                                source,
                                                                source2,
+                                                               link,
+                                                               link2,
                                                                start_play1_sec,
                                                                start_play2_sec,
-                                                               track_element.attrib['credits'])
+                                                               track_element.attrib['credits'],
+                                                               package_name,
+                                                               package_link)
 
             audio_player.add_music_tracks(name_to_music_track_mapping)
 
@@ -225,21 +205,26 @@ class GameInfo:
             except:
                 print('ERROR: Failed to create directory', base_path)
 
+            package_name: Optional[str] = None
+            if 'name' in element.attrib:
+                package_name = os.path.join(base_path, element.attrib['name'])
+            package_link: Optional[str] = None
+            if 'link' in element.attrib:
+                package_link = element.attrib['link']
+
             for track_element in element.findall("./Track"):
                 name = track_element.attrib['name']
                 source = os.path.join(base_path, track_element.attrib['source'])
-
-                # Attempt to download source if it isn't present
-                if not os.path.exists(source) and 'link' in track_element.attrib:
-                    GameInfo.download_file(track_element.attrib['link'], source)
-
-                # Attempt to download the overall package if source is still not present
-                if not os.path.exists(source) and 'link' in element.attrib and 'name' in element.attrib:
-                    GameInfo.download_file(element.attrib['link'], os.path.join(base_path, element.attrib['name']))
+                link: Optional[str] = None
+                if 'link' in track_element.attrib:
+                    link = track_element.attrib['link']
 
                 name_to_sound_track_mapping[name] = SoundTrack(name,
                                                                source,
-                                                               track_element.attrib['credits'])
+                                                               link,
+                                                               track_element.attrib['credits'],
+                                                               package_name,
+                                                               package_link)
 
             audio_player.add_sound_tracks(name_to_sound_track_mapping)
 

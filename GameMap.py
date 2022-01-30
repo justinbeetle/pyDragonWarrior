@@ -707,7 +707,7 @@ class GameMap(GameMapInterface):
 
         # For all other tiles, just use the tile name
         if tile_name == 'DEFAULT TILE':
-            print('WARN: default time at', tile, flush=True)
+            print('WARN: default tile at', tile, flush=True)
         return tile_name
 
     def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:

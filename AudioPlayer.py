@@ -2,27 +2,120 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional
 
+import certifi
 import os.path
 import pygame.mixer
 import pygame.time
+import ssl
 import threading
+import urllib.request
+import zipfile
+
+
+def download_file(url: str, filepath: str) -> bool:
+    print(f'Downloading {url} to {filepath}...', flush=True)
+    try:
+        if url.startswith('https://'):
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            with urllib.request.urlopen(url, context=ssl_context) as resp, open(filepath, 'wb') as file:
+                file.write(resp.read())
+        else:
+            urllib.request.urlretrieve(url, filepath)
+
+        # If the download file was a zip, extract the contents
+        if filepath.endswith('.zip'):
+            with zipfile.ZipFile(filepath, 'r') as zip_ref:
+                zip_ref.extractall(os.path.dirname(filepath))
+            os.remove(filepath)
+        return True
+    except:
+        print(f'ERROR: Failed to download {url}', flush=True)
+    return False
 
 
 class MusicTrack(NamedTuple):
     name: str
     file_path1: str
     file_path2: Optional[str] = None
+    link1: Optional[str] = None
+    link2: Optional[str] = None
     file_start1_sec: float = 0.0
     file_start2_sec: float = 0.0
     credits: str = 'Uncredited'
+    package_name: Optional[str] = None
+    package_link: Optional[str] = None
+
+    def is_file1_present(self) -> bool:
+        return os.path.exists(self.file_path1)
+
+    def is_file2_present(self) -> bool:
+        return self.file_path2 is None or os.path.exists(self.file_path2)
+
+    def is_track_present(self) -> bool:
+        return self.is_file1_present() and self.is_file2_present()
+
+    def stage_track(self) -> bool:
+        if self.is_track_present():
+            return True
+
+        # Try to download the track
+        if not self.is_file1_present() and self.link1 is not None:
+            download_file(self.link1, self.file_path1)
+        if not self.is_file2_present() and self.link2 is not None:
+            download_file(self.link2, self.file_path2)
+
+        if self.is_track_present():
+            return True
+
+        # Try to download the package of tracks
+        if self.package_name is not None and self.package_link is not None:
+            download_file(self.package_link, self.package_name)
+
+        if not self.is_file1_present():
+            if not self.is_file2_present():
+                print(f'ERROR: Failed to stage {self.file_path1} and {self.file_path2}', flush=True)
+            else:
+                print(f'ERROR: Failed to stage {self.file_path1}', flush=True)
+            return False
+        elif not self.is_file2_present():
+            print(f'ERROR: Failed to stage {self.file_path2}', flush=True)
+            return False
+
+        return True
 
 
 class SoundTrack(NamedTuple):
     name: str
     file_path: str
+    link: Optional[str] = None
     credits: str = 'Uncredited'
+    package_name: Optional[str] = None
+    package_link: Optional[str] = None
+
+    def is_track_present(self) -> bool:
+        return os.path.exists(self.file_path)
+
+    def stage_track(self) -> bool:
+        if self.is_track_present():
+            return True
+
+        # Try to download the track
+        if self.link is not None:
+            download_file(self.link, self.file_path)
+
+        if self.is_track_present():
+            return True
+
+        # Try to download the package of tracks
+        if self.package_name is not None and self.package_link is not None:
+            download_file(self.package_link, self.package_name)
+
+        if not self.is_track_present():
+            return False
+
+        return True
 
 
 class AudioPlayer:
@@ -33,9 +126,9 @@ class AudioPlayer:
             pygame.mixer.set_num_channels(32)
          
             self.music_path = './'
-            self.name_to_music_track_mapping: Dict[str, MusicTrack] = {}
+            self.name_to_music_track_mapping: Dict[str, List[MusicTrack]] = {}
             self.sound_path = './'
-            self.name_to_sound_track_mapping: Dict[str, SoundTrack] = {}
+            self.name_to_sound_track_mapping: Dict[str, List[SoundTrack]] = {}
             self.music_rel_file_path1: Optional[str] = None
             self.music_rel_file_path2: Optional[str] = None
             self.music_file_start1_sec = 0.0
@@ -56,40 +149,18 @@ class AudioPlayer:
 
         def add_music_tracks(self, name_to_track_mapping: Dict[str, MusicTrack]) -> None:
             for name in name_to_track_mapping:
-                if name in self.name_to_music_track_mapping:
-                    # In case of duplicate names, give preference to the first one successfully added
-                    continue
-
-                # Validate the paths
-                path = os.path.join(self.music_path, name_to_track_mapping[name].file_path1)
-                if not os.path.exists(path):
-                    print(f'ERROR: Failed to add music track {name} because {path} does not exist', flush=True)
-                    continue
-                file_path2 = name_to_track_mapping[name].file_path2
-                if file_path2 is not None:
-                    path = os.path.join(self.music_path, file_path2)
-                    if not os.path.exists(path):
-                        print(f'ERROR: Failed to add music track {name} because {path} does not exist', flush=True)
-                        continue
-
-                self.name_to_music_track_mapping[name] = name_to_track_mapping[name]
+                if name not in self.name_to_music_track_mapping:
+                    self.name_to_music_track_mapping[name] = []
+                self.name_to_music_track_mapping[name].append(name_to_track_mapping[name])
 
         def set_sound_path(self, sound_path: str) -> None:
             self.sound_path = sound_path
 
         def add_sound_tracks(self, name_to_track_mapping: Dict[str, SoundTrack]) -> None:
             for name in name_to_track_mapping:
-                if name in self.name_to_sound_track_mapping:
-                    # In case of duplicate names, give preference to the first one successfully added
-                    continue
-
-                # Validate the path
-                path = os.path.join(self.sound_path, name_to_track_mapping[name].file_path)
-                if not os.path.exists(path):
-                    print(f'ERROR: Failed to add sound track {name} because {path} does not exist', flush=True)
-                    continue
-
-                self.name_to_sound_track_mapping[name] = name_to_track_mapping[name]
+                if name not in self.name_to_sound_track_mapping:
+                    self.name_to_sound_track_mapping[name] = []
+                self.name_to_sound_track_mapping[name].append(name_to_track_mapping[name])
          
         def play_music(self,
                        music_rel_file_path1: str,
@@ -99,15 +170,28 @@ class AudioPlayer:
                        music_file_start2_sec: float = 0.0) -> None:
             self.music_thread_lock.acquire()
             if music_rel_file_path1 in self.name_to_music_track_mapping:
-                track = self.name_to_music_track_mapping[music_rel_file_path1]
-                self.music_rel_file_path1 = track.file_path1
-                self.music_file_start1_sec = track.file_start1_sec
-                if track.file_path2 is not None:
-                    self.music_rel_file_path2 = track.file_path2
-                    self.music_file_start2_sec = track.file_start2_sec
-                elif not interrupt:
-                    self.music_rel_file_path2 = track.file_path1
-                    self.music_file_start2_sec = track.file_start1_sec
+                tracks = self.name_to_music_track_mapping[music_rel_file_path1]
+                for track in tracks[:]:
+                    if not track.stage_track():
+                        tracks.remove(track)
+                        continue
+
+                    self.music_rel_file_path1 = track.file_path1
+                    self.music_file_start1_sec = track.file_start1_sec
+
+                    if track.file_path2 is not None:
+                        self.music_rel_file_path2 = track.file_path2
+                        self.music_file_start2_sec = track.file_start2_sec
+                    elif not interrupt:
+                        self.music_rel_file_path2 = track.file_path1
+                        self.music_file_start2_sec = track.file_start1_sec
+
+                if 0 == len(tracks):
+                    print(f'ERROR: Failed to stage all possible music tracks with name {music_rel_file_path1}',
+                          flush=True)
+                    del self.name_to_music_track_mapping[music_rel_file_path1]
+                    if not interrupt:
+                        self.stop_music()
             else:
                 self.music_rel_file_path1 = music_rel_file_path1
                 self.music_file_start1_sec = music_file_start1_sec
@@ -176,13 +260,38 @@ class AudioPlayer:
 
         def play_sound(self, sound_rel_file_path: str, from_music_tracks_first: bool = False) -> None:
             # Can play either a sound or music track as a sound track - it just won't loop.
+            music_track_file_path = None
+            if sound_rel_file_path in self.name_to_music_track_mapping:
+                tracks = self.name_to_music_track_mapping[sound_rel_file_path]
+                for track in tracks[:]:
+                    if not track.stage_track():
+                        tracks.remove(track)
+                        continue
+                    music_track_file_path = track.file_path1
 
-            if from_music_tracks_first and sound_rel_file_path in self.name_to_music_track_mapping:
-                sound_file_path = self.name_to_music_track_mapping[sound_rel_file_path].file_path1
-            elif sound_rel_file_path in self.name_to_sound_track_mapping:
-                sound_file_path = self.name_to_sound_track_mapping[sound_rel_file_path].file_path
-            elif sound_rel_file_path in self.name_to_music_track_mapping:
-                sound_file_path = self.name_to_music_track_mapping[sound_rel_file_path].file_path1
+                if 0 == len(tracks):
+                    print(f'ERROR: Failed to stage all possible music tracks with name {sound_rel_file_path}',
+                          flush=True)
+                    del self.name_to_music_track_mapping[sound_rel_file_path]
+
+            sound_track_file_path = None
+            if sound_rel_file_path in self.name_to_sound_track_mapping:
+                tracks = self.name_to_sound_track_mapping[sound_rel_file_path]
+                for track in tracks[:]:
+                    if not track.stage_track():
+                        tracks.remove(track)
+                        continue
+                    sound_track_file_path = track.file_path
+
+                if 0 == len(tracks):
+                    print(f'ERROR: Failed to stage all possible sound tracks with name {sound_rel_file_path}',
+                          flush=True)
+                    del self.name_to_sound_track_mapping[sound_rel_file_path]
+
+            if (from_music_tracks_first or sound_track_file_path is None) and music_track_file_path is not None:
+                sound_file_path = music_track_file_path
+            elif sound_track_file_path is not None:
+                sound_file_path = sound_track_file_path
             else:
                 sound_file_path = sound_rel_file_path
 
@@ -203,7 +312,7 @@ class AudioPlayer:
 
             sound = self.sounds[sound_file_path]
             if sound is not None:
-                channel = sound.play()
+                sound.play()
 
         def stop_music(self) -> None:
             self.music_rel_file_path1 = self.music_rel_file_path2 = None
