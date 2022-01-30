@@ -137,6 +137,9 @@ class GameInfo:
         audio_player.set_sound_path(sound_path)
 
         if 0 != len(audio_player.get_music_tracks()) or 0 != len(audio_player.get_sound_tracks()):
+            # Stage all the tracks on the second go around
+            audio_player.stage_all_tracks()
+
             # Don't try to add tracks more than once
             return
 

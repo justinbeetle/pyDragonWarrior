@@ -2,9 +2,10 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 
 import certifi
+import concurrent.futures
 import os.path
 import pygame.mixer
 import pygame.time
@@ -15,7 +16,7 @@ import zipfile
 
 
 def download_file(url: str, filepath: str) -> bool:
-    print(f'Downloading {url} to {filepath}...', flush=True)
+    # print(f'Downloading {url} to {filepath}...', flush=True)
     try:
         if url.startswith('https://'):
             ssl_context = ssl.create_default_context(cafile=certifi.where())
@@ -26,8 +27,10 @@ def download_file(url: str, filepath: str) -> bool:
 
         # If the download file was a zip, extract the contents
         if filepath.endswith('.zip'):
+            extract_dir = os.path.dirname(filepath)
+            # print(f'Extracting files from {filepath} to {extract_dir}...', flush=True)
             with zipfile.ZipFile(filepath, 'r') as zip_ref:
-                zip_ref.extractall(os.path.dirname(filepath))
+                zip_ref.extractall(extract_dir)
             os.remove(filepath)
         return True
     except:
@@ -85,6 +88,20 @@ class MusicTrack(NamedTuple):
 
         return True
 
+    def get_required_download_info(self) -> Set[Tuple[str, str]]:
+        required_download_info = set()
+        if not self.is_file1_present():
+            if self.link1 is not None:
+                required_download_info.add((self.link1, self.file_path1))
+            elif self.package_link is not None and self.package_name is not None:
+                required_download_info.add((self.package_link, self.package_name))
+        if not self.is_file2_present():
+            if self.link2 is not None:
+                required_download_info.add((self.link1, self.file_path1))
+            elif self.package_link is not None and self.package_name is not None:
+                required_download_info.add((self.package_link, self.package_name))
+        return required_download_info
+
 
 class SoundTrack(NamedTuple):
     name: str
@@ -116,6 +133,15 @@ class SoundTrack(NamedTuple):
             return False
 
         return True
+
+    def get_required_download_info(self) -> Set[Tuple[str, str]]:
+        required_download_info = set()
+        if not self.is_track_present():
+            if self.link is not None:
+                required_download_info.add((self.link, self.file_path))
+            elif self.package_link is not None and self.package_name is not None:
+                required_download_info.add((self.package_link, self.package_name))
+        return required_download_info
 
 
 class AudioPlayer:
@@ -161,6 +187,54 @@ class AudioPlayer:
                 if name not in self.name_to_sound_track_mapping:
                     self.name_to_sound_track_mapping[name] = []
                 self.name_to_sound_track_mapping[name].append(name_to_track_mapping[name])
+
+        def stage_music_track(self, track_name: str) -> Optional[MusicTrack]:
+            if track_name not in self.name_to_music_track_mapping:
+                return
+            tracks = self.name_to_music_track_mapping[track_name]
+            for track in tracks[:]:
+                if not track.stage_track():
+                    tracks.remove(track)
+                    continue
+            if 0 == len(tracks):
+                print(f'ERROR: Failed to stage all possible music tracks with name {track_name}', flush=True)
+                return None
+            return tracks[0]
+
+        def stage_sound_track(self, track_name: str) -> Optional[SoundTrack]:
+            if track_name not in self.name_to_sound_track_mapping:
+                return
+            tracks = self.name_to_sound_track_mapping[track_name]
+            for track in tracks[:]:
+                if not track.stage_track():
+                    tracks.remove(track)
+                    continue
+            if 0 == len(tracks):
+                print(f'ERROR: Failed to stage all possible sound tracks with name {track_name}', flush=True)
+                return None
+            return tracks[0]
+
+        def stage_all_tracks(self) -> None:
+            # First determine everything that needs to be downloaded.  Use a set to avoid duplicate downloads
+            required_download_info = set()
+            for track_name in self.name_to_music_track_mapping:
+                for track in self.name_to_music_track_mapping[track_name]:
+                    required_download_info |= track.get_required_download_info()
+            for track_name in self.name_to_sound_track_mapping:
+                for track in self.name_to_sound_track_mapping[track_name]:
+                    required_download_info |= track.get_required_download_info()
+
+            # Perform all the downloads using a thread pool
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for url, filepath in required_download_info:
+                    executor.submit(download_file, url, filepath)
+
+            # After the downloads, cleanup the name to track mappings
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for track_name in self.name_to_music_track_mapping:
+                    self.stage_music_track(track_name)
+                for track_name in self.name_to_sound_track_mapping:
+                    self.stage_sound_track(track_name)
          
         def play_music(self,
                        music_rel_file_path1: str,
@@ -169,29 +243,17 @@ class AudioPlayer:
                        music_file_start1_sec: float = 0.0,
                        music_file_start2_sec: float = 0.0) -> None:
             self.music_thread_lock.acquire()
-            if music_rel_file_path1 in self.name_to_music_track_mapping:
-                tracks = self.name_to_music_track_mapping[music_rel_file_path1]
-                for track in tracks[:]:
-                    if not track.stage_track():
-                        tracks.remove(track)
-                        continue
+            music_track = self.stage_music_track(music_rel_file_path1)
+            if music_track is not None:
+                self.music_rel_file_path1 = music_track.file_path1
+                self.music_file_start1_sec = music_track.file_start1_sec
 
-                    self.music_rel_file_path1 = track.file_path1
-                    self.music_file_start1_sec = track.file_start1_sec
-
-                    if track.file_path2 is not None:
-                        self.music_rel_file_path2 = track.file_path2
-                        self.music_file_start2_sec = track.file_start2_sec
-                    elif not interrupt:
-                        self.music_rel_file_path2 = track.file_path1
-                        self.music_file_start2_sec = track.file_start1_sec
-
-                if 0 == len(tracks):
-                    print(f'ERROR: Failed to stage all possible music tracks with name {music_rel_file_path1}',
-                          flush=True)
-                    del self.name_to_music_track_mapping[music_rel_file_path1]
-                    if not interrupt:
-                        self.stop_music()
+                if music_track.file_path2 is not None:
+                    self.music_rel_file_path2 = music_track.file_path2
+                    self.music_file_start2_sec = music_track.file_start2_sec
+                elif not interrupt:
+                    self.music_rel_file_path2 = music_track.file_path1
+                    self.music_file_start2_sec = music_track.file_start1_sec
             else:
                 self.music_rel_file_path1 = music_rel_file_path1
                 self.music_file_start1_sec = music_file_start1_sec
@@ -202,11 +264,11 @@ class AudioPlayer:
                     self.music_rel_file_path2 = music_rel_file_path1
                     self.music_file_start2_sec = music_file_start1_sec
 
-            if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
-                self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
+                if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
+                    self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
 
-            if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
-                self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
+                if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
+                    self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
 
             self.music_thread_lock.release()
 
@@ -260,43 +322,17 @@ class AudioPlayer:
 
         def play_sound(self, sound_rel_file_path: str, from_music_tracks_first: bool = False) -> None:
             # Can play either a sound or music track as a sound track - it just won't loop.
-            music_track_file_path = None
-            if sound_rel_file_path in self.name_to_music_track_mapping:
-                tracks = self.name_to_music_track_mapping[sound_rel_file_path]
-                for track in tracks[:]:
-                    if not track.stage_track():
-                        tracks.remove(track)
-                        continue
-                    music_track_file_path = track.file_path1
+            sound_track = self.stage_sound_track(sound_rel_file_path)
+            music_track = self.stage_music_track(sound_rel_file_path)
 
-                if 0 == len(tracks):
-                    print(f'ERROR: Failed to stage all possible music tracks with name {sound_rel_file_path}',
-                          flush=True)
-                    del self.name_to_music_track_mapping[sound_rel_file_path]
-
-            sound_track_file_path = None
-            if sound_rel_file_path in self.name_to_sound_track_mapping:
-                tracks = self.name_to_sound_track_mapping[sound_rel_file_path]
-                for track in tracks[:]:
-                    if not track.stage_track():
-                        tracks.remove(track)
-                        continue
-                    sound_track_file_path = track.file_path
-
-                if 0 == len(tracks):
-                    print(f'ERROR: Failed to stage all possible sound tracks with name {sound_rel_file_path}',
-                          flush=True)
-                    del self.name_to_sound_track_mapping[sound_rel_file_path]
-
-            if (from_music_tracks_first or sound_track_file_path is None) and music_track_file_path is not None:
-                sound_file_path = music_track_file_path
-            elif sound_track_file_path is not None:
-                sound_file_path = sound_track_file_path
+            if (from_music_tracks_first or sound_track is None) and music_track is not None:
+                sound_file_path = music_track.file_path1
+            elif sound_track is not None:
+                sound_file_path = sound_track.file_path
             else:
                 sound_file_path = sound_rel_file_path
-
-            if not os.path.exists(sound_file_path):
-                sound_file_path = os.path.join(self.sound_path, sound_file_path)
+                if not os.path.exists(sound_file_path):
+                    sound_file_path = os.path.join(self.sound_path, sound_file_path)
 
             sound_thread = threading.Thread(target=self.__sound_thread, args=[sound_file_path])
             sound_thread.start()
@@ -351,6 +387,10 @@ class AudioPlayer:
         if self.instance is not None:
             return self.instance.name_to_sound_track_mapping
         return {}
+
+    def stage_all_tracks(self) -> None:
+        if self.instance is not None:
+            self.instance.stage_all_tracks()
 
     # If interrupt is True, new music cuts in and then is replaced by the old music. This is only applicable when
     # music_file_path2 is not specified as it is implemented by leaving music_file_path2 unchanged.
