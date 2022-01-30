@@ -11,6 +11,7 @@ from GameDialog import GameDialog
 from GameInfo import GameInfo
 from GenericGameState import GenericGameState
 from HeroParty import HeroParty
+from MapCharacterState import MapCharacterState
 from Point import Point
 
 
@@ -88,6 +89,10 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def remove_decoration(self, decoration: MapDecoration) -> None:
+        pass
+
+    @abc.abstractmethod
+    def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
         pass
 
     @abc.abstractmethod

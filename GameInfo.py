@@ -92,7 +92,7 @@ class GameInfo:
         self.monster_sets = GameInfo.parse_monster_sets(xml_root)
 
         # Parse maps
-        self.maps = self.parse_maps(xml_root, image_path, os.path.join(data_path, xml_root.attrib['mapsPath']))
+        self.maps = self.parse_maps(xml_root, os.path.join(data_path, xml_root.attrib['mapsPath']))
 
         # Parse dialog scripts
         for element in xml_root.findall("./DialogScripts/DialogScript"):
@@ -865,7 +865,7 @@ class GameInfo:
             monster_sets[element.attrib['name']] = monsters
         return monster_sets
 
-    def parse_maps(self, xml_root: ET.Element, image_path: str, maps_path: str) -> Dict[str, Map]:
+    def parse_maps(self, xml_root: ET.Element, maps_path: str) -> Dict[str, Map]:
         maps: Dict[str, Map] = {}
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
@@ -1007,6 +1007,9 @@ class GameInfo:
             npcs: List[NpcInfo] = []
             for npc_element in element.findall('.//NonPlayerCharacter'):
                 progress_marker = None
+                name = None
+                if 'name' in npc_element.attrib:
+                    name = npc_element.attrib['name']
                 if 'progressMarker' in npc_element.attrib:
                     progress_marker = npc_element.attrib['progressMarker']
                 inverse_progress_marker = None
@@ -1018,7 +1021,8 @@ class GameInfo:
                                     npc_element.attrib['walking'] == 'yes',
                                     self.parse_dialog(npc_element),
                                     progress_marker,
-                                    inverse_progress_marker))
+                                    inverse_progress_marker,
+                                    name))
 
             # Parse special monsters
             # print( 'Parse special monsters', flush=True )

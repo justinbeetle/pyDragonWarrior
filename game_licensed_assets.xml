@@ -59,6 +59,7 @@
    <CharacterTypes>
       <!--<xi:include href="data/characters_legacy.xml" parse="xml"/>-->
       <xi:include href="data/characters_tiny_tales.xml" parse="xml"/>
+      <xi:include href="data/characters_time_fantasy.xml" parse="xml"/>
 
       <CharacterType type="ghost"                  image="ghost.png"                  phases="2"/>
       <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
@@ -128,7 +129,7 @@
          <Monster name="Green Dragon" x="6" y="16" inverseProgressMarker="PM_Rescued_Princess">
             <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="6" y="15"/></RunAwayDialog></Monster>
 
-         <NonPlayerCharacter type="princess" x="7" y="20" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
+         <NonPlayerCharacter type="princess" name="Princess Gwaelin" x="7" y="20" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
             <Dialog>"Thou art brave indeed to rescue me, [NAME]."</Dialog>
             <Dialog>"I am Gwaelin, daughter of Lorik."</Dialog>
             <Dialog>"Will thou take me to the castle?"</Dialog>

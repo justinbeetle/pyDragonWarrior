@@ -26,7 +26,7 @@
          <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
          <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call -->
          <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="PLAY_MUSIC" name="16_-_Dragon_Warrior_-_NES_-_Finale.ogg"/></DialogAssert>
+         <DialogAction type="PLAY_MUSIC" name="final_victory"/></DialogAssert>
       <Dialog>"The legends have proven true.  Thou art indeed of the line of Erdrick.  It is thy right to rule over this land.  Will thou take my place?"</Dialog>
       <Dialog>[NAME] thought carefully before answering.  "I cannot," said [NAME].  "If ever I am to rule a country, it must be a land that I myself find."</Dialog>
       <DialogCheck type="HAS_ITEM" name="PM_Rescued_Princess">
@@ -35,7 +35,7 @@
             <DialogOption name="Yes">
                <Dialog>"I'm so happy!"</Dialog>
                <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
-               <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/> <!-- TODO: This has the king joining the party instead.  Also, want to script the princess moving next to the main character here before she joins the party. -->
+               <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/>
                <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess as an NPC and add her to the hero party -->
             <DialogOption name="No">
                <Dialog>"But thou must."</Dialog>
@@ -50,9 +50,9 @@
          <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
          <DialogAction type="GOTO_COORDINATES" dir="SOUTH"/> <!-- The GOTO_COORDINATES forces a setMap call -->
          <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="PLAY_MUSIC" name="16_-_Dragon_Warrior_-_NES_-_Finale.ogg"/></NonPlayerCharacter>
+         <DialogAction type="PLAY_MUSIC" name="final_victory"/></NonPlayerCharacter>
 
-   <NonPlayerCharacter type="princess" x="11" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord and PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Carrying_Princess">
+   <NonPlayerCharacter type="princess" name="Princess Gwaelin" x="11" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord and PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Carrying_Princess">
       <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
 
    <NonPlayerCharacter type="guard" x="10" y="10" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">

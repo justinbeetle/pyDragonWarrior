@@ -32,7 +32,7 @@
       <Dialog>"Dost thou love me, [NAME]?"</Dialog>
       <DialogOptions label="but_thou_must_love_me">
          <DialogOption name="Yes">
-            <DialogAction type="PLAY_MUSIC" name="23_-_Dragon_Warrior_-_NES_-_Rescued_Gwaelin.ogg"/>
+            <DialogAction type="PLAY_MUSIC" name="love"/>
             <Dialog>"I'm so happy!"</Dialog>
             <DialogAction type="GAIN_ITEM" name="PM_Given_Princess_Love"/></DialogOption>
          <DialogOption name="No">

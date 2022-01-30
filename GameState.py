@@ -20,6 +20,7 @@ from GameMap import GameMap
 from GameStateInterface import GameStateInterface
 from HeroParty import HeroParty
 from HeroState import HeroState
+from MapCharacterState import MapCharacterState
 from MonsterParty import MonsterParty
 from MonsterState import MonsterState
 from NpcState import NpcState
@@ -454,6 +455,9 @@ class GameState(GameStateInterface):
 
     def get_npc_to_talk_to(self) -> Optional[NpcState]:
         return self.game_map.get_npc_to_talk_to()
+
+    def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
+        return self.game_map.get_npc_by_name(name)
 
     def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
         if tile is None:

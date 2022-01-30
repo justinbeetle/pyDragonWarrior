@@ -902,11 +902,23 @@ class GameDialogEvaluator:
                     self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
 
                 elif item.type == DialogActionEnum.JOIN_PARTY:
-                    if item.name is not None and npc is not None:
-                        self.hero_party.add_non_combat_member(item.name, npc)
+                    if item.name is not None:
+                        if self.hero_party.get_member(item.name) is None:
+                            # Add NPC with the same name, if any.  If not, default to the NPC the PC is talking to.
+                            npc_to_join_party = self.game_state.get_npc_by_name(item.name)
+                            if npc_to_join_party is None:
+                                print(f'Failed to find an NPC with name {item.name}', flush=True)
+                                npc_to_join_party = npc
+
+                            if npc_to_join_party is not None:
+                                self.hero_party.add_non_combat_member(item.name, npc_to_join_party)
+                            else:
+                                print(f'ERROR: JOIN_PARTY failed because the NPC is None', flush=True)
+                        else:
+                            print(f'Not adding {item.name} to the party because they are already a member', flush=True)
+
                     else:
-                        print(f'ERROR: JOIN_PARTY failed because the name ({item.name}) or NPC ({npc}) is None',
-                              flush=True)
+                        print(f'ERROR: JOIN_PARTY failed because the name is None', flush=True)
 
                 elif item.type == DialogActionEnum.LEAVE_PARTY:
                     if item.name is not None:

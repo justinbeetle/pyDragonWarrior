@@ -49,7 +49,7 @@ def fade_out(screen: pygame.surface.Surface,
         screen.blit(background_surface, (0, 0))
         screen.blit(fade_surface, (0, 0))
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(20)
 
 
 '''def fade_in(screen: pygame.surface.Surface,

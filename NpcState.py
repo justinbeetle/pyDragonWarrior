@@ -23,8 +23,7 @@ class NpcState(MapCharacterState):
 
 
 def main() -> None:
-    from Point import Point
-    from GameTypes import CharacterType, Direction
+    from GameTypes import Direction
 
     # Test out character states
     state = NpcState(NpcInfo.create_null())

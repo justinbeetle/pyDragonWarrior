@@ -57,7 +57,7 @@ def main() -> None:
         # Load required Python libraries
         if args. perform_pip_install:
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-U', '-r',
-                                   os.path.join(application_path, 'requirements.txt')])
+                                   os.path.join(application_path, 'requirements.txt')], stdout=subprocess.DEVNULL)
 
     application_name = 'pyDragonWarrior'
     saves_path = get_saves_path(application_path, application_name)

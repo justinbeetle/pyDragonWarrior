@@ -424,6 +424,7 @@ class NpcInfo(NamedTuple):
     dialog: Optional[DialogType] = None
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
+    name: Optional[str] = None
 
     @staticmethod
     def create_null(name: str = 'null') -> NpcInfo:

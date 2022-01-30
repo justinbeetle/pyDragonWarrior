@@ -424,6 +424,15 @@ class GameMap(GameMapInterface):
 
         return None
 
+    def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
+        for sprite in self.group:
+            if isinstance(sprite, NpcSprite):
+                npc_state = sprite.character
+                if name == npc_state.npc_info.name:
+                    return npc_state
+
+        return None
+
     def get_tile_degrees_of_freedom(self,
                                     tile: Point,
                                     enforce_npc_hp_penalty_limit: bool,
