@@ -128,20 +128,22 @@ class GameInfo:
 
     @staticmethod
     def init_audio_player(xml_root: ET.Element, data_path: str) -> None:
-        music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
-        sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
-
-        # Initialize the audio player
         audio_player = AudioPlayer()
-        audio_player.set_music_path(music_path)
-        audio_player.set_sound_path(sound_path)
-
-        if 0 != len(audio_player.get_music_tracks()) or 0 != len(audio_player.get_sound_tracks()):
+        if 0 == len(audio_player.get_music_tracks()) and 0 == len(audio_player.get_sound_tracks()):
+            # On the first initialization pass, just add the tracks
+            GameInfo.init_audio_player_music(xml_root, data_path)
+            GameInfo.init_audio_player_sounds(xml_root, data_path)
+        else:
             # Stage all the tracks on the second go around
             audio_player.stage_all_tracks()
 
-            # Don't try to add tracks more than once
-            return
+    @staticmethod
+    def init_audio_player_music(xml_root: ET.Element, data_path: str) -> None:
+        music_path = os.path.join(data_path, xml_root.attrib['musicPath'])
+
+        # Set the audio player music path
+        audio_player = AudioPlayer()
+        audio_player.set_music_path(music_path)
 
         # Parse music mappings and add to the audio player
         for element in xml_root.findall("./MusicMappings"):
@@ -195,6 +197,14 @@ class GameInfo:
 
             audio_player.add_music_tracks(name_to_music_track_mapping)
 
+    @staticmethod
+    def init_audio_player_sounds(xml_root: ET.Element, data_path: str) -> None:
+        sound_path = os.path.join(data_path, xml_root.attrib['soundPath'])
+
+        # Set the audio player sound path
+        audio_player = AudioPlayer()
+        audio_player.set_sound_path(sound_path)
+
         # Parse sound mappings and add to the audio player
         for element in xml_root.findall("./SoundMappings"):
             name_to_sound_track_mapping: Dict[str, SoundTrack] = {}
@@ -230,6 +240,7 @@ class GameInfo:
                                                                package_link)
 
             audio_player.add_sound_tracks(name_to_sound_track_mapping)
+
 
     @staticmethod
     def parse_title_info(xml_root: ET.Element, image_path: str) -> Tuple[pygame.surface.Surface, str]:
@@ -776,42 +787,27 @@ class GameInfo:
             monster_image = pygame.transform.scale(unscaled_monster_image,
                                                    (unscaled_monster_image.get_width() * monster_scale_factor,
                                                     unscaled_monster_image.get_height() * monster_scale_factor))
-
-            dmg_image = monster_image.copy()
-            for x in range(dmg_image.get_width()):
-                for y in range(dmg_image.get_height()):
-                    if cast(pygame.Color, dmg_image.get_at((x, y))).a != 0:
-                        dmg_image.set_at((x, y), pygame.Color('red'))
         else:
             # First, scale up the monster images.
             # Then expand them a few pixels and put a thin black border around them to off contrast.
-            # Also generate a version of the image all in as the damanage images used in  combat encounters.
             scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
-                                                          (
-                                                              unscaled_monster_image.get_width() * monster_scale_factor,
-                                                              unscaled_monster_image.get_height() * monster_scale_factor))
-            black_border_pixels = 1
-            expanded_monster_image = pygame.Surface((scaled_monster_image.get_width() + 2 * black_border_pixels,
-                                                     scaled_monster_image.get_height() + 2 * black_border_pixels),
-                                                    pygame.SRCALPHA)
-            expanded_monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
-            dmg_image = expanded_monster_image.copy()
-            monster_image = expanded_monster_image.copy()
-            for x in range(expanded_monster_image.get_width()):
-                xm = max(0, x - black_border_pixels)
-                xp = min(expanded_monster_image.get_width() - 1, x + black_border_pixels)
-                for y in range(expanded_monster_image.get_height()):
-                    ym = max(0, y - black_border_pixels)
-                    yp = min(expanded_monster_image.get_height() - 1, y + black_border_pixels)
-                    if cast(pygame.Color, expanded_monster_image.get_at((x, y))).a == 0:
-                        if cast(pygame.Color, expanded_monster_image.get_at((xm, y))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((xp, y))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((x, ym))).a != 0 \
-                                or cast(pygame.Color, expanded_monster_image.get_at((x, yp))).a != 0:
-                            monster_image.set_at((x, y), pygame.Color('black'))
-                            dmg_image.set_at((x, y), pygame.Color('red'))
-                    else:
-                        dmg_image.set_at((x, y), pygame.Color('red'))
+                                                          (unscaled_monster_image.get_width() * monster_scale_factor,
+                                                           unscaled_monster_image.get_height() * monster_scale_factor))
+            monster_image = pygame.Surface((scaled_monster_image.get_width() + 2 * black_border_pixels,
+                                            scaled_monster_image.get_height() + 2 * black_border_pixels),
+                                           pygame.SRCALPHA)
+
+            # Fill the image with transparency, then perform 4 blits to create the border.
+            # Convert the border to black a final fill multiplying the RGB values by 0.
+            monster_image.fill(pygame.Color(0, 0, 0, 0))
+            monster_image.blit(scaled_monster_image, (0, black_border_pixels))
+            monster_image.blit(scaled_monster_image, (black_border_pixels, 0))
+            monster_image.blit(scaled_monster_image, (black_border_pixels, 2*black_border_pixels))
+            monster_image.blit(scaled_monster_image, (2*black_border_pixels, black_border_pixels))
+            monster_image.fill('black', special_flags=pygame.BLEND_RGB_MULT)
+
+            # Blit the main image into the center
+            monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
 
         (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib['hp'])
         (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib['gp'])
@@ -838,7 +834,6 @@ class GameInfo:
         return MonsterInfoPicklable(
             monster_name,
             SurfacePickable.from_surface(monster_image),
-            SurfacePickable.from_surface(dmg_image),
             int(element.attrib['strength']),
             int(element.attrib['agility']),
             min_hp,
@@ -1112,31 +1107,31 @@ class GameInfo:
 
             # Load the encounter image
             # print('Load the encounter image', flush=True)
-            encounter_image = None
+            encounter_background = None
             if len(monster_zones) and 'encounterBackground' in element.attrib:
-                encounter_image = self.encounter_backgrounds[element.attrib['encounterBackground']]
+                encounter_background = self.encounter_backgrounds[element.attrib['encounterBackground']]
 
             # Save the map information
             # print('Save the map information', flush=True)
             maps[map_name] = Map(map_name,
-                                      map_tiled_file_name,
-                                      map_dat,
-                                      map_overlay_dat,
-                                      music,
-                                      light_diameter,
-                                      leaving_transition,
-                                      point_transitions,
-                                      incoming_transitions,
-                                      transitions_by_map,
-                                      transitions_by_map_and_name,
-                                      transitions_by_name,
-                                      map_decorations,
-                                      npcs,
-                                      monster_zones,
-                                      encounter_image,
-                                      special_monsters,
-                                      is_outside,
-                                      origin)
+                                 map_tiled_file_name,
+                                 map_dat,
+                                 map_overlay_dat,
+                                 music,
+                                 light_diameter,
+                                 leaving_transition,
+                                 point_transitions,
+                                 incoming_transitions,
+                                 transitions_by_map,
+                                 transitions_by_map_and_name,
+                                 transitions_by_name,
+                                 map_decorations,
+                                 npcs,
+                                 monster_zones,
+                                 encounter_background,
+                                 special_monsters,
+                                 is_outside,
+                                 origin)
         return maps
 
     def get_location(self, map_name: Optional[str], element: ET.Element) -> Point:

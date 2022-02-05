@@ -13,8 +13,8 @@ from GameDialogEvaluator import GameDialogEvaluator
 import GameEvents
 from GameInfo import GameInfo
 from GameStateInterface import GameStateInterface
-from GameTypes import DialogAction, DialogActionEnum, DialogType, GameTypes, MonsterAction, MonsterInfo, Problem, \
-    SpecialMonster, TargetTypeEnum, Tool
+from GameTypes import DialogAction, DialogActionEnum, DialogType, EncounterBackground, GameTypes, MonsterAction, \
+    MonsterInfo, Problem, SpecialMonster, TargetTypeEnum, Tool
 from HeroParty import HeroParty
 from HeroState import HeroState
 from MonsterParty import MonsterParty
@@ -35,7 +35,7 @@ class CombatEncounter(CombatEncounterInterface):
                  game_info: GameInfo,
                  game_state: GameStateInterface,
                  monster_party: MonsterParty,
-                 encounter_image: pygame.surface.Surface,
+                 encounter_background: EncounterBackground,
                  message_dialog: Optional[GameDialog] = None,
                  approach_dialog: Optional[DialogType] = None,
                  victory_dialog: Optional[DialogType] = None,
@@ -46,7 +46,6 @@ class CombatEncounter(CombatEncounterInterface):
         self.game_state = game_state
         self.hero_party = game_state.get_hero_party()
         self.monster_party = monster_party
-        self.encounter_image = encounter_image
         self.approach_dialog = approach_dialog
         self.victory_dialog = victory_dialog
         self.run_away_dialog = run_away_dialog
@@ -71,6 +70,14 @@ class CombatEncounter(CombatEncounterInterface):
             self.encounter_music = CombatEncounter.default_encounter_music
 
         self.hero_party.clear_combat_status_affects()
+
+        # Scale the encounter image
+        encounter_image_size_px = Point(encounter_background.image.get_size())
+        encounter_image_size_px *= min(self.game_state.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
+                                       self.game_state.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h)
+        encounter_image_size_px = encounter_image_size_px.round()
+        self.encounter_image = pygame.transform.smoothscale(encounter_background.image,
+                                                            encounter_image_size_px.getAsIntTuple())
 
     def encounter_loop(self) -> None:
         # Start encounter music
@@ -146,7 +153,8 @@ class CombatEncounter(CombatEncounterInterface):
     def render_monsters(self,
                         damage_image_monsters: Optional[List[CombatCharacterState]] = None,
                         force_display_monsters: Optional[List[CombatCharacterState]] = None,
-                        render_dialogs: bool = True) -> None:
+                        render_dialogs: bool = True,
+                        flicker_color: pygame.Color = pygame.Color('red')) -> None:
         if damage_image_monsters is None:
             damage_image_monsters = []
         if force_display_monsters is None:
@@ -169,7 +177,9 @@ class CombatEncounter(CombatEncounterInterface):
         for monster in self.monster_party.members:
             if monster.is_still_in_combat() or monster in force_display_monsters:
                 if monster in damage_image_monsters:
-                    monster_image = monster.monster_info.dmg_image
+                    monster_image = monster.monster_info.image.copy()
+                    monster_image.fill('black', special_flags=pygame.BLEND_RGB_MULT)
+                    monster_image.fill(flicker_color, special_flags=pygame.BLEND_RGB_ADD)
                 else:
                     monster_image = monster.monster_info.image
                 monster_image_dest_px = Point(monster_pos_x,
@@ -198,14 +208,22 @@ class CombatEncounter(CombatEncounterInterface):
             self.render_damage_to_hero_party()
 
     def render_damage_to_monster_party(self, targets: List[CombatCharacterState]) -> None:
+        self.render_flickering_monsters(targets, pygame.Color('red'))
+
+    def render_monster_casting(self, casting_monster: CombatCharacterState) -> None:
+        self.render_flickering_monsters([casting_monster], pygame.Color('white'))
+
+    def render_flickering_monsters(self, monsters: List[CombatCharacterState], flicker_color: pygame.Color) -> None:
         clock = pygame.time.Clock()
         for flickerTimes in range(10):
-            self.render_monsters(targets, targets)
+            self.render_monsters(monsters, monsters, flicker_color=flicker_color)
             pygame.display.flip()
+            pygame.time.wait(20)
             clock.tick(30)
 
-            self.render_monsters([], targets)
+            self.render_monsters([], monsters)
             pygame.display.flip()
+            pygame.time.wait(20)
             clock.tick(30)
 
         # Final render to drop any of the targets which were killed
@@ -217,16 +235,19 @@ class CombatEncounter(CombatEncounterInterface):
         clock = pygame.time.Clock()
         for flickerTimes in range(10):
             offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
+
             self.game_state.screen.blit(self.background_image, (0, 0))
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen, False, offset_pixels)
             self.message_dialog.blit(self.game_state.screen, True, offset_pixels)
-
+            pygame.time.wait(20)
             clock.tick(30)
+
             self.game_state.screen.blit(self.background_image, (0, 0))
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen, False)
             self.message_dialog.blit(self.game_state.screen, True)
+            pygame.time.wait(20)
             clock.tick(30)
 
     def get_monsters_still_in_combat(self) -> List[MonsterState]:
@@ -623,7 +644,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     @staticmethod
     def gen_cam_problem() -> Problem:
-        a = random.choices([1, 2, 3, 4], weights=(1, 1, 4, 2))[0]
+        a = random.choices([1, 2, 3, 4], weights=(1, 1, 8, 3))[0]
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term=0, max_term=20)
         elif 1 == a:
@@ -658,11 +679,11 @@ def main() -> None:
 
     # Find an encounter image to use
     for map in game_info.maps:
-        if game_info.maps[map].encounter_image is not None:
-            encounter_image = game_info.maps[map].encounter_image
+        if game_info.maps[map].encounter_background is not None:
+            encounter_background = game_info.maps[map].encounter_background
 
     # Verify an encounter image was found
-    if encounter_image is None:
+    if encounter_background is None:
         print('Failed to find an encounter image', flush=True)
         AudioPlayer().terminate()
         pygame.quit()
@@ -679,7 +700,7 @@ def main() -> None:
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
-    def handle_quit_side_effect() -> None:
+    def handle_quit_side_effect(force: bool=False) -> None:
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 
@@ -708,9 +729,9 @@ def main() -> None:
         combat_encounter = CombatEncounter(game_info,
                                            mock_game_state,
                                            monster_party,
-                                           encounter_image)
+                                           encounter_background)
         combat_encounter.encounter_loop()
-        clock.tick(30)
+        pygame.time.wait(200)
 
     # Terminate pygame
     AudioPlayer().terminate()

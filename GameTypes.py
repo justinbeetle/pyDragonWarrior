@@ -193,47 +193,6 @@ class TargetTypeEnum(Enum):
     SELF = 5
 
 
-# Alternate options to attacking (or attempting to run away) which may be attempted by a monster
-# TODO: Get rid of this in favor of actions defined in XML
-class MonsterActionEnum(Enum):
-    HEAL = 1
-    HURT = 2
-    SLEEP = 3
-    STOPSPELL = 4
-    HEALMORE = 5
-    HURTMORE = 6
-    BREATH_FIRE = 7
-    BREATH_STRONG_FIRE = 8
-    ATTACK = 9
-
-    def is_spell(self) -> bool:
-        return (MonsterActionEnum.HEAL == self
-                or MonsterActionEnum.HURT == self
-                or MonsterActionEnum.SLEEP == self
-                or MonsterActionEnum.STOPSPELL == self
-                or MonsterActionEnum.HEALMORE == self
-                or MonsterActionEnum.HURTMORE == self)
-
-    def is_heal_spell(self) -> bool:
-        return MonsterActionEnum.HEAL == self or MonsterActionEnum.HEALMORE == self
-
-    def is_hurt_spell(self) -> bool:
-        return MonsterActionEnum.HURT == self or MonsterActionEnum.HURTMORE == self
-
-    def get_spell(self, spells: Dict[str, Spell]) -> Optional[Spell]:
-        if self.name.capitalize() in spells:
-            return spells[self.name.capitalize()]
-        return None
-
-    def requires_target(self) -> bool:
-        return (MonsterActionEnum.ATTACK == self
-                or self.is_hurt_spell()
-                or self.is_fire_attack())
-
-    def is_fire_attack(self) -> bool:
-        return MonsterActionEnum.BREATH_FIRE == self or MonsterActionEnum.BREATH_STRONG_FIRE == self
-
-
 # Dialog type
 # The correct type for the branching dialog is Dict[str, 'DialogType'] but the type of Dict[str, Any] is used instead
 # since mypy does not yet support recursive types and cannot handle the correct type.
@@ -357,7 +316,7 @@ class Tile(NamedTuple):
     can_talk_over: bool
     hp_penalty: int
     mp_penalty: int
-    speed: float
+    speed: float  # TODO:  Implement this!
     spawn_rate: float
 
 
@@ -379,6 +338,9 @@ class CharacterType(NamedTuple):
     images: Dict[Direction, Dict[int, pygame.surface.Surface]]
     levels: List[Level] = []
     num_phases: int = 2
+    phase_change_frequency_factor: float = 1.0  # TODO:  Implement this!
+    movement_speed_factor: float = 1.0          # TODO:  Implement this!
+    movement_frequency_factor: float = 1.0      # TODO:  Implement this!
 
     @staticmethod
     def create_null(name: str = 'null') -> CharacterType:
@@ -483,7 +445,7 @@ class Map(NamedTuple):
     map_decorations: List[MapDecoration]
     npcs: List[NpcInfo]
     monster_zones: List[MonsterZone]
-    encounter_image: Optional[pygame.surface.Surface]
+    encounter_background: Optional[EncounterBackground]
     special_monsters: List[SpecialMonster]
     is_outside: bool
     origin: Optional[Point] = None
@@ -551,8 +513,6 @@ class MonsterActionRule(NamedTuple):
 class MonsterInfo(NamedTuple):
     name: str
     image: pygame.surface.Surface
-    dmg_image: pygame.surface.Surface
-    # TODO: Add cast_image
     strength: int
     agility: int
     min_hp: int
@@ -588,8 +548,6 @@ class SurfacePickable(NamedTuple):
 class MonsterInfoPicklable(NamedTuple):
     name: str
     image: SurfacePickable
-    dmg_image: SurfacePickable
-    # TODO: Add cast_image
     strength: int
     agility: int
     min_hp: int
@@ -609,7 +567,6 @@ class MonsterInfoPicklable(NamedTuple):
     def to_monster_info(self) -> MonsterInfo:
         return MonsterInfo(self.name,
                            self.image.to_surface().convert_alpha(),
-                           self.dmg_image.to_surface().convert_alpha(),
                            self.strength,
                            self.agility,
                            self.min_hp,
@@ -749,9 +706,6 @@ class Problem(NamedTuple):
 
 
 def main() -> None:
-    print(MonsterActionEnum.ATTACK.name)
-    print(MonsterActionEnum.ATTACK.value)
-
     print('SOUTH' in Direction.__members__)
     print(Direction.SOUTH in Direction)
 

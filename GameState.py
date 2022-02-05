@@ -707,21 +707,14 @@ class GameState(GameStateInterface):
         if self.hero_party.is_monster_party_repelled(monster_party, self.is_outside()):
             return
 
-        # A combat encounter requires an encounter image
-        encounter_image = self.game_info.maps[self.get_map_name()].encounter_image
-        if encounter_image is None:
+        # A combat encounter requires an encounter background
+        encounter_background = self.game_info.maps[self.get_map_name()].encounter_background
+        if encounter_background is None:
             encounter_background = self.get_encounter_background()
             if encounter_background is None:
                 print('Failed to initiate combat encounter due to lack of encounter image in map ' +
                       self.get_map_name(), flush=True)
                 return
-            encounter_image = encounter_background.image
-        # Scale the encounter image
-        encounter_image_size_px = Point(encounter_image.get_size())
-        encounter_image_size_px *= min(self.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
-                                       self.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h)
-        encounter_image_size_px = encounter_image_size_px.round()
-        encounter_image = pygame.transform.smoothscale(encounter_image, encounter_image_size_px.getAsIntTuple())
 
         # Perform the combat encounter
         CombatEncounter.static_init('combat')
@@ -729,7 +722,7 @@ class GameState(GameStateInterface):
             game_info=self.game_info,
             game_state=self,
             monster_party=monster_party,
-            encounter_image=encounter_image,
+            encounter_background=encounter_background,
             message_dialog=message_dialog,
             approach_dialog=approach_dialog,
             victory_dialog=victory_dialog,

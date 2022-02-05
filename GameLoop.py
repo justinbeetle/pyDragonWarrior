@@ -502,14 +502,14 @@ class GameLoop:
               self.game_state.hero_party.members[0].dest_pos_dat_tile:
             # Redraws the characters when movement_allowed is True
             # print('advancing one tick in scroll_tile', flush=True)
-            self.game_state.advance_tick()
-
             if movement_allowed and movement_hp_penalty > 0 and first_frame:
                 flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
                 flicker_surface.fill('red')
                 flicker_surface.set_alpha(128)
+                self.game_state.advance_tick(update_map=True, draw_map=True, advance_time=False, flip_buffer=False)
                 self.game_state.screen.blit(flicker_surface, (0, 0))
-                self.game_state.advance_tick(update_map=True, draw_map=False, advance_time=True, flip_buffer=True)
+                self.game_state.advance_tick(update_map=False, draw_map=False, advance_time=True, flip_buffer=True)
+                pygame.time.wait(20)
                 first_frame = False
             else:
                 self.game_state.advance_tick()

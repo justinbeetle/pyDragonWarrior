@@ -75,10 +75,12 @@ def flickering(screen: pygame.surface.Surface) -> None:
     for flicker_times in range(10):
         screen.blit(flicker_surface, (0, 0))
         pygame.display.flip()
+        pygame.time.wait(20)
         clock.tick(30)
 
         screen.blit(background_surface, (0, 0))
         pygame.display.flip()
+        pygame.time.wait(20)
         clock.tick(30)
 
 
@@ -160,6 +162,7 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
                     message_dialog.blit(game_state.screen, True)
 
                 # Advance a tick
+                pygame.time.wait(40)
                 clock.tick(15)
 
             for j in range(63, 196, 64):
@@ -186,6 +189,7 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
                                            set_color=rainbow_color,
                                            inverse_set=True)
                 pygame.display.flip()
+                pygame.time.wait(100)
                 clock.tick(5)
             except:
                 print('Color not found: ', rainbow_color, flush=True)

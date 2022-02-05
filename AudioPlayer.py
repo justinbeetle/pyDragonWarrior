@@ -66,7 +66,7 @@ class MusicTrack(NamedTuple):
         # Try to download the track
         if not self.is_file1_present() and self.link1 is not None:
             download_file(self.link1, self.file_path1)
-        if not self.is_file2_present() and self.link2 is not None:
+        if not self.is_file2_present() and self.link2 is not None and self.file_path2 is not None:
             download_file(self.link2, self.file_path2)
 
         if self.is_track_present():
@@ -96,8 +96,8 @@ class MusicTrack(NamedTuple):
             elif self.package_link is not None and self.package_name is not None:
                 required_download_info.add((self.package_link, self.package_name))
         if not self.is_file2_present():
-            if self.link2 is not None:
-                required_download_info.add((self.link1, self.file_path1))
+            if self.link2 is not None and self.file_path2 is not None:
+                required_download_info.add((self.link2, self.file_path2))
             elif self.package_link is not None and self.package_name is not None:
                 required_download_info.add((self.package_link, self.package_name))
         return required_download_info
@@ -190,7 +190,7 @@ class AudioPlayer:
 
         def stage_music_track(self, track_name: str) -> Optional[MusicTrack]:
             if track_name not in self.name_to_music_track_mapping:
-                return
+                return None
             tracks = self.name_to_music_track_mapping[track_name]
             for track in tracks[:]:
                 if not track.stage_track():
@@ -203,7 +203,7 @@ class AudioPlayer:
 
         def stage_sound_track(self, track_name: str) -> Optional[SoundTrack]:
             if track_name not in self.name_to_sound_track_mapping:
-                return
+                return None
             tracks = self.name_to_sound_track_mapping[track_name]
             for track in tracks[:]:
                 if not track.stage_track():
@@ -218,11 +218,11 @@ class AudioPlayer:
             # First determine everything that needs to be downloaded.  Use a set to avoid duplicate downloads
             required_download_info = set()
             for track_name in self.name_to_music_track_mapping:
-                for track in self.name_to_music_track_mapping[track_name]:
-                    required_download_info |= track.get_required_download_info()
+                for music_track in self.name_to_music_track_mapping[track_name]:
+                    required_download_info |= music_track.get_required_download_info()
             for track_name in self.name_to_sound_track_mapping:
-                for track in self.name_to_sound_track_mapping[track_name]:
-                    required_download_info |= track.get_required_download_info()
+                for sound_track in self.name_to_sound_track_mapping[track_name]:
+                    required_download_info |= sound_track.get_required_download_info()
 
             # Perform all the downloads using a thread pool
             with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -370,7 +370,7 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.add_music_tracks(name_to_track_mapping)
 
-    def get_music_tracks(self) -> Dict[str, MusicTrack]:
+    def get_music_tracks(self) -> Dict[str, List[MusicTrack]]:
         if self.instance is not None:
             return self.instance.name_to_music_track_mapping
         return {}
@@ -383,7 +383,7 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.add_sound_tracks(name_to_track_mapping)
 
-    def get_sound_tracks(self) -> Dict[str, SoundTrack]:
+    def get_sound_tracks(self) -> Dict[str, List[SoundTrack]]:
         if self.instance is not None:
             return self.instance.name_to_sound_track_mapping
         return {}
