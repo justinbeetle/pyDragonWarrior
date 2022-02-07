@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Tuple, Union
 
 import pygame
 import random
@@ -83,12 +83,14 @@ class CombatEncounter(CombatEncounterInterface):
         # Start encounter music
         AudioPlayer().play_music(self.encounter_music, self.encounter_music)
 
+        # Phase in the encounter background
+        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
+        self.render_encounter_background_phase_in()
+
         # Clear event queue
         GameEvents.clear_events()
 
-        # Render the status dialog, monsters, and approach dialog
-        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
-        self.render_monsters()
+        # Add the approach dialog
         if self.approach_dialog is not None:
             self.gde.traverse_dialog(self.message_dialog, self.approach_dialog, depth=1)
         else:
@@ -150,24 +152,55 @@ class CombatEncounter(CombatEncounterInterface):
         self.game_state.draw_map(False, draw_combat=False)
         pygame.display.flip()
 
-    def render_monsters(self,
-                        damage_image_monsters: Optional[List[CombatCharacterState]] = None,
-                        force_display_monsters: Optional[List[CombatCharacterState]] = None,
-                        render_dialogs: bool = True,
-                        flicker_color: pygame.Color = pygame.Color('red')) -> None:
-        if damage_image_monsters is None:
-            damage_image_monsters = []
-        if force_display_monsters is None:
-            force_display_monsters = []
+    def render_encounter_background_phase_in(self) -> None:
+        clock = pygame.time.Clock()
+        for percent in range(10, 100, 10):
+            self.render_encounter_background(percent)
+            pygame.display.flip()
+            pygame.time.wait(20)
+            clock.tick(20)
 
-        # Render the encounter background
+        # Final render to drop to complete the background and drop in the monsters
+        self.render_monsters()
+
+    def render_encounter_background(self, percent: int=100) -> Tuple[Point, Point]:
+        # Determine the size and screen position for the full background image
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
             (self.game_state.get_win_size_pixels().w - encounter_image_size_px.w) / 2,
             self.message_dialog.pos_tile.y * self.game_info.tile_size_pixels
             - encounter_image_size_px.h + CombatEncounter.DAMAGE_FLICKER_PIXELS)
+
+        # Determine what subset of the encounter background to render based on the specified percent
+        encounter_image_rect = self.encounter_image.get_rect()
+        encounter_image_screen_rect = encounter_image_rect.move(encounter_image_dest_px)
+        if percent < 100:
+            inflate_pixels = encounter_image_size_px * (percent / 100 - 1)
+            encounter_image_rect.inflate_ip(inflate_pixels)
+            encounter_image_screen_rect.inflate_ip(inflate_pixels)
+
+        # Draw the background image, then the border, then the encounter image
         self.game_state.screen.blit(self.background_image, (0, 0))
-        self.game_state.screen.blit(self.encounter_image, encounter_image_dest_px)
+        outside_border_width = 4
+        pygame.draw.rect(self.game_state.screen, 'black',
+                         encounter_image_screen_rect.inflate(outside_border_width, outside_border_width))
+        self.game_state.screen.blit(self.encounter_image, encounter_image_screen_rect, encounter_image_rect)
+
+        # Return the size and screen position for the full background image - they are used in render_monsters
+        return encounter_image_size_px, encounter_image_dest_px
+
+    def render_monsters(self,
+                        flicker_image_monsters: Optional[List[CombatCharacterState]] = None,
+                        force_display_monsters: Optional[List[CombatCharacterState]] = None,
+                        render_dialogs: bool = True,
+                        flicker_color: pygame.Color = pygame.Color('red')) -> None:
+        if flicker_image_monsters is None:
+            flicker_image_monsters = []
+        if force_display_monsters is None:
+            force_display_monsters = []
+
+        # Render the encounter background
+        encounter_image_size_px, encounter_image_dest_px = self.render_encounter_background()
 
         # Render the monsters
         monster_width_px = CombatEncounter.MONSTER_SPACING_PIXELS * (len(self.monster_party.members) - 1)
@@ -176,7 +209,7 @@ class CombatEncounter(CombatEncounterInterface):
         monster_pos_x = (self.game_state.get_win_size_pixels().x - monster_width_px) / 2
         for monster in self.monster_party.members:
             if monster.is_still_in_combat() or monster in force_display_monsters:
-                if monster in damage_image_monsters:
+                if monster in flicker_image_monsters:
                     monster_image = monster.monster_info.image.copy()
                     monster_image.fill('black', special_flags=pygame.BLEND_RGB_MULT)
                     monster_image.fill(flicker_color, special_flags=pygame.BLEND_RGB_ADD)
@@ -659,7 +692,6 @@ def main() -> None:
     # Initialize pygame
     pygame.init()
     pygame.font.init()
-    clock = pygame.time.Clock()
 
     # Setup the screen
     win_size_pixels = Point(1280, 960)
@@ -681,6 +713,7 @@ def main() -> None:
     for map in game_info.maps:
         if game_info.maps[map].encounter_background is not None:
             encounter_background = game_info.maps[map].encounter_background
+            break
 
     # Verify an encounter image was found
     if encounter_background is None:
@@ -696,6 +729,7 @@ def main() -> None:
     mock_game_state = mock.create_autospec(spec=GameStateInterface)
     mock_game_state.screen = screen
     mock_game_state.is_running = True
+    mock_game_state.is_light_restricted = MagicMock(return_value=False)
     mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
