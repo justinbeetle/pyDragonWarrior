@@ -48,9 +48,8 @@ def fade_out(screen: pygame.surface.Surface,
         fade_surface.set_alpha(i)
         screen.blit(background_surface, (0, 0))
         screen.blit(fade_surface, (0, 0))
-        pygame.display.flip()
-        pygame.time.wait(20)
         clock.tick(20)
+        pygame.display.flip()
 
 
 def flickering(screen: pygame.surface.Surface) -> None:
@@ -62,14 +61,12 @@ def flickering(screen: pygame.surface.Surface) -> None:
     clock = pygame.time.Clock()
     for flicker_times in range(10):
         screen.blit(flicker_surface, (0, 0))
-        pygame.display.flip()
-        pygame.time.wait(20)
         clock.tick(30)
+        pygame.display.flip()
 
         screen.blit(background_surface, (0, 0))
-        pygame.display.flip()
-        pygame.time.wait(20)
         clock.tick(30)
+        pygame.display.flip()
 
 
 def pink_tinge(screen: pygame.surface.Surface,
@@ -145,13 +142,13 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
                 game_state.screen.blit(fade_surface, (0, 0))
 
                 # Overlay the dialogs
-                game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_background=False, draw_status=True)
+                game_state.draw_map(flip_buffer=False, draw_background=False, draw_status=True)
                 if not message_dialog.is_empty():
-                    message_dialog.blit(game_state.screen, True)
+                    message_dialog.blit(game_state.screen)
 
                 # Advance a tick
-                pygame.time.wait(40)
                 clock.tick(15)
+                pygame.display.flip()
 
             for j in range(63, 196, 64):
                 fade_step(j)
@@ -176,9 +173,8 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
                                            threshold=pygame.Color(50, 50, 50),
                                            set_color=rainbow_color,
                                            inverse_set=True)
-                pygame.display.flip()
-                pygame.time.wait(100)
                 clock.tick(5)
+                pygame.display.flip()
             except:
                 print('Color not found: ', rainbow_color, flush=True)
 

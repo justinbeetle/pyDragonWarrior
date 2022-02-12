@@ -627,15 +627,16 @@ class GameState(GameStateInterface):
             self.game_map.update()
 
         if draw_map:
-            self.draw_map(flip_buffer=flip_buffer)
-        elif flip_buffer:
-            pygame.display.flip()
+            self.draw_map(flip_buffer=False)
 
         if advance_time:
             self.clock.tick(30)
             # self.tick_count += 1
             # if 10 == self.tick_count % 100:
             #     print(f'FPS = {self.clock.get_fps()}', flush=True)
+
+        if flip_buffer:
+            pygame.display.flip()
 
     def get_game_info(self) -> GameInfo:
         return self.game_info

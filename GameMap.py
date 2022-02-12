@@ -704,7 +704,7 @@ class GameMap(GameMapInterface):
             if backgrounds is not None:
                 if background in backgrounds:
                     return background
-                print(f'WARN: No encounter background for {background} at {tile}', flush=True)
+                # print(f'WARN: No encounter background for {background} at {tile}', flush=True)
 
                 background = tile_name + vegetation_suffix
                 if background in backgrounds:

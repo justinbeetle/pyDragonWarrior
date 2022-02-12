@@ -99,8 +99,9 @@ class GameDialogEvaluator:
                 AudioPlayer().play_sound('talking')
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
-            message_dialog.blit(self.game_state.screen, True)
+            message_dialog.blit(self.game_state.screen)
             clock.tick(30)
+            pygame.display.flip()
 
     def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
         # Skip waiting for acknowledgement of message dialog if the content
@@ -120,14 +121,15 @@ class GameDialogEvaluator:
             # Process events
             events = GameEvents.get_events()
             if 0 == len(events):
-                clock.tick(8)
                 if message_dialog is not None:
                     if is_waiting_indicator_drawn:
                         message_dialog.erase_waiting_indicator()
                     else:
                         message_dialog.draw_waiting_indicator()
                     is_waiting_indicator_drawn = not is_waiting_indicator_drawn
-                    message_dialog.blit(self.game_state.screen, True)
+                    message_dialog.blit(self.game_state.screen)
+                clock.tick(8)
+                pygame.display.flip()
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -868,7 +870,6 @@ class GameDialogEvaluator:
                                         add_message(target.get_name() + "'s hit points reduced by "
                                                                + str(damage) + '.')
                             else:
-                                # TODO: Play sound?
                                 AudioPlayer().play_sound('attack_miss_lvl2')
                                 if isinstance(target, HeroState):
                                     add_message(target.get_name() + ' dodges the strike.')
