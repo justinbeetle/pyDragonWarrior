@@ -4,7 +4,8 @@
       <Dialog>"Thou art most welcome in Brecconary."</Dialog></NonPlayerCharacter>
 
    <NonPlayerCharacter type="girl" location="girl outside blacksmith" dir="SOUTH" walking="no">
-      <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog></NonPlayerCharacter>
+      <Dialog>"Welcome!  Enter the shop and speak to its keeper across the desk."</Dialog>
+      <Dialog>"Don't forget to equip new arms and armour before venturing forth!"</Dialog></NonPlayerCharacter>
 
    <NonPlayerCharacter type="guard" location="dying guard" dir="NORTH" walking="no">
       <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogAssert>

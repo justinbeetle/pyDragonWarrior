@@ -2,12 +2,9 @@
 <Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounter_backgrounds">
    <Title music="title" image="title.png"/>
 
-   <Fonts>
+   <Dialogs image="dialog.png">
       <Font name="data/fonts/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf" credits="somepx - https://itch.io/profile/somepx"/>
-      <Font name="arialms"/>
-      <Font name="lucidasans"/>
-      <Font name="arial"/>
-   </Fonts>
+   </Dialogs>
 
    <xi:include href="data/music/music_dw1.xml" parse="xml"/>
 

@@ -611,8 +611,7 @@ class GameState(GameStateInterface):
             self.combat_encounter.background_image = self.screen.copy()
             self.combat_encounter.render_monsters()
         elif draw_status:
-            # TODO: Do we want to always show a status dialog?  If so, exploring or encounter?
-            GameDialog.create_encounter_status_dialog(
+            GameDialog.create_persistent_status_dialog(
                 self.hero_party).blit(self.screen, False)
 
         # Flip the screen buffer
@@ -743,7 +742,7 @@ class GameState(GameStateInterface):
             self.hero_party.main_character.hp = 0
             AudioPlayer().stop_music()
             AudioPlayer().play_sound('player_died')
-            GameDialog.create_exploring_status_dialog(
+            GameDialog.create_encounter_status_dialog(
                 self.hero_party).blit(self.screen, False)
             gde = GameDialogEvaluator(self.game_info, self)
             if message_dialog is None:

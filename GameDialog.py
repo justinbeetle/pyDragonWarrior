@@ -44,13 +44,32 @@ class GameDialog:
     outside_spacing_pixels = 24
     internal_spacing_pixels = 10
     selection_indicator_pixels = 16
+    border_image: Optional[pygame.surface.Surface] = None
 
     @staticmethod
     def static_init(win_size_tiles: Point,
                     tile_size_pixels: int,
-                    font_names: List[str] = []) -> None:
+                    font_names: List[str] = [],
+                    border_image_filename: Optional[str] = None) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
+        if border_image_filename is not None:
+            try:
+                image = pygame.image.load(border_image_filename)
+
+                # Expect the border image to be square
+                if image.get_width() != image.get_height() and 0 == image.get_width() % 3:
+                    print('ERROR: The dialog border image must be square with a size divisible by 3', flush=True)
+                    GameDialog.border_image = None
+                else:
+                    scale_factor = tile_size_pixels // (image.get_width() // 3) - 1
+                    if scale_factor > 0:
+                        scale_size = image.get_width() * scale_factor
+                        GameDialog.border_image = pygame.transform.scale(image, (scale_size, scale_size))
+                    else:
+                        GameDialog.border_image = image
+            except:
+                print('ERROR: Failed to load', border_image_filename, flush=True)
 
         # Determine fonts
         def find_font_by_name(font_names: List[str], default_font_name: Optional[str] = None) -> Optional[str]:
@@ -290,8 +309,67 @@ class GameDialog:
     def initialize_image(self) -> None:
         self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
         self.image.fill('black')
-        pygame.draw.rect(self.image, self.font_color,
-                         pygame.Rect(8, 8, self.image.get_width() - 16, self.image.get_height() - 16), 7)
+        if GameDialog.border_image is not None:
+            border_image = GameDialog.border_image.convert().copy()
+            pygame.transform.threshold(border_image,
+                                       border_image,
+                                       search_color=pygame.Color('white'),
+                                       set_color=self.font_color,
+                                       inverse_set=True)
+
+            border_px = border_image.get_width() // 3
+            src_size = (border_px, border_px)
+            middle_width_span = self.image.get_width() - 2 * border_px
+            middle_height_span = self.image.get_height() - 2 * border_px
+
+            # Top Left Corner
+            src_pos = dst_pos = (0, 0)
+            self.image.blit(border_image, dst_pos, pygame.Rect(src_pos, src_size))
+            # Top Middle
+            src_pos = dst_pos = (border_px, 0)
+            dst_size = (middle_width_span, border_px)
+            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
+                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            # Top Right Corner
+            src_pos = (border_px + border_px, 0)
+            dst_pos = (border_px + middle_width_span, 0)
+            self.image.blit(border_image, dst_pos, pygame.Rect(src_pos, src_size))
+            # Left Middle
+            src_pos = (0, border_px)
+            dst_pos = (0, border_px)
+            dst_size = (border_px, middle_height_span)
+            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
+                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            # Right Middle
+            src_pos = (border_px + border_px, border_px)
+            dst_pos = (border_px + middle_width_span, border_px)
+            dst_size = (border_px, middle_height_span)
+            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)),
+                                   dst_size,
+                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            # Bottom Left Corner
+            src_pos = (0, border_px + border_px)
+            dst_pos = (0, border_px + middle_height_span)
+            self.image.blit(border_image, dst_pos, pygame.Rect(src_pos, src_size))
+            # Bottom Middle
+            src_pos = (border_px, border_px + border_px)
+            dst_pos = (border_px, border_px + middle_height_span)
+            dst_size = (middle_width_span, border_px)
+            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
+                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            # Bottom Right Corner
+            src_pos = (border_px + border_px, border_px + border_px)
+            dst_pos = (border_px + middle_width_span, border_px + middle_height_span)
+            self.image.blit(border_image, dst_pos, pygame.Rect(src_pos, src_size))
+        else:
+            outside_border_width = 5
+            inside_border_width = 4
+            pygame.draw.rect(self.image, self.font_color,
+                             pygame.Rect(outside_border_width,
+                                         outside_border_width,
+                                         self.image.get_width() - 2 * outside_border_width,
+                                         self.image.get_height() - 2 * outside_border_width),
+                             inside_border_width)
         if self.title is not None:
             title_image = GameDialog.render_font(self.title)
             title_image_pos_x = (self.image.get_width() - title_image.get_width()) / 2
@@ -374,43 +452,32 @@ class GameDialog:
                              trailing_message: Optional[str] = None) -> GameDialog:
         if size_tiles is None:
             # TODO: Calculate size based on row_data
-            size_tiles = GameDialog.get_size_for_content('XP 1000000000', len(row_data), title)
+            longest_string = 'Health '+'10000000'*(len(row_data[0])-1)
+            size_tiles = GameDialog.get_size_for_content(longest_string, len(row_data), title)
 
             # Add in length for trailing_message
             if trailing_message is not None:
                 size_pixels = size_tiles * GameDialog.tile_size_pixels
                 trailing_message_lines = GameDialog.convert_message_to_lines(trailing_message, int(size_pixels.w))
-                size_tiles = GameDialog.get_size_for_content(
-                    'XP 1000000000', len(row_data) + len(trailing_message_lines), title)
+                size_tiles = GameDialog.get_size_for_content(longest_string,
+                                                             len(row_data) + len(trailing_message_lines),
+                                                             title)
+
         dialog = GameDialog(pos_tile, size_tiles, title)
         dialog.add_row_data(row_data, spacing_type=spacing_type, trailing_message=trailing_message)
         return dialog
 
     @staticmethod
-    def create_exploring_status_dialog(party: HeroParty) -> GameDialog:
-        if 1 == len(party.combat_members):
-            return GameDialog.create_status_dialog(
-                Point(1, 1),
-                None,
-                party.main_character.name,
-                [['Level', party.main_character.level.name],
-                 ['Health', str(party.main_character.hp)],
-                 ['Magic', str(party.main_character.mp)],
-                 ['Gold', str(party.gp)],
-                 ['EXP', str(party.main_character.xp)]])
-        else:
-            # Use encounter dialog instead even when exploring for parties
-            return GameDialog.create_encounter_status_dialog(party, 'Gold: ' + str(party.gp))
-
-    @staticmethod
-    def create_encounter_status_dialog(party: HeroParty, trailing_message: Optional[str] = None) -> GameDialog:
+    def create_persistent_status_dialog(party: HeroParty) -> GameDialog:
         title: Optional[str] = None
         if 1 == len(party.combat_members):
             title = party.main_character.name
+            spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
             status_data: List[List[Optional[str]]] = [['Level', party.main_character.level.name],
                                                       ['Health', str(party.main_character.hp)],
                                                       ['Magic', str(party.main_character.mp)]]
         else:
+            spacing_type = GameDialogSpacing.EQUAL_COLUMNS
             status_data = [[''],
                            ['Level'],
                            ['Health'],
@@ -426,6 +493,46 @@ class GameDialog:
             None,
             title,
             status_data,
+            spacing_type=spacing_type)
+
+    @staticmethod
+    def create_exploring_status_dialog(party: HeroParty) -> GameDialog:
+        return GameDialog.create_encounter_status_dialog(party)
+
+    @staticmethod
+    def create_encounter_status_dialog(party: HeroParty) -> GameDialog:
+        title: Optional[str] = None
+        trailing_message: Optional[str] = None
+        if 1 == len(party.combat_members):
+            title = party.main_character.name
+            spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
+            status_data: List[List[Optional[str]]] = [['Level', party.main_character.level.name],
+                                                      ['Health', str(party.main_character.hp)],
+                                                      ['Magic', str(party.main_character.mp)],
+                                                      ['XP', str(party.main_character.xp)],
+                                                      ['Gold', str(party.gp)]]
+        else:
+            spacing_type = GameDialogSpacing.EQUAL_COLUMNS
+            status_data = [[''],
+                           ['Level'],
+                           ['Health'],
+                           ['Magic'],
+                           ['XP']]
+            for member in party.combat_members:
+                status_data[0].append(member.get_name())
+                status_data[1].append(member.level.name)
+                status_data[2].append(str(member.hp))
+                status_data[3].append(str(member.mp))
+                status_data[4].append(str(member.xp))
+
+            trailing_message = f'Gold: {party.gp}'
+
+        return GameDialog.create_status_dialog(
+            Point(1, 1),
+            None,
+            title,
+            status_data,
+            spacing_type=spacing_type,
             trailing_message=trailing_message)
 
     @staticmethod

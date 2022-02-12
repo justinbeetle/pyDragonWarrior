@@ -119,9 +119,12 @@ class GameInfo:
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         GameInfo.init_audio_player(xml_root, data_path)
 
+        image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
+        font_names, dialog_border_image_filename = GameInfo.parse_dialogs_info(xml_root, image_path)
         GameDialog.static_init(win_size_tiles,
                                tile_size_pixels,
-                               GameInfo.parse_font_info(xml_root))
+                               font_names,
+                               dialog_border_image_filename)
 
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
         return GameInfo.parse_title_info(xml_root, image_path)
@@ -253,11 +256,15 @@ class GameInfo:
         return title_image, title_music
 
     @staticmethod
-    def parse_font_info(xml_root: ET.Element) -> List[str]:
+    def parse_dialogs_info(xml_root: ET.Element, image_path: str) -> Tuple[List[str], Optional[str]]:
         font_names: List[str] = []
-        for element in xml_root.findall("./Fonts//Font"):
+        dialogs_element = xml_root.find('Dialogs')
+        for element in dialogs_element.findall(".//Font"):
             font_names.append(element.attrib['name'])
-        return font_names
+        dialog_border_image_filename = None
+        if 'image' in dialogs_element.attrib:
+            dialog_border_image_filename = os.path.join(image_path, dialogs_element.attrib['image'])
+        return font_names, dialog_border_image_filename
 
     @staticmethod
     def parse_encounter_backgrounds(xml_root: ET.Element, image_path: str) -> Dict[str, EncounterBackground]:

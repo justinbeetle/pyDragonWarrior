@@ -84,7 +84,6 @@ class CombatEncounter(CombatEncounterInterface):
         AudioPlayer().play_music(self.encounter_music, self.encounter_music)
 
         # Phase in the encounter background
-        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
         self.render_encounter_background_phase_in()
 
         # Clear event queue
@@ -107,6 +106,7 @@ class CombatEncounter(CombatEncounterInterface):
                 if monster.should_run_away(self.hero_party.main_character):
                     last_turn_was_monster_turn = True
                     monster.has_run_away = True
+                    AudioPlayer().play_sound('run_away')
                     self.add_message(monster.get_name() + ' is running away.')
                     self.render_monsters()
 
@@ -156,7 +156,7 @@ class CombatEncounter(CombatEncounterInterface):
         clock = pygame.time.Clock()
         for percent in range(10, 100, 10):
             self.render_encounter_background(percent)
-            pygame.display.flip()
+            GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, True)
             pygame.time.wait(20)
             clock.tick(20)
 
@@ -333,8 +333,8 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Check if the monster is going to run away.  Only random monsters should ever run away.
         if monster.should_run_away(self.hero_party.main_character):
-            AudioPlayer().play_sound('run_away')
             monster.has_run_away = True
+            AudioPlayer().play_sound('run_away')
             self.add_message(monster.get_name() + ' is running away.')
             self.render_monsters()
             return
@@ -551,7 +551,7 @@ class CombatEncounter(CombatEncounterInterface):
                     if hero.level_up_check():
                         self.wait_for_acknowledgement()
                         AudioPlayer().play_sound('level_up')
-                        GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
+                        GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, False)
                         # TODO: Update text for multiple hero encounters
                         self.add_message(
                             '\nCourage and wit have served thee well. Thou hast been promoted to the next level.')
