@@ -654,6 +654,15 @@ class GameInfo:
             num_phases = 2
             if 'phases' in element.attrib:
                 num_phases = int(element.attrib['phases'])
+            movement_speed_factor = 1.0
+            if 'speed' in element.attrib:
+                movement_speed_factor = float(element.attrib['speed'])
+            ticks_per_step = 30
+            if 'frames_per_step' in element.attrib:
+                ticks_per_step = int(element.attrib['frames_per_step'])
+            ticks_between_npc_moves = 60
+            if 'frames_between_moves' in element.attrib:
+                ticks_between_npc_moves = int(element.attrib['frames_between_moves'])
             character_type_filename = os.path.join(character_path, element.attrib['image'])
             # print('Loading image', character_type_filename, flush=True)
             try:
@@ -708,7 +717,10 @@ class GameInfo:
             new_char = CharacterType(name=character_type,
                                      images=character_type_images,
                                      levels=character_levels,
-                                     num_phases=num_phases)
+                                     num_phases=num_phases,
+                                     movement_speed_factor=movement_speed_factor,
+                                     ticks_per_step=ticks_per_step,
+                                     ticks_between_npc_moves=ticks_between_npc_moves)
 
             character_types[character_type] = new_char
         return character_types

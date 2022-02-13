@@ -427,7 +427,7 @@ class CombatEncounter(CombatEncounterInterface):
             elif menu_result == 'RUN':
                 target = random.choice(self.monster_party.get_still_in_combat_members())
                 if target.is_blocking_escape(hero):
-                    # TODO: Play sound?
+                    AudioPlayer().play_sound('attack_miss_lvl2')
                     self.add_message(hero.get_name() + ' started to run away but was blocked in front.')
                 else:
                     AudioPlayer().play_sound('run_away')

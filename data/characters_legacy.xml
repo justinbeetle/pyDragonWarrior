@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-   <CharacterType type="hero"                   image="hero.png"                   levels="hero"/>
-   <CharacterType type="hero_sword"             image="hero_sword.png"/>
-   <CharacterType type="hero_shield"            image="hero_shield.png"/>
-   <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png"/>
-   <CharacterType type="ghost"                  image="ghost.png"/>
-   <CharacterType type="king"                   image="king.png"/>
-   <CharacterType type="princess"               image="princess.png"/>
-   <CharacterType type="guard"                  image="guard.png"/>
-   <CharacterType type="warrior"                image="warrior.png"/>
-   <CharacterType type="sage"                   image="sage.png"/>
-   <CharacterType type="boy"                    image="boy.png"/>
-   <CharacterType type="girl"                   image="girl.png"/>
-   <CharacterType type="merchant"               image="merchant.png"/>
-   <CharacterType type="trumpeter"              image="trumpeter.png"/>
-   <CharacterType type="dragonlord"             image="dragonlord.png"/>
+   <CharacterType type="hero"                   image="hero.png"                  speed="1.0"  frames_per_step="30" frames_between_moves="60" levels="hero"/>
+   <CharacterType type="hero_sword"             image="hero_sword.png"            speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="hero_shield"            image="hero_shield.png"           speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="hero_sword_and_shield"  image="hero_sword_and_shield.png" speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="ghost"                  image="ghost.png"                 speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="king"                   image="king.png"                  speed="0.75" frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="princess"               image="princess.png"              speed="0.75" frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="guard"                  image="guard.png"                 speed="1.0"  frames_per_step="50" frames_between_moves="60"/>
+   <CharacterType type="warrior"                image="warrior.png"               speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="sage"                   image="sage.png"                  speed="0.25" frames_per_step="80" frames_between_moves="90"/>
+   <CharacterType type="boy"                    image="boy.png"                   speed="1.0"  frames_per_step="20" frames_between_moves="50"/>
+   <CharacterType type="girl"                   image="girl.png"                  speed="0.75" frames_per_step="24" frames_between_moves="60"/>
+   <CharacterType type="merchant"               image="merchant.png"              speed="0.75" frames_per_step="50" frames_between_moves="80"/>
+   <CharacterType type="trumpeter"              image="trumpeter.png"             speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
+   <CharacterType type="dragonlord"             image="dragonlord.png"            speed="1.0"  frames_per_step="30" frames_between_moves="60"/>
 </root>

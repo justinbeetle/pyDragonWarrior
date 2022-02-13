@@ -316,8 +316,21 @@ class Tile(NamedTuple):
     can_talk_over: bool
     hp_penalty: int
     mp_penalty: int
-    speed: float  # TODO:  Implement this!
+    movement_speed_factor: float
     spawn_rate: float
+
+    @staticmethod
+    def default_tile() -> Tile:
+        # Return a default, walkable tile as a default
+        return Tile('DEFAULT TILE',
+                    '?',
+                    [],
+                    True,
+                    False,
+                    0,
+                    0,
+                    1.0,
+                    1.0)
 
 
 class Decoration(NamedTuple):
@@ -338,9 +351,9 @@ class CharacterType(NamedTuple):
     images: Dict[Direction, Dict[int, pygame.surface.Surface]]
     levels: List[Level] = []
     num_phases: int = 2
-    phase_change_frequency_factor: float = 1.0  # TODO:  Implement this!
-    movement_speed_factor: float = 1.0          # TODO:  Implement this!
-    movement_frequency_factor: float = 1.0      # TODO:  Implement this!
+    movement_speed_factor: float = 1.0
+    ticks_per_step: int = 30
+    ticks_between_npc_moves: int = 60
 
     @staticmethod
     def create_null(name: str = 'null') -> CharacterType:

@@ -14,39 +14,39 @@
    <xi:include href="data/images/encounter_backgrounds/encounter_backgrounds_custom.xml" parse="xml"/>
 
    <Tiles imagePath="tiles_ios_hybrid">
-      <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="mountain"         image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="plain"            image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="simple"/>
-      <Tile name="deciduous_forest" image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.9" spawnRate="1/16" type="complex"/>
-      <Tile name="hill"             image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.7" spawnRate="1/8"  type="complex"/>
-      <Tile name="desert"           image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"  type="simple"/>
-      <Tile name="swamp"            image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="bridge"           image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24" type="complex"/>
-      <Tile name="stone"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="complex"/>
-      <Tile name="roof"             image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="path"             image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="counter"          image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                           type="complex"/>
-      <Tile name="inn"              image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="armor"            image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
-      <Tile name="barrier"          image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0" spawnRate="1/16" type="simple"/>
-      <Tile name="darkness"         image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"    type="simple"/>
+      <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="0"    type="complex"/>
+      <Tile name="mountain"         image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="complex"/>
+      <Tile name="plain"            image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="1/24" type="simple"/>
+      <Tile name="deciduous_forest" image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75" spawnRate="1/12" type="complex"/>
+      <Tile name="hill"             image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75" spawnRate="1/8"  type="complex"/>
+      <Tile name="desert"           image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75" spawnRate="1/8"  type="simple"/>
+      <Tile name="swamp"            image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="0.5"  spawnRate="1/8"  type="simple"/>
+      <Tile name="bridge"           image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="1/24" type="complex"/>
+      <Tile name="stone"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="complex"/>
+      <Tile name="roof"             image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="simple"/>
+      <Tile name="path"             image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="1/16" type="simple"/>
+      <Tile name="counter"          image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                            type="complex"/>
+      <Tile name="inn"              image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="simple"/>
+      <Tile name="armor"            image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="simple"/>
+      <Tile name="barrier"          image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0"  spawnRate="1/16" type="simple"/>
+      <Tile name="darkness"         image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"    type="simple"/>
 
-      <Tile name="beach"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="beach_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
-      <Tile name="shore"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="shore_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="shore_cliff"                                      walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="shore_cliff_walkable"                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="river"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="river_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="volcano"                                          walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-  <!--<Tile name="deciduous_forest"                                 walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>-->
-      <Tile name="pine_forest"                                      walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/16"/>
-      <Tile name="jungle"                                           walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/8"/>
-      <Tile name="cliff"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="cliff_walkable"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="1/24"/>
-      <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
-      <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0" spawnRate="0"/>
+      <Tile name="beach"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="beach_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="1/16"/>
+      <Tile name="shore"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="shore_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="1/24"/>
+      <Tile name="shore_cliff"                                      walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="shore_cliff_walkable"                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="1/24"/>
+      <Tile name="river"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="river_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"  spawnRate="1/24"/>
+      <Tile name="volcano"                                          walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+  <!--<Tile name="deciduous_forest"                                 walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75" spawnRate="1/12"/>-->
+      <Tile name="pine_forest"                                      walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75" spawnRate="1/12"/>
+      <Tile name="jungle"                                           walkable="yes" boatable="no"  hpPenalty="0"  speed="0.5"  spawnRate="1/8"/>
+      <Tile name="cliff"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="cliff_walkable"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="1/24"/>
+      <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"/>
+      <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"  spawnRate="0"/>
    </Tiles>
 
    <Decorations imagePath="decorations_20">

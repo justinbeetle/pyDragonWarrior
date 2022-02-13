@@ -22,6 +22,10 @@ from NpcState import NpcState
 
 class GameMapInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
+    def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
+        pass
+
+    @abc.abstractmethod
     def can_move_to_tile(self,
                          tile: Point,
                          enforce_npc_hp_penalty_limit: bool = False,
@@ -80,18 +84,20 @@ class MapDecorationSprite(MapSprite):
 class CharacterSprite(MapSprite):
     character: MapCharacterState
 
-    def __init__(self, character: MapCharacterState) -> None:
+    def __init__(self, character: MapCharacterState, game_map: GameMapInterface) -> None:
         super().__init__()
         self.character = character
-        self.phase = 0
+        self.game_map = game_map
+        self.phase = random.randint(0, self.character.character_type.num_phases-1)
         self.update_count = 0
 
-        # TODO: Make updates_per_phase_change a parameter of a character
         if self.character.character_type.num_phases == 2:
-            self.updates_per_phase_change = 20
+            # One step per phase change for characters with two phases
+            self.updates_per_phase_change = self.character.character_type.ticks_per_step
             self.character_phase_progression = [0, 1]
         else:
-            self.updates_per_phase_change = 15
+            # One half step per phase change for characters with three phases
+            self.updates_per_phase_change = self.character.character_type.ticks_per_step // 2
             self.character_phase_progression = [0, 1, 2, 1]
 
         self.image = self.get_image()
@@ -112,8 +118,16 @@ class CharacterSprite(MapSprite):
     def update(self, *args: Any, **kwargs: Any) -> None:
         # Move the character in steps to the destination tile
         if self.character.curr_pos_dat_tile != self.character.dest_pos_dat_tile:
+            if self.character.curr_pos_offset_img_px.mag() < MapSprite.tile_size_pixels / 2:
+                nearest_tile = self.character.curr_pos_dat_tile
+            else:
+                nearest_tile = self.character.dest_pos_dat_tile
+            image_px_step_size = max(1, int(round(MapSprite.image_px_step_size *
+                                                  self.character.character_type.movement_speed_factor *
+                                                  self.game_map.get_tile_info(nearest_tile).movement_speed_factor)))
+
             direction_vector = self.character.direction.get_vector()
-            self.character.curr_pos_offset_img_px += direction_vector * MapSprite.image_px_step_size
+            self.character.curr_pos_offset_img_px += direction_vector * image_px_step_size
             if self.character.curr_pos_offset_img_px.mag() / MapSprite.tile_size_pixels >= direction_vector.mag():
                 self.character.curr_pos_dat_tile = self.character.dest_pos_dat_tile
                 self.character.curr_pos_offset_img_px = Point(0, 0)
@@ -136,9 +150,9 @@ class HeroSprite(CharacterSprite):
     character: HeroState
     character_types: Dict[str, CharacterType] = {}
 
-    def __init__(self, hero: HeroState, hero_party: HeroParty) -> None:
+    def __init__(self, hero: HeroState, hero_party: HeroParty, game_map: GameMapInterface) -> None:
         self.hero_party = hero_party
-        super().__init__(hero)
+        super().__init__(hero, game_map)
 
     def get_image(self) -> pygame.surface.Surface:
         if self.character.hp <= 0:
@@ -163,24 +177,23 @@ class NpcSprite(CharacterSprite):
     character: NpcState
 
     def __init__(self, character: NpcState, game_map: GameMapInterface) -> None:
-        self.game_map = game_map
-        self.updates_per_npc_move = 60  # TODO: Make this a parameter of a character
-        super().__init__(character)
+        super().__init__(character, game_map)
+        self.updates_between_npc_moves = character.character_type.ticks_between_npc_moves
 
         # Vary the movement rate across the NPCs
-        move_delta = random.randint(-10, 10)
-        self.updates_per_npc_move += move_delta
+        move_delta = random.randint(-6, 6)
+        self.updates_between_npc_moves += move_delta
         self.updates_per_phase_change += move_delta // 2
-        self.update_count = random.randint(0, max(0, self.updates_per_npc_move-1))
+        self.update_count = random.randint(0, max(0, self.updates_between_npc_moves-1))
 
-        # Increase updates_per_phase_change for characters which are not moving
+        # Increase updates_per_phase_change for characters which are not moving so they step less frequently
         if not self.character.npc_info.walking:
-            self.updates_per_phase_change *= 2
+            self.updates_per_phase_change *= 5
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         if self.character.npc_info.walking:
             # Start moving NPC by setting a destination tile
-            if (self.update_count % self.updates_per_npc_move) == self.updates_per_npc_move - 1:
+            if (self.update_count % self.updates_between_npc_moves) == self.updates_between_npc_moves - 1:
                 # TODO: Determine where to move instead of blindly moving forward
                 self.character.direction = random.choice(list(Direction))
                 dest_tile = self.character.curr_pos_dat_tile + self.character.direction.get_vector()
@@ -249,7 +262,7 @@ class GameMap(GameMapInterface):
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
         for hero in reversed(hero_party.members):
-            self.group.add(HeroSprite(hero, hero_party), layer=self.map_data.character_layer)
+            self.group.add(HeroSprite(hero, hero_party, self), layer=self.map_data.character_layer)
         for npc_info in self.npcs:
             self.group.add(NpcSprite(npc_info, self), layer=self.map_data.character_layer)
 
@@ -338,16 +351,7 @@ class GameMap(GameMapInterface):
             except IndexError:
                 pass
 
-        # Return a default, walkable tile as a default
-        return Tile('DEFAULT TILE',
-                    '?',
-                    [],
-                    True,
-                    False,
-                    0,
-                    0,
-                    1.0,
-                    1.0)
+        return Tile.default_tile()
 
     def get_decorations(
             self,
