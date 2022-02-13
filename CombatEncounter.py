@@ -72,12 +72,16 @@ class CombatEncounter(CombatEncounterInterface):
         self.hero_party.clear_combat_status_affects()
 
         # Scale the encounter image
+        # Pixelize the encounter backgrounds so they better fit with the pixelized graphics of the game
+        pixelize_factor = 5
         encounter_image_size_px = Point(encounter_background.image.get_size())
         encounter_image_size_px *= min(self.game_state.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
                                        self.game_state.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h)
-        encounter_image_size_px = encounter_image_size_px.round()
-        self.encounter_image = pygame.transform.smoothscale(encounter_background.image,
-                                                            encounter_image_size_px.getAsIntTuple())
+        encounter_image_size_px = encounter_image_size_px // pixelize_factor * pixelize_factor
+        self.encounter_image = pygame.transform.scale(
+            pygame.transform.smoothscale(encounter_background.image,
+                                         (encounter_image_size_px // pixelize_factor).getAsIntTuple()),
+            encounter_image_size_px.getAsIntTuple())
 
     def encounter_loop(self) -> None:
         # Start encounter music
