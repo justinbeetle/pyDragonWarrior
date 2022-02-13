@@ -259,11 +259,12 @@ class GameInfo:
     def parse_dialogs_info(xml_root: ET.Element, image_path: str) -> Tuple[List[str], Optional[str]]:
         font_names: List[str] = []
         dialogs_element = xml_root.find('Dialogs')
-        for element in dialogs_element.findall(".//Font"):
-            font_names.append(element.attrib['name'])
-        dialog_border_image_filename = None
-        if 'image' in dialogs_element.attrib:
-            dialog_border_image_filename = os.path.join(image_path, dialogs_element.attrib['image'])
+        if dialogs_element is not None:
+            for element in dialogs_element.findall(".//Font"):
+                font_names.append(element.attrib['name'])
+            dialog_border_image_filename = None
+            if 'image' in dialogs_element.attrib:
+                dialog_border_image_filename = os.path.join(image_path, dialogs_element.attrib['image'])
         return font_names, dialog_border_image_filename
 
     @staticmethod

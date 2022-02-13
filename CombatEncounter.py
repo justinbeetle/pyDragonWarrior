@@ -153,16 +153,16 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_encounter_background_phase_in(self) -> None:
         clock = pygame.time.Clock()
-        for percent in range(10, 100, 10):
-            self.render_encounter_background(percent)
+        for percent in range(5, 100, 5):
+            self.render_encounter_background(True, percent)
             GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen)
-            pygame.time.Clock().tick(20)
+            clock.tick(40)
             pygame.display.flip()
 
         # Final render to drop to complete the background and drop in the monsters
         self.render_monsters()
 
-    def render_encounter_background(self, percent: int=100) -> Tuple[Point, Point]:
+    def render_encounter_background(self, render_background: bool=True, percent: int=100) -> Tuple[Point, Point]:
         # Determine the size and screen position for the full background image
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
@@ -179,7 +179,8 @@ class CombatEncounter(CombatEncounterInterface):
             encounter_image_screen_rect.inflate_ip(inflate_pixels)
 
         # Draw the background image, then the border, then the encounter image
-        self.game_state.screen.blit(self.background_image, (0, 0))
+        if render_background:
+            self.game_state.screen.blit(self.background_image, (0, 0))
         outside_border_width = 4
         pygame.draw.rect(self.game_state.screen, 'black',
                          encounter_image_screen_rect.inflate(outside_border_width, outside_border_width))
@@ -191,6 +192,7 @@ class CombatEncounter(CombatEncounterInterface):
     def render_monsters(self,
                         flicker_image_monsters: Optional[List[CombatCharacterState]] = None,
                         force_display_monsters: Optional[List[CombatCharacterState]] = None,
+                        render_background: bool = True,
                         render_dialogs: bool = True,
                         flicker_color: pygame.Color = pygame.Color('red')) -> None:
         if flicker_image_monsters is None:
@@ -199,7 +201,7 @@ class CombatEncounter(CombatEncounterInterface):
             force_display_monsters = []
 
         # Render the encounter background
-        encounter_image_size_px, encounter_image_dest_px = self.render_encounter_background()
+        encounter_image_size_px, encounter_image_dest_px = self.render_encounter_background(render_background)
 
         # Render the monsters
         monster_width_px = CombatEncounter.MONSTER_SPACING_PIXELS * (len(self.monster_party.members) - 1)
@@ -249,11 +251,11 @@ class CombatEncounter(CombatEncounterInterface):
         clock = pygame.time.Clock()
         for flickerTimes in range(10):
             self.render_monsters(monsters, monsters, flicker_color=flicker_color)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
             pygame.display.flip()
 
             self.render_monsters([], monsters)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
             pygame.display.flip()
 
         # Final render to drop any of the targets which were killed
@@ -261,23 +263,25 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_damage_to_hero_party(self) -> None:
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
-        # TODO: Flicker red on a death blow
         clock = pygame.time.Clock()
+        offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
         for flickerTimes in range(10):
-            offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
-
-            self.game_state.screen.blit(self.background_image, (0, 0))
-            self.render_monsters(render_dialogs=False)
+            if not self.hero_party.is_still_in_combat():
+                # On a death blow, the background flickers red
+                self.game_state.screen.fill('red')
+            else:
+                self.game_state.screen.blit(self.background_image, (0, 0))
+            self.render_monsters(render_background=False, render_dialogs=False)
             status_dialog.blit(self.game_state.screen, offset_pixels=offset_pixels)
             self.message_dialog.blit(self.game_state.screen, offset_pixels=offset_pixels)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
             pygame.display.flip()
 
             self.game_state.screen.blit(self.background_image, (0, 0))
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen)
             self.message_dialog.blit(self.game_state.screen)
-            pygame.time.Clock().tick(30)
+            clock.tick(30)
             pygame.display.flip()
 
     def get_monsters_still_in_combat(self) -> List[MonsterState]:

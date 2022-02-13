@@ -850,7 +850,7 @@ class GameDialogEvaluator:
                                 # Check for a dodge
                                 if allow_dodge and target.is_dodging_attack():
                                     AudioPlayer().play_sound('attack_miss_lvl1')
-                                    add_message(target.get_name() + ' dodges ' + self.actor.get_name() + "'s strike.")
+                                    add_message(f"{target.get_name()} dodges {self.actor.get_name()}'s strike.")
                                 else:
                                     if damage > 32:
                                         AudioPlayer().play_sound('hit_lvl_4')
@@ -865,10 +865,9 @@ class GameDialogEvaluator:
 
                                     target.hp = max(0, target.hp - damage)
                                     if target == self.hero_party.main_character:
-                                        add_message('Thy hit points reduced by ' + str(damage) + '.')
+                                        add_message(f'Thy hit points reduced by {damage}.')
                                     else:
-                                        add_message(target.get_name() + "'s hit points reduced by "
-                                                               + str(damage) + '.')
+                                        add_message(f"{target.get_name()}'s hit points reduced by {damage}.")
                             else:
                                 AudioPlayer().play_sound('attack_miss_lvl2')
                                 if isinstance(target, HeroState):
