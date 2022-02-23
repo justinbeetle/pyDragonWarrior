@@ -165,6 +165,8 @@ class GameDialogEvaluator:
         while self.game_state.is_running and is_waiting_for_user_input:
             # Process events
             events = GameEvents.get_events(translate_e_to_enter=GameDialog.use_menus_for_text_entry())
+            if 0 == len(events):
+                pygame.time.wait(25)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -227,7 +229,7 @@ class GameDialogEvaluator:
         return menu_result
 
     def update_default_dialog_font_color(self) -> None:
-        old_default = GameDialog.font_color
+        old_default = GameDialog.default_font_color
         if self.hero_party.has_low_health():
             new_default = GameDialog.LOW_HEALTH_FONT_COLOR
         else:
@@ -236,18 +238,14 @@ class GameDialogEvaluator:
             GameDialog.set_default_font_color(new_default)
 
     def update_status_dialog(self, flip_buffer: bool = False, message_dialog: Optional[GameDialog] = None) -> None:
-        old_default = GameDialog.font_color
+        old_default = GameDialog.get_default_font_color()
         self.update_default_dialog_font_color()
-        if old_default != GameDialog.font_color:
+        new_default = GameDialog.get_default_font_color()
+        if old_default != new_default:
             self.game_state.draw_map(flip_buffer=False)
             if message_dialog is not None:
-                message_dialog.set_font_color(GameDialog.font_color)
+                message_dialog.set_font_color(new_default)
                 message_dialog.blit(self.game_state.screen, flip_buffer=False)
-
-        # TODO: Store off the message_dialog and ensure it is using the correct font color too
-        if message_dialog is not None and message_dialog.font_color != GameDialog.font_color:
-            message_dialog.set_font_color(GameDialog.font_color)
-            message_dialog.blit(self.game_state.screen, flip_buffer=False)
 
         if self.game_state.is_in_combat():
             GameDialog.create_encounter_status_dialog(

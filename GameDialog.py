@@ -37,7 +37,7 @@ class GameDialog:
 
     win_size_tiles = Point(20, 15)
     tile_size_pixels = 48
-    font_color = NOMINAL_HEALTH_FONT_COLOR
+    default_font_color = NOMINAL_HEALTH_FONT_COLOR
     font: pygame.Font
     widest_character: int = 0
     anti_alias = True
@@ -174,7 +174,7 @@ class GameDialog:
         return int(GameDialog.get_font(text).size(text)[0])
 
     @staticmethod
-    def render_font(text: str) -> pygame.surface.Surface:
+    def render_font(text: str, color: pygame.Color) -> pygame.surface.Surface:
         if text in GameDialog.UNICODE_CHARACTERS:
             width = GameDialog.get_font_width(text)
             height = GameDialog.get_font(text).get_height()
@@ -204,8 +204,8 @@ class GameDialog:
                     (full_width, quarter_height),
                     (full_width, three_quarters_height),
                     (width // 4, three_quarters_height)]
-                pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
-                pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
+                pygame.draw.aalines(font_surface, color, True, pointlist)
+                pygame.draw.polygon(font_surface, color, pointlist)
 
                 # Draw the inner shape
                 x_start = quarter_width + inner_border
@@ -237,8 +237,8 @@ class GameDialog:
                     (full_width, quarter_height),
                     (full_width, three_quarters_height),
                     (0, three_quarters_height)]
-                pygame.draw.aalines(font_surface, GameDialog.font_color, True, pointlist)
-                pygame.draw.polygon(font_surface, GameDialog.font_color, pointlist)
+                pygame.draw.aalines(font_surface, color, True, pointlist)
+                pygame.draw.polygon(font_surface, color, pointlist)
 
                 # Draw the inner shape
                 x_start = inner_border
@@ -260,7 +260,7 @@ class GameDialog:
         return cast(pygame.surface.Surface,
                     GameDialog.get_font(text).render(text,
                                                      GameDialog.anti_alias,
-                                                     GameDialog.font_color,
+                                                     color,
                                                      pygame.Color('black')))
 
     @staticmethod
@@ -279,7 +279,7 @@ class GameDialog:
             self.pos_tile = Point(pos_tile)
         self.size_tiles = Point(size_tiles)
         self.title = title
-        self.font_color = GameDialog.font_color
+        self.font_color = GameDialog.default_font_color
 
         # Initialize the image
         self.image = pygame.surface.Surface((0, 0))
@@ -371,7 +371,7 @@ class GameDialog:
                                          self.image.get_height() - 2 * outside_border_width),
                              inside_border_width)
         if self.title is not None:
-            title_image = GameDialog.render_font(self.title)
+            title_image = GameDialog.render_font(self.title, self.font_color)
             title_image_pos_x = (self.image.get_width() - title_image.get_width()) / 2
             self.image.fill(
                 'black',
@@ -666,8 +666,12 @@ class GameDialog:
         self.add_menu_prompt(['YES', 'NO'], 2, GameDialogSpacing.SPACERS, prompt)
 
     @staticmethod
+    def get_default_font_color() -> pygame.Color:
+        return GameDialog.default_font_color
+
+    @staticmethod
     def set_default_font_color(font_color: pygame.Color) -> None:
-        GameDialog.font_color = font_color
+        GameDialog.default_font_color = font_color
 
     def set_font_color(self, font_color: pygame.Color) -> None:
         if font_color != self.font_color:
@@ -745,7 +749,7 @@ class GameDialog:
         col_pos_x = GameDialog.outside_spacing_pixels
         row_pos_y = self.get_starting_row_pos_y()
         for lines in self.displayed_message_lines:
-            self.image.blit(GameDialog.render_font(lines), (col_pos_x, row_pos_y))
+            self.image.blit(GameDialog.render_font(lines, self.font_color), (col_pos_x, row_pos_y))
             row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
         # Blit row data to dialog
@@ -757,7 +761,7 @@ class GameDialog:
             first_col_pos_x = GameDialog.outside_spacing_pixels
             if self.row_data_prompt is not None:
                 first_col_pos_x += GameDialog.get_font_width(self.row_data_prompt)
-                self.image.blit(GameDialog.render_font(self.row_data_prompt),
+                self.image.blit(GameDialog.render_font(self.row_data_prompt, self.font_color),
                                 (GameDialog.outside_spacing_pixels, row_pos_y))
 
             # Determine column widths
@@ -789,12 +793,12 @@ class GameDialog:
                                                              GameDialog.outside_spacing_pixels) // num_cols
                         if self.is_menu:
                             col_pos_x += GameDialog.selection_indicator_pixels + GameDialog.internal_spacing_pixels
-                    self.image.blit(GameDialog.render_font(row_col_text), (col_pos_x, row_pos_y))
+                    self.image.blit(GameDialog.render_font(row_col_text, self.font_color), (col_pos_x, row_pos_y))
                 row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
             col_pos_x = GameDialog.outside_spacing_pixels
             for lines in self.row_data_trailing_message_lines:
-                self.image.blit(GameDialog.render_font(lines),
+                self.image.blit(GameDialog.render_font(lines, self.font_color),
                                 (col_pos_x, row_pos_y))
                 row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
 
@@ -1124,7 +1128,6 @@ def main() -> None:
     win_size_pixels = win_size_tiles * tile_size_pixels
     screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(),
                                      pygame.SRCALPHA | pygame.HWSURFACE)
-    clock = pygame.time.Clock()
 
     # Test out game dialog
     GameDialog.static_init(win_size_tiles, tile_size_pixels, ['lucidasans', 'arialms'])
@@ -1133,6 +1136,80 @@ def main() -> None:
 
     GameDialog.force_use_menus_for_text_entry = True
 
+    def wait_for_message_to_fully_display(dialog_with_message: GameDialog) -> None:
+        clock = pygame.time.Clock()
+        dialog_with_message.blit(screen, True)
+        while dialog_with_message.has_more_content():
+            should_wait_for_acknowledgement = dialog_with_message.advance_content()[0]
+            if should_wait_for_acknowledgement:
+                is_waiting_indicator_drawn = False
+                for i in range(0, 8):
+                    if is_waiting_indicator_drawn:
+                        dialog_with_message.erase_waiting_indicator()
+                    else:
+                        dialog_with_message.draw_waiting_indicator()
+                    is_waiting_indicator_drawn = not is_waiting_indicator_drawn
+                    dialog_with_message.blit(screen)
+                    clock.tick(8)
+                    pygame.display.flip()
+                dialog_with_message.acknowledge()
+            else:
+                dialog_with_message.blit(screen)
+                clock.tick(30)
+                pygame.display.flip()
+
+    def wait_for_menu_selection(dialog_with_menu: GameDialog) -> None:
+        is_awaiting_selection = True
+        dialog_with_menu.blit(screen, True)
+        while is_awaiting_selection:
+            events = GameEvents.get_events()
+            if 0 == len(events):
+                pygame.time.wait(25)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                    elif event.key == pygame.K_RETURN:
+                        is_awaiting_selection = False
+                        print('Selection made =', dialog_with_menu.get_selected_menu_option(), flush=True)
+                    else:
+                        dialog_with_menu.process_event(event, screen)
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+
+    def wait_for_user_input(dialog_with_user_input: GameDialog) -> None:
+        is_waiting_for_user_input = True
+        wait_for_message_to_fully_display(dialog_with_user_input)
+        while is_waiting_for_user_input:
+            events = GameEvents.get_events()
+            if 0 == len(events):
+                pygame.time.wait(25)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                    elif event.key == pygame.K_RETURN:
+                        if GameDialog.use_menus_for_text_entry():
+                            # Get a menu selection and turn that into an event
+                            menu_result = dialog_with_user_input.get_selected_menu_option()
+                            if menu_result == GameDialog.ENTER_UNICODE:
+                                is_waiting_for_user_input = False
+                                print('Selection made =', dialog_with_user_input.get_user_text(), flush=True)
+                            elif menu_result == GameDialog.BACKSPACE_UNICODE:
+                                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_BACKSPACE})
+                            else:
+                                event = pygame.event.Event(pygame.KEYDOWN, {'key': None, 'unicode': menu_result})
+
+                            if is_waiting_for_user_input:
+                                message_dialog.process_event(event, screen)
+                        else:
+                            is_waiting_for_user_input = False
+                            print('Selection made =', dialog_with_user_input.get_user_text(), flush=True)
+                    else:
+                        dialog_with_user_input.process_event(event, screen)
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+
     screen.fill('pink')
     GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog('Hail!')
@@ -1140,96 +1217,41 @@ def main() -> None:
     message_dialog.add_message('Capslock=' + GameDialog.CAPSLOCK_UNICODE)
     message_dialog.add_message('Backspace=' + GameDialog.BACKSPACE_UNICODE)
     message_dialog.add_message('Enter=' + GameDialog.ENTER_UNICODE)
-    message_dialog.draw_waiting_indicator()
-    message_dialog.blit(screen, False)
-    menu = GameDialog.create_exploring_menu()
-    menu.blit(screen, True)
+    wait_for_message_to_fully_display(message_dialog)
 
-    is_awaiting_selection = True
-    while is_awaiting_selection:
-        for event in GameEvents.get_events():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    is_awaiting_selection = False
-                elif event.key == pygame.K_RETURN:
-                    is_awaiting_selection = False
-                    print('Selection made =', menu.get_selected_menu_option(), flush=True)
-                else:
-                    menu.process_event(event, screen)
-            elif event.type == pygame.QUIT:
-                is_awaiting_selection = False
-        clock.tick(30)
+    wait_for_menu_selection(GameDialog.create_exploring_menu())
+
+    wait_for_menu_selection(GameDialog.create_menu_dialog(
+        Point(-1, 1),
+        None,
+        'OPTIONS',
+        [f'Option {n}' for n in range(0, 100)],
+        2))
 
     screen.fill('pink')
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
-    GameDialog.create_message_dialog(
+    wait_for_message_to_fully_display(GameDialog.create_message_dialog(
         'word wrap testing...  Word wrap testing...  word wrap testing...  ' +
-        'Word Wrap testing...  word Wrap testing...  Word Wrap testing...').blit(screen, False)
-    menu = GameDialog.create_encounter_menu()
-    menu.blit(screen, True)
-
-    is_awaiting_selection = True
-    while is_awaiting_selection:
-        for event in GameEvents.get_events():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    is_awaiting_selection = False
-                elif event.key == pygame.K_RETURN:
-                    is_awaiting_selection = False
-                    print('Selection made =', menu.get_selected_menu_option(), flush=True)
-                else:
-                    menu.process_event(event, screen)
-            elif event.type == pygame.QUIT:
-                is_awaiting_selection = False
-        clock.tick(30)
+        'Word Wrap testing...  word Wrap testing...  Word Wrap testing...'))
+    wait_for_menu_selection(GameDialog.create_encounter_menu())
 
     screen.fill('pink')
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog(
         'Hail 1!\nHail 2!\nHail 3!\nHail 4!\nHail 5!\nHail 6!\nHail 7!\nHail 8!\nHail 9!\nHail 10!\nHail 11!')
-    while message_dialog.has_more_content():
-        message_dialog.draw_waiting_indicator()
-        message_dialog.blit(screen, True)
-        pygame.time.wait(1000)
-        message_dialog.advance_content()
-    message_dialog.blit(screen, True)
+    wait_for_message_to_fully_display(message_dialog)
 
     message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
+    GameDialog.set_default_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
+    GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog.set_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
-    message_dialog.blit(screen, True)
-    is_awaiting_selection = True
-    while is_awaiting_selection:
-        for event in GameEvents.get_events():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    is_awaiting_selection = False
-                elif event.key == pygame.K_RETURN:
-                    is_awaiting_selection = False
-                    print('Selection made =', message_dialog.get_selected_menu_option(), flush=True)
-                else:
-                    message_dialog.process_event(event, screen)
-            elif event.type == pygame.QUIT:
-                is_awaiting_selection = False
-        clock.tick(30)
+    GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
+    wait_for_menu_selection(message_dialog)
     message_dialog.add_message('\nLexie attacks!')
-    message_dialog.blit(screen, True)
+    wait_for_message_to_fully_display(message_dialog)
 
-    message_dialog.prompt_for_user_text('\n1 + 15 =', '[0-9]')
-    message_dialog.blit(screen, True)
-    is_awaiting_selection = True
-    while is_awaiting_selection:
-        for event in GameEvents.get_events():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    is_awaiting_selection = False
-                elif event.key == pygame.K_RETURN:
-                    is_awaiting_selection = False
-                    print('Selection made =', message_dialog.get_user_text(), flush=True)
-                else:
-                    message_dialog.process_event(event, screen)
-            elif event.type == pygame.QUIT:
-                is_awaiting_selection = False
-        clock.tick(30)
+    message_dialog.prompt_for_user_text('\n1 + 15 =', GameDialog.get_number_characters())
+    wait_for_user_input(message_dialog)
 
     # Terminate pygame
     pygame.font.quit()
