@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="134" height="132" tilewidth="16" tileheight="16" infinite="0" nextlayerid="46" nextobjectid="56">
- <tileset firstgid="1" source="tilesets/overworld/OverworldTileset.tsx"/>
- <tileset firstgid="3201" source="tilesets/overworld/tropical_extras.tsx"/>
+ <tileset firstgid="1" source="../../licensed_assets/itch.io/pita/rpg-overworld-tileset_v1.2/OverworldTileset.tsx"/>
+ <tileset firstgid="3201" source="../../licensed_assets/itch.io/pita/rpg-overworld-tileset_v1.2/tropical_extras.tsx"/>
  <layer id="25" name="under" width="134" height="132" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>

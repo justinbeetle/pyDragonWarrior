@@ -12,7 +12,7 @@
    <PointTransition    decoration="pass"          x="81"  y="106"                        toMap="cantlin"               respawnDecorations="yes"/>
    <IncomingTransition decoration="pass"          x="81"  y="105"            dir="NORTH" toMap="cantlin"/>
    <PointTransition    decoration="pass"          x="33"  y="17"             dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="34"  y="62"             dir="WEST"  toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="34"  y="62"             dir="SOUTH" toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
    <PointTransition    decoration="pass" name="N" x="113" y="47"             dir="SOUTH" toMap="swamp_cave" toName="N" respawnDecorations="yes"/>
    <PointTransition    decoration="pass" name="S" x="113" y="56"             dir="SOUTH" toMap="swamp_cave" toName="S" respawnDecorations="yes"/>
    <PointTransition    decoration="pass"          x="88"  y="5"              dir="SOUTH" toMap="northern_shrine"       respawnDecorations="yes"/>

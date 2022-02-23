@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="80" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="49" nextobjectid="50">
- <tileset firstgid="1" source="tilesets/overworld/OverworldTileset.tsx"/>
- <tileset firstgid="3201" source="tilesets/village/Village_Tileset.tsx"/>
- <tileset firstgid="4225" source="tilesets/dungeon/dungeon_tileset.tsx"/>
+ <tileset firstgid="1" source="../../licensed_assets/itch.io/pita/rpg-overworld-tileset_v1.2/OverworldTileset.tsx"/>
+ <tileset firstgid="3201" source="../../licensed_assets/itch.io/pita/rpg-village-tileset_v1.0/Village_Tileset.tsx"/>
+ <tileset firstgid="4225" source="../../licensed_assets/itch.io/pita/rpg-dungeon-pack_v1.1/dungeon_tileset.tsx"/>
  <layer id="31" name="under" width="80" height="64" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>
