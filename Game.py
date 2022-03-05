@@ -92,7 +92,22 @@ def main() -> None:
         game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 16 * 3
-    game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+    try:
+        game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+    except Exception as e:
+        if game_xml_path.endswith('game_licensed_assets.xml'):
+            # print('ERROR: Failed to load', game_xml_path, flush=True)
+            # import traceback
+            # print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+            #                                  e,
+            #                                  e.__traceback__),
+            #       file=sys.stderr, flush=True)
+            # traceback.print_exc()
+
+            game_xml_path = os.path.join(base_path, 'game.xml')
+            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+        else:
+            raise e
 
     # Run the game
     game_loop.run(args.save)
