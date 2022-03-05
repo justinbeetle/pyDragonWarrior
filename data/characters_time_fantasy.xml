@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+   <!-- Characters from Time Fantasy character sets -->
+   <CharacterType type="cow"                   image="../../licensed_assets/itch.io/finalbossblues/tf_animals/cow.png"                   phases="3"/>
+   <CharacterType type="cow_baby"              image="../../licensed_assets/itch.io/finalbossblues/tf_animals/cow_baby.png"              phases="3"/>
+</root>

@@ -32,6 +32,15 @@ def get_saves_path(application_path: str, application_name: str) -> str:
     return saves_path
 
 
+def print_exception(e: Exception) -> None:
+    import traceback
+    print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
+                                     e,
+                                     e.__traceback__),
+          file=sys.stderr, flush=True)
+    traceback.print_exc()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gamepad', help='Gamepad (if present) will be used for providing user inputs',
@@ -86,28 +95,21 @@ def main() -> None:
     GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
-    if not args.force_use_unlicensed_assets and os.path.exists(os.path.join(base_path, 'data', 'licensed_assets')):
-        game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
-    else:
-        game_xml_path = os.path.join(base_path, 'game.xml')
     win_size_pixels = None  # Point(2560, 1340)
     tile_size_pixels = 16 * 3
-    try:
-        game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
-    except Exception as e:
-        if game_xml_path.endswith('game_licensed_assets.xml'):
-            # print('ERROR: Failed to load', game_xml_path, flush=True)
-            # import traceback
-            # print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-            #                                  e,
-            #                                  e.__traceback__),
-            #       file=sys.stderr, flush=True)
-            # traceback.print_exc()
-
-            game_xml_path = os.path.join(base_path, 'game.xml')
+    use_unlicensed_assets = args.force_use_unlicensed_assets
+    if not use_unlicensed_assets:
+        try:
+            game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
             game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
-        else:
-            raise e
+        except Exception as e:
+            use_unlicensed_assets = True
+            # print('ERROR: Failed to load licensed assets', flush=True)
+            # print_exception(e)
+
+    if use_unlicensed_assets:
+        game_xml_path = os.path.join(base_path, 'game.xml')
+        game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
 
     # Run the game
     game_loop.run(args.save)
@@ -123,9 +125,4 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
-        traceback.print_exc()
+        print_exception(e)
