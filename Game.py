@@ -63,9 +63,13 @@ def main() -> None:
     # Determine if application is a script file or frozen exe
     if getattr(sys, 'frozen', False):
         # Executing as a PyInstaller binary executable
+        if args.verbose:
+            print(f'Running as a PyInstaller binary executable', flush=True)
         application_path = os.path.dirname(sys.executable)
     elif __file__:
         # Normal execution
+        if args.verbose:
+            print(f'Running as a Python script', flush=True)
         application_path = os.path.dirname(__file__)
 
         # Load required Python libraries
@@ -74,7 +78,10 @@ def main() -> None:
             if 'VIRTUAL_ENV' not in os.environ:
                 # Identify path for venv
                 venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, 'venv')
-                if not venv_path_found:
+                if venv_path_found:
+                    if args.verbose:
+                        print(f'Not running in a venv, will switch to {venv_path}', flush=True)
+                else:
                     venv_path = None
                     print('ERROR: Failed to identify a venv path to which the current user has write access',
                           flush=True)
@@ -83,7 +90,6 @@ def main() -> None:
                 if args.verbose:
                     print(f'Already running in venv {venv_path}', flush=True)
 
-            # Create the venv if it doesn't already exist
             if venv_path:
                 created_venv = False
                 if args.verbose:
@@ -93,19 +99,24 @@ def main() -> None:
                     subprocess_stdout = subprocess.DEVNULL
                     subprocess_stderr = subprocess.DEVNULL
 
-                # Create the venv
+                # Create the venv if it doesn't already exist
                 import venv
-                venv_builder = venv.EnvBuilder()
+                venv_builder = venv.EnvBuilder(with_pip=True)
                 venv_context = venv_builder.ensure_directories(venv_path)
-                if not os.path.exists(venv_context.executable):
+                if not os.path.exists(venv_context.env_exe):
                     print(f'Creating venv {venv_path}...', flush=True)
                     created_venv = True
-                venv_builder.create(venv_path)
+                try:
+                    venv_builder.create(venv_path)
+                except:
+                    if args.verbose:
+                        print(f'Failed to create venv', flush=True)
+                        traceback.print_exc()
 
                 # Run pip to install the required packages into the venv
                 if args.verbose or created_venv:
                     print('Running pip install...', flush=True)
-                subprocess.check_call([venv_context.executable, '-m', 'pip', 'install', '-U', '-r',
+                subprocess.check_call([venv_context.env_exe, '-m', 'pip', 'install', '-U', '-r',
                                        os.path.join(application_path, 'requirements.txt')],
                                       stdout=subprocess_stdout,
                                       stderr=subprocess_stderr)
@@ -113,10 +124,12 @@ def main() -> None:
                     print('Completed pip install', flush=True)
 
                 # Run the application from the venv
-                if venv_context.executable != sys.executable:
+                if venv_context.env_exe != sys.executable:
                     if args.verbose:
                         print('Running application in venv', flush=True)
-                    exit(subprocess.check_call([venv_context.executable] + sys.argv))
+                    exit(subprocess.check_call([venv_context.env_exe] + sys.argv))
+            elif args.verbose:
+                print('Not running in a venv', flush=True)
 
     # Identify the path for saved gamed files
     saves_path_found, saves_path = get_writeable_application_path(application_path, application_name, 'saves')
@@ -132,7 +145,7 @@ def main() -> None:
     from GameLoop import GameLoop
 
     # Set the current working directory to the location of this file so that the game can be run from any path
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     base_path = os.path.split(os.path.abspath(__file__))[0]
     icon_image_filename = os.path.join(base_path, 'icon.png')
 

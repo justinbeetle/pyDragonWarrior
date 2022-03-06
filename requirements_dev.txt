@@ -1,0 +1,9 @@
+numpy
+pygame
+pyscroll
+pytmx
+certifi
+opensimplex
+mypy
+pyinstaller
+snakeviz

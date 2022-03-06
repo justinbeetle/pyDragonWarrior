@@ -316,6 +316,8 @@ class AudioPlayer:
                         if self.music_rel_file_path1 not in failed_to_play:
                             print('ERROR: Failed to load', self.music_rel_file_path1, flush=True)
                             failed_to_play.add(self.music_rel_file_path1)
+                            # import traceback
+                            # traceback.print_exc()
 
                 self.music_thread_lock.release()
                 pygame.time.wait(100)
@@ -345,6 +347,8 @@ class AudioPlayer:
                 except:
                     print('ERROR: Failed to load', sound_file_path, flush=True)
                     self.sounds[sound_file_path] = None
+                    # import traceback
+                    # traceback.print_exc()
 
             sound = self.sounds[sound_file_path]
             if sound is not None:

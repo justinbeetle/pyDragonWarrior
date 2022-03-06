@@ -260,7 +260,7 @@ class GameDialogEvaluator:
                         depth: int = 0,
                         add_spacing: bool = True,
                         npc: Optional[MapCharacterState] = None) -> None:
-        def add_message(messages: Union[str, list[str]]) -> None:
+        def add_message(messages: Union[str, List[str]]) -> None:
             if isinstance(messages, str):
                 self.add_and_wait_for_message(messages, message_dialog)
             else:

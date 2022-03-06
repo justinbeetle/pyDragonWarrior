@@ -29,10 +29,10 @@ class MapGenNoise:
                 elevation_factor_x = min(1.0, edge_dist_x/16.0)
                 moisture_factor_x = 1.0
 
-                elevation_noise = (elevation_simplex.noise2d(x/8.0, y/8.0) + 1) / 2.0 \
+                elevation_noise = (elevation_simplex.noise2(x/8.0, y/8.0) + 1) / 2.0 \
                                   * elevation_factor_x \
                                   * elevation_factor_y
-                moisture_noise = (moisture_simplex.noise2d(x/20.0, y/20.0) + 1) / 2.0 \
+                moisture_noise = (moisture_simplex.noise2(x/20.0, y/20.0) + 1) / 2.0 \
                                   * moisture_factor_x \
                                   * moisture_factor_y
                 # print('x=', x, "; y=", y, "; elevation_noise=", elevation_noise)
