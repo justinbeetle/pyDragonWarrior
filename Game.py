@@ -1,75 +1,129 @@
 #!/usr/bin/env python
 
+from typing import Tuple
+
 import argparse
 from multiprocessing import freeze_support
 import os
 import pathlib
 import subprocess
 import sys
+import traceback
 
 
-def get_saves_path(application_path: str, application_name: str) -> str:
-    saves_base_path = application_path
-    saves_path = os.path.join(saves_base_path, 'saves')
-    if (os.path.exists(saves_path) and not os.access(saves_path, os.W_OK)) or not os.access(application_path, os.W_OK):
+def is_windows() -> bool:
+    return sys.platform in ('win32', 'cygwin')
+
+
+def get_writeable_application_path(application_path: str, application_name: str, directory: str) -> Tuple[bool, str]:
+    """Get a writeable directory path for this application
+
+    First try to use the path of the application.  Then try APPDATA on Windows.  Finally try the home directory.
+    Return a tuple of a bool indicating success and the path identified
+    """
+    writeable_application_base_path = application_path
+    writeable_application_path = os.path.join(writeable_application_base_path, directory)
+
+    def is_path_writeable() -> bool:
+        return (os.path.exists(writeable_application_path) and os.access(writeable_application_path, os.W_OK)) \
+               or os.access(application_path, os.W_OK)
+
+    if not is_path_writeable():
         # Don't have access to write saved game files in the application path.  Determine an alternate location.
-        is_windows = sys.platform in ('win32', 'cygwin')
-        if is_windows and 'APPDATA' in os.environ:
+        if is_windows() and 'APPDATA' in os.environ:
             # On Windows, prefer a base path in the user's AppData\Roaming directory
-            saves_base_path = os.environ['APPDATA']
+            writeable_application_base_path = os.environ['APPDATA']
         else:
             # Default to a base path in the user's home directory
-            saves_base_path = str(pathlib.Path.home())
+            writeable_application_base_path = str(pathlib.Path.home())
 
-        # Default to using the home directory
-        saves_path = os.path.join(saves_base_path, f'.{application_name}', 'saves')
+        writeable_application_path = os.path.join(writeable_application_base_path, f'.{application_name}', directory)
 
-        print('Running with a save path of', saves_path, flush=True)
-
-    if (os.path.exists(saves_path) and not os.access(saves_path, os.W_OK)) or not os.access(saves_base_path, os.W_OK):
-        print('ERROR: Failed to identify a save path to which the current user has write access', flush=True)
-
-    return saves_path
-
-
-def print_exception(e: Exception) -> None:
-    import traceback
-    print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                     e,
-                                     e.__traceback__),
-          file=sys.stderr, flush=True)
-    traceback.print_exc()
+    return is_path_writeable(), writeable_application_path
 
 
 def main() -> None:
+    application_name = 'pyDragonWarrior'
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('-g', '--gamepad', help='Gamepad (if present) will be used for providing user inputs',
-                        action='store_true', default=None)
-    parser.add_argument('-k', '--keyboard', dest='gamepad', help='Keyboard will be used for providing user inputs',
-                        action='store_false')
-    parser.add_argument('-u', '--force-use-unlicensed-assets', help='Force using the unlicensed assets',
-                        action='store_true', default=False)
-    parser.add_argument('-p', '--skip_pip_install', dest='perform_pip_install', help='Skip performing a pip install',
-                        action='store_false', default=True)
+    parser.add_argument('-g', '--gamepad', action='store_true', default=None,
+                        help='Gamepad (if present) will be used for providing user inputs')
+    parser.add_argument('-k', '--keyboard', dest='gamepad', action='store_false',
+                        help='Keyboard will be used for providing user inputs')
+    parser.add_argument('-u', '--force-use-unlicensed-assets', action='store_true', default=False,
+                        help='Force using the unlicensed assets')
+    parser.add_argument('-s', '--skip-pip-install', dest='perform_pip_install', action='store_false', default=True,
+                        help='Skip performing a pip install to a venv')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='Enable verbose logging')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
     # print('args =', args, flush=True)
 
     # Determine if application is a script file or frozen exe
     if getattr(sys, 'frozen', False):
-        # Executing as a pyinstaller binary executable
+        # Executing as a PyInstaller binary executable
         application_path = os.path.dirname(sys.executable)
     elif __file__:
         # Normal execution
         application_path = os.path.dirname(__file__)
 
         # Load required Python libraries
-        if args. perform_pip_install:
-            subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-U', '-r',
-                                   os.path.join(application_path, 'requirements.txt')], stdout=subprocess.DEVNULL)
+        if args.perform_pip_install:
+            # If not in a virtual environment, create one first
+            if 'VIRTUAL_ENV' not in os.environ:
+                # Identify path for venv
+                venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, 'venv')
+                if not venv_path_found:
+                    venv_path = None
+                    print('ERROR: Failed to identify a venv path to which the current user has write access',
+                          flush=True)
+            else:
+                venv_path = os.environ['VIRTUAL_ENV']
+                if args.verbose:
+                    print(f'Already running in venv {venv_path}', flush=True)
 
-    application_name = 'pyDragonWarrior'
-    saves_path = get_saves_path(application_path, application_name)
+            # Create the venv if it doesn't already exist
+            if venv_path:
+                created_venv = False
+                if args.verbose:
+                    subprocess_stdout = None
+                    subprocess_stderr = None
+                else:
+                    subprocess_stdout = subprocess.DEVNULL
+                    subprocess_stderr = subprocess.DEVNULL
+
+                # Create the venv
+                import venv
+                venv_builder = venv.EnvBuilder()
+                venv_context = venv_builder.ensure_directories(venv_path)
+                if not os.path.exists(venv_context.executable):
+                    print(f'Creating venv {venv_path}...', flush=True)
+                    created_venv = True
+                venv_builder.create(venv_path)
+
+                # Run pip to install the required packages into the venv
+                if args.verbose or created_venv:
+                    print('Running pip install...', flush=True)
+                subprocess.check_call([venv_context.executable, '-m', 'pip', 'install', '-U', '-r',
+                                       os.path.join(application_path, 'requirements.txt')],
+                                      stdout=subprocess_stdout,
+                                      stderr=subprocess_stderr)
+                if not args.verbose and created_venv:
+                    print('Completed pip install', flush=True)
+
+                # Run the application from the venv
+                if venv_context.executable != sys.executable:
+                    if args.verbose:
+                        print('Running application in venv', flush=True)
+                    exit(subprocess.check_call([venv_context.executable] + sys.argv))
+
+    # Identify the path for saved gamed files
+    saves_path_found, saves_path = get_writeable_application_path(application_path, application_name, 'saves')
+    if not saves_path_found:
+        print('ERROR: Failed to identify a saves path to which the current user has write access', flush=True)
+    elif args.verbose:
+        print('Running with a save path of', saves_path, flush=True)
 
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # Silence pygame outputs to standard out
     import pygame
@@ -102,10 +156,11 @@ def main() -> None:
         try:
             game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
             game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
-        except Exception as e:
+        except:
             use_unlicensed_assets = True
-            # print('ERROR: Failed to load licensed assets', flush=True)
-            # print_exception(e)
+            if args.verbose:
+                print('ERROR: Failed to load licensed assets', flush=True)
+                traceback.print_exc()
 
     if use_unlicensed_assets:
         game_xml_path = os.path.join(base_path, 'game.xml')
@@ -125,4 +180,4 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as e:
-        print_exception(e)
+        traceback.print_exc()
