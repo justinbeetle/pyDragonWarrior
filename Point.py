@@ -50,16 +50,14 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
         return Point(self.x - p[0], self.y - p[1])
 
     def __rsub__(self, p: PointTupleType) -> Point:
-        if isinstance(p, tuple):
-            return Point(p) - self
-        return NotImplemented
+        return Point(p) - self
 
-    def __mul__(self, p: ScalarOrPointTupleType) -> Point:
+    def __mul__(self, p: ScalarOrPointTupleType) -> Point:  # type: ignore[override]
         if isinstance(p, tuple):
             return Point(self.x * p[0], self.y * p[1])
         return Point(self.x * p, self.y * p)
 
-    def __rmul__(self, p: ScalarOrPointTupleType) -> Point:
+    def __rmul__(self, p: ScalarOrPointTupleType) -> Point:  # type: ignore[override]
         return self * p
 
     def __truediv__(self, p: ScalarOrPointTupleType) -> Point:
@@ -68,9 +66,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
         return Point(self.x / p, self.y / p)
 
     def __rtruediv__(self, p: PointTupleType) -> Point:
-        if isinstance(p, tuple):
-            return Point(p) / self
-        return NotImplemented
+        return Point(p) / self
 
     def __floordiv__(self, p: ScalarOrPointTupleType) -> Point:
         if isinstance(p, tuple):
@@ -78,15 +74,13 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
         return Point(self.x // p, self.y // p)
 
     def __rfloordiv__(self, p: PointTupleType) -> Point:
-        if isinstance(p, tuple):
-            return Point(p) / self
-        return NotImplemented
+        return Point(p) // self
 
     def floor(self) -> Point:
-        return Point(math.floor(self.x), math.floor(self.y))
+        return Point(int(math.floor(self.x)), int(math.floor(self.y)))
 
     def ceil(self) -> Point:
-        return Point(math.ceil(self.x), math.ceil(self.y))
+        return Point(int(math.ceil(self.x)), int(math.ceil(self.y)))
 
     def round(self) -> Point:
         return Point(int(round(self.x)), int(round(self.y)))

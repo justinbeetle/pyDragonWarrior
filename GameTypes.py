@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, NamedTuple, Optional, Tuple, Union
 
 from dataclasses import dataclass
 from enum import Enum
@@ -543,13 +543,16 @@ class MonsterInfo(NamedTuple):
     may_run_away: bool
 
 
+PygameSurfaceFormatType = Union[Literal['P'], Literal['RGB'], Literal['RGBX'], Literal['RGBA'], Literal['ARGB']]
+
+
 class SurfacePickable(NamedTuple):
     pixels: str
     size: Tuple[int, int]
-    format: str
+    format: PygameSurfaceFormatType
 
     @staticmethod
-    def from_surface(surface: pygame.surface.Surface, format: str='RGBA') -> SurfacePickable:
+    def from_surface(surface: pygame.surface.Surface, format: PygameSurfaceFormatType = 'RGBA') -> SurfacePickable:
         return SurfacePickable(pygame.image.tostring(surface, format),
                                surface.get_size(),
                                format)

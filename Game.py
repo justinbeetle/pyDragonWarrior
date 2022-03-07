@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import argparse
 from multiprocessing import freeze_support
@@ -75,6 +75,7 @@ def main() -> None:
         # Load required Python libraries
         if args.perform_pip_install:
             # If not in a virtual environment, create one first
+            venv_path: Optional[str] = None
             if 'VIRTUAL_ENV' not in os.environ:
                 # Identify path for venv
                 venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, 'venv')
