@@ -209,15 +209,18 @@ class GameLoop:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
-                        menu = True
-                    elif event.key == pygame.K_SPACE:
                         # Fast, smart interactions - skip launching the menu
                         if self.game_state.get_npc_to_talk_to() is not None:
                             talking = True
                         elif self.game_state.is_facing_openable_item():
                             opening = True
+                        elif self.game_state.make_map_transition(self.game_state.get_point_transition()):
+                            # Transitioned to a new map
+                            pass
                         else:
                             searching = True
+                    elif event.key == pygame.K_SPACE:
+                        menu = True
                     elif event.key == pygame.K_F1:
                         AudioPlayer().play_sound('select')
                         self.game_state.save(quick_save=True)

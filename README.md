@@ -13,15 +13,15 @@ A Python based Dragon Warrior clone.  Dragon Warrior was chosen as a game with w
 
 Execute pyDragonWarrior/Game.py
 
-Note: Running Game.py runs a subshell command to install the required Python libaries using pip.
+Note: Running Game.py runs a subshell command to install the required Python libaries in a venv using pip.
 
 ## Controls
 
 | Control                      | Keyboard Bindings  | Gamepad Bindings |
 | ---------------------------- | ------------------ | ---------------- |
 | Move                         | WASD or Arrow Keys | D-Pad            |
-| Enter Menu or Make Selection | Enter or E         | A                |
-| Interact or Leave Menu       | Space or Q         | B                |
+| Interact or Make Selection   | Enter or E         | A                |
+| Enter Menu or Leave Menu     | Space or Q         | B                |
 | Exit                         | Escape             | Select           |
 | Quick Save                   | F1                 | Menu             |
 
