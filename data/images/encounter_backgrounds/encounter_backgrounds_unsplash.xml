@@ -11,6 +11,7 @@
    <Image name="desert_close_mountain"                   source="desert_close_mountain.jfif"                    link="https://unsplash.com/photos/YrYeghM0OgE" credits="Austin Anderson - https://unsplash.com/@aanderson0329"/>
    <Image name="desert_distant_mountain"                 source="desert_distant_mountain.jfif"                  link="https://unsplash.com/photos/CUDoVGSfUPg" credits="Parastoo Maleki - https://unsplash.com/@blueswallow"/>
    <Image name="desert_hill"                             source="desert_hill.jfif"                              link="https://unsplash.com/photos/2zgGXQsGXtQ" credits="Mostapha Abidour - https://unsplash.com/@mostaphaabidour"/>
+   <Image name="gate"                                    source="gate.png"                                      link="https://unsplash.com/photos/16YxCJSoAek" credits="Ivan Aleksic - https://unsplash.com/@ivalex"/>
    <Image name="hill_distant_mountain"                   source="hill_distant_mountain.jfif"                    link="https://unsplash.com/photos/eT1ef3tPglU" credits="Jeremy Cai - https://unsplash.com/@j"/>
    <Image name="jungle"                                  source="jungle.jfif"                                   link="https://unsplash.com/photos/6xxxvB72qB0" credits="Isaac Quesada - https://unsplash.com/@isaacquesada"/>
    <Image name="jungle_dark"                             source="jungle_dark.jfif"                              link="https://unsplash.com/photos/iulSk5ChQso" credits="Ehud Neuhaus - https://unsplash.com/@paramir"/>

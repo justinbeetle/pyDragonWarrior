@@ -329,18 +329,22 @@ class GameMap(GameMapInterface):
             self.game_state.screen.blit(sprite.get_image(), sprite.get_rect().move(map_center_offset))
         pygame.display.flip()
 
-    def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
+    def get_tile_info(self, tile: Optional[Point] = None, use_second: bool = False) -> Tile:
         if tile is None:
             tile = self.game_state.get_hero_party().main_character.curr_pos_dat_tile
 
         if isinstance(self.map_data, PaddedTiledMapData):
             tile_name = None
             tile_x, tile_y = tile.getAsIntTuple()
-            for l in self.map_data.base_tile_layers:
+            for l in reversed(self.map_data.base_tile_layers):
                 tile_properties = self.map_data.get_tile_properties(tile_x, tile_y, l)
                 if tile_properties is not None and 'type' in tile_properties and \
                         tile_properties['type'] is not None and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']
+                    if use_second:
+                        use_second = False
+                    else:
+                        break
             if tile_name is not None and tile_name in self.game_state.get_game_info().tiles:
                 return self.game_state.get_game_info().tiles[tile_name]
         else:
@@ -640,6 +644,14 @@ class GameMap(GameMapInterface):
             tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
         tile_info = self.get_tile_info(tile)
         tile_name = tile_info.name.replace('_walkable', '')
+
+        # Handle gates, which we should be able to see through to the local terrain
+        background_prefix = ''
+        if 'gate' == tile_name:
+            background_prefix = 'gate:'
+            tile_info = self.get_tile_info(tile, use_second=True)
+            tile_name = tile_info.name.replace('_walkable', '')
+
         if tile_name in ['hill', 'cliff']:
             tile_name = 'plain'
 
@@ -648,11 +660,11 @@ class GameMap(GameMapInterface):
         if tile_name in forested_tiles:
             adjacent_tiles_of_same_type = self.get_surrounding_tile_type_count(tile, 1, [tile_name]) - 1
             if adjacent_tiles_of_same_type >= 7:
-                return tile_name + '_dark'
+                return background_prefix + tile_name + '_dark'
             elif adjacent_tiles_of_same_type >= 2:
-                return tile_name
+                return background_prefix + tile_name
             else:
-                return tile_name + '_light'
+                return background_prefix + tile_name + '_light'
 
         # Handle shore backgrounds
         shore_tiles = ['shore', 'shore_walkable', 'shore_cliff', 'shore_cliff_walkable', 'beach', 'beach_walkable']
@@ -663,7 +675,7 @@ class GameMap(GameMapInterface):
                 shore_tile_name = tile_type.replace('_walkable', '')
                 if shore_tile_name in shore_tile_name_to_tile_name_map and tile_name == \
                         shore_tile_name_to_tile_name_map[shore_tile_name]:
-                    return shore_tile_name
+                    return background_prefix + shore_tile_name
 
         # Handle backgrounds on some other tile types, taking into account surrounding vegetation and elevation.
         if tile_name in ['plain', 'desert']:
@@ -707,20 +719,21 @@ class GameMap(GameMapInterface):
             background = tile_name + vegetation_suffix + elevation_suffix
             if backgrounds is not None:
                 if background in backgrounds:
-                    return background
+                    return background_prefix + background
                 # print(f'WARN: No encounter background for {background} at {tile}', flush=True)
 
                 background = tile_name + vegetation_suffix
                 if background in backgrounds:
-                    return background
+                    return background_prefix + background
 
                 background = tile_name + elevation_suffix
                 if background in backgrounds:
-                    return background
+                    return background_prefix + background
 
         # For all other tiles, just use the tile name
         if tile_name == 'DEFAULT TILE':
             print('WARN: default tile at', tile, flush=True)
+
         return tile_name
 
     def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
@@ -730,6 +743,41 @@ class GameMap(GameMapInterface):
         encounter_background_name = self.get_encounter_background_name(tile, list(backgrounds.keys()))
         if encounter_background_name in backgrounds:
             return backgrounds[encounter_background_name]
+        if encounter_background_name.startswith('gate:'):
+            non_gate_background_name = encounter_background_name.replace('gate:', '')
+            if 'gate' in backgrounds and non_gate_background_name in backgrounds:
+                gate_background = backgrounds['gate']
+                background_without_gate = backgrounds[non_gate_background_name]
+
+                # Combine the two backgrounds
+                # Scale the background_without_gate image to the dimension and size of the gate_background image
+                original_width = background_without_gate.image.get_width()
+                original_height = background_without_gate.image.get_height()
+                target_width = gate_background.image.get_width()
+                target_height = gate_background.image.get_height()
+                actual_height_to_width_ratio = original_width / original_height
+                target_height_to_width_ratio = target_width / target_height
+                if actual_height_to_width_ratio != target_height_to_width_ratio:
+                    if actual_height_to_width_ratio < target_height_to_width_ratio:
+                        subsurface_height = original_width / target_height_to_width_ratio
+                        subsurface_rect = pygame.Rect(0,
+                                                      (original_height - subsurface_height) // 2,
+                                                      original_width,
+                                                      subsurface_height)
+                    else:
+                        subsurface_width = original_height * target_height_to_width_ratio
+                        subsurface_rect = pygame.Rect((original_width - subsurface_width) // 2,
+                                                      0,
+                                                      subsurface_width,
+                                                      original_height)
+                    background_image_without_gate = background_without_gate.image.subsurface(subsurface_rect)
+                else:
+                    background_image_without_gate = background_without_gate.image
+                combined_image = pygame.transform.smoothscale(background_image_without_gate,
+                                                              (target_width, target_height))
+                combined_image.blit(gate_background.image, (0, 0))
+                return EncounterBackground(encounter_background_name, combined_image)
+
         print(f'WARN: No encounter background for {encounter_background_name} at {tile}', flush=True)
         return None
 

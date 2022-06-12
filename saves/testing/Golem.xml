@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<SaveState dir="SOUTH" gp="100000" map="overworld" name="Wallace" x="74" xp="9000" y="100">
+<SaveState dir="SOUTH" gp="100000" map="overworld" name="Wallace" location="Run away from Golem" xp="9000">
    <EquippedItems>
       <Item name="Broad Sword"/>
       <Item name="Magic Armor"/>

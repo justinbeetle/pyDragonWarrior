@@ -28,9 +28,11 @@
    <MapLocation x="66" y="50" name="Rainbow Bridge Formation Point"/>
    <MapDecoration type="bridge" x="65" y="50" progressMarker="PM_Created_Rainbow_Bridge"/>
 
-   <Monster name="Golem" x="74" y="101" inverseProgressMarker="PM_Defeated_Golem">
+   <MapLocation x="74" y="101" name="Golem"/>
+   <MapLocation x="74" y="100" name="Run away from Golem"/>
+   <Monster name="Golem" location="Golem" inverseProgressMarker="PM_Defeated_Golem">
       <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
-      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="74" y="100"/></RunAwayDialog></Monster>
+      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" location="Run away from Golem"/></RunAwayDialog></Monster>
 
    <MapLocation x="109" y="110" name="Southern Shrine"/>
    <MapLocation x="49"  y="49"  name="Charlock Castle"/>

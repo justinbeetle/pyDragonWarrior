@@ -9237,6 +9237,7 @@
    <frame tileid="1457" duration="600"/>
    <frame tileid="1458" duration="400"/>
    <frame tileid="1459" duration="250"/>
+   <frame tileid="1456" duration="250"/>
   </animation>
  </tile>
  <tile id="1457">
@@ -9249,6 +9250,7 @@
    <frame tileid="1457" duration="400"/>
    <frame tileid="1458" duration="400"/>
    <frame tileid="1459" duration="250"/>
+   <frame tileid="1456" duration="250"/>
   </animation>
  </tile>
  <tile id="1458">
@@ -9261,6 +9263,7 @@
    <frame tileid="1457" duration="600"/>
    <frame tileid="1458" duration="500"/>
    <frame tileid="1459" duration="250"/>
+   <frame tileid="1456" duration="250"/>
   </animation>
  </tile>
  <tile id="1459">
@@ -9273,6 +9276,7 @@
    <frame tileid="1457" duration="1500"/>
    <frame tileid="1458" duration="750"/>
    <frame tileid="1459" duration="250"/>
+   <frame tileid="1456" duration="250"/>
   </animation>
  </tile>
  <tile id="1460">
@@ -9523,21 +9527,53 @@
   <properties>
    <property name="type" value=""/>
   </properties>
+  <animation>
+   <frame tileid="1516" duration="1400"/>
+   <frame tileid="1496" duration="750"/>
+   <frame tileid="1497" duration="700"/>
+   <frame tileid="1498" duration="700"/>
+   <frame tileid="1499" duration="250"/>
+   <frame tileid="1496" duration="250"/>
+  </animation>
  </tile>
  <tile id="1497">
   <properties>
    <property name="type" value=""/>
   </properties>
+  <animation>
+   <frame tileid="1516" duration="1750"/>
+   <frame tileid="1496" duration="600"/>
+   <frame tileid="1497" duration="600"/>
+   <frame tileid="1498" duration="600"/>
+   <frame tileid="1499" duration="250"/>
+   <frame tileid="1496" duration="250"/>
+  </animation>
  </tile>
  <tile id="1498">
   <properties>
    <property name="type" value=""/>
   </properties>
+  <animation>
+   <frame tileid="1516" duration="2000"/>
+   <frame tileid="1496" duration="700"/>
+   <frame tileid="1497" duration="700"/>
+   <frame tileid="1498" duration="700"/>
+   <frame tileid="1499" duration="250"/>
+   <frame tileid="1496" duration="250"/>
+  </animation>
  </tile>
  <tile id="1499">
   <properties>
    <property name="type" value=""/>
   </properties>
+  <animation>
+   <frame tileid="1516" duration="1900"/>
+   <frame tileid="1496" duration="750"/>
+   <frame tileid="1497" duration="700"/>
+   <frame tileid="1498" duration="650"/>
+   <frame tileid="1499" duration="250"/>
+   <frame tileid="1496" duration="250"/>
+  </animation>
  </tile>
  <tile id="1500">
   <properties>
@@ -10187,6 +10223,58 @@
   <properties>
    <property name="type" value="plain"/>
   </properties>
+ </tile>
+ <tile id="1736">
+  <animation>
+   <frame tileid="1516" duration="1000"/>
+   <frame tileid="1736" duration="600"/>
+   <frame tileid="1737" duration="500"/>
+   <frame tileid="1738" duration="500"/>
+   <frame tileid="1739" duration="250"/>
+   <frame tileid="1776" duration="250"/>
+   <frame tileid="1777" duration="250"/>
+   <frame tileid="1778" duration="250"/>
+   <frame tileid="1736" duration="250"/>
+  </animation>
+ </tile>
+ <tile id="1737">
+  <animation>
+   <frame tileid="1516" duration="1500"/>
+   <frame tileid="1736" duration="750"/>
+   <frame tileid="1737" duration="700"/>
+   <frame tileid="1738" duration="650"/>
+   <frame tileid="1739" duration="250"/>
+   <frame tileid="1776" duration="250"/>
+   <frame tileid="1777" duration="250"/>
+   <frame tileid="1778" duration="250"/>
+   <frame tileid="1736" duration="250"/>
+  </animation>
+ </tile>
+ <tile id="1738">
+  <animation>
+   <frame tileid="1516" duration="2000"/>
+   <frame tileid="1736" duration="600"/>
+   <frame tileid="1737" duration="600"/>
+   <frame tileid="1738" duration="600"/>
+   <frame tileid="1739" duration="250"/>
+   <frame tileid="1776" duration="250"/>
+   <frame tileid="1777" duration="250"/>
+   <frame tileid="1778" duration="250"/>
+   <frame tileid="1736" duration="250"/>
+  </animation>
+ </tile>
+ <tile id="1739">
+  <animation>
+   <frame tileid="1516" duration="1750"/>
+   <frame tileid="1736" duration="650"/>
+   <frame tileid="1737" duration="600"/>
+   <frame tileid="1738" duration="550"/>
+   <frame tileid="1739" duration="250"/>
+   <frame tileid="1776" duration="250"/>
+   <frame tileid="1777" duration="250"/>
+   <frame tileid="1778" duration="250"/>
+   <frame tileid="1736" duration="250"/>
+  </animation>
  </tile>
  <tile id="1760" terrain="1,13,1,1">
   <properties>

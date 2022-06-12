@@ -9,7 +9,7 @@
    <PointTransition    decoration="pass"          x="111" y="78"                         toMap="rimuldar"              respawnDecorations="yes"/>
    <IncomingTransition decoration="pass"          x="112" y="78"             dir="EAST"  toMap="rimuldar"/>
    <PointTransition    decoration="pass"          x="31"  y="95"             dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="81"  y="106"                        toMap="cantlin"               respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="81"  y="107"                        toMap="cantlin"               respawnDecorations="yes"/>
    <IncomingTransition decoration="pass"          x="81"  y="105"            dir="NORTH" toMap="cantlin"/>
    <PointTransition    decoration="pass"          x="33"  y="17"             dir="SOUTH" toMap="erdricks_tomb_lvl1"    respawnDecorations="yes"/>
    <PointTransition    decoration="pass"          x="34"  y="62"             dir="SOUTH" toMap="mountain_cave_lvl1"    respawnDecorations="yes"/>
@@ -35,9 +35,11 @@
    <MapDecoration type="bridge_left" x="70" y="55" progressMarker="PM_Created_Rainbow_Bridge"/>
    <MapDecoration type="bridge_right" x="71" y="55" progressMarker="PM_Created_Rainbow_Bridge"/>
 
-   <Monster name="Golem" x="81" y="106" inverseProgressMarker="PM_Defeated_Golem">
+   <MapLocation x="81" y="106" name="Golem"/>
+   <MapLocation x="81" y="105" name="Run away from Golem"/>
+   <Monster name="Golem" location="Golem" inverseProgressMarker="PM_Defeated_Golem">
       <VictoryDialog><DialogAction type="GAIN_ITEM" name="PM_Defeated_Golem"/></VictoryDialog>
-      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="81" y="105"/></RunAwayDialog></Monster>
+      <RunAwayDialog><DialogAction type="GOTO_COORDINATES" location="Run away from Golem"/></RunAwayDialog></Monster>
 
    <MapLocation x="116" y="117" name="Southern Shrine"/>
    <MapLocation x="53"  y="54"  name="Charlock Castle"/>

@@ -26,7 +26,10 @@ class GameLoop:
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int) -> None:
+                 tile_size_pixels: int,
+                 verbose: bool=False) -> None:
+        self.verbose = verbose
+
         # Determine effective window size in both tiles and pixels
         # Initialize the pygame displays
         if desired_win_size_pixels is None:
@@ -64,12 +67,14 @@ class GameLoop:
         # Play title music and display title screen
         AudioPlayer().play_music(self.title_music)
 
+        # Scale to up to 90% of the display width and/or 40% of the height
         title_image_size_px = Point(self.title_image.get_size())
-        title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.8 / title_image_size_px.w,
-                                              self.win_size_pixels.h * 0.8 / title_image_size_px.h)))
+        title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.9 / title_image_size_px.w,
+                                              self.win_size_pixels.h * 0.4 / title_image_size_px.h)))
         title_image = pygame.transform.scale(self.title_image, title_image_size_px.getAsIntTuple())
         title_image_dest_px = Point((self.win_size_pixels.w - title_image_size_px.w) / 2,
                                     self.win_size_pixels.h / 2 - title_image_size_px.h)
+
         screen = pygame.display.get_surface()
         screen.fill('black')
         screen.blit(title_image, title_image_dest_px)
@@ -466,9 +471,9 @@ class GameLoop:
                       or hero_dest_dat_tile[1] == map_size[1] - 1):
                     transition = leaving_transition
             if transition is None:
-                # TODO: Uncomment following two statements to disable coordinate logging
-                #encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
-                #print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
+                if self.verbose:
+                    encounter_background = self.game_state.get_encounter_background(hero_dest_dat_tile)
+                    print('Check for transitions at', hero_dest_dat_tile, encounter_background, flush=True)
 
                 # See if this tile has any associated transitions
                 transition = self.game_state.get_point_transition(hero_dest_dat_tile,

@@ -36,6 +36,7 @@ class GameInfo:
         self.game_xml_path = game_xml_path
         self.tile_size_pixels = tile_size_pixels
         self.dialog_sequences: Dict[str, DialogType] = {}
+        self.map_being_parsed: Optional[str] = None
 
         # Find image_px_step_size.  Select step size nearest to 1/6 of a tile which yields a value where
         # tile_size_pixels is divisible by image_px_step_size.
@@ -284,8 +285,7 @@ class GameInfo:
                     credits = image_element.attrib['credits']
                 # print('Loading', encounter_background_name, flush=True)
                 try:
-                    encounter_background_image = pygame.image.load(
-                        os.path.join(element_encounter_path, image_filename)).convert()
+                    encounter_background_image = pygame.image.load(os.path.join(element_encounter_path, image_filename))
                     encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
                                                                                            encounter_background_image,
                                                                                            credits)
@@ -884,6 +884,7 @@ class GameInfo:
         maps: Dict[str, Map] = {}
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib['name']
+            self.map_being_parsed = map_name
             # print( 'mapName =', map_name, flush=True )
             music = element.attrib['music']
             light_diameter = None
@@ -1152,6 +1153,7 @@ class GameInfo:
                                  special_monsters,
                                  is_outside,
                                  origin)
+            self.map_being_parsed = None
         return maps
 
     def get_location(self, map_name: Optional[str], element: ET.Element) -> Point:
@@ -1277,7 +1279,7 @@ class GameInfo:
                         GameTypes.parse_int_range(element.attrib['count'])
                         count = element.attrib['count']
                   
-            map_name = None
+            map_name = self.map_being_parsed
             if 'map' in element.attrib:
                 map_name = element.attrib['map']
             

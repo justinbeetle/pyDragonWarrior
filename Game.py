@@ -169,7 +169,8 @@ def main() -> None:
     if not use_unlicensed_assets:
         try:
             game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
-            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
+                                 verbose=args.verbose)
         except:
             use_unlicensed_assets = True
             if args.verbose:
