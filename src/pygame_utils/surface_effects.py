@@ -2,8 +2,9 @@
 
 import pygame
 
-from GameDialog import GameDialog
-from GameStateInterface import GameStateInterface
+# TODO: Factor these our of this module
+from pydw.game_dialog import GameDialog
+from pydw.game_state_interface import GameStateInterface
 
 
 def fade_to_black_and_back(screen: pygame.surface.Surface) -> None:

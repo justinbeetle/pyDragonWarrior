@@ -12,7 +12,7 @@ import pygame
 import pyscroll
 import pytmx
 
-from Point import Point
+from generic_utils.point import Point
 
 
 class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore

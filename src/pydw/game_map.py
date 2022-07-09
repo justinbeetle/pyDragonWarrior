@@ -8,16 +8,18 @@ import pygame
 import pyscroll
 import random
 
-from AudioPlayer import AudioPlayer
-from GameStateInterface import GameStateInterface
-from GameTypes import CharacterType, Direction, EncounterBackground, MapDecoration, NpcInfo, Tile
-from HeroParty import HeroParty
-from HeroState import HeroState
-from LegacyMapData import LegacyMapData
-from PaddedTiledMapData import PaddedTiledMapData
-from Point import Point
-from MapCharacterState import MapCharacterState
-from NpcState import NpcState
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer
+
+from pydw.game_state_interface import GameStateInterface
+from pydw.game_types import CharacterType, Direction, EncounterBackground, MapDecoration, Tile
+from pydw.hero_party import HeroParty
+from pydw.hero_state import HeroState
+from pydw.legacy_map_data import LegacyMapData
+from pydw.padded_tiled_map_data import PaddedTiledMapData
+from pydw.map_character_state import MapCharacterState
+from pydw.npc_state import NpcState
 
 
 class GameMapInterface(metaclass=abc.ABCMeta):

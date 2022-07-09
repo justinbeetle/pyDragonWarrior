@@ -10,9 +10,12 @@ import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude
 #import lxml.etree as ET  # May desire to use in future for better xinclude support
 
-from AudioPlayer import AudioPlayer, MusicTrack, SoundTrack
-from GameDialog import GameDialog
-from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterType, Decoration, DialogAction, \
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer, MusicTrack, SoundTrack
+
+from pydw.game_dialog import GameDialog
+from pydw.game_types import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterType, Decoration, DialogAction, \
     DialogActionEnum, DialogCheck, DialogCheckEnum, DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, \
     DialogVendorBuyOptionsParamWithoutReplacementType,  DialogVendorBuyOptionsParamType, \
     DialogVendorBuyOptionsVariable, DialogVendorSellOptions, DialogVendorSellOptionsParamWithoutReplacementType, \
@@ -20,8 +23,6 @@ from GameTypes import ActionCategoryTypeEnum, AnyTransition, Armor, CharacterTyp
     IncomingTransition, ItemType, Level, Map, MapDecoration, MonsterAction, MonsterActionRule, MonsterInfo, \
     MonsterInfoPicklable, MonsterZone, NamedLocation, NpcInfo, OutgoingTransition, Shield, SpecialMonster, Spell, \
     SurfacePickable, TargetTypeEnum, Tile, Tool, Weapon
-
-from Point import Point
 
 
 class GameInfo:

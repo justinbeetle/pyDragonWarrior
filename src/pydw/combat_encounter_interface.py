@@ -5,8 +5,8 @@ from typing import List
 
 import abc
 
-from CombatCharacterState import CombatCharacterState
-from MonsterState import MonsterState
+from pydw.combat_character_state import CombatCharacterState
+from pydw.monster_state import MonsterState
 
 
 class CombatEncounterInterface(metaclass=abc.ABCMeta):

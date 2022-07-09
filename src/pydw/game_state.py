@@ -8,23 +8,25 @@ import random
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 
-from AudioPlayer import AudioPlayer
-from CombatEncounter import CombatEncounter
-import GameEvents
-from GameDialog import GameDialog
-from GameDialogEvaluator import GameDialogEvaluator
-from GameTypes import DialogReplacementVariables, DialogType, Direction, EncounterBackground, MapDecoration, \
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer
+import pygame_utils.game_events as GameEvents
+
+from pydw.combat_encounter import CombatEncounter
+from pydw.game_dialog import GameDialog
+from pydw.game_dialog_evaluator import GameDialogEvaluator
+from pydw.game_types import DialogReplacementVariables, DialogType, Direction, EncounterBackground, MapDecoration, \
     MonsterInfo, OutgoingTransition, SpecialMonster, Tile
-from GameInfo import GameInfo
-from GameMap import GameMap
-from GameStateInterface import GameStateInterface
-from HeroParty import HeroParty
-from HeroState import HeroState
-from MapCharacterState import MapCharacterState
-from MonsterParty import MonsterParty
-from MonsterState import MonsterState
-from NpcState import NpcState
-from Point import Point
+from pydw.game_info import GameInfo
+from pydw.game_map import GameMap
+from pydw.game_state_interface import GameStateInterface
+from pydw.hero_party import HeroParty
+from pydw.hero_state import HeroState
+from pydw.map_character_state import MapCharacterState
+from pydw.monster_party import MonsterParty
+from pydw.monster_state import MonsterState
+from pydw.npc_state import NpcState
 
 
 class GameState(GameStateInterface):

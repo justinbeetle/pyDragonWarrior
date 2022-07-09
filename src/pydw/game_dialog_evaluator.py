@@ -6,20 +6,22 @@ import pygame
 import random
 import time
 
-from AudioPlayer import AudioPlayer
-from CombatCharacterState import CombatCharacterState
-from CombatEncounterInterface import CombatEncounterInterface
-from GameDialog import GameDialog, GameDialogSpacing
-from GameTypes import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer
+import pygame_utils.game_events as GameEvents
+import pygame_utils.surface_effects as SurfaceEffects
+
+from pydw.combat_character_state import CombatCharacterState
+from pydw.combat_encounter_interface import CombatEncounterInterface
+from pydw.game_dialog import GameDialog, GameDialogSpacing
+from pydw.game_types import ActionCategoryTypeEnum, DialogAction, DialogActionEnum, DialogCheck, DialogCheckEnum, \
     DialogGoTo, DialogType, DialogVariable, DialogVendorBuyOptions, DialogVendorBuyOptionsVariable, \
     DialogVendorSellOptions, DialogVendorSellOptionsVariable, Direction, GameTypes, Level
-from GameInfo import GameInfo
-from GameStateInterface import GameStateInterface
-import GameEvents
-from HeroState import HeroState
-from MapCharacterState import MapCharacterState
-from Point import Point
-import SurfaceEffects
+from pydw.game_info import GameInfo
+from pydw.game_state_interface import GameStateInterface
+from pydw.hero_state import HeroState
+from pydw.map_character_state import MapCharacterState
 
 
 class GameDialogEvaluator:

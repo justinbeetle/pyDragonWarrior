@@ -66,11 +66,12 @@ def main() -> None:
         if args.verbose:
             print(f'Running as a PyInstaller binary executable', flush=True)
         application_path = os.path.dirname(sys.executable)
+        base_path = os.path.dirname(os.path.abspath(__file__))
     elif __file__:
         # Normal execution
         if args.verbose:
             print(f'Running as a Python script', flush=True)
-        application_path = os.path.dirname(__file__)
+        application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
         # Load required Python libraries
         if args.perform_pip_install:
@@ -111,10 +112,11 @@ def main() -> None:
                     venv_builder.create(venv_path)
                 except:
                     if args.verbose:
-                        print(f'Failed to create venv', flush=True)
+                        print(f'Failed to create venv {venv_path}', flush=True)
                         traceback.print_exc()
 
                 # Run pip to install the required packages into the venv
+                # We could just run setup.py, but it doesn't use wheels and the pygame src dist has install issues
                 if args.verbose or created_venv:
                     print('Running pip install...', flush=True)
                 subprocess.check_call([venv_context.env_exe, '-m', 'pip', 'install', '-U', '-r',
@@ -124,11 +126,20 @@ def main() -> None:
                 if not args.verbose and created_venv:
                     print('Completed pip install', flush=True)
 
+                # Run setup.py to install the pyDragonWarrior into the venv
+                if args.verbose or created_venv:
+                    print('Running setup.py install...', flush=True)
+                subprocess.check_call([venv_context.env_exe, os.path.join(application_path, 'setup.py'), 'install'],
+                                      stdout=subprocess_stdout,
+                                      stderr=subprocess_stderr)
+                if not args.verbose and created_venv:
+                    print('Completed setup.py install', flush=True)
+
                 # Run the application from the venv
                 if venv_context.env_exe != sys.executable:
                     if args.verbose:
                         print('Running application in venv', flush=True)
-                    exit(subprocess.check_call([venv_context.env_exe] + sys.argv))
+                    exit(subprocess.check_call([venv_context.env_exe] + sys.argv + ['-s']))
             elif args.verbose:
                 print('Not running in a venv', flush=True)
 
@@ -141,13 +152,12 @@ def main() -> None:
 
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # Silence pygame outputs to standard out
     import pygame
-    from AudioPlayer import AudioPlayer
-    from GameDialog import GameDialog
-    from GameLoop import GameLoop
+    from pygame_utils.audio_player import AudioPlayer
+    from pydw.game_dialog import GameDialog
+    from pydw.game_loop import GameLoop
 
-    # Set the current working directory to the location of this file so that the game can be run from any path
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    base_path = os.path.split(os.path.abspath(__file__))[0]
+    # Set the current working directory to the base path so that the game can be run from any path
+    os.chdir(base_path)
     icon_image_filename = os.path.join(base_path, 'icon.png')
 
     pygame.init()

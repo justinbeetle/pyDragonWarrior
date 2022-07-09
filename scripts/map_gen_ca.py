@@ -5,7 +5,7 @@ from typing import List
 
 class MapGenCa:
     @staticmethod
-    def genMapDat(width: int,
+    def gen_map_dat(width: int,
                   height: int) -> List[str]:
         dat = []
         dat.append('w'*(width+2))
@@ -16,13 +16,13 @@ class MapGenCa:
 
 
 def main() -> None:
-    from GameMap import MapViewer
-    from GameTypes import Map
+    from pydw.game_map import MapViewer
+    from pydw.game_types import Map
 
     # Generate and render a map
     map_name = 'mapGenCa'
     viewer = MapViewer()
-    viewer.game_info.maps[map_name] = Map.create(map_name, MapGenCa.genMapDat(50, 50))
+    viewer.game_info.maps[map_name] = Map.create(map_name, MapGenCa.gen_map_dat(50, 50))
     viewer.view_map(map_name)
 
 

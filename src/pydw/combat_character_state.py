@@ -7,7 +7,7 @@ import abc
 import math
 import random
 
-from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, Spell
+from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, Spell
 
 
 class CombatCharacterState(metaclass=abc.ABCMeta):

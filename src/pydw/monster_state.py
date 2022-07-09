@@ -4,8 +4,8 @@ from typing import Optional, List, Tuple, Union
 
 import random
 
-from CombatCharacterState import CombatCharacterState
-from GameTypes import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
+from pydw.combat_character_state import CombatCharacterState
+from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
 
 
 class MonsterState(CombatCharacterState):

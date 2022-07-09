@@ -2,17 +2,18 @@
 
 # Imports to support type annotations
 from typing import List, Optional
-from GameTypes import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo, Tile
 
 import abc
 import pygame
 
-from GameDialog import GameDialog
-from GameInfo import GameInfo
-from GenericGameState import GenericGameState
-from HeroParty import HeroParty
-from MapCharacterState import MapCharacterState
-from Point import Point
+from generic_utils.point import Point
+
+from pydw.game_dialog import GameDialog
+from pydw.game_info import GameInfo
+from pydw.game_types import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo, Tile
+from pydw.generic_game_state import GenericGameState
+from pydw.hero_party import HeroParty
+from pydw.map_character_state import MapCharacterState
 
 
 class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):

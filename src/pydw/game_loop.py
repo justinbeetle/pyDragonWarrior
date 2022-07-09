@@ -8,16 +8,18 @@ import os
 import pygame
 import random
 
-from AudioPlayer import AudioPlayer
-from CombatCharacterState import CombatCharacterState
-import GameEvents
-from GameDialog import GameDialog, GameDialogSpacing
-from GameDialogEvaluator import GameDialogEvaluator
-from GameInfo import GameInfo
-from GameMap import CharacterSprite
-from GameState import GameState
-from GameTypes import Direction, OutgoingTransition, Tool
-from Point import Point
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer
+import pygame_utils.game_events as GameEvents
+
+from pydw.combat_character_state import CombatCharacterState
+from pydw.game_dialog import GameDialog, GameDialogSpacing
+from pydw.game_dialog_evaluator import GameDialogEvaluator
+from pydw.game_info import GameInfo
+from pydw.game_map import CharacterSprite
+from pydw.game_state import GameState
+from pydw.game_types import Direction, OutgoingTransition, Tool
 
 
 class GameLoop:
@@ -27,7 +29,7 @@ class GameLoop:
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
                  tile_size_pixels: int,
-                 verbose: bool=False) -> None:
+                 verbose: bool = False) -> None:
         self.verbose = verbose
 
         # Determine effective window size in both tiles and pixels
@@ -507,7 +509,7 @@ class GameLoop:
 
         first_frame = True
         while self.game_state.hero_party.members[0].curr_pos_dat_tile != \
-              self.game_state.hero_party.members[0].dest_pos_dat_tile:
+                self.game_state.hero_party.members[0].dest_pos_dat_tile:
             # Redraws the characters when movement_allowed is True
             # print('advancing one tick in scroll_tile', flush=True)
             if movement_allowed and movement_hp_penalty > 0 and first_frame:

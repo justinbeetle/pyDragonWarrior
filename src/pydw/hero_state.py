@@ -7,11 +7,12 @@ from typing import Dict, List, Optional, Tuple
 import math
 import random
 
-from CombatCharacterState import CombatCharacterState
-from MapCharacterState import MapCharacterState
-from Point import Point
-from GameTypes import ActionCategoryTypeEnum, Armor, CharacterType, DialogActionEnum, Direction, Helm, ItemType, \
+from generic_utils.point import Point
+
+from pydw.combat_character_state import CombatCharacterState
+from pydw.game_types import ActionCategoryTypeEnum, Armor, CharacterType, DialogActionEnum, Direction, Helm, ItemType, \
     Level,  Shield, Spell, Tool, Weapon
+from pydw.map_character_state import MapCharacterState
 
 
 class HeroState(MapCharacterState, CombatCharacterState):

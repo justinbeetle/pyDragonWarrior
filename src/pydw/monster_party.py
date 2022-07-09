@@ -3,8 +3,8 @@
 # Imports to support type annotations
 from typing import Dict, List, Union
 
-from GameTypes import MonsterInfo, SpecialMonster
-from MonsterState import MonsterState
+from pydw.game_types import MonsterInfo, SpecialMonster
+from pydw.monster_state import MonsterState
 
 
 class MonsterParty:

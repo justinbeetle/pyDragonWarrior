@@ -99,8 +99,8 @@ python -m pip install --upgrade numpy
 python setup.py install
 
 python -m mypy Game.py --strict --ignore-missing-imports
-/c/users/justin/appdata/local/programs/python/python39/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png Game.py
-/c/users/justin/appdata/local/programs/python/python39/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" Game.py
+/c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/game.py
+/c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/game.py
 cd dist
 tar cfz pyDragonWarrior.tgz pyDragonWarrior
 

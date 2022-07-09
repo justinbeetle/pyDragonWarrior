@@ -2,13 +2,13 @@
 
 # Imports to support type annotations
 from typing import List, Optional, Union
-from GameTypes import ItemType
 
-from GameTypes import DialogType, Direction
-from HeroState import HeroState
-from MapCharacterState import MapCharacterState
-from MonsterParty import MonsterParty
-from Point import Point
+from generic_utils.point import Point
+
+from pydw.game_types import DialogType, Direction, ItemType
+from pydw.hero_state import HeroState
+from pydw.map_character_state import MapCharacterState
+from pydw.monster_party import MonsterParty
 
 
 class HeroParty:

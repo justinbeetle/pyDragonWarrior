@@ -9,9 +9,11 @@ import math
 import os
 import pygame
 
-import GameEvents
-from HeroParty import HeroParty
-from Point import Point
+from generic_utils.point import Point
+
+import pygame_utils.game_events as GameEvents
+
+from pydw.hero_party import HeroParty
 
 
 class GameDialogSpacing(Enum):

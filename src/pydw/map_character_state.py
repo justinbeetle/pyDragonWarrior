@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-from Point import Point
-from GameTypes import CharacterType, Direction
+from generic_utils.point import Point
+
+from pydw.game_types import CharacterType, Direction
 
 
 class MapCharacterState:

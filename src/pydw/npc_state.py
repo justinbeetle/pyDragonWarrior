@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from MapCharacterState import MapCharacterState
-from GameTypes import NpcInfo
+from pydw.map_character_state import MapCharacterState
+from pydw.game_types import NpcInfo
 
 
 class NpcState(MapCharacterState):
@@ -23,7 +23,7 @@ class NpcState(MapCharacterState):
 
 
 def main() -> None:
-    from GameTypes import Direction
+    from game_types import Direction
 
     # Test out character states
     state = NpcState(NpcInfo.create_null())

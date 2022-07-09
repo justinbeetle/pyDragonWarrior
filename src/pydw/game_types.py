@@ -9,7 +9,7 @@ from enum import Enum
 import pygame
 import random
 
-from Point import Point
+from generic_utils.point import Point
 
 
 class GameTypes:

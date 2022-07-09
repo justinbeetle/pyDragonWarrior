@@ -12,8 +12,9 @@ import collections
 import pygame
 import pyscroll
 
-from GameInfo import GameInfo
-from Point import Point
+from generic_utils.point import Point
+
+from pydw.game_info import GameInfo
 
 
 class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
@@ -420,11 +421,11 @@ class ScrollTest:
             self.running = False
 
 
-from AudioPlayer import AudioPlayer
 class MapViewer:
     def __init__(self) -> None:
         # Initialize pygame
         pygame.init()
+        from pygame_utils.AudioPlayer import AudioPlayer
         self.audio_player = AudioPlayer()
 
         # Setup to draw maps

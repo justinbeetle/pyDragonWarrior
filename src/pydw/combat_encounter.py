@@ -5,21 +5,23 @@ from typing import cast, List, Optional, Tuple, Union
 import pygame
 import random
 
-from AudioPlayer import AudioPlayer
-from CombatCharacterState import CombatCharacterState
-from CombatEncounterInterface import CombatEncounterInterface
-from GameDialog import GameDialog, GameDialogSpacing
-from GameDialogEvaluator import GameDialogEvaluator
-import GameEvents
-from GameInfo import GameInfo
-from GameStateInterface import GameStateInterface
-from GameTypes import DialogAction, DialogActionEnum, DialogType, EncounterBackground, GameTypes, MonsterAction, \
+from generic_utils.point import Point
+
+from pygame_utils.audio_player import AudioPlayer
+import pygame_utils.game_events as GameEvents
+
+from pydw.combat_character_state import CombatCharacterState
+from pydw.combat_encounter_interface import CombatEncounterInterface
+from pydw.game_dialog import GameDialog, GameDialogSpacing
+from pydw.game_dialog_evaluator import GameDialogEvaluator
+from pydw.game_info import GameInfo
+from pydw.game_state_interface import GameStateInterface
+from pydw.game_types import DialogAction, DialogActionEnum, DialogType, EncounterBackground, GameTypes, MonsterAction, \
     MonsterInfo, Problem, SpecialMonster, TargetTypeEnum, Tool
-from HeroParty import HeroParty
-from HeroState import HeroState
-from MonsterParty import MonsterParty
-from MonsterState import MonsterState
-from Point import Point
+from pydw.hero_party import HeroParty
+from pydw.hero_state import HeroState
+from pydw.monster_party import MonsterParty
+from pydw.monster_state import MonsterState
 
 
 class CombatEncounter(CombatEncounterInterface):
