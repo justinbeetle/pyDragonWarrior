@@ -3,18 +3,24 @@
 # Imports to support type annotations
 from typing import Dict, List, Union
 
+from pydw.combat_character_state import CombatCharacterState
+from pydw.combat_party import CombatParty
 from pydw.game_types import MonsterInfo, SpecialMonster
 from pydw.monster_state import MonsterState
 
 
-class MonsterParty:
+class MonsterParty(CombatParty):
     NUMBERS = ['a', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
     ORDINAL_NUMBERS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth']
 
     def __init__(self, monsters: List[Union[MonsterInfo, SpecialMonster, MonsterState]] = []) -> None:
+        super().__init__()
         self.members: List[MonsterState] = []
         for monster in monsters:
             self.add_monster(monster)
+
+    def get_combat_members(self) -> List[CombatCharacterState]:
+        return self.members
 
     def add_monster(self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]) -> None:
         if isinstance(monster, MonsterState):
@@ -48,26 +54,6 @@ class MonsterParty:
                                  current_monster_type_to_count_map[monster.monster_info.name]]
                              + ' ' + monster.monster_info.name)
             current_monster_type_to_count_map[monster.monster_info.name] += 1
-
-    def is_still_in_combat(self) -> bool:
-        for member in self.members:
-            if member.is_still_in_combat():
-                return True
-        return False
-
-    def get_still_in_combat_members(self) -> List[MonsterState]:
-        alive_members = []
-        for member in self.members:
-            if member.is_still_in_combat():
-                alive_members.append(member)
-        return alive_members
-
-    def get_highest_attack_strength(self) -> int:
-        highest_attack_strength = 0
-        for member in self.members:
-            if member.is_still_in_combat():
-                highest_attack_strength = max(highest_attack_strength, member.get_attack_strength())
-        return highest_attack_strength
 
     def get_default_approach_dialog(self) -> str:
         if 1 == len(self.members):

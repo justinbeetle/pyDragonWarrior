@@ -1,4 +1,11 @@
 [FORMAT]
 max-line-length=120
 
-good-names:gp,hp,mp,xp,x,y
+good-names:gp,hp,mp,xp,i,j,k,x,y,z
+
+[TYPECHECK]
+
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+generated-members=pygame.K*

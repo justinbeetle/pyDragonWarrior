@@ -5,14 +5,17 @@ from typing import List, Optional, Union
 
 from generic_utils.point import Point
 
+from pydw.combat_character_state import CombatCharacterState
+from pydw.combat_party import CombatParty
 from pydw.game_types import DialogType, Direction, ItemType
 from pydw.hero_state import HeroState
 from pydw.map_character_state import MapCharacterState
 from pydw.monster_party import MonsterParty
 
 
-class HeroParty:
+class HeroParty(CombatParty):
     def __init__(self, main_character: HeroState) -> None:
+        super().__init__()
         self.main_character = main_character
         self.members = [main_character]  # in party order
         self.gp = 0
@@ -34,7 +37,10 @@ class HeroParty:
     def combat_members(self) -> List[HeroState]:
         return [member for member in self.members if member.is_combat_character]
 
-    def add_member(self, member: HeroState, order: Optional[int]=None, is_main_character: bool=False) -> None:
+    def get_combat_members(self) -> List[CombatCharacterState]:
+        return self.combat_members
+
+    def add_member(self, member: HeroState, order: Optional[int] = None, is_main_character: bool = False) -> None:
         if is_main_character:
             self.main_character = member
         if member not in self.members:
@@ -176,19 +182,6 @@ class HeroParty:
             if member.is_alive():
                 return True
         return False
-
-    def is_still_in_combat(self) -> bool:
-        for member in self.members:
-            if member.is_still_in_combat():
-                return True
-        return False
-
-    def get_still_in_combat_members(self) -> List[HeroState]:
-        alive_members = []
-        for member in self.members:
-            if member.is_still_in_combat():
-                alive_members.append(member)
-        return alive_members
 
     def is_ignoring_tile_penalties(self) -> bool:
         for member in self.members:

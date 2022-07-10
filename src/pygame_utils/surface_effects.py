@@ -111,7 +111,7 @@ rainbow_colors = [pygame.Color('red'),
                   pygame.Color('yellow'),
                   pygame.Color('green'),
                   pygame.Color('blue'),
-                  #pygame.Color('blueviolet'),  # pygame.Color('indigo'),
+                  pygame.Color('indigo'),
                   pygame.Color('violet')]
 
 
@@ -167,17 +167,14 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
     clock = pygame.time.Clock()
     for i in range(4):
         for rainbow_color in rainbow_colors:
-            try:
-                pygame.transform.threshold(screen,
-                                           orig_screen,
-                                           search_color=water_color,
-                                           threshold=pygame.Color(50, 50, 50),
-                                           set_color=rainbow_color,
-                                           inverse_set=True)
-                clock.tick(5)
-                pygame.display.flip()
-            except:
-                print('Color not found: ', rainbow_color, flush=True)
+            pygame.transform.threshold(screen,
+                                       orig_screen,
+                                       search_color=water_color,
+                                       threshold=pygame.Color(50, 50, 50),
+                                       set_color=rainbow_color,
+                                       inverse_set=True)
+            clock.tick(5)
+            pygame.display.flip()
 
     # Restore original screen
     screen.blit(orig_screen, (0, 0))

@@ -1133,7 +1133,7 @@ def main() -> None:
 
     # Test out game dialog
     GameDialog.static_init(win_size_tiles, tile_size_pixels, ['lucidasans', 'arialms'])
-    from HeroState import HeroState
+    from pydw.hero_state import HeroState
     hero_party = HeroParty(HeroState.create_null())
 
     GameDialog.force_use_menus_for_text_entry = True
