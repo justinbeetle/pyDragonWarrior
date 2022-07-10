@@ -37,7 +37,7 @@ class GameLoop:
         if desired_win_size_pixels is None:
             screen = pygame.display.set_mode(
                 (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)
             self.win_size_pixels = Point(screen.get_size())
             win_size_tiles = (self.win_size_pixels / tile_size_pixels).floor()
         else:
@@ -45,7 +45,7 @@ class GameLoop:
             self.win_size_pixels = win_size_tiles * tile_size_pixels
             pygame.display.set_mode(
                 self.win_size_pixels.getAsIntTuple(),
-                pygame.SRCALPHA)  # | pygame.DOUBLEBUF | pygame.HWSURFACE)
+                pygame.SRCALPHA)
 
         self.title_image, self.title_music = \
             GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)

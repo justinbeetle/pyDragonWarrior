@@ -4,6 +4,7 @@ pyscroll
 pytmx
 certifi
 opensimplex
+pytest
 mypy
 pyinstaller
 snakeviz

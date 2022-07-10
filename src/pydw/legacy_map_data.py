@@ -27,7 +27,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                  game_info: GameInfo,
                  map_name: str,
                  image_pad_tiles: Point = Point(0, 0)):
-        super(LegacyMapData, self).__init__()
+        super().__init__()
         self.game_info = game_info
         self.map_name = map_name
         self.image_pad_tiles = Point(image_pad_tiles)

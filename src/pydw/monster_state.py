@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Optional, List, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import random
 
@@ -16,7 +16,7 @@ class MonsterState(CombatCharacterState):
         else:
             self.monster_info = monster_info
             self.special_monster_info = None
-        super(MonsterState, self).__init__(hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp))
+        super().__init__(hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp))
         self.gp = random.randint(self.monster_info.min_gp, self.monster_info.max_gp)
         self.xp = self.monster_info.xp  # TODO: Should this also come from a range?
         self.name = 'the ' + self.monster_info.name
@@ -63,9 +63,9 @@ class MonsterState(CombatCharacterState):
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.SLEEP == action:
             return self.monster_info.sleep_resist
-        elif DialogActionEnum.STOPSPELL == action:
+        if DialogActionEnum.STOPSPELL == action:
             return self.monster_info.stopspell_resist
-        elif DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
+        if DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
             return self.monster_info.hurt_resist
         return 0
 
@@ -130,22 +130,20 @@ class MonsterState(CombatCharacterState):
                 self.get_agility() * random.uniform(0, 1) * self.monster_info.block_factor)
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s)" % (
-            self.__class__.__name__,
-            super(MonsterState, self).__str__(),
-            self.monster_info,
-            self.special_monster_info,
-            self.gp,
-            self.xp)
+        return f'{self.__class__.__name__}(' \
+               f'{super()}, ' \
+               f'{self.monster_info}, ' \
+               f'{self.special_monster_info}, ' \
+               f'{self.gp}, ' \
+               f'{self.xp})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r)" % (
-            self.__class__.__name__,
-            super(MonsterState, self).__repr__(),
-            self.monster_info,
-            self.special_monster_info,
-            self.gp,
-            self.xp)
+        return f'{self.__class__.__name__}(' \
+               f'{super()!r}, ' \
+               f'{self.monster_info!r}, ' \
+               f'{self.special_monster_info!r}, ' \
+               f'{self.gp!r}, ' \
+               f'{self.xp!r})'
 
 
 def main() -> None:

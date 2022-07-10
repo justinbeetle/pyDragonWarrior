@@ -81,20 +81,20 @@ class HeroState(MapCharacterState, CombatCharacterState):
         if filter_types is None:
             item_passed_type_filter = True
         else:
-            for filterType in filter_types:
-                if filterType == 'Weapon' and isinstance(item, Weapon):
+            for filter_type in filter_types:
+                if filter_type == 'Weapon' and isinstance(item, Weapon):
                     item_passed_type_filter = True
                     break
-                elif filterType == 'Helm' and isinstance(item, Helm):
+                if filter_type == 'Helm' and isinstance(item, Helm):
                     item_passed_type_filter = True
                     break
-                elif filterType == 'Armor' and isinstance(item, Armor):
+                if filter_type == 'Armor' and isinstance(item, Armor):
                     item_passed_type_filter = True
                     break
-                elif filterType == 'Shield' and isinstance(item, Shield):
+                if filter_type == 'Shield' and isinstance(item, Shield):
                     item_passed_type_filter = True
                     break
-                elif filterType == 'Tool' and isinstance(item, Tool):
+                if filter_type == 'Tool' and isinstance(item, Tool):
                     item_passed_type_filter = True
                     break
         if item_passed_type_filter and (not limit_to_droppable or not isinstance(item, Tool) or item.droppable):
@@ -443,22 +443,20 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 self.hp_regen_tiles_remaining = self.armor.hp_regen_tiles
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s)" % (
-            self.__class__.__name__,
-            MapCharacterState.__str__(self),
-            CombatCharacterState.__str__(self),
-            self.name,
-            self.level,
-            self.xp)
+        return f'{self.__class__.__name__}(' \
+               f'{MapCharacterState.__str__(self)}, ' \
+               f'{CombatCharacterState.__str__(self)}, ' \
+               f'{self.name}, ' \
+               f'{self.level}, ' \
+               f'{self.xp})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r)" % (
-            self.__class__.__name__,
-            MapCharacterState.__repr__(self),
-            CombatCharacterState.__repr__(self),
-            self.name,
-            self.level,
-            self.xp)
+        return f'{self.__class__.__name__}(' \
+               f'{MapCharacterState.__repr__(self)}, ' \
+               f'{CombatCharacterState.__repr__(self)}, ' \
+               f'{self.name!r}, ' \
+               f'{self.level!r}, ' \
+               f'{self.xp!r})'
 
 
 def main() -> None:

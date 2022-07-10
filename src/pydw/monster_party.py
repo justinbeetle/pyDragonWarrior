@@ -115,8 +115,7 @@ class MonsterParty:
         terms[-1] = 'and ' + terms[-1]
         if 2 == len(terms):
             return ' '.join(terms)
-        else:
-            return ', '.join(terms)
+        return ', '.join(terms)
 
     # Get the number of monsters defeated
     def get_defeated_count(self) -> int:
@@ -143,14 +142,10 @@ class MonsterParty:
         return ret_val
 
     def __str__(self) -> str:
-        return "%s(%s)" % (
-            self.__class__.__name__,
-            self.members)
+        return f'{self.__class__.__name__}({self.members})'
 
     def __repr__(self) -> str:
-        return "%s(%r)" % (
-            self.__class__.__name__,
-            self.members)
+        return f'{self.__class__.__name__}({self.members!r})'
 
 
 def main() -> None:

@@ -25,7 +25,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def __init__(self, tmx_filename: str,
                  image_pad_tiles: Point=Point(0, 0),
                  desired_tile_size: Optional[int] = None):
-        super(PaddedTiledMapData, self).__init__()
+        super().__init__()
 
         # load data from pytmx
         self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)

@@ -255,7 +255,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_flickering_monsters(self, monsters: List[CombatCharacterState], flicker_color: pygame.Color) -> None:
         clock = pygame.time.Clock()
-        for flickerTimes in range(10):
+        for flicker_times in range(10):
             self.render_monsters(monsters, monsters, flicker_color=flicker_color)
             clock.tick(30)
             pygame.display.flip()
@@ -271,7 +271,7 @@ class CombatEncounter(CombatEncounterInterface):
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
         clock = pygame.time.Clock()
         offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
-        for flickerTimes in range(10):
+        for flicker_times in range(10):
             if not self.hero_party.is_still_in_combat():
                 # On a death blow, the background flickers red
                 self.game_state.screen.fill('red')
@@ -446,29 +446,29 @@ class CombatEncounter(CombatEncounterInterface):
                 if len(available_spell_names) == 0:
                     self.add_message('Thou hast not yet learned any spells.')
                     continue
-                else:
-                    menu_dialog = GameDialog.create_menu_dialog(
-                        Point(-1, 1),
-                        None,
-                        'SPELLS',
-                        available_spell_names,
-                        1)
-                    menu_dialog.blit(self.game_state.screen, True)
-                    menu_result = self.gde.get_menu_result(menu_dialog)
-                    menu_dialog.erase(self.game_state.screen, self.background_image)
 
-                    # print('menu_result =', menu_result, flush=True)
-                    if menu_result is None:
-                        continue
-                    spell = hero.get_spell(menu_result)
-                    if spell is not None and hero.mp >= spell.mp:
-                        hero.mp -= spell.mp
-                        use_dialog = spell.use_dialog
-                        target_type = spell.target_type
-                    else:
-                        self.add_message('Thou dost not have enough magic to cast the spell.')
-                        continue
-                    menu_dialog.erase(self.game_state.screen, self.background_image, True)
+                menu_dialog = GameDialog.create_menu_dialog(
+                    Point(-1, 1),
+                    None,
+                    'SPELLS',
+                    available_spell_names,
+                    1)
+                menu_dialog.blit(self.game_state.screen, True)
+                menu_result = self.gde.get_menu_result(menu_dialog)
+                menu_dialog.erase(self.game_state.screen, self.background_image)
+
+                # print('menu_result =', menu_result, flush=True)
+                if menu_result is None:
+                    continue
+                spell = hero.get_spell(menu_result)
+                if spell is not None and hero.mp >= spell.mp:
+                    hero.mp -= spell.mp
+                    use_dialog = spell.use_dialog
+                    target_type = spell.target_type
+                else:
+                    self.add_message('Thou dost not have enough magic to cast the spell.')
+                    continue
+                menu_dialog.erase(self.game_state.screen, self.background_image, True)
 
             elif menu_result == 'ITEM':
                 item_cols = 2
@@ -476,31 +476,30 @@ class CombatEncounter(CombatEncounterInterface):
                 if len(item_row_data) == 0:
                     self.add_message('Thou dost not have any tools.')
                     continue
-                else:
-                    menu_dialog = GameDialog.create_menu_dialog(
-                        Point(-1, 1),
-                        None,
-                        'ITEMS',
-                        item_row_data,
-                        item_cols,
-                        GameDialogSpacing.OUTSIDE_JUSTIFIED)
-                    menu_dialog.blit(self.game_state.screen, True)
-                    item_result = self.gde.get_menu_result(menu_dialog)
-                    menu_dialog.erase(self.game_state.screen, self.background_image)
 
-                    # print( 'item_result =', item_result, flush=True )
-                    if item_result is None:
-                        continue
-                    item = hero.get_item(item_result)
-                    if item is None or not isinstance(item, Tool):
-                        continue
-                    if item.use_dialog is not None:
-                        use_dialog = item.use_dialog
-                        target_type = item.target_type
-                    else:
-                        self.add_message(hero.get_name()
-                                                        + ' studied the object and was confounded by it.')
-                        return
+                menu_dialog = GameDialog.create_menu_dialog(
+                    Point(-1, 1),
+                    None,
+                    'ITEMS',
+                    item_row_data,
+                    item_cols,
+                    GameDialogSpacing.OUTSIDE_JUSTIFIED)
+                menu_dialog.blit(self.game_state.screen, True)
+                item_result = self.gde.get_menu_result(menu_dialog)
+                menu_dialog.erase(self.game_state.screen, self.background_image)
+
+                # print( 'item_result =', item_result, flush=True )
+                if item_result is None:
+                    continue
+                item = hero.get_item(item_result)
+                if item is None or not isinstance(item, Tool):
+                    continue
+                if item.use_dialog is not None:
+                    use_dialog = item.use_dialog
+                    target_type = item.target_type
+                else:
+                    self.add_message(hero.get_name() + ' studied the object and was confounded by it.')
+                    return
             else:
                 continue
 
@@ -600,17 +599,17 @@ class CombatEncounter(CombatEncounterInterface):
             damage_action.problem = problem
 
     @staticmethod
-    def gen_addition_problem(min_term: int=0, max_term: int=12) -> Problem:
+    def gen_addition_problem(min_term: int = 0, max_term: int = 12) -> Problem:
         addend_1 = random.randrange(min_term, max_term)
         addend_2 = random.randrange(min_term, max_term)
         sum = addend_1 + addend_2
         return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum), '0123456789')
 
     @staticmethod
-    def gen_subtraction_problem(min_term: int=0,
-                                max_term: int=12,
-                                minuend_min: Optional[int]=None,
-                                minuend_max: Optional[int]=None) -> Problem:
+    def gen_subtraction_problem(min_term: int = 0,
+                                max_term: int = 12,
+                                minuend_min: Optional[int] = None,
+                                minuend_max: Optional[int] = None) -> Problem:
         if minuend_min is not None and minuend_max is not None:
             minuend = random.randrange(12, 16)
             subtrahend = random.randrange(min(min_term, minuend), min(max_term, minuend))
@@ -623,10 +622,10 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference), '0123456789')
 
     @staticmethod
-    def gen_multiplication_problem(min_term: int=0,
-                                   max_term: int=12,
-                                   multiplicand_1_range: Optional[List[int]]=None,
-                                   multiplicand_2_range: Optional[List[int]]=None) -> Problem:
+    def gen_multiplication_problem(min_term: int = 0,
+                                   max_term: int = 12,
+                                   multiplicand_1_range: Optional[List[int]] = None,
+                                   multiplicand_2_range: Optional[List[int]] = None) -> Problem:
         if multiplicand_1_range is None:
             multiplicand_1 = random.randrange(min_term, max_term)
         else:
@@ -645,10 +644,10 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(multiplicand_1) + ' x ' + str(multiplicand_2) + ' =', str(product), '0123456789')
 
     @staticmethod
-    def gen_division_problem(min_term: int=0,
-                             max_term: int=12,
-                             multiplicand_1_range: Optional[List[int]]=None,
-                             multiplicand_2_range: Optional[List[int]]=None) -> Problem:
+    def gen_division_problem(min_term: int = 0,
+                             max_term: int = 12,
+                             multiplicand_1_range: Optional[List[int]] = None,
+                             multiplicand_2_range: Optional[List[int]] = None) -> Problem:
         if multiplicand_1_range is None:
             multiplicand_1 = random.randrange(min_term, max_term)
         else:
@@ -671,28 +670,26 @@ class CombatEncounter(CombatEncounterInterface):
         return Problem(str(dividend) + ' / ' + str(divisor) + ' =', str(quotient), '0123456789')
 
     @staticmethod
-    def gen_any_problem(min_term: int=0, max_term: int=12) -> Problem:
+    def gen_any_problem(min_term: int = 0, max_term: int = 12) -> Problem:
         a = random.randrange(0, 3)
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term, max_term)
-        elif 1 == a:
+        if 1 == a:
             return CombatEncounter.gen_subtraction_problem(min_term, max_term)
-        elif 2 == a:
+        if 2 == a:
             return CombatEncounter.gen_multiplication_problem(min_term, max_term)
-        else:
-            return CombatEncounter.gen_division_problem(min_term, max_term)
+        return CombatEncounter.gen_division_problem(min_term, max_term)
 
     @staticmethod
     def gen_cam_problem() -> Problem:
         a = random.choices([1, 2, 3, 4], weights=(1, 1, 8, 3))[0]
         if 0 == a:
             return CombatEncounter.gen_addition_problem(min_term=0, max_term=20)
-        elif 1 == a:
+        if 1 == a:
             return CombatEncounter.gen_subtraction_problem(min_term=0, max_term=20)
-        elif 2 == a:
+        if 2 == a:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
-        else:
-            return CombatEncounter.gen_division_problem(min_term=0, max_term=12)
+        return CombatEncounter.gen_division_problem(min_term=0, max_term=12)
 
 
 def main() -> None:
@@ -710,16 +707,16 @@ def main() -> None:
 
     # Initialize GameInfo
     import os
-    from GameInfo import GameInfo
+    from pydw.game_info import GameInfo
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
 
     # Find an encounter image to use
-    for map in game_info.maps:
-        if game_info.maps[map].encounter_background is not None:
-            encounter_background = game_info.maps[map].encounter_background
+    for map_name in game_info.maps:
+        if game_info.maps[map_name].encounter_background is not None:
+            encounter_background = game_info.maps[map_name].encounter_background
             break
 
     # Verify an encounter image was found
@@ -732,7 +729,7 @@ def main() -> None:
     # Setup a mock game state
     from unittest import mock
     from unittest.mock import MagicMock
-    from GameTypes import DialogReplacementVariables
+    from pydw.game_types import DialogReplacementVariables
     mock_game_state = mock.create_autospec(spec=GameStateInterface)
     mock_game_state.screen = screen
     mock_game_state.is_running = True
@@ -741,12 +738,12 @@ def main() -> None:
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
-    def handle_quit_side_effect(force: bool=False) -> None:
+    def handle_quit_side_effect(force: bool = False) -> None:
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 
     # Create a series of hero party and monster party tuples for encounters
-    from GameTypes import Direction
+    from pydw.game_tTypes import Direction
     combat_parties = []
     for i in range(1, 4):
         hero_party = HeroParty(HeroState(game_info.character_types['hero'], Point(), Direction.NORTH, 'Camden', 20000))

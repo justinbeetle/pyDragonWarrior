@@ -85,7 +85,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
     def round(self) -> Point:
         return Point(int(round(self.x)), int(round(self.y)))
 
-    def mag(self) -> float:
+    def mag(self) -> PointTypeElemType:
         return abs(self.x + self.y)
 
     def __str__(self) -> str:

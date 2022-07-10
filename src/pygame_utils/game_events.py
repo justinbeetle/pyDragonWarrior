@@ -9,6 +9,11 @@ joysticks: Dict[int, pygame.joystick.Joystick] = {}
 
 
 def setup_joystick() -> bool:
+    """ Detect joysticks/gamepads as they become available and configure them for use
+
+    :return: Flag indicating if any joysticks are available
+    """
+
     if pygame.joystick.get_count() != len(joysticks):
         print('pygame.joystick.get_count() =', pygame.joystick.get_count(), flush=True)
 
@@ -16,8 +21,8 @@ def setup_joystick() -> bool:
     for instance_id, joystick in joysticks.copy().items():
         # Determine if the joystick is still present
         found_joystick = False
-        for joystickId in range(pygame.joystick.get_count()):
-            if pygame.joystick.Joystick(joystickId).get_instance_id() == instance_id:
+        for joystick_id in range(pygame.joystick.get_count()):
+            if pygame.joystick.Joystick(joystick_id).get_instance_id() == instance_id:
                 found_joystick = True
                 break
 
@@ -28,8 +33,8 @@ def setup_joystick() -> bool:
             del joysticks[instance_id]
 
     # Add new joysticks
-    for joystickId in range(pygame.joystick.get_count()):
-        joystick = pygame.joystick.Joystick(joystickId)
+    for joystick_id in range(pygame.joystick.get_count()):
+        joystick = pygame.joystick.Joystick(joystick_id)
         instance_id = joystick.get_instance_id()
 
         # Skip previously initialized joysticks
@@ -47,9 +52,21 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
-def get_events(is_keyboard_repeat_enabled: bool=False,
-               translate_wasd_to_uldr: bool=True,
-               translate_e_to_enter: bool=True) -> List[pygame.event.Event]:
+def get_events(is_keyboard_repeat_enabled: bool = False,
+               translate_wasd_to_uldr: bool = True,
+               translate_e_to_enter: bool = True) -> List[pygame.event.Event]:
+    """ Translate both keyboard and joystick/gamepad events into a reduced set of events.
+
+    :param is_keyboard_repeat_enabled: Allow a held key to continue generating events, defaults to False
+
+    :param translate_wasd_to_uldr: translate events on the WASD keys to events on the UP/LEFT/DOWN/RIGHT keys, defaults
+        to True
+
+    :param translate_e_to_enter: translate events on the E key to events on the ENTER key, defaults to True
+
+    :return: List of events
+    """
+
     # Allow joysticks to be rediscovered if they get uninitialized.
     setup_joystick()
 
@@ -74,8 +91,8 @@ def get_events(is_keyboard_repeat_enabled: bool=False,
             elif pygame.K_q == event.key:
                 event.__dict__['key'] = pygame.K_SPACE
 
-        #elif event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
-        #    print('Detected gain focus event', flush=True)
+        # elif event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
+        #     print('Detected gain focus event', flush=True)
 
         # Translate joystick events to keyboard events
         elif event.type == pygame.JOYBUTTONDOWN:
@@ -161,15 +178,14 @@ def main() -> None:
     pygame.init()
     setup_joystick()
 
-    # Setup to draw maps
-    print('Setup to draw maps...', flush=True)
+    # Setup display
+    print('Setup to display to allow for cursor event...', flush=True)
     win_size_pixels = (250, 250)
     pygame.display.set_mode(win_size_pixels, pygame.SRCALPHA | pygame.HWSURFACE)
 
     print('pygame.display.Info() =', pygame.display.Info(), flush=True)
     print('pygame.display.get_wm_info() =', pygame.display.get_wm_info(), flush=True)
 
-    # Iterate through and render the different maps
     is_running = True
     while is_running:
         # Process events
