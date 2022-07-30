@@ -5,6 +5,7 @@
 A Python based Dragon Warrior clone.  Dragon Warrior was chosen as a game with which I have sentimental attachment but the intent is that it eventually evolves into a unique fantasy game in the spirit of Dragon Warrior instead of being an out-and-out clone or reimagining.
 
 ![Python application](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml/badge.svg)
+![mypy](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml/badge.svg)
 ![Pylint](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml/badge.svg)
 
 ## Installation
