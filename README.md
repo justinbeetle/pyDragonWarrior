@@ -8,7 +8,7 @@ A Python based Dragon Warrior clone.  Dragon Warrior was chosen as a game with w
 
 1. Install python: Install the latest Python 3 version from https://www.python.org/downloads
 2. Install pyDragonWarrior: git clone https://github.com/justinbeetle/pyDragonWarrior.git
-cp 
+ 
 ## Running
 
 Execute pyDragonWarrior/src/pydw/game.py
@@ -26,3 +26,4 @@ Note: Running game.py runs a subshell command to install the required Python lib
 | Quick Save                   | F1                 | Menu             |
 
 Note: Gamepad support has only been tested with an XBox One controller.
+

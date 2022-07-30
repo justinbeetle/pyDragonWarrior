@@ -61,87 +61,93 @@ def main() -> None:
     # print('args =', args, flush=True)
 
     # Determine if application is a script file or frozen exe
-    if getattr(sys, 'frozen', False):
+    is_frozen = getattr(sys, 'frozen', False)
+    if is_frozen:
         # Executing as a PyInstaller binary executable
         if args.verbose:
             print(f'Running as a PyInstaller binary executable', flush=True)
         application_path = os.path.dirname(sys.executable)
         base_path = os.path.dirname(os.path.abspath(__file__))
-    elif __file__:
+    else:
         # Normal execution
         if args.verbose:
             print(f'Running as a Python script', flush=True)
         application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-        # Load required Python libraries
-        if args.perform_pip_install:
-            # If not in a virtual environment, create one first
-            venv_path: Optional[str] = None
-            if 'VIRTUAL_ENV' not in os.environ:
-                # Identify path for venv
-                venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, 'venv')
-                if venv_path_found:
-                    if args.verbose:
-                        print(f'Not running in a venv, will switch to {venv_path}', flush=True)
-                else:
-                    venv_path = None
-                    print('ERROR: Failed to identify a venv path to which the current user has write access',
-                          flush=True)
+    # Set the current working directory to the base path so that the game can be run from any path
+    # First ensure sys.argv[0] is an absolute path
+    sys.argv[0] = os.path.abspath(sys.argv[0])
+    os.chdir(base_path)
+
+    # Load required Python libraries
+    if not is_frozen and args.perform_pip_install:
+        # If not in a virtual environment, create one first
+        venv_path: Optional[str] = None
+        if 'VIRTUAL_ENV' not in os.environ:
+            # Identify path for venv
+            venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, 'venv')
+            if venv_path_found:
+                if args.verbose:
+                    print(f'Not running in a venv, will switch to {venv_path}', flush=True)
             else:
-                venv_path = os.environ['VIRTUAL_ENV']
+                venv_path = None
+                print('ERROR: Failed to identify a venv path to which the current user has write access',
+                      flush=True)
+        else:
+            venv_path = os.environ['VIRTUAL_ENV']
+            if args.verbose:
+                print(f'Already running in venv {venv_path}', flush=True)
+
+        if venv_path:
+            created_venv = False
+            if args.verbose:
+                subprocess_stdout = sys.stdout
+                subprocess_stderr = sys.stderr
+            else:
+                subprocess_stdout = subprocess.DEVNULL
+                subprocess_stderr = subprocess.DEVNULL
+
+            # Create the venv if it doesn't already exist
+            import venv
+            venv_builder = venv.EnvBuilder(with_pip=True)
+            venv_context = venv_builder.ensure_directories(venv_path)
+            if not os.path.exists(venv_context.env_exe):
+                print(f'Creating venv {venv_path}...', flush=True)
+                created_venv = True
+            try:
+                venv_builder.create(venv_path)
+            except:
                 if args.verbose:
-                    print(f'Already running in venv {venv_path}', flush=True)
+                    print(f'Failed to create venv {venv_path}', flush=True)
+                    traceback.print_exc()
 
-            if venv_path:
-                created_venv = False
+            # Run pip to install the required packages into the venv
+            # We could just run setup.py, but it doesn't use wheels and the pygame src dist has install issues
+            if args.verbose or created_venv:
+                print('Running pip install...', flush=True)
+            subprocess.check_call([venv_context.env_exe, '-m', 'pip', 'install', '-U', '-r',
+                                   os.path.join(application_path, 'requirements.txt')],
+                                  stdout=subprocess_stdout,
+                                  stderr=subprocess_stderr)
+            if not args.verbose and created_venv:
+                print('Completed pip install', flush=True)
+
+            # Run setup.py to install the pyDragonWarrior into the venv
+            if args.verbose or created_venv:
+                print('Running setup.py install...', flush=True)
+            subprocess.check_call([venv_context.env_exe, os.path.join(application_path, 'setup.py'), 'install'],
+                                  stdout=subprocess_stdout,
+                                  stderr=subprocess_stderr)
+            if not args.verbose and created_venv:
+                print('Completed setup.py install', flush=True)
+
+            # Run the application from the venv
+            if venv_context.env_exe != sys.executable:
                 if args.verbose:
-                    subprocess_stdout = None
-                    subprocess_stderr = None
-                else:
-                    subprocess_stdout = subprocess.DEVNULL
-                    subprocess_stderr = subprocess.DEVNULL
-
-                # Create the venv if it doesn't already exist
-                import venv
-                venv_builder = venv.EnvBuilder(with_pip=True)
-                venv_context = venv_builder.ensure_directories(venv_path)
-                if not os.path.exists(venv_context.env_exe):
-                    print(f'Creating venv {venv_path}...', flush=True)
-                    created_venv = True
-                try:
-                    venv_builder.create(venv_path)
-                except:
-                    if args.verbose:
-                        print(f'Failed to create venv {venv_path}', flush=True)
-                        traceback.print_exc()
-
-                # Run pip to install the required packages into the venv
-                # We could just run setup.py, but it doesn't use wheels and the pygame src dist has install issues
-                if args.verbose or created_venv:
-                    print('Running pip install...', flush=True)
-                subprocess.check_call([venv_context.env_exe, '-m', 'pip', 'install', '-U', '-r',
-                                       os.path.join(application_path, 'requirements.txt')],
-                                      stdout=subprocess_stdout,
-                                      stderr=subprocess_stderr)
-                if not args.verbose and created_venv:
-                    print('Completed pip install', flush=True)
-
-                # Run setup.py to install the pyDragonWarrior into the venv
-                if args.verbose or created_venv:
-                    print('Running setup.py install...', flush=True)
-                subprocess.check_call([venv_context.env_exe, os.path.join(application_path, 'setup.py'), 'install'],
-                                      stdout=subprocess_stdout,
-                                      stderr=subprocess_stderr)
-                if not args.verbose and created_venv:
-                    print('Completed setup.py install', flush=True)
-
-                # Run the application from the venv
-                if venv_context.env_exe != sys.executable:
-                    if args.verbose:
-                        print('Running application in venv', flush=True)
-                    exit(subprocess.check_call([venv_context.env_exe] + sys.argv + ['-s']))
-            elif args.verbose:
-                print('Not running in a venv', flush=True)
+                    print('Running application in venv', flush=True)
+                exit(subprocess.check_call([venv_context.env_exe] + sys.argv + ['-s']))
+        elif args.verbose:
+            print('Not running in a venv', flush=True)
 
     # Identify the path for saved gamed files
     saves_path_found, saves_path = get_writeable_application_path(application_path, application_name, 'saves')
@@ -156,13 +162,10 @@ def main() -> None:
     from pydw.game_dialog import GameDialog
     from pydw.game_loop import GameLoop
 
-    # Set the current working directory to the base path so that the game can be run from any path
-    os.chdir(base_path)
-    icon_image_filename = os.path.join(base_path, 'icon.png')
-
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.display.set_caption(application_name)
+    icon_image_filename = os.path.join(base_path, 'icon.png')
     if os.path.exists(icon_image_filename):
         try:
             icon_image = pygame.image.load(icon_image_filename)
