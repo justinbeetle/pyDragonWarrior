@@ -12,7 +12,7 @@ import pygame_utils.game_events as GameEvents
 
 from pydw.game_map import GameMap
 from pydw.game_state_interface import GameStateInterface
-from pydw.game_types import CharacterType, Direction, EncounterBackground, MapDecoration, Tile
+from pydw.game_types import Direction
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 

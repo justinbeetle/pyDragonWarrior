@@ -100,9 +100,13 @@ python setup.py install
 
 
 Generate PyInstaller single file package:
+   Run the game, to ensure the venv is fully populated: src/pydw/game.py
+   Activate the venv: source venv/Scripts/activate
    /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/game.py
 
 Generate PyInstaller tarball package:
+   Run the game, to ensure the venv is fully populated: src/pydw/game.py
+   Activate the venv: source venv/Scripts/activate
    /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/game.py
    cd dist
    tar cfz pyDragonWarrior.tgz pyDragonWarrior

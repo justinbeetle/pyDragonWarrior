@@ -650,6 +650,11 @@ class Weapon(NamedTuple):
     def __hash__(self) -> int:
         return hash('Weapon:' + self.name)
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Weapon):
+            return self.name == other.name
+        return False
+
 
 class Helm(NamedTuple):
     name: str
@@ -686,6 +691,11 @@ class Tool(NamedTuple):
 
     def __hash__(self) -> int:
         return hash('Tool:' + self.name)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Tool):
+            return self.name == other.name
+        return False
 
 
 ItemType = Union[Weapon, Helm, Armor, Shield, Tool]

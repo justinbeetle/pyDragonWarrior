@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import cast, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import concurrent.futures
 import os

@@ -102,7 +102,7 @@ class CharacterSprite(MapSprite):
             self.updates_per_phase_change = self.character.character_type.ticks_per_step // 2
             self.character_phase_progression = [0, 1, 2, 1]
 
-        self.image = self.get_image()
+        self.image = CharacterSprite.get_image(self)
         self.rect = self.get_rect()
 
     def get_phase_image_index(self) -> int:
