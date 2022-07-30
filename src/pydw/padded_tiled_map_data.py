@@ -158,7 +158,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                                    obj.y / self.tmx.tileheight,
                                    obj.width / self.tmx.tilewidth,
                                    obj.height / self.tmx.tileheight)
-                if rect.collidepoint(pos_dat_tile.getAsIntTuple()):
+                if rect.collidepoint(pos_dat_tile.get_as_int_tuple()):
                     return idx, l.name
         return None
 
@@ -259,7 +259,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def tile_size(self) -> Tuple[int, int]:
         """ This is the pixel size of tiles to be rendered
-        
+
         :return: (int, int)
         """
         if self.pre_zoom == 1.0:
@@ -270,7 +270,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def map_size(self) -> Tuple[int, int]:
         """ This is the size of the map in tiles
-        
+
         :return: (int, int)
         """
         # This size INCLUDES the padding
@@ -279,7 +279,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def visible_tile_layers(self) -> List[int]:
         """ This must return layer numbers, not objects
-        
+
         :return: [int, int, ...]
         """
         return self.layers_to_render
@@ -392,7 +392,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                         if not render_tile:
                             yield x, y, l, images[-1]
                             continue
-                    
+
                     if track and gid in tracked_gids:
                         anim_map[gid].positions.add((x, y, l))
 

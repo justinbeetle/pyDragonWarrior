@@ -19,5 +19,5 @@ class CombatEncounterInterface(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_monsters_still_in_combat(self) -> List[MonsterState]:
+    def get_monsters_still_in_combat(self) -> List[CombatCharacterState]:
         pass

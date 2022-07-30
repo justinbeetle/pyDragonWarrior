@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import Dict, List, Union
+from typing import cast, Dict, List, Union
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_party import CombatParty
@@ -20,7 +20,7 @@ class MonsterParty(CombatParty):
             self.add_monster(monster)
 
     def get_combat_members(self) -> List[CombatCharacterState]:
-        return self.members
+        return cast(List[CombatCharacterState], self.members)
 
     def add_monster(self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]) -> None:
         if isinstance(monster, MonsterState):

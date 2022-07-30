@@ -44,7 +44,7 @@ class GameLoop:
             win_size_tiles = (desired_win_size_pixels / tile_size_pixels).floor()
             self.win_size_pixels = win_size_tiles * tile_size_pixels
             pygame.display.set_mode(
-                self.win_size_pixels.getAsIntTuple(),
+                self.win_size_pixels.get_as_int_tuple(),
                 pygame.SRCALPHA)
 
         self.title_image, self.title_music = \
@@ -73,7 +73,7 @@ class GameLoop:
         title_image_size_px = Point(self.title_image.get_size())
         title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.9 / title_image_size_px.w,
                                               self.win_size_pixels.h * 0.4 / title_image_size_px.h)))
-        title_image = pygame.transform.scale(self.title_image, title_image_size_px.getAsIntTuple())
+        title_image = pygame.transform.scale(self.title_image, title_image_size_px.get_as_int_tuple())
         title_image_dest_px = Point((self.win_size_pixels.w - title_image_size_px.w) / 2,
                                     self.win_size_pixels.h / 2 - title_image_size_px.h)
 
@@ -465,7 +465,7 @@ class GameLoop:
             leaving_transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
             if leaving_transition is not None:
                 if leaving_transition.bounding_box:
-                    if not leaving_transition.bounding_box.collidepoint(hero_dest_dat_tile.getAsIntTuple()):
+                    if not leaving_transition.bounding_box.collidepoint(hero_dest_dat_tile.get_as_int_tuple()):
                         transition = leaving_transition
                 elif (hero_dest_dat_tile[0] == 0
                       or hero_dest_dat_tile[1] == 0

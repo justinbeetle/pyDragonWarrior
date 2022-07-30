@@ -538,7 +538,7 @@ class GameInfo:
             scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
             image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
             pygame.transform.scale(image_unscaled,
-                                   scaled_size_pixels.getAsIntTuple(),
+                                   scaled_size_pixels.get_as_int_tuple(),
                                    image_scaled)
             return image_scaled
 
@@ -710,7 +710,7 @@ class GameInfo:
                                                                                y_px,
                                                                                phase_image_size.w,
                                                                                phase_image_size.h),
-                                               phase_image_scaled_size.getAsIntTuple(),
+                                               phase_image_scaled_size.get_as_int_tuple(),
                                                image.subsurface(dest_image_rect))
                         direction_character_type_images[phase] = image
                     character_type_images[direction] = direction_character_type_images
@@ -733,11 +733,10 @@ class GameInfo:
             action_name = element.attrib['name']
             spell = None
             target_type = TargetTypeEnum.SINGLE_ENEMY
-            use_dialog: Optional[DialogType] = None
             if 'spell' in element.attrib and element.attrib['spell'] in self.spells:
                 spell = self.spells[element.attrib['spell']]
                 target_type = spell.target_type
-                use_dialog = spell.use_dialog
+                use_dialog: Optional[DialogType] = spell.use_dialog
             else:
                 if 'target' in element.attrib:
                     target_type = TargetTypeEnum[element.attrib['target']]
@@ -1083,13 +1082,12 @@ class GameInfo:
             if map_dat_file_name.endswith('.tmx'):
                 map_tiled_file_name = map_dat_file_name
             else:
-                map_dat_file = open(map_dat_file_name, 'r')
-                # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
-                for line in map_dat_file:
-                    line = line.strip('\n')
-                    map_dat.append(line)
-                    # TODO: Validate the map is rectangular and all tiles are defined
-                map_dat_file.close()
+                with open(map_dat_file_name, 'r') as map_dat_file:
+                    # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
+                    for line in map_dat_file:
+                        line = line.strip('\n')
+                        map_dat.append(line)
+                        # TODO: Validate the map is rectangular and all tiles are defined`
                 map_dat_size = Point(len(map_dat[0]), len(map_dat))
 
                 # Conditionally load map dat overlap file
@@ -1097,13 +1095,12 @@ class GameInfo:
                     # print('Load map overlay dat file', flush=True)
                     map_overlay_dat = []
                     map_overlay_dat_file_name = os.path.join(maps_path, element.attrib['overlayTiles'])
-                    map_overlay_dat_file = open(map_overlay_dat_file_name, 'r')
-                    # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
-                    for line in map_overlay_dat_file:
-                        line = line.strip('\n')
-                        map_overlay_dat.append(line)
-                        # TODO: Validate the map is rectangular and all tiles are defined
-                    map_overlay_dat_file.close()
+                    with open(map_overlay_dat_file_name, 'r') as map_overlay_dat_file:
+                        # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
+                        for line in map_overlay_dat_file:
+                            line = line.strip('\n')
+                            map_overlay_dat.append(line)
+                            # TODO: Validate the map is rectangular and all tiles are defined
                     map_overlay_dat_size = Point(len(map_overlay_dat[0]), len(map_overlay_dat))
                     if map_dat_size != map_overlay_dat_size:
                         print('ERROR: Size mismatch between the map and map overlaps.  Map size =', map_dat_size,
@@ -1119,13 +1116,13 @@ class GameInfo:
                                                  999999999,
                                                  element.attrib['monsterSet']))
             else:
-                for monsterZoneElement in element.findall('.//MonsterZones/MonsterZone'):
+                for monster_zone_element in element.findall('.//MonsterZones/MonsterZone'):
                     monster_zones.append(MonsterZone(
-                        int(monsterZoneElement.attrib['x']),
-                        int(monsterZoneElement.attrib['y']),
-                        int(monsterZoneElement.attrib['w']),
-                        int(monsterZoneElement.attrib['h']),
-                        monsterZoneElement.attrib['set']))
+                        int(monster_zone_element.attrib['x']),
+                        int(monster_zone_element.attrib['y']),
+                        int(monster_zone_element.attrib['w']),
+                        int(monster_zone_element.attrib['h']),
+                        monster_zone_element.attrib['set']))
 
             # Load the encounter image
             # print('Load the encounter image', flush=True)
@@ -1211,7 +1208,7 @@ class GameInfo:
         self.pc_weapon: Optional[Weapon] = None
         self.pc_armor: Optional[Armor] = None
         self.pc_shield: Optional[Shield] = None
-        self.pc_otherEquippedItems: List[Tool] = []
+        self.pc_other_equipped_items: List[Tool] = []
         for item_element in initial_state_element.findall("./EquippedItems/Item"):
             item_name = item_element.attrib['name']
             if item_name in self.weapons:
@@ -1221,24 +1218,24 @@ class GameInfo:
             elif item_name in self.shields:
                 self.pc_shield = self.shields[item_name]
             elif item_name in self.tools:
-                self.pc_otherEquippedItems.append(self.tools[item_name])
+                self.pc_other_equipped_items.append(self.tools[item_name])
             else:
                 print('ERROR: Unsupported item', item_name, flush=True)
 
-        self.pc_unequippedItems: Dict[ItemType, int] = {}
+        self.pc_unequipped_items: Dict[ItemType, int] = {}
         for item_element in initial_state_element.findall("./UnequippedItems/Item"):
             item_name = item_element.attrib['name']
             item_count = 1
             if 'count' in item_element.attrib:
                 item_count = int(item_element.attrib['count'])
             if item_name in self.items:
-                self.pc_unequippedItems[self.items[item_name]] = item_count
+                self.pc_unequipped_items[self.items[item_name]] = item_count
             else:
                 print('ERROR: Unsupported item', item_name, flush=True)
 
-        self.pc_progressMarkers: List[str] = []
+        self.pc_progress_markers: List[str] = []
         for progress_marker_element in initial_state_element.findall("./ProgressMarkers/ProgressMarker"):
-            self.pc_progressMarkers.append(progress_marker_element.attrib['name'])
+            self.pc_progress_markers.append(progress_marker_element.attrib['name'])
             # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
 
         self.initial_map_decorations: List[MapDecoration] = []
@@ -1259,7 +1256,7 @@ class GameInfo:
         dialog: DialogType = []
         for element in dialog_root_element:
             # print('in parseDialog: element =', element, flush=True)
-         
+
             label = None
             if 'label' in element.attrib and element.attrib['label'] != 'None':
                 label = element.attrib['label']
@@ -1267,7 +1264,7 @@ class GameInfo:
             name = None
             if 'name' in element.attrib:
                 name = element.attrib['name']
-            
+
             count: Union[int, str] = 1
             if 'count' in element.attrib:
                 if ('unlimited' == element.attrib['count']
@@ -1279,27 +1276,27 @@ class GameInfo:
                     except ValueError:
                         GameTypes.parse_int_range(element.attrib['count'])
                         count = element.attrib['count']
-                  
+
             map_name = self.map_being_parsed
             if 'map' in element.attrib:
                 map_name = element.attrib['map']
-            
+
             map_pos = None
             try:
                 map_pos = self.get_location(map_name, element)
             except:
                 pass
-         
+
             map_dir = None
             try:
                 map_dir = self.get_optional_direction(map_name, element)
             except:
                 pass
-               
+
             if element.tag == 'DialogGoTo':
                 if label is not None:
                     dialog.append(DialogGoTo(label))
-            
+
             elif element.tag == 'Dialog':
                 if element.text is not None:
                     dialog.append(element.text)
@@ -1426,15 +1423,15 @@ class GameInfo:
                     dialog.append(DialogVendorBuyOptionsVariable(name, value_for_dialog_vendor_buy_options))
                 elif value == 'INVENTORY_ITEM_TYPE_LIST':
                     value_for_dialog_vendor_sell_options: DialogVendorSellOptionsParamWithoutReplacementType = []
-                    for itemTypeElement in element.findall("./InventoryItemType"):
-                        value_for_dialog_vendor_sell_options.append(itemTypeElement.attrib['type'])
+                    for item_type_element in element.findall("./InventoryItemType"):
+                        value_for_dialog_vendor_sell_options.append(item_type_element.attrib['type'])
                     dialog.append(DialogVendorSellOptionsVariable(name, value_for_dialog_vendor_sell_options))
                 else:
                     dialog.append(DialogVariable(name, value))
 
         if len(dialog) > 0:
             return dialog
-      
+
         return None
 
     def get_item(self, name: str) -> Optional[ItemType]:

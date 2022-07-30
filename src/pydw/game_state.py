@@ -157,11 +157,11 @@ class GameState(GameStateInterface):
             pc.weapon = self.game_info.pc_weapon
             pc.armor = self.game_info.pc_armor
             pc.shield = self.game_info.pc_shield
-            pc.other_equipped_items = self.game_info.pc_otherEquippedItems
-            pc.unequipped_items = self.game_info.pc_unequippedItems
+            pc.other_equipped_items = self.game_info.pc_other_equipped_items
+            pc.unequipped_items = self.game_info.pc_unequipped_items
             self.hero_party = HeroParty(pc)
             self.hero_party.gp = self.game_info.pc_gp
-            self.hero_party.progress_markers = self.game_info.pc_progressMarkers
+            self.hero_party.progress_markers = self.game_info.pc_progress_markers
 
             self.set_map(self.game_info.initial_map, self.game_info.initial_map_decorations, init=True)
         else:
@@ -333,8 +333,8 @@ class GameState(GameStateInterface):
 
         # Save state related to removed decorations
         removed_decorations_element = ET.SubElement(xml_root, 'RemovedDecorations')
-        for map_name in self.removed_decorations_by_map:
-            for decoration in self.removed_decorations_by_map[map_name]:
+        for map_name, removed_decorations in self.removed_decorations_by_map.items():
+            for decoration in removed_decorations:
                 removed_decoration_element = ET.SubElement(removed_decorations_element, 'RemovedDecoration')
                 removed_decoration_element.attrib['map'] = map_name
                 removed_decoration_element.attrib['x'] = str(decoration.point.x)
@@ -402,9 +402,8 @@ class GameState(GameStateInterface):
         try:
             if not os.path.isdir(self.saves_path):
                 os.makedirs(self.saves_path)
-            save_game_file = open(save_game_file_path, 'w')
-            save_game_file.write(xml_string)
-            save_game_file.close()
+            with open(save_game_file_path, 'w') as save_game_file:
+                save_game_file.write(xml_string)
 
             print('Saved game to file', save_game_file_path, flush=True)
         except Exception as exc:

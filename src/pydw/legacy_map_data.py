@@ -104,7 +104,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return layers_to_render_orig != self.visible_tile_layers
 
     def is_interior(self, pos_dat_tile: Point) -> bool:
-        tile_x, tile_y = pos_dat_tile.getAsIntTuple()
+        tile_x, tile_y = pos_dat_tile.get_as_int_tuple()
         for l in self.overlay_tile_layers:
             if self._get_tile_image(tile_x, tile_y, l,
                                     image_indexing=False, limit_to_visible=False) is not None:
@@ -183,7 +183,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def tile_size(self) -> Tuple[int, int]:
         """ This is the pixel size of tiles to be rendered
-        
+
         :return: (int, int)
         """
         return self.game_info.tile_size_pixels, self.game_info.tile_size_pixels
@@ -195,7 +195,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         :return: (int, int)
         """
         # This size INCLUDES the padding
-        return self.map_size_tiles.getAsIntTuple()
+        return self.map_size_tiles.get_as_int_tuple()
 
     @property
     def visible_tile_layers(self) -> List[int]:
@@ -239,7 +239,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
         x1, y1, x2, y2 = pyscroll.common.rect_to_bb(rect)
-        tiles_w, tiles_h = self.map_size_tiles.getAsIntTuple()
+        tiles_w, tiles_h = self.map_size_tiles.get_as_int_tuple()
         x1 = min(max(x1, 0), tiles_w - 1)
         x2 = min(max(x2, 0), tiles_w - 1)
         y1 = min(max(y1, 0), tiles_h - 1)
@@ -440,7 +440,7 @@ class MapViewer:
         else:
             self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-            self.screen = pygame.display.set_mode(self.win_size_pixels.getAsIntTuple(),
+            self.screen = pygame.display.set_mode(self.win_size_pixels.get_as_int_tuple(),
                                                   pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE)
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
 

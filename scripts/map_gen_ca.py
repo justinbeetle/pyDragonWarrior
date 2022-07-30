@@ -2,12 +2,16 @@
 
 from typing import List
 
+import os
+
+from pydw.game_map_viewer import GameMapViewer
+from pydw.game_types import Map
+
 
 class MapGenCa:
     @staticmethod
-    def gen_map_dat(width: int,
-                  height: int) -> List[str]:
-        dat = []
+    def gen_map_dat(width: int, height: int) -> List[str]:
+        dat: List[str] = []
         dat.append('w'*(width+2))
         for y in range(height):
             dat.append('w' + '_'*width + 'w')
@@ -16,12 +20,9 @@ class MapGenCa:
 
 
 def main() -> None:
-    from pydw.game_map import MapViewer
-    from pydw.game_types import Map
-
     # Generate and render a map
     map_name = 'mapGenCa'
-    viewer = MapViewer()
+    viewer = GameMapViewer(os.path.join(os.path.dirname(__file__), os.path.pardir))
     viewer.game_info.maps[map_name] = Map.create(map_name, MapGenCa.gen_map_dat(50, 50))
     viewer.view_map(map_name)
 

@@ -205,7 +205,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 print('WARN: Item not in inventory:', item_name, flush=True)
         else:
             print('WARN: Item already equipped:', item_name, flush=True)
-         
+
     def unequip_item(self, item_name: str) -> None:
         # Unequip an equipped item by removing it as eqipped and adding it as unequipped
         if self.weapon is not None and item_name == self.weapon.name:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import List, Optional, Union
+from typing import cast, List, Optional, Union
 
 from generic_utils.point import Point
 
@@ -38,7 +38,7 @@ class HeroParty(CombatParty):
         return [member for member in self.members if member.is_combat_character]
 
     def get_combat_members(self) -> List[CombatCharacterState]:
-        return self.combat_members
+        return cast(List[CombatCharacterState], self.combat_members)
 
     def add_member(self, member: HeroState, order: Optional[int] = None, is_main_character: bool = False) -> None:
         if is_main_character:
@@ -282,24 +282,16 @@ class HeroParty(CombatParty):
                 monster_party.get_highest_attack_strength() // 2)
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s)" % (
-            self.__class__.__name__,
-            self.main_character,
-            self.members,
-            self.gp,
-            self.progress_markers)
+        return f'{self.__class__.__name__}({self.main_character}, ' \
+               f'{self.members}, {self.gp}, {self.progress_markers})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r)" % (
-            self.__class__.__name__,
-            self.main_character,
-            self.members,
-            self.gp,
-            self.progress_markers)
+        return f'{self.__class__.__name__}({self.main_character!r}, ' \
+               f'{self.members!r}, {self.gp!r}, {self.progress_markers!r})'
 
 
 def main() -> None:
-    from GameTypes import CharacterType, Direction
+    from GameTypes import CharacterType
     character_type = CharacterType('myType', {}, [])
     hero_state = HeroState(character_type, Point(7, 3), Direction.WEST, 'Sir Me')
     hero_party = HeroParty(hero_state)

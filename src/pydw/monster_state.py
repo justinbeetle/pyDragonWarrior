@@ -8,6 +8,7 @@ from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
 
 
+
 class MonsterState(CombatCharacterState):
     def __init__(self, monster_info: Union[MonsterInfo, SpecialMonster]) -> None:
         if isinstance(monster_info, SpecialMonster):

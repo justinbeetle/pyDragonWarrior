@@ -98,23 +98,22 @@ python -m pip install --upgrade numpy
 # Publish latest pytmx and pyscroll
 python setup.py install
 
-python -m mypy src/pydw/game.py --strict --ignore-missing-imports
-/c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/game.py
-/c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/game.py
-cd dist
-tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
-pytest
+Generate PyInstaller single file package:
+   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/game.py
 
-pylint $(git ls-files '*.py')
+Generate PyInstaller tarball package:
+   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/game.py
+   cd dist
+   tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
-pip install snakeviz --user
-python -m cProfile -o <name>.profile ./Game.py <args>
-/c/users/justin/appdata/roaming/python/Python39/Scripts/snakeviz.exe <name>.profile
+Run mypy:   python -m mypy src/pydw/game.py --strict --ignore-missing-imports
+Run pylint: pylint $(git ls-files '*.py')
+Run tests:  pytest
 
-cd C:\Users\Justin\Desktop\Adventure\Adventure
-C:\Users\Justin\AppData\Local\Programs\Python\Python36-32\Scripts\pyinstaller Game.py
-copy game.xml, data, and saves from C:\Users\Justin\Desktop\Adventure\Adventure to C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game
-run C:\Users\Justin\Desktop\Adventure\Adventure\dist\Game\Game.exe
+Profile:
+   pip install snakeviz --user
+   python -m cProfile -o <name>.profile ./Game.py <args>
+   /c/users/justin/appdata/roaming/python/Python39/Scripts/snakeviz.exe <name>.profile
 
 Push tags:  git push origin --tags

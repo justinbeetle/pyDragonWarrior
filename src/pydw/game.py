@@ -25,8 +25,8 @@ def get_writeable_application_path(application_path: str, application_name: str,
     writeable_application_path = os.path.join(writeable_application_base_path, directory)
 
     def is_path_writeable() -> bool:
-        return (os.path.exists(writeable_application_path) and os.access(writeable_application_path, os.W_OK)) \
-               or os.access(application_path, os.W_OK)
+        return os.access(writeable_application_path, os.W_OK) if os.path.exists(writeable_application_path) else \
+            os.access(writeable_application_base_path, os.W_OK)
 
     if not is_path_writeable():
         # Don't have access to write saved game files in the application path.  Determine an alternate location.
@@ -65,13 +65,13 @@ def main() -> None:
     if is_frozen:
         # Executing as a PyInstaller binary executable
         if args.verbose:
-            print(f'Running as a PyInstaller binary executable', flush=True)
+            print('Running as a PyInstaller binary executable', flush=True)
         application_path = os.path.dirname(sys.executable)
         base_path = os.path.dirname(os.path.abspath(__file__))
     else:
         # Normal execution
         if args.verbose:
-            print(f'Running as a Python script', flush=True)
+            print('Running as a Python script', flush=True)
         application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
     # Set the current working directory to the base path so that the game can be run from any path
@@ -101,8 +101,8 @@ def main() -> None:
         if venv_path:
             created_venv = False
             if args.verbose:
-                subprocess_stdout = sys.stdout
-                subprocess_stderr = sys.stderr
+                subprocess_stdout = None
+                subprocess_stderr = None
             else:
                 subprocess_stdout = subprocess.DEVNULL
                 subprocess_stderr = subprocess.DEVNULL

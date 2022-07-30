@@ -379,9 +379,9 @@ class GameDialogEvaluator:
                 if menu_result is not None:
                     # print('menu_result =', menu_result, flush=True)
                     self.replacement_variables.generic['[ITEM]'] = menu_result
-                    for itemNameAndGp in name_and_gp_row_data:
-                        if itemNameAndGp[0] == menu_result:
-                            self.replacement_variables.generic['[COST]'] = itemNameAndGp[1]
+                    for item_name_and_gp in name_and_gp_row_data:
+                        if item_name_and_gp[0] == menu_result:
+                            self.replacement_variables.generic['[COST]'] = item_name_and_gp[1]
                 else:
                     self.replacement_variables.generic.pop('[ITEM]', None)
                     self.replacement_variables.generic.pop('[COST]', None)
@@ -913,12 +913,12 @@ class GameDialogEvaluator:
                             if npc_to_join_party is not None:
                                 self.hero_party.add_non_combat_member(item.name, npc_to_join_party)
                             else:
-                                print(f'ERROR: JOIN_PARTY failed because the NPC is None', flush=True)
+                                print('ERROR: JOIN_PARTY failed because the NPC is None', flush=True)
                         else:
                             print(f'Not adding {item.name} to the party because they are already a member', flush=True)
 
                     else:
-                        print(f'ERROR: JOIN_PARTY failed because the name is None', flush=True)
+                        print('ERROR: JOIN_PARTY failed because the name is None', flush=True)
 
                 elif item.type == DialogActionEnum.LEAVE_PARTY:
                     if item.name is not None:

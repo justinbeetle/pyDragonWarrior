@@ -82,8 +82,8 @@ class CombatEncounter(CombatEncounterInterface):
         encounter_image_size_px = encounter_image_size_px // pixelize_factor * pixelize_factor
         self.encounter_image = pygame.transform.scale(
             pygame.transform.smoothscale(encounter_background.image,
-                                         (encounter_image_size_px // pixelize_factor).getAsIntTuple()),
-            encounter_image_size_px.getAsIntTuple())
+                                         (encounter_image_size_px // pixelize_factor).get_as_int_tuple()),
+            encounter_image_size_px.get_as_int_tuple())
 
     def encounter_loop(self) -> None:
         # Start encounter music
@@ -290,7 +290,7 @@ class CombatEncounter(CombatEncounterInterface):
             clock.tick(30)
             pygame.display.flip()
 
-    def get_monsters_still_in_combat(self) -> List[MonsterState]:
+    def get_monsters_still_in_combat(self) -> List[CombatCharacterState]:
         return self.monster_party.get_still_in_combat_members()
 
     def get_turn_order(self) -> List[Union[HeroState, MonsterState]]:
@@ -374,11 +374,11 @@ class CombatEncounter(CombatEncounterInterface):
         if TargetTypeEnum.SINGLE_ALLY == chosen_monster_action.target_type:
             self.gde.set_targets([monster])
         elif TargetTypeEnum.ALL_ALLIES == chosen_monster_action.target_type:
-            self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
+            self.gde.set_targets(self.monster_party.get_still_in_combat_members())
         elif TargetTypeEnum.SINGLE_ENEMY == chosen_monster_action.target_type:
             self.gde.set_targets([target])
         else:  # TargetTypeEnum.ALL_ENEMIES
-            self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
+            self.gde.set_targets(self.hero_party.get_still_in_combat_members())
 
         # Perform the monster action
         self.gde.traverse_dialog(self.message_dialog, chosen_monster_action.use_dialog, depth=1, add_spacing=False)
@@ -517,21 +517,21 @@ class CombatEncounter(CombatEncounterInterface):
         if TargetTypeEnum.SINGLE_ALLY == target_type:
             still_in_combat_heroes = self.hero_party.get_still_in_combat_members()
             if 1 == len(still_in_combat_heroes):
-                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_heroes))
+                self.gde.set_targets(still_in_combat_heroes)
             else:
                 # TODO: Prompt for selection of which ally to target
                 self.gde.set_targets([still_in_combat_heroes[0]])
         elif TargetTypeEnum.ALL_ALLIES == target_type:
-            self.gde.set_targets(cast(List[CombatCharacterState], self.hero_party.get_still_in_combat_members()))
+            self.gde.set_targets(self.hero_party.get_still_in_combat_members())
         elif TargetTypeEnum.SINGLE_ENEMY == target_type:
             still_in_combat_monsters = self.monster_party.get_still_in_combat_members()
             if 1 == len(still_in_combat_monsters):
-                self.gde.set_targets(cast(List[CombatCharacterState], still_in_combat_monsters))
+                self.gde.set_targets(still_in_combat_monsters)
             else:
                 # TODO: Prompt for selection of which enemy to target
                 self.gde.set_targets([still_in_combat_monsters[0]])
         elif TargetTypeEnum.ALL_ENEMIES:
-            self.gde.set_targets(cast(List[CombatCharacterState], self.monster_party.get_still_in_combat_members()))
+            self.gde.set_targets(self.monster_party.get_still_in_combat_members())
         else:
             print('ERROR: Unsupported target type', target_type, flush=True)
 
@@ -602,8 +602,8 @@ class CombatEncounter(CombatEncounterInterface):
     def gen_addition_problem(min_term: int = 0, max_term: int = 12) -> Problem:
         addend_1 = random.randrange(min_term, max_term)
         addend_2 = random.randrange(min_term, max_term)
-        sum = addend_1 + addend_2
-        return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(sum), '0123456789')
+        summation = addend_1 + addend_2
+        return Problem(str(addend_1) + ' + ' + str(addend_2) + ' =', str(summation), '0123456789')
 
     @staticmethod
     def gen_subtraction_problem(min_term: int = 0,
@@ -614,10 +614,10 @@ class CombatEncounter(CombatEncounterInterface):
             minuend = random.randrange(12, 16)
             subtrahend = random.randrange(min(min_term, minuend), min(max_term, minuend))
         else:
-            a = random.randrange(min_term, max_term)
-            b = random.randrange(min_term, max_term)
-            minuend = a+b
-            subtrahend = random.choice((a, b))
+            term1 = random.randrange(min_term, max_term)
+            term2 = random.randrange(min_term, max_term)
+            minuend = term1+term2
+            subtrahend = random.choice((term1, term2))
         difference = minuend - subtrahend
         return Problem(str(minuend) + ' - ' + str(subtrahend) + ' =', str(difference), '0123456789')
 
@@ -671,23 +671,23 @@ class CombatEncounter(CombatEncounterInterface):
 
     @staticmethod
     def gen_any_problem(min_term: int = 0, max_term: int = 12) -> Problem:
-        a = random.randrange(0, 3)
-        if 0 == a:
+        random_val = random.randrange(0, 3)
+        if 0 == random_val:
             return CombatEncounter.gen_addition_problem(min_term, max_term)
-        if 1 == a:
+        if 1 == random_val:
             return CombatEncounter.gen_subtraction_problem(min_term, max_term)
-        if 2 == a:
+        if 2 == random_val:
             return CombatEncounter.gen_multiplication_problem(min_term, max_term)
         return CombatEncounter.gen_division_problem(min_term, max_term)
 
     @staticmethod
     def gen_cam_problem() -> Problem:
-        a = random.choices([1, 2, 3, 4], weights=(1, 1, 8, 3))[0]
-        if 0 == a:
+        random_val = random.choices([0, 1, 2, 3], weights=(1, 1, 8, 3))[0]
+        if 0 == random_val:
             return CombatEncounter.gen_addition_problem(min_term=0, max_term=20)
-        if 1 == a:
+        if 1 == random_val:
             return CombatEncounter.gen_subtraction_problem(min_term=0, max_term=20)
-        if 2 == a:
+        if 2 == random_val:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
         return CombatEncounter.gen_division_problem(min_term=0, max_term=12)
 
@@ -702,21 +702,20 @@ def main() -> None:
     tile_size_pixels = 48
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(), pygame.SRCALPHA | pygame.HWSURFACE)
+    screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA | pygame.HWSURFACE)
     screen.fill('pink')
 
     # Initialize GameInfo
     import os
-    from pydw.game_info import GameInfo
     base_path = os.path.split(os.path.abspath(__file__))[0]
     game_xml_path = os.path.join(base_path, 'game.xml')
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
 
     # Find an encounter image to use
-    for map_name in game_info.maps:
-        if game_info.maps[map_name].encounter_background is not None:
-            encounter_background = game_info.maps[map_name].encounter_background
+    for game_map in game_info.maps.values():
+        if game_map.encounter_background is not None:
+            encounter_background = game_map.encounter_background
             break
 
     # Verify an encounter image was found
@@ -738,7 +737,7 @@ def main() -> None:
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
-    def handle_quit_side_effect(force: bool = False) -> None:
+    def handle_quit_side_effect() -> None:
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 

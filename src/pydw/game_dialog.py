@@ -851,7 +851,7 @@ class GameDialog:
                     elif isinstance(current_option, str):
                         temp.append(current_option)
                 else:
-                    for colInner in range(cols_per_option):
+                    for col_inner in range(cols_per_option):
                         temp.append(None)
             row_data.append(temp)
         return row_data
@@ -1128,7 +1128,7 @@ def main() -> None:
     tile_size_pixels = 48
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels.getAsIntTuple(),
+    screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(),
                                      pygame.SRCALPHA | pygame.HWSURFACE)
 
     # Test out game dialog

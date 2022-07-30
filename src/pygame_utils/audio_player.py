@@ -125,7 +125,7 @@ class AudioPlayer:
             # Choose a desired audio format
             pygame.mixer.init(11025)  # Raises exception on fail
             pygame.mixer.set_num_channels(32)
-         
+
             self.music_path = './'
             self.name_to_music_track_mapping: Dict[str, List[MusicTrack]] = {}
             self.sound_path = './'
@@ -139,12 +139,12 @@ class AudioPlayer:
             self.music_thread_lock = threading.RLock()
             self.music_thread = threading.Thread(target=self.__music_thread)
             self.music_thread.start()
-         
+
         def __del__(self) -> None:
             self.terminate()
             self.music_thread.join()
             pygame.mixer.quit()
-         
+
         def set_music_path(self, music_path: str) -> None:
             self.music_path = music_path
 
@@ -192,11 +192,11 @@ class AudioPlayer:
         def stage_all_tracks(self) -> None:
             # First determine everything that needs to be downloaded.  Use a set to avoid duplicate downloads
             required_download_info = set()
-            for track_name in self.name_to_music_track_mapping:
-                for music_track in self.name_to_music_track_mapping[track_name]:
+            for music_track_mapping in self.name_to_music_track_mapping.values():
+                for music_track in music_track_mapping:
                     required_download_info |= music_track.get_required_download_info()
-            for track_name in self.name_to_sound_track_mapping:
-                for sound_track in self.name_to_sound_track_mapping[track_name]:
+            for sound_track_mapping in self.name_to_sound_track_mapping.values():
+                for sound_track in sound_track_mapping:
                     required_download_info |= sound_track.get_required_download_info()
 
             # Perform all the downloads using a thread pool
@@ -210,42 +210,40 @@ class AudioPlayer:
                     self.stage_music_track(track_name)
                 for track_name in self.name_to_sound_track_mapping:
                     self.stage_sound_track(track_name)
-         
+
         def play_music(self,
                        music_rel_file_path1: str,
                        music_rel_file_path2: Optional[str] = None,
                        interrupt: bool = False,
                        music_file_start1_sec: float = 0.0,
                        music_file_start2_sec: float = 0.0) -> None:
-            self.music_thread_lock.acquire()
-            music_track = self.stage_music_track(music_rel_file_path1)
-            if music_track is not None:
-                self.music_rel_file_path1 = music_track.file_path1
-                self.music_file_start1_sec = music_track.file_start1_sec
+            with self.music_thread_lock:
+                music_track = self.stage_music_track(music_rel_file_path1)
+                if music_track is not None:
+                    self.music_rel_file_path1 = music_track.file_path1
+                    self.music_file_start1_sec = music_track.file_start1_sec
 
-                if music_track.file_path2 is not None:
-                    self.music_rel_file_path2 = music_track.file_path2
-                    self.music_file_start2_sec = music_track.file_start2_sec
-                elif not interrupt:
-                    self.music_rel_file_path2 = music_track.file_path1
-                    self.music_file_start2_sec = music_track.file_start1_sec
-            else:
-                self.music_rel_file_path1 = music_rel_file_path1
-                self.music_file_start1_sec = music_file_start1_sec
-                if music_rel_file_path2 is not None:
-                    self.music_rel_file_path2 = music_rel_file_path2
-                    self.music_file_start2_sec = music_file_start2_sec
-                elif not interrupt:
-                    self.music_rel_file_path2 = music_rel_file_path1
-                    self.music_file_start2_sec = music_file_start1_sec
+                    if music_track.file_path2 is not None:
+                        self.music_rel_file_path2 = music_track.file_path2
+                        self.music_file_start2_sec = music_track.file_start2_sec
+                    elif not interrupt:
+                        self.music_rel_file_path2 = music_track.file_path1
+                        self.music_file_start2_sec = music_track.file_start1_sec
+                else:
+                    self.music_rel_file_path1 = music_rel_file_path1
+                    self.music_file_start1_sec = music_file_start1_sec
+                    if music_rel_file_path2 is not None:
+                        self.music_rel_file_path2 = music_rel_file_path2
+                        self.music_file_start2_sec = music_file_start2_sec
+                    elif not interrupt:
+                        self.music_rel_file_path2 = music_rel_file_path1
+                        self.music_file_start2_sec = music_file_start1_sec
 
-                if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
-                    self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
+                    if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
+                        self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
 
-                if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
-                    self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
-
-            self.music_thread_lock.release()
+                    if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
+                        self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
 
         def __music_thread(self) -> None:
             first_time = True
@@ -255,46 +253,45 @@ class AudioPlayer:
             while self.running:
                 # TODO: Switch to a more responsive approach which is not polling based
 
-                self.music_thread_lock.acquire()
-                if (current_music_rel_file_path1 != self.music_rel_file_path1
-                        or current_music_rel_file_path2 != self.music_rel_file_path2):
-                    current_music_rel_file_path1 = self.music_rel_file_path1
-                    current_music_rel_file_path2 = self.music_rel_file_path2
-                    first_time = True
-               
-                if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
-                    # load the music
-                    if first_time:
-                        first_time = False
-                    else:
-                        self.music_rel_file_path1 = self.music_rel_file_path2
-                        self.music_file_start1_sec = self.music_file_start2_sec
+                with self.music_thread_lock:
+                    if (current_music_rel_file_path1 != self.music_rel_file_path1
+                            or current_music_rel_file_path2 != self.music_rel_file_path2):
+                        current_music_rel_file_path1 = self.music_rel_file_path1
+                        current_music_rel_file_path2 = self.music_rel_file_path2
+                        first_time = True
 
-                    try:
-                        pygame.mixer.music.load(self.music_rel_file_path1)
+                    if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
+                        # load the music
+                        if first_time:
+                            first_time = False
+                        else:
+                            self.music_rel_file_path1 = self.music_rel_file_path2
+                            self.music_file_start1_sec = self.music_file_start2_sec
 
-                        # start playing
-                        pygame.mixer.music.play(start=self.music_file_start1_sec)
+                        try:
+                            pygame.mixer.music.load(self.music_rel_file_path1)
 
-                        # poll until finished
-                        while (self.running
-                               and pygame.mixer.music.get_busy()
-                               and current_music_rel_file_path1 == self.music_rel_file_path1
-                               and current_music_rel_file_path2 == self.music_rel_file_path2):
-                            # still playing and not changed
-                            self.music_thread_lock.release()
-                            pygame.time.wait(100)
-                            self.music_thread_lock.acquire()
+                            # start playing
+                            pygame.mixer.music.play(start=self.music_file_start1_sec)
 
-                        pygame.mixer.music.stop()
-                    except:
-                        if self.music_rel_file_path1 not in failed_to_play:
-                            print('ERROR: Failed to load', self.music_rel_file_path1, flush=True)
-                            failed_to_play.add(self.music_rel_file_path1)
-                            # import traceback
-                            # traceback.print_exc()
+                            # poll until finished
+                            while (self.running
+                                   and pygame.mixer.music.get_busy()
+                                   and current_music_rel_file_path1 == self.music_rel_file_path1
+                                   and current_music_rel_file_path2 == self.music_rel_file_path2):
+                                # still playing and not changed
+                                self.music_thread_lock.release()
+                                pygame.time.wait(100)
+                                self.music_thread_lock.acquire()
 
-                self.music_thread_lock.release()
+                            pygame.mixer.music.stop()
+                        except:
+                            if self.music_rel_file_path1 not in failed_to_play:
+                                print('ERROR: Failed to load', self.music_rel_file_path1, flush=True)
+                                failed_to_play.add(self.music_rel_file_path1)
+                                # import traceback
+                                # traceback.print_exc()
+
                 pygame.time.wait(100)
 
         def play_sound(self, sound_rel_file_path: str, from_music_tracks_first: bool = False) -> None:

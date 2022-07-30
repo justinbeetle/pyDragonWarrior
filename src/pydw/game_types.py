@@ -32,8 +32,8 @@ class GameTypes:
 
     @staticmethod
     def get_int_value(value: Union[str, int]) -> int:
-        (minVal, maxVal) = GameTypes.parse_int_range(value)
-        return random.randint(minVal, maxVal)
+        (min_val, max_val) = GameTypes.parse_int_range(value)
+        return random.randint(min_val, max_val)
 
     @staticmethod
     def dialog_contains_action(dialog: DialogType, action: DialogActionEnum) -> bool:
@@ -429,7 +429,7 @@ class MapDecoration(NamedTuple):
         return MapDecoration(type, point, collision_rect, dialog, progress_marker, inverse_progress_marker)
 
     def overlaps(self, tile: Point) -> bool:
-        return bool(self.collision_rect.collidepoint(tile.getAsIntTuple()))
+        return bool(self.collision_rect.collidepoint(tile.get_as_int_tuple()))
 
 
 class SpecialMonster(NamedTuple):

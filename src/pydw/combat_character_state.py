@@ -71,7 +71,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             return False
         if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
             return False
-        if type(self) == type(target) and (DialogActionEnum.SLEEP == action
+        if isinstance(self, type(target)) and (DialogActionEnum.SLEEP == action
                                            or DialogActionEnum.STOPSPELL == action
                                            or DialogActionEnum.DAMAGE_TARGET == action):
             # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
@@ -162,19 +162,9 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         return damage
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s)" % (
-            self.__class__.__name__,
-            self.hp,
-            self.max_hp,
-            self.is_asleep,
-            self.turns_asleep,
-            self.are_spells_blocked)
+        return f'{self.__class__.__name__}({self.hp}, {self.max_hp}, ' \
+               f'{self.is_asleep}, {self.turns_asleep}, {self.are_spells_blocked})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r)" % (
-            self.__class__.__name__,
-            self.hp,
-            self.max_hp,
-            self.is_asleep,
-            self.turns_asleep,
-            self.are_spells_blocked)
+        return f'{self.__class__.__name__}({self.hp!r}, {self.max_hp!r}, ' \
+               f'{self.is_asleep!r}, {self.turns_asleep!r}, {self.are_spells_blocked!r})'

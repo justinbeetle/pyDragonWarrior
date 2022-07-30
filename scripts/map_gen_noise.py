@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
 from typing import List
+
 from opensimplex import OpenSimplex
-import random
+import os
+
+from pydw.game_map_viewer import GameMapViewer
+from pydw.game_types import Map
 
 
 class MapGenNoise:
@@ -14,7 +18,7 @@ class MapGenNoise:
         elevation_simplex = OpenSimplex(elevation_seed)
         moisture_simplex = OpenSimplex(moisture_seed)
 
-        dat = list()
+        dat: List[str] = []
         dat.append('w' * (width + 2))
         for y in range(height):
             edge_dist_y = min(y+1, height-y)
@@ -35,39 +39,39 @@ class MapGenNoise:
                                   * moisture_factor_x
                                   * moisture_factor_y)
                 # print('x=', x, "; y=", y, "; elevation_noise=", elevation_noise)
-                if elevation_noise > 0.725:
-                    row += 'M'
-                elif elevation_noise > 0.625:
+                if elevation_noise > 0.725:  # mountain elevation
+                    row += 'M'  # mountain
+                elif elevation_noise > 0.625:  # hill elevation
                     if moisture_noise > 0.60:
-                        row += 'f'
+                        row += 'f'  # forest
                     else:
-                        row += 'm'
-                elif elevation_noise > 0.35:
+                        row += 'm'  # hill
+                elif elevation_noise > 0.35:  # high plains elevation
                     if moisture_noise > 0.95:
-                        row += 's'
+                        row += 's'  # swamp
                     elif moisture_noise > 0.60:
-                        row += 'f'
+                        row += 'f'  # forest
                     elif moisture_noise > 0.15:
-                        row += '_'
+                        row += '_'  # plain
                     else:
-                        row += '-'
-                elif elevation_noise > 0.30:
+                        row += '-'  # desert
+                elif elevation_noise > 0.30:  # low plains elevation
                     if moisture_noise > 0.95:
-                        row += 's'
+                        row += 's'  # swamp
                     elif moisture_noise > 0.60:
-                        row += 'f'
+                        row += 'f'  # forest
                     elif moisture_noise > 0.30:
-                        row += '_'
+                        row += '_'  # plain
                     else:
-                        row += '-'
-                else:
-                    if edge_dist_x > 20 and edge_dist_y > 20 and False:
+                        row += '-'  # desert
+                else:  # ocean elevation
+                    if edge_dist_x > 20 and edge_dist_y > 20:  # ocean elevation away from the edge of the map
                         if moisture_noise > 0.25:
-                            row += 'w'
+                            row += 'w'  # water
                         else:
-                            row += '-'
+                            row += '-'  # desert (as beach)
                     else:
-                        row += 'w'
+                        row += 'w'  # water
             row += 'w'
             dat.append(row)
         dat.append('w'*(width+2))
@@ -75,12 +79,9 @@ class MapGenNoise:
 
 
 def main() -> None:
-    from pydw.game_map import MapViewer
-    from pydw.game_types import Map
-
     # Generate and render a map
     map_name = 'mapGenNoise'
-    viewer = MapViewer()
+    viewer = GameMapViewer(os.path.join(os.path.dirname(__file__), os.path.pardir))
     elevation_seed = 0      # int(random.random() * 10000)
     moisture_seed = 123456  # int(random.random() * 10000)
     print('elevation_seed =', elevation_seed)

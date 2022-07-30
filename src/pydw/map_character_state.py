@@ -14,20 +14,12 @@ class MapCharacterState:
         self.direction = direction
 
     def __str__(self) -> str:
-        return "%s(%s, %s, %s, %s, %s)" % (self.__class__.__name__,
-                                           self.character_type,
-                                           self.curr_pos_dat_tile,
-                                           self.dest_pos_dat_tile,
-                                           self.curr_pos_offset_img_px,
-                                           self.direction)
+        return f'{self.__class__.__name__}({self.character_type}, {self.curr_pos_dat_tile}, ' \
+               f'{self.dest_pos_dat_tile}, {self.curr_pos_offset_img_px}, {self.direction})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r, %r, %r, %r)" % (self.__class__.__name__,
-                                           self.character_type,
-                                           self.curr_pos_dat_tile,
-                                           self.dest_pos_dat_tile,
-                                           self.curr_pos_offset_img_px,
-                                           self.direction)
+        return f'{self.__class__.__name__}({self.character_type!r}, {self.curr_pos_dat_tile!r}, ' \
+               f'{self.dest_pos_dat_tile!r}, {self.curr_pos_offset_img_px!r}, {self.direction!r})'
 
 
 def main() -> None:

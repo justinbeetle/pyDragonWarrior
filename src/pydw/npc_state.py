@@ -12,14 +12,10 @@ class NpcState(MapCharacterState):
         self.npc_info = npc_info
 
     def __str__(self) -> str:
-        return "%s(%s, %s)" % (self.__class__.__name__,
-                               MapCharacterState.__str__(self),
-                               self.npc_info)
+        return f'{self.__class__.__name__}({MapCharacterState.__str__(self)}, {self.npc_info})'
 
     def __repr__(self) -> str:
-        return "%s(%r, %r)" % (self.__class__.__name__,
-                               MapCharacterState.__repr__(self),
-                               self.npc_info)
+        return f'{self.__class__.__name__}({MapCharacterState.__repr__(self)}, {self.npc_info!r})'
 
 
 def main() -> None:
