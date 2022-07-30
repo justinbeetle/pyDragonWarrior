@@ -650,7 +650,7 @@ class Weapon(NamedTuple):
     def __hash__(self) -> int:
         return hash('Weapon:' + self.name)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Weapon):
             return self.name == other.name
         return False
@@ -692,7 +692,7 @@ class Tool(NamedTuple):
     def __hash__(self) -> int:
         return hash('Tool:' + self.name)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Tool):
             return self.name == other.name
         return False
