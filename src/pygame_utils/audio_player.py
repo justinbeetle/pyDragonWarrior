@@ -4,6 +4,7 @@
 from __future__ import annotations
 from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 
+import atexit
 import concurrent.futures
 import os.path
 import pygame.mixer
@@ -142,8 +143,6 @@ class AudioPlayer:
 
         def __del__(self) -> None:
             self.terminate()
-            self.music_thread.join()
-            pygame.mixer.quit()
 
         def set_music_path(self, music_path: str) -> None:
             self.music_path = music_path
@@ -331,12 +330,15 @@ class AudioPlayer:
 
         def terminate(self) -> None:
             self.running = False
+            self.music_thread.join()
+            pygame.mixer.quit()
 
     instance: Optional[AudioPlayer.__AudioPlayer] = None
 
     def __init__(self) -> None:
         if not AudioPlayer.instance:
             AudioPlayer.instance = AudioPlayer.__AudioPlayer()
+            atexit(AudioPlayer.instance.terminate)
 
     def set_music_path(self, music_path: str) -> None:
         if self.instance is not None:
@@ -394,7 +396,6 @@ class AudioPlayer:
     def terminate(self) -> None:
         if self.instance is not None:
             self.instance.terminate()
-            self.instance.__del__()
             self.instance = None
 
 
