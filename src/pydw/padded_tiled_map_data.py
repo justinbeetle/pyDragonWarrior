@@ -563,8 +563,9 @@ class ScrollTest:
                     fps_log.append(clock.get_fps())
                     fps = sum(fps_log)/len(fps_log)
                     dt = 1/fps
-                except ZeroDivisionError:
-                    continue
+                except (OverflowError, ZeroDivisionError):
+                    fps = 60.0
+                    dt = 1/fps
 
                 self.handle_input()
                 self.update(dt)

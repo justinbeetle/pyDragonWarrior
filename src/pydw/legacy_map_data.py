@@ -8,7 +8,6 @@ Source copied and modified from https://github.com/bitcraft/pyscroll
 """
 from typing import Iterator, List, Optional, Tuple
 
-import collections
 import pygame
 import pyscroll
 
@@ -395,6 +394,8 @@ class ScrollTest:
         self.map_layer.center(self.center)
 
     def run(self) -> None:
+        import collections
+
         clock = pygame.time.Clock()
         self.running = True
         fps = 60.0
@@ -409,8 +410,9 @@ class ScrollTest:
                     fps_log.append(clock.get_fps())
                     fps = sum(fps_log)/len(fps_log)
                     dt = 1/fps
-                except ZeroDivisionError:
-                    continue
+                except (OverflowError, ZeroDivisionError):
+                    fps = 60.0
+                    dt = 1/fps
 
                 self.handle_input()
                 self.update(dt)
