@@ -51,7 +51,7 @@ class GameDialog:
     @staticmethod
     def static_init(win_size_tiles: Point,
                     tile_size_pixels: int,
-                    font_names: List[str] = [],
+                    font_names: Optional[List[str]] = None,
                     border_image_filename: Optional[str] = None) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
@@ -74,20 +74,17 @@ class GameDialog:
                 print('ERROR: Failed to load', border_image_filename, flush=True)
 
         # Determine fonts
-        def find_font_by_name(font_names: List[str], default_font_name: Optional[str] = None) -> Optional[str]:
-            font_name = default_font_name
-            for name in font_names:
-                if name in pygame.font.get_fonts():
-                    font_name = name
-                    # print('Found system font', name, flush=True)
-                    break
-                elif os.path.exists(name):
-                    font_name = name
-                    # print('Found font', name, flush=True)
-                    break
-                else:
+        def find_font_by_name(font_names: Optional[List[str]], default_font_name: Optional[str] = None) -> Optional[str]:
+            if font_names is not None:
+                for name in font_names:
+                    if name in pygame.font.get_fonts():
+                        # print('Found system font', name, flush=True)
+                        return name
+                    if os.path.exists(name):
+                        # print('Found font', name, flush=True)
+                        return name
                     print('WARN: Failed to load font', name, flush=True)
-            return font_name
+            return default_font_name
 
         font_name = find_font_by_name(font_names, None)
 
@@ -179,92 +176,98 @@ class GameDialog:
     @staticmethod
     def render_font(text: str, color: pygame.Color) -> pygame.surface.Surface:
         if text in GameDialog.UNICODE_CHARACTERS:
-            width = GameDialog.get_font_width(text)
-            height = GameDialog.get_font().get_height()
-            font_surface = pygame.Surface((width, height))
-
-            inner_border = 4
-            half_inner_width = 1
-            inner_width = half_inner_width * 2
-
-            quarter_width = width // 4
-            full_width = width - 1
-            quarter_height = height // 4
-            half_height = quarter_height * 2
-            three_quarters_height = quarter_height * 3
-
-            y_coords = (quarter_height + inner_border,
-                        half_height - half_inner_width,
-                        half_height,
-                        half_height + half_inner_width,
-                        three_quarters_height - inner_border)
-
-            if text == GameDialog.BACKSPACE_UNICODE:
-                # Draw the outer shape
-                pointlist = [
-                    (0, half_height),
-                    (quarter_width, quarter_height),
-                    (full_width, quarter_height),
-                    (full_width, three_quarters_height),
-                    (width // 4, three_quarters_height)]
-                pygame.draw.aalines(font_surface, color, True, pointlist)
-                pygame.draw.polygon(font_surface, color, pointlist)
-
-                # Draw the inner shape
-                x_start = quarter_width + inner_border
-                x_mid = quarter_width + (full_width - quarter_width) // 2
-                x_end = x_start + (x_mid - x_start) * 2
-                x_coords = [x_start, x_start + inner_width,
-                            x_mid - half_inner_width, x_mid, x_mid + half_inner_width,
-                            x_end - inner_width, x_end]
-                pointlist = [
-                    (x_coords[0], y_coords[0]),
-                    (x_coords[1], y_coords[0]),
-                    (x_coords[3], y_coords[1]),
-                    (x_coords[5], y_coords[0]),
-                    (x_coords[6], y_coords[0]),
-                    (x_coords[4], y_coords[2]),
-                    (x_coords[6], y_coords[4]),
-                    (x_coords[5], y_coords[4]),
-                    (x_coords[3], y_coords[3]),
-                    (x_coords[1], y_coords[4]),
-                    (x_coords[0], y_coords[4]),
-                    (x_coords[2], y_coords[2])]
-                pygame.draw.aalines(font_surface, 'black', True, pointlist)
-                pygame.draw.polygon(font_surface, 'black', pointlist)
-                return font_surface
-            elif text == GameDialog.ENTER_UNICODE:
-                # Draw the outer shape
-                pointlist = [
-                    (0, quarter_height),
-                    (full_width, quarter_height),
-                    (full_width, three_quarters_height),
-                    (0, three_quarters_height)]
-                pygame.draw.aalines(font_surface, color, True, pointlist)
-                pygame.draw.polygon(font_surface, color, pointlist)
-
-                # Draw the inner shape
-                x_start = inner_border
-                x_end = full_width - inner_border
-                x_coords = [x_start, width // 2, x_end - inner_width, x_end]
-                pointlist = [
-                    (x_coords[0], y_coords[2]),
-                    (x_coords[1], y_coords[0]),
-                    (x_coords[1], y_coords[1]),
-                    (x_coords[2], y_coords[1]),
-                    (x_coords[2], y_coords[0]),
-                    (x_coords[3], y_coords[0]),
-                    (x_coords[3], y_coords[3]),
-                    (x_coords[1], y_coords[3]),
-                    (x_coords[1], y_coords[4])]
-                pygame.draw.aalines(font_surface, 'black', True, pointlist)
-                pygame.draw.polygon(font_surface, 'black', pointlist)
-                return font_surface
+            return GameDialog.render_unicode_character(text, color)
         return cast(pygame.surface.Surface,
                     GameDialog.get_font().render(text,
                                                  GameDialog.anti_alias,
                                                  color,
                                                  pygame.Color('black')))
+
+    @staticmethod
+    def render_unicode_character(text: str, color: pygame.Color) -> pygame.surface.Surface:
+        width = GameDialog.get_font_width(text)
+        height = GameDialog.get_font().get_height()
+        font_surface = pygame.Surface((width, height))
+
+        inner_border = 4
+        half_inner_width = 1
+        inner_width = half_inner_width * 2
+
+        quarter_width = width // 4
+        full_width = width - 1
+        quarter_height = height // 4
+        half_height = quarter_height * 2
+        three_quarters_height = quarter_height * 3
+
+        y_coords = (quarter_height + inner_border,
+                    half_height - half_inner_width,
+                    half_height,
+                    half_height + half_inner_width,
+                    three_quarters_height - inner_border)
+
+        if text == GameDialog.BACKSPACE_UNICODE:
+            # Draw the outer shape
+            pointlist = [
+                (0, half_height),
+                (quarter_width, quarter_height),
+                (full_width, quarter_height),
+                (full_width, three_quarters_height),
+                (quarter_width, three_quarters_height)]
+            pygame.draw.aalines(font_surface, color, True, pointlist)
+            pygame.draw.polygon(font_surface, color, pointlist)
+
+            # Draw the inner shape
+            x_start = quarter_width + inner_border
+            x_mid = quarter_width + (full_width - quarter_width) // 2
+            x_end = x_start + (x_mid - x_start) * 2
+            x_coords = [x_start, x_start + inner_width,
+                        x_mid - half_inner_width, x_mid, x_mid + half_inner_width,
+                        x_end - inner_width, x_end]
+            pointlist = [
+                (x_coords[0], y_coords[0]),
+                (x_coords[1], y_coords[0]),
+                (x_coords[3], y_coords[1]),
+                (x_coords[5], y_coords[0]),
+                (x_coords[6], y_coords[0]),
+                (x_coords[4], y_coords[2]),
+                (x_coords[6], y_coords[4]),
+                (x_coords[5], y_coords[4]),
+                (x_coords[3], y_coords[3]),
+                (x_coords[1], y_coords[4]),
+                (x_coords[0], y_coords[4]),
+                (x_coords[2], y_coords[2])]
+            pygame.draw.aalines(font_surface, 'black', True, pointlist)
+            pygame.draw.polygon(font_surface, 'black', pointlist)
+        elif text == GameDialog.ENTER_UNICODE:
+            # Draw the outer shape
+            pointlist = [
+                (0, quarter_height),
+                (full_width, quarter_height),
+                (full_width, three_quarters_height),
+                (0, three_quarters_height)]
+            pygame.draw.aalines(font_surface, color, True, pointlist)
+            pygame.draw.polygon(font_surface, color, pointlist)
+
+            # Draw the inner shape
+            x_start = inner_border
+            x_end = full_width - inner_border
+            x_coords = [x_start, width // 2, x_end - inner_width, x_end]
+            pointlist = [
+                (x_coords[0], y_coords[2]),
+                (x_coords[1], y_coords[0]),
+                (x_coords[1], y_coords[1]),
+                (x_coords[2], y_coords[1]),
+                (x_coords[2], y_coords[0]),
+                (x_coords[3], y_coords[0]),
+                (x_coords[3], y_coords[3]),
+                (x_coords[1], y_coords[3]),
+                (x_coords[1], y_coords[4])]
+            pygame.draw.aalines(font_surface, 'black', True, pointlist)
+            pygame.draw.polygon(font_surface, 'black', pointlist)
+        else:
+            print(f'ERROR: Character {text} is not supported', flush=True)
+
+        return font_surface
 
     @staticmethod
     def use_menus_for_text_entry() -> bool:
@@ -877,10 +880,10 @@ class GameDialog:
             if spacing_type == GameDialogSpacing.OUTSIDE_JUSTIFIED:
                 self.menu_data = []
                 num_cols = len(row_data[0])
-                for row in range(len(row_data)):
+                for row in row_data:
                     temp = []
                     for col in range(num_cols // 2):
-                        temp.append(row_data[row][2 * col])
+                        temp.append(row[2 * col])
                     self.menu_data.append(temp)
             else:
                 self.menu_data = row_data

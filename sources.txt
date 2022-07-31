@@ -112,8 +112,8 @@ Generate PyInstaller tarball package:
    tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
 Run mypy:   python -m mypy src/pydw/game.py --strict --ignore-missing-imports
-Run pylint: pylint $(git ls-files '*.py')
-Run tests:  pytest
+Run pylint: python -m pylint $(git ls-files '*.py')
+Run tests:  python -m pytest
 
 Profile:
    pip install snakeviz --user

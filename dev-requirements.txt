@@ -6,5 +6,6 @@ certifi
 opensimplex
 pytest
 mypy
+pylint
 pyinstaller
 snakeviz

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+""" Module defining the download_file method """
 
 import os
 import ssl
@@ -9,6 +9,15 @@ import certifi
 
 
 def download_file(url: str, filepath: str) -> bool:
+    """ Download a file.  For zip files, extract the contents and delete the file.
+
+    :param url: Source URL of the file to be downloaded
+
+    :param filepath: Destination path for the file to be downloaded
+
+    :return: True on success, else False
+    """
+
     # print(f'Downloading {url} to {filepath}...', flush=True)
     try:
         if url.startswith('https://'):
