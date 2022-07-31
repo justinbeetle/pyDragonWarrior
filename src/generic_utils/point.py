@@ -19,7 +19,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
 
     @property
     def x(self) -> PointTypeElemType:
-        if isinstance(self[0], float) or isinstance(self[0], int):
+        if isinstance(self[0], (float, int)):
             return self[0]
         return float(self[0])
 
@@ -29,7 +29,7 @@ class Point(Tuple[Union[float, int], Union[float, int]]):
 
     @property
     def y(self) -> PointTypeElemType:
-        if isinstance(self[1], float) or isinstance(self[1], int):
+        if isinstance(self[1], (float, int)):
             return self[1]
         return float(self[1])
 
