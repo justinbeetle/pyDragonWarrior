@@ -104,8 +104,8 @@ venv.bak/
 .mypy_cache/
 
 # Ignore large files
-data/music
-data/sounds
+*.ogg
+*.wav
 
 # Ignore archived saves
 saves

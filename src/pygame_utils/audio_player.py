@@ -7,9 +7,10 @@ from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 import atexit
 import concurrent.futures
 import os.path
+import threading
+
 import pygame.mixer
 import pygame.time
-import threading
 
 from generic_utils.download_file import download_file
 

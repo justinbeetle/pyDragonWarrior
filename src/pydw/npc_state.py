@@ -20,7 +20,7 @@ class NpcState(MapCharacterState):
 
 def main() -> None:
     # TODO: Convert to unit test
-    from game_types import Direction
+    from pydw.game_types import Direction
 
     # Test out character states
     state = NpcState(NpcInfo.create_null())

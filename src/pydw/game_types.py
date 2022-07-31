@@ -16,10 +16,8 @@ class GameTypes:
     @staticmethod
     def parse_float(value: Union[str, float, int]) -> float:
         if isinstance(value, str) and '/' in value:
-            ret_val = int(value.split('/')[0]) / int(value.split('/')[1])
-        else:
-            ret_val = float(value)
-        return ret_val
+            return float(value.split('/')[0]) / float(value.split('/')[1])
+        return float(value)
 
     @staticmethod
     def parse_int_range(value: Union[str, int]) -> Tuple[int, int]:
