@@ -460,6 +460,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
 
 
 def main() -> None:
+    # TODO: Convert to unit test
     # Test out character states
     hero_state = HeroState.create_null()
     print(hero_state, flush=True)

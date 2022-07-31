@@ -425,7 +425,7 @@ class MapViewer:
     def __init__(self) -> None:
         # Initialize pygame
         pygame.init()
-        from pygame_utils.AudioPlayer import AudioPlayer
+        from pygame_utils.audio_player import AudioPlayer
         self.audio_player = AudioPlayer()
 
         # Setup to draw maps
@@ -446,7 +446,7 @@ class MapViewer:
 
         # Initialize GameInfo
         import os
-        base_path = os.path.split(os.path.abspath(__file__))[0]
+        base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
         game_xml_path = os.path.join(base_path, 'game.xml')
         self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
 

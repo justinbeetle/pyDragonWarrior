@@ -123,7 +123,7 @@ def _remap_keyboard_event(translate_wasd_to_uldr: bool,
             # orig_event = event
             event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.key.key_code(event.text), 'unicode': event.text})
             # print(f'Translated {orig_event} to {event}', flush=True)
-        except:
+        except Exception:
             print(f'Failed to translate {event} to a KEYDOWN event', flush=True)
 
     if pygame.KEYDOWN == event.type:

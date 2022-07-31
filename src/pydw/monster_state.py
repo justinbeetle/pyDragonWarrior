@@ -148,6 +148,7 @@ class MonsterState(CombatCharacterState):
 
 
 def main() -> None:
+    # TODO: Convert to unit test
     import pygame
     monster_info = MonsterInfo(
         name='MonsterName',

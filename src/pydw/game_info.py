@@ -160,7 +160,7 @@ class GameInfo:
             try:
                 if not os.path.exists(base_path):
                     os.mkdir(base_path)
-            except:
+            except Exception:
                 print('ERROR: Failed to create directory', base_path)
 
             package_name: Optional[str] = None
@@ -220,7 +220,7 @@ class GameInfo:
             try:
                 if not os.path.exists(base_path):
                     os.mkdir(base_path)
-            except:
+            except Exception:
                 print('ERROR: Failed to create directory', base_path)
 
             package_name: Optional[str] = None
@@ -290,7 +290,7 @@ class GameInfo:
                     encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
                                                                                            encounter_background_image,
                                                                                            credits)
-                except:
+                except Exception:
                     print('ERROR: Failed to load', encounter_background_name, flush=True)
         return encounter_backgrounds
 
@@ -1284,13 +1284,13 @@ class GameInfo:
             map_pos = None
             try:
                 map_pos = self.get_location(map_name, element)
-            except:
+            except Exception:
                 pass
 
             map_dir = None
             try:
                 map_dir = self.get_optional_direction(map_name, element)
-            except:
+            except Exception:
                 pass
 
             if element.tag == 'DialogGoTo':

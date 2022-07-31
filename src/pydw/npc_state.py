@@ -19,6 +19,7 @@ class NpcState(MapCharacterState):
 
 
 def main() -> None:
+    # TODO: Convert to unit test
     from game_types import Direction
 
     # Test out character states

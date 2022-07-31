@@ -284,7 +284,7 @@ class AudioPlayer:
                                 self.music_thread_lock.acquire()
 
                             pygame.mixer.music.stop()
-                        except:
+                        except Exception:
                             if self.music_rel_file_path1 not in failed_to_play:
                                 print('ERROR: Failed to load', self.music_rel_file_path1, flush=True)
                                 failed_to_play.add(self.music_rel_file_path1)
@@ -315,7 +315,7 @@ class AudioPlayer:
             if sound_file_path not in self.sounds:
                 try:
                     self.sounds[sound_file_path] = pygame.mixer.Sound(sound_file_path)
-                except:
+                except Exception:
                     print('ERROR: Failed to load', sound_file_path, flush=True)
                     self.sounds[sound_file_path] = None
                     # import traceback
@@ -338,7 +338,7 @@ class AudioPlayer:
     def __init__(self) -> None:
         if not AudioPlayer.instance:
             AudioPlayer.instance = AudioPlayer.__AudioPlayer()
-            atexit(AudioPlayer.instance.terminate)
+            atexit.register(AudioPlayer.instance.terminate)
 
     def set_music_path(self, music_path: str) -> None:
         if self.instance is not None:
@@ -402,7 +402,7 @@ class AudioPlayer:
 def main() -> None:
     # Initialize the music player
     audio_player = AudioPlayer()
-    base_path = os.path.split(os.path.abspath(__file__))[0]
+    base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
     audio_player.set_music_path(os.path.join(base_path, 'data', 'music', 'dw1'))
     audio_player.set_sound_path(os.path.join(base_path, 'data', 'sounds', 'dw1'))
 

@@ -576,6 +576,7 @@ class ScrollTest:
 
 
 if __name__ == "__main__":
+    import os
     import sys
 
     pygame.init()
@@ -583,10 +584,12 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode((800, 800), pygame.RESIZABLE)
     pygame.display.set_caption('pyscroll Test')
 
+    base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
     try:
         filename = sys.argv[1]
     except IndexError:
-        filename = "data/maps/tiled/alefgard.tmx"
+        filename = os.path.join('data', 'maps', 'tiled', 'alefgard.tmx')
+    filename = os.path.join(base_path, filename)
 
     try:
         test = ScrollTest(screen, filename)

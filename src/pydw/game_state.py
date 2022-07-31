@@ -786,19 +786,3 @@ class GameState(GameStateInterface):
 
     def toggle_should_add_math_problems_in_combat(self) -> None:
         self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat
-
-
-def main() -> None:
-    print('Not implemented', flush=True)
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        import sys
-        import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)

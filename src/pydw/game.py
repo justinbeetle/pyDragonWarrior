@@ -116,7 +116,7 @@ def main() -> None:
                 created_venv = True
             try:
                 venv_builder.create(venv_path)
-            except:
+            except Exception:
                 if args.verbose:
                     print(f'Failed to create venv {venv_path}', flush=True)
                     traceback.print_exc()
@@ -170,7 +170,7 @@ def main() -> None:
         try:
             icon_image = pygame.image.load(icon_image_filename)
             pygame.display.set_icon(icon_image)
-        except:
+        except Exception:
             print('ERROR: Failed to load', icon_image_filename, flush=True)
 
     GameDialog.force_use_menus_for_text_entry = args.gamepad
@@ -184,7 +184,7 @@ def main() -> None:
             game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
             game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
                                  verbose=args.verbose)
-        except:
+        except Exception:
             use_unlicensed_assets = True
             if args.verbose:
                 print('ERROR: Failed to load licensed assets', flush=True)

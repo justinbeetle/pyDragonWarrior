@@ -934,21 +934,3 @@ class GameDialogEvaluator:
 
         if depth == 0 and not message_dialog.is_empty():
             self.wait_for_acknowledgement(message_dialog)
-
-
-def main() -> None:
-    # TODO
-    pass
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        import sys
-        import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
-        traceback.print_exc()

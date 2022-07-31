@@ -25,6 +25,6 @@ def download_file(url: str, filepath: str) -> bool:
                 zip_ref.extractall(extract_dir)
             os.remove(filepath)
         return True
-    except:
+    except Exception:
         print(f'ERROR: Failed to download {url}', flush=True)
     return False

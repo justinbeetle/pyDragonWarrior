@@ -70,7 +70,7 @@ class GameDialog:
                         GameDialog.border_image = pygame.transform.scale(image, (scale_size, scale_size))
                     else:
                         GameDialog.border_image = image
-            except:
+            except Exception:
                 print('ERROR: Failed to load', border_image_filename, flush=True)
 
         # Determine fonts

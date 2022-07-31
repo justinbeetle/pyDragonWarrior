@@ -729,21 +729,3 @@ class Problem(NamedTuple):
     problem: str
     answer: str
     answer_allowed_characters: Optional[str] = None
-
-
-def main() -> None:
-    print('SOUTH' in Direction.__members__)
-    print(Direction.SOUTH in Direction)
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        import sys
-        import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
-        traceback.print_exc()

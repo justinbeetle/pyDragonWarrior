@@ -23,6 +23,7 @@ class MapCharacterState:
 
 
 def main() -> None:
+    # TODO: Convert to unit test
     # Test out character states
     state = MapCharacterState(CharacterType.create_null(), Point(5, 6), Direction.SOUTH)
     print(state, flush=True)

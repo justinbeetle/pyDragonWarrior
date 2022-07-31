@@ -291,7 +291,8 @@ class HeroParty(CombatParty):
 
 
 def main() -> None:
-    from GameTypes import CharacterType
+    # TODO: Convert to unit test
+    from pydw.game_types import CharacterType
     character_type = CharacterType('myType', {}, [])
     hero_state = HeroState(character_type, Point(7, 3), Direction.WEST, 'Sir Me')
     hero_party = HeroParty(hero_state)

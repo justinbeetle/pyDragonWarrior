@@ -707,7 +707,7 @@ def main() -> None:
 
     # Initialize GameInfo
     import os
-    base_path = os.path.split(os.path.abspath(__file__))[0]
+    base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
     game_xml_path = os.path.join(base_path, 'game.xml')
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
@@ -737,12 +737,12 @@ def main() -> None:
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
-    def handle_quit_side_effect() -> None:
+    def handle_quit_side_effect(force: bool = False) -> None:
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 
     # Create a series of hero party and monster party tuples for encounters
-    from pydw.game_tTypes import Direction
+    from pydw.game_types import Direction
     combat_parties = []
     for i in range(1, 4):
         hero_party = HeroParty(HeroState(game_info.character_types['hero'], Point(), Direction.NORTH, 'Camden', 20000))
