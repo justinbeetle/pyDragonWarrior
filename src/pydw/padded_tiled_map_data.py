@@ -23,7 +23,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX = 'Monster Set '
 
     def __init__(self, tmx_filename: str,
-                 image_pad_tiles: Point=Point(0, 0),
+                 image_pad_tiles: Point = Point(0, 0),
                  desired_tile_size: Optional[int] = None):
         super().__init__()
 
@@ -144,7 +144,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def get_overlapping_object_group_info(self,
                                           pos_dat_tile: Point,
-                                          name_filter: Optional[Callable[[Optional[str]], bool]]=None) \
+                                          name_filter: Optional[Callable[[Optional[str]], bool]] = None) \
             -> Optional[Tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
         for idx, l in enumerate(self.tmx.layers):
@@ -173,11 +173,11 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def increment_layers_to_render(self) -> None:
         layer_added = False
         new_layers = []
-        for l in self.all_tile_layers:
-            if l in self.layers_to_render:
-                new_layers.append(l)
+        for layer_idx in self.all_tile_layers:
+            if layer_idx in self.layers_to_render:
+                new_layers.append(layer_idx)
             elif not layer_added:
-                new_layers.append(l)
+                new_layers.append(layer_idx)
                 layer_added = True
         self.layers_to_render = new_layers
 
@@ -194,14 +194,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def calc_base_tile_layers(self) -> List[int]:
         tile_layers = []
-        for idx, l in enumerate(self.tmx.layers):
+        for layer_idx, layer in enumerate(self.tmx.layers):
             # Skip non-tile layers
-            if not isinstance(l, pytmx.pytmx.TiledTileLayer):
+            if not isinstance(layer, pytmx.pytmx.TiledTileLayer):
                 continue
 
             # Assume base layers are the default
-            if l.visible and ('is_overlay' not in l.properties or not l.properties['is_overlay']):
-                tile_layers.append(idx)
+            if layer.visible and ('is_overlay' not in layer.properties or not layer.properties['is_overlay']):
+                tile_layers.append(layer_idx)
         return tile_layers
 
     @property
@@ -218,14 +218,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def calc_overlay_tile_layers(self) -> List[int]:
         tile_layers = []
-        for idx, l in enumerate(self.tmx.layers):
+        for layer_idx, layer in enumerate(self.tmx.layers):
             # Skip non-tile layers
-            if not isinstance(l, pytmx.pytmx.TiledTileLayer):
+            if not isinstance(layer, pytmx.pytmx.TiledTileLayer):
                 continue
 
             # Assume base layers are the default
-            if l.visible and 'is_overlay' in l.properties and l.properties['is_overlay']:
-                tile_layers.append(idx + self.overlay_layer_offset)
+            if layer.visible and 'is_overlay' in layer.properties and layer.properties['is_overlay']:
+                tile_layers.append(layer_idx + self.overlay_layer_offset)
         return tile_layers
 
     def get_animations(self) -> Iterator[Tuple[int, Any]]:
@@ -246,12 +246,12 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         :return: None
         """
         images = list()
-        for i in self.tmx.images:
+        for image in self.tmx.images:
             try:
                 if alpha:
-                    images.append(i.convert_alpha(parent))
+                    images.append(image.convert_alpha(parent))
                 else:
-                    images.append(i.convert(parent))
+                    images.append(image.convert(parent))
             except AttributeError:
                 images.append(None)
         self.tmx.images = images
@@ -295,26 +295,26 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return (layer for layer in self.tmx.visible_layers
                 if isinstance(layer, pytmx.TiledObjectGroup))
 
-    def get_tile_properties(self, x: int, y: int, l: int) -> Optional[Dict[str, str]]:
-        if l not in self.base_tile_layers:
-            l -= self.overlay_layer_offset
-        if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
+    def get_tile_properties(self, x: int, y: int, layer_idx: int) -> Optional[Dict[str, str]]:
+        if layer_idx not in self.base_tile_layers:
+            layer_idx -= self.overlay_layer_offset
+        if not isinstance(self.tmx.layers[layer_idx], pytmx.pytmx.TiledTileLayer):
             return None
         x = min(max(0, x), self.tmx.width-1)
         y = min(max(0, y), self.tmx.height-1)
-        return cast(Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, l))
+        return cast(Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, layer_idx))
 
     def _get_tile_image(self,
                         x: int,
                         y: int,
-                        l: int,
-                        image_indexing: bool=True,
-                        limit_to_visible: bool=True) -> Optional[pygame.surface.Surface]:
-        if l not in self.visible_tile_layers and limit_to_visible:
+                        layer_idx: int,
+                        image_indexing: bool = True,
+                        limit_to_visible: bool = True) -> Optional[pygame.surface.Surface]:
+        if layer_idx not in self.visible_tile_layers and limit_to_visible:
             return None
-        if l not in self.base_tile_layers:
-            l -= self.overlay_layer_offset
-        if not isinstance(self.tmx.layers[l], pytmx.pytmx.TiledTileLayer):
+        if layer_idx not in self.base_tile_layers:
+            layer_idx -= self.overlay_layer_offset
+        if not isinstance(self.tmx.layers[layer_idx], pytmx.pytmx.TiledTileLayer):
             return None
         if image_indexing:
             # With image_indexing, coord (0,0) is where the pad starts.
@@ -335,7 +335,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             if not render_tile:
                 return cast(Optional[pygame.surface.Surface], self.tmx.images[-1])
         try:
-            return cast(Optional[pygame.surface.Surface], self.tmx.get_tile_image(x, y, l))
+            return cast(Optional[pygame.surface.Surface], self.tmx.get_tile_image(x, y, layer_idx))
         except ValueError:
             return None
 
@@ -363,15 +363,15 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         anim_map = self._animation_map
         track = bool(self._animation_queue)
 
-        for l in self.visible_tile_layers:
-            if l not in self.base_tile_layers:
-                l -= self.overlay_layer_offset
+        for layer_idx in self.visible_tile_layers:
+            if layer_idx not in self.base_tile_layers:
+                layer_idx -= self.overlay_layer_offset
 
-            if not isinstance(layers[l], pytmx.pytmx.TiledTileLayer):
+            if not isinstance(layers[layer_idx], pytmx.pytmx.TiledTileLayer):
                 continue
 
             for y in range(y1, y2+1):
-                row = layers[l].data[min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)]
+                row = layers[layer_idx].data[min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)]
 
                 for x in range(x1, x2+1):
                     gid = row[min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)]
@@ -390,19 +390,19 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                                 render_tile = True
                                 break
                         if not render_tile:
-                            yield x, y, l, images[-1]
+                            yield x, y, layer_idx, images[-1]
                             continue
 
                     if track and gid in tracked_gids:
-                        anim_map[gid].positions.add((x, y, l))
+                        anim_map[gid].positions.add((x, y, layer_idx))
 
                     try:
                         # animated, so return the correct frame
-                        yield x, y, l, at[(x, y, l)]
+                        yield x, y, layer_idx, at[(x, y, layer_idx)]
 
                     except KeyError:
                         # not animated, so return surface from data, if any
-                        yield x, y, l, images[gid]
+                        yield x, y, layer_idx, images[gid]
 
 
 class ScrollTest:

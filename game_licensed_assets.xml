@@ -451,7 +451,7 @@
                   <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
                   <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
                   <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
-               <Dialog>The [ITEM]?  Is that okay?</Dialog>
+               <Dialog>"The [ITEM]?  Is that okay?"</Dialog>
                <DialogOptions>
                   <DialogOption name="Yes">
                      <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
@@ -484,7 +484,7 @@
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
                   <Dialog>"I will see thee later."</Dialog></DialogAssert>
-               <Dialog>Here you go.</Dialog>
+               <Dialog>"Here you go."</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>"Here, take this key.  Dost thou wish to purchase more?"</Dialog>
@@ -500,7 +500,7 @@
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
                   <Dialog>"All the best to thee."</Dialog></DialogAssert>
-               <Dialog>Here you go.</Dialog>
+               <Dialog>"Here you go."</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>"I thank thee.  Won't thou buy one more bottle?"</Dialog>
@@ -514,7 +514,7 @@
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
                   <Dialog>"Please come again when you have more gold!"</Dialog></DialogAssert>
-               <Dialog>Here you go.</Dialog>
+               <Dialog>"Here you go."</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>"Would you like to buy another?"</Dialog>

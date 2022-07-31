@@ -8,7 +8,6 @@ from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
 
 
-
 class MonsterState(CombatCharacterState):
     def __init__(self, monster_info: Union[MonsterInfo, SpecialMonster]) -> None:
         if isinstance(monster_info, SpecialMonster):
@@ -31,14 +30,8 @@ class MonsterState(CombatCharacterState):
     def set_name(self, name: str) -> None:
         self.name = name
 
-    def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 1.0 / 3.0)
-        if ret_val:
-            self.turns_asleep += 1
-        else:
-            self.is_asleep = False
-            self.turns_asleep = 0
-        return ret_val
+    def get_wake_probability(self) -> float:
+        return 1.0 / 3.0
 
     def get_strength(self) -> int:
         return self.monster_info.strength

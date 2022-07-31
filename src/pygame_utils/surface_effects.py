@@ -2,7 +2,7 @@
 
 import pygame
 
-# TODO: Factor these our of this module
+# TODO: Factor these out of this module
 from pydw.game_dialog import GameDialog
 from pydw.game_state_interface import GameStateInterface
 
@@ -60,7 +60,7 @@ def flickering(screen: pygame.surface.Surface) -> None:
     flicker_surface.set_alpha(128)
 
     clock = pygame.time.Clock()
-    for flicker_times in range(10):
+    for _ in range(10):
         screen.blit(flicker_surface, (0, 0))
         clock.tick(30)
         pygame.display.flip()
@@ -132,7 +132,7 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
 
     # Cycle through the rainbow colors
     clock = pygame.time.Clock()
-    for i in range(2):
+    for _ in range(2):
         for rainbow_color in rainbow_colors:
             fade_surface = pygame.surface.Surface(game_state.screen.get_size())
             fade_surface.fill(rainbow_color)
@@ -165,7 +165,7 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface,
 
     # Cycle through the rainbow colors
     clock = pygame.time.Clock()
-    for i in range(4):
+    for _ in range(4):
         for rainbow_color in rainbow_colors:
             pygame.transform.threshold(screen,
                                        orig_screen,

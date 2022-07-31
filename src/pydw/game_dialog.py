@@ -166,20 +166,20 @@ class GameDialog:
         return Point(math.ceil(width_pixels / GameDialog.tile_size_pixels), height_pixels / GameDialog.tile_size_pixels)
 
     @staticmethod
-    def get_font(text: str) -> pygame.Font:
+    def get_font() -> pygame.Font:
         return GameDialog.font
 
     @staticmethod
     def get_font_width(text: str) -> int:
         if text in GameDialog.UNICODE_CHARACTERS:
             return GameDialog.widest_character
-        return int(GameDialog.get_font(text).size(text)[0])
+        return int(GameDialog.get_font().size(text)[0])
 
     @staticmethod
     def render_font(text: str, color: pygame.Color) -> pygame.surface.Surface:
         if text in GameDialog.UNICODE_CHARACTERS:
             width = GameDialog.get_font_width(text)
-            height = GameDialog.get_font(text).get_height()
+            height = GameDialog.get_font().get_height()
             font_surface = pygame.Surface((width, height))
 
             inner_border = 4
@@ -260,10 +260,10 @@ class GameDialog:
                 pygame.draw.polygon(font_surface, 'black', pointlist)
                 return font_surface
         return cast(pygame.surface.Surface,
-                    GameDialog.get_font(text).render(text,
-                                                     GameDialog.anti_alias,
-                                                     color,
-                                                     pygame.Color('black')))
+                    GameDialog.get_font().render(text,
+                                                 GameDialog.anti_alias,
+                                                 color,
+                                                 pygame.Color('black')))
 
     @staticmethod
     def use_menus_for_text_entry() -> bool:
@@ -851,7 +851,7 @@ class GameDialog:
                     elif isinstance(current_option, str):
                         temp.append(current_option)
                 else:
-                    for col_inner in range(cols_per_option):
+                    for _ in range(cols_per_option):
                         temp.append(None)
             row_data.append(temp)
         return row_data
@@ -1145,7 +1145,7 @@ def main() -> None:
             should_wait_for_acknowledgement = dialog_with_message.advance_content()[0]
             if should_wait_for_acknowledgement:
                 is_waiting_indicator_drawn = False
-                for i in range(0, 8):
+                for _ in range(0, 8):
                     if is_waiting_indicator_drawn:
                         dialog_with_message.erase_waiting_indicator()
                     else:

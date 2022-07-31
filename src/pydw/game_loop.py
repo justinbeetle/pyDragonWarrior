@@ -389,7 +389,7 @@ class GameLoop:
                         dialog = ['[NAME] searched the ground and found nothing.']
                     else:
                         dialog = ['[NAME] found nothing to open.']
-                        dest_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile\
+                        dest_tile = self.game_state.hero_party.members[0].curr_pos_dat_tile \
                                     + self.game_state.hero_party.members[0].direction.get_vector()
                         decorations += self.game_state.get_decorations(dest_tile)
 
@@ -541,5 +541,5 @@ class GameLoop:
                     # NOTE: Comment out the following line to disable encounters
                     self.game_state.initiate_encounter()
         else:
-            for x in range(CharacterSprite.get_tile_movement_steps()):
+            for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.game_state.advance_tick()

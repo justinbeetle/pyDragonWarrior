@@ -54,7 +54,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         # Top padding
         padded_row = pad_row(dat[0])
-        for i in range(int(self.image_pad_tiles.h)):
+        for _ in range(int(self.image_pad_tiles.h)):
             padded_dat.append(padded_row)
 
         # Middle
@@ -63,7 +63,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         # Bottom padding
         padded_row = pad_row(dat[-1])
-        for i in range(int(self.image_pad_tiles.h) + 1):
+        for _ in range(int(self.image_pad_tiles.h) + 1):
             padded_dat.append(padded_row)
 
         # Generate map_images from padded_dat
@@ -114,6 +114,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return not self.is_interior(pos_dat_tile)
 
     def get_monster_set_name(self, pos_dat_tile: Point) -> Optional[str]:
+        _ = pos_dat_tile  # appease pylint - pos_dat_tile is needed to conform to the interface
         return None
 
     def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
@@ -145,13 +146,13 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def overlay_tile_layers(self) -> List[int]:
         if self.overlay_images is not None:
-            return[LegacyMapData.OVERLAY_MAP_LAYER]
+            return [LegacyMapData.OVERLAY_MAP_LAYER]
         return []
 
     def get_animations(self) -> None:
         return
 
-    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool=False) -> None:
+    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool = False) -> None:
         """ Convert all images in the data to match the parent
 
         :param parent: pygame.surface.Surface
@@ -161,7 +162,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         def convert_surfaces_helper(map_images: List[List[Optional[pygame.surface.Surface]]],
                                     parent: pygame.surface.Surface,
-                                    alpha: bool=False) -> List[List[Optional[pygame.surface.Surface]]]:
+                                    alpha: bool = False) -> List[List[Optional[pygame.surface.Surface]]]:
             converted_map_images: List[List[Optional[pygame.surface.Surface]]] = []
             for map_images_row in map_images:
                 converted_images_row: List[Optional[pygame.surface.Surface]] = []
@@ -208,8 +209,8 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                         x: int,
                         y: int,
                         l: int,
-                        image_indexing: bool=True,
-                        limit_to_visible: bool=True) -> Optional[pygame.surface.Surface]:
+                        image_indexing: bool = True,
+                        limit_to_visible: bool = True) -> Optional[pygame.surface.Surface]:
         if l not in self.all_tile_layers or (limit_to_visible and l not in self.layers_to_render):
             return None
 

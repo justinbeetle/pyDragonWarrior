@@ -13,7 +13,7 @@ class MapGenCa:
     def gen_map_dat(width: int, height: int) -> List[str]:
         dat: List[str] = []
         dat.append('w'*(width+2))
-        for y in range(height):
+        for _ in range(height):
             dat.append('w' + '_'*width + 'w')
         dat.append('w'*(width+2))
         return dat

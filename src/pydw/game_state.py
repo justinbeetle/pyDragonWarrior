@@ -299,7 +299,7 @@ class GameState(GameStateInterface):
         gde = GameDialogEvaluator(self.game_info, self)
         gde.update_default_dialog_font_color()
 
-    def save(self, quick_save: bool=False) -> None:
+    def save(self, quick_save: bool = False) -> None:
         # Save the overall state of the party
         xml_root = ET.Element('SaveState')
         xml_root.attrib['name'] = self.hero_party.main_character.name
@@ -409,7 +409,7 @@ class GameState(GameStateInterface):
         except Exception as exc:
             print('ERROR: Exception encountered while attempting to save game file:', exc, flush=True)
 
-    def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str='archive') -> None:
+    def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str = 'archive') -> None:
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
             archive_dir = os.path.join(self.saves_path, archive_dir_name)
@@ -432,7 +432,7 @@ class GameState(GameStateInterface):
     # Find point transitions for either the specified point or the current position of the player character.
     # If auto is true, only look for automatic point transitions
     def get_point_transition(self, tile: Optional[Point] = None,
-                             filter_to_automatic_transitions: bool=False) -> Optional[OutgoingTransition]:
+                             filter_to_automatic_transitions: bool = False) -> Optional[OutgoingTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for point_transition in self.game_info.maps[self.get_map_name()].point_transitions:
@@ -594,11 +594,11 @@ class GameState(GameStateInterface):
             self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
 
     def draw_map(self,
-                 flip_buffer: bool=True,
-                 draw_background: bool=True,
-                 draw_combat: bool=True,
-                 draw_status: bool=True,
-                 draw_only_character_sprites: bool=False) -> None:
+                 flip_buffer: bool = True,
+                 draw_background: bool = True,
+                 draw_combat: bool = True,
+                 draw_status: bool = True,
+                 draw_only_character_sprites: bool = False) -> None:
         if draw_only_character_sprites:
             self.game_map.draw_character_sprites()
             return
@@ -620,10 +620,10 @@ class GameState(GameStateInterface):
             pygame.display.flip()
 
     def advance_tick(self,
-                     update_map: bool=True,
-                     draw_map: bool=True,
-                     advance_time: bool=True,
-                     flip_buffer: bool=True) -> None:
+                     update_map: bool = True,
+                     draw_map: bool = True,
+                     advance_time: bool = True,
+                     flip_buffer: bool = True) -> None:
         if update_map:
             self.game_map.update()
 

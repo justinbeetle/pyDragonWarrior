@@ -207,5 +207,5 @@ if __name__ == '__main__':
     freeze_support()  # This allows pyinstaller Windows executables to support the use of concurrent.futures
     try:
         main()
-    except Exception as e:
+    except Exception:
         traceback.print_exc()

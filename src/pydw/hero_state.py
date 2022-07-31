@@ -120,7 +120,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def has_item(self, item_name: str) -> bool:
         return self.get_item_count(item_name) > 0
 
-    def get_item_count(self, item_name: str, unequipped_only: bool=False) -> int:
+    def get_item_count(self, item_name: str, unequipped_only: bool = False) -> int:
         ret_val = 0
         for item in self.unequipped_items:
             if item_name == item.name:
@@ -130,7 +130,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
             ret_val += 1
         return ret_val
 
-    def get_item(self, item_name: str, unequipped_only: bool=False) -> Optional[ItemType]:
+    def get_item(self, item_name: str, unequipped_only: bool = False) -> Optional[ItemType]:
         for item in self.unequipped_items:
             if item_name == item.name:
                 return item
@@ -227,14 +227,14 @@ class HeroState(MapCharacterState, CombatCharacterState):
                     self.other_equipped_items.remove(item)
                     break
 
-    def gain_item(self, item: ItemType, count: int=1) -> None:
+    def gain_item(self, item: ItemType, count: int = 1) -> None:
         # Gained items always go unequippedItems
         if item in self.unequipped_items:
             self.unequipped_items[item] += count
         else:
             self.unequipped_items[item] = count
 
-    def lose_item(self, item_name: str, count: int=1, unequipped_only: bool=False) -> None:
+    def lose_item(self, item_name: str, count: int = 1, unequipped_only: bool = False) -> None:
         # Lost items are taken from unequippedItems where possible, else equipped items
         remaining_items_to_lose = count
         for item in self.unequipped_items:
@@ -268,14 +268,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def get_type_name(self) -> str:
         return self.character_type.name
 
-    def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > 0.5)
-        if ret_val:
-            self.turns_asleep += 1
-        else:
-            self.is_asleep = False
-            self.turns_asleep = 0
-        return ret_val
+    def get_wake_probability(self) -> float:
+        return 0.5
 
     def get_strength(self) -> int:
         return self.level.strength

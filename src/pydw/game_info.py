@@ -8,7 +8,7 @@ import pygame
 import numpy
 import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude
-#import lxml.etree as ET  # May desire to use in future for better xinclude support
+# import lxml.etree as ET  # May desire to use in future for better xinclude support
 
 from generic_utils.point import Point
 
@@ -245,7 +245,6 @@ class GameInfo:
                                                                package_link)
 
             audio_player.add_sound_tracks(name_to_sound_track_mapping)
-
 
     @staticmethod
     def parse_title_info(xml_root: ET.Element, image_path: str) -> Tuple[pygame.surface.Surface, str]:
@@ -1174,7 +1173,7 @@ class GameInfo:
             return Direction[element.attrib['dir']]
         return None
 
-    def parse_initial_game_state(self, pc_name : Optional[str] = None) -> None:
+    def parse_initial_game_state(self, pc_name: Optional[str] = None) -> None:
         # TODO: Introduce a game type to hold this information
         # TODO: Better yet, replace this method entirely with GameState.load as this is game state information and not
         #       generic game info information.

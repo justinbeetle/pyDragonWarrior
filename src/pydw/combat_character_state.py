@@ -72,8 +72,8 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
             return False
         if isinstance(self, type(target)) and (DialogActionEnum.SLEEP == action
-                                           or DialogActionEnum.STOPSPELL == action
-                                           or DialogActionEnum.DAMAGE_TARGET == action):
+                                               or DialogActionEnum.STOPSPELL == action
+                                               or DialogActionEnum.DAMAGE_TARGET == action):
             # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
             return False
         return True
@@ -97,9 +97,18 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def get_type_name(self) -> str:
         pass
 
-    # Determine if character should remain asleep.  Should maintain turnsAsleep.
-    @abc.abstractmethod
+    # Determine if character should remain asleep.  Maintain turns_asleep.
     def is_still_asleep(self) -> bool:
+        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > self.get_wake_probability())
+        if ret_val:
+            self.turns_asleep += 1
+        else:
+            self.is_asleep = False
+            self.turns_asleep = 0
+        return ret_val
+
+    @abc.abstractmethod
+    def get_wake_probability(self) -> float:
         pass
 
     @abc.abstractmethod

@@ -168,7 +168,7 @@ class CombatEncounter(CombatEncounterInterface):
         # Final render to drop to complete the background and drop in the monsters
         self.render_monsters()
 
-    def render_encounter_background(self, render_background: bool=True, percent: int=100) -> Tuple[Point, Point]:
+    def render_encounter_background(self, render_background: bool = True, percent: int = 100) -> Tuple[Point, Point]:
         # Determine the size and screen position for the full background image
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
@@ -255,7 +255,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_flickering_monsters(self, monsters: List[CombatCharacterState], flicker_color: pygame.Color) -> None:
         clock = pygame.time.Clock()
-        for flicker_times in range(10):
+        for _ in range(10):
             self.render_monsters(monsters, monsters, flicker_color=flicker_color)
             clock.tick(30)
             pygame.display.flip()
@@ -271,7 +271,7 @@ class CombatEncounter(CombatEncounterInterface):
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
         clock = pygame.time.Clock()
         offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
-        for flicker_times in range(10):
+        for _ in range(10):
             if not self.hero_party.is_still_in_combat():
                 # On a death blow, the background flickers red
                 self.game_state.screen.fill('red')
@@ -546,8 +546,8 @@ class CombatEncounter(CombatEncounterInterface):
             # TODO: Update text for multiple monster encounters
             if gp != 0 or xp != 0:
                 self.add_message(
-                    '\nThou hast done well in defeating ' + self.monster_party.get_defeated_monster_summary()
-                    + '. Thy experience increases by ' + str(xp) + '. Thy gold increases by ' + str(gp) + '.')
+                    f'\nThou hast done well in defeating {self.monster_party.get_defeated_monster_summary()}. '
+                    f'Thy experience increases by {xp}. Thy gold increases by {gp}.')
             self.hero_party.gp += gp
             for hero in self.hero_party.combat_members:
                 if hero.is_still_in_combat():
@@ -566,15 +566,13 @@ class CombatEncounter(CombatEncounterInterface):
                         hp_increase = hero.level.hp - old_level.hp
                         mp_increase = hero.level.mp - old_level.mp
                         if strength_increase > 0:
-                            self.add_message('Thy strength increases by ' + str(strength_increase) + '.')
+                            self.add_message(f'Thy strength increases by {strength_increase}.')
                         if agility_increase > 0:
-                            self.add_message('Thy agility increases by ' + str(agility_increase) + '.')
+                            self.add_message(f'Thy agility increases by {agility_increase}.')
                         if hp_increase > 0:
-                            self.add_message('Thy maximum hit points increase by ' +
-                                                            str(hp_increase) + '.')
+                            self.add_message(f'Thy maximum hit points increase by {hp_increase}.')
                         if mp_increase > 0:
-                            self.add_message('Thy maximum magic points increase by ' +
-                                                            str(mp_increase) + '.')
+                            self.add_message(f'Thy maximum magic points increase by {mp_increase}.')
                         # print('old_spells =', len(old_spells), flush=True)
                         # print('new_spells =', len(hero.get_available_spells()), flush=True)
                         if len(hero.get_available_spells()) > len(old_spells):
@@ -594,7 +592,7 @@ class CombatEncounter(CombatEncounterInterface):
         damage_action = GameTypes.get_dialog_action(dialog, DialogActionEnum.DAMAGE_TARGET)
         if damage_action is not None and isinstance(damage_action, DialogAction):
             if problem is None:
-                #problem = CombatEncounter.gen_any_problem()
+                # problem = CombatEncounter.gen_any_problem()
                 problem = CombatEncounter.gen_cam_problem()
             damage_action.problem = problem
 
@@ -738,6 +736,7 @@ def main() -> None:
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
 
     def handle_quit_side_effect(force: bool = False) -> None:
+        _ = force  # appease pylint - force is needed to conform to the interface
         mock_game_state.is_running = False
     mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
 

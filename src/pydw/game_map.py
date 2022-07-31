@@ -143,6 +143,8 @@ class CharacterSprite(MapSprite):
         self.image = self.get_image()
         self.rect = self.get_rect()
 
+        super().update(args, kwargs)
+
     @staticmethod
     def get_tile_movement_steps() -> int:
         return int(math.ceil(MapSprite.tile_size_pixels / MapSprite.image_px_step_size))
@@ -202,7 +204,7 @@ class NpcSprite(CharacterSprite):
                 if self.game_map.can_move_to_tile(dest_tile, True, True, True, self.character.curr_pos_dat_tile):
                     self.character.dest_pos_dat_tile = dest_tile
 
-        super().update()
+        super().update(args, kwargs)
 
 
 class GameMap(GameMapInterface):
@@ -268,7 +270,7 @@ class GameMap(GameMapInterface):
         for npc_info in self.npcs:
             self.group.add(NpcSprite(npc_info, self), layer=self.map_data.character_layer)
 
-    def size(self, with_padding: bool=False) -> Point:
+    def size(self, with_padding: bool = False) -> Point:
         # Doesn't include padding, just the size of data size of the map
         if with_padding:
             return Point(self.map_data.map_size)
@@ -287,7 +289,7 @@ class GameMap(GameMapInterface):
         # Center the map on the PC
         self.group.center((self.game_state.get_image_pad_tiles() + Point(0.5, 0.5) +
                            self.game_state.get_hero_party().get_curr_pos_dat_tile()) *
-                           self.map_data.tile_size + self.game_state.get_hero_party().get_curr_pos_offset_img_px())
+                          self.map_data.tile_size + self.game_state.get_hero_party().get_curr_pos_offset_img_px())
 
         # Detect if the hero is eclipsed by the over layer(s).  If so, do not render those layers.
         if self.map_data.set_pc_character_tile(self.game_state.get_hero_party().get_curr_pos_dat_tile()):
@@ -361,9 +363,9 @@ class GameMap(GameMapInterface):
 
     def get_decorations(
             self,
-            tile: Optional[Point]=None,
-            decoration_filter: Optional[Callable[[MapDecoration], bool]]=None,
-            stop_after_first: bool=False) -> List[MapDecoration]:
+            tile: Optional[Point] = None,
+            decoration_filter: Optional[Callable[[MapDecoration], bool]] = None,
+            stop_after_first: bool = False) -> List[MapDecoration]:
         decorations = []
         if tile is None:
             tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
@@ -378,8 +380,8 @@ class GameMap(GameMapInterface):
 
     def get_decoration_for_interaction(
             self,
-            pos_dat_tile: Optional[Point]=None,
-            decoration_filter: Optional[Callable[[MapDecoration], bool]]=None) -> Optional[MapDecoration]:
+            pos_dat_tile: Optional[Point] = None,
+            decoration_filter: Optional[Callable[[MapDecoration], bool]] = None) -> Optional[MapDecoration]:
         decoration = None
 
         if pos_dat_tile is None:
