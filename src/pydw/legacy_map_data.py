@@ -104,8 +104,8 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     def is_interior(self, pos_dat_tile: Point) -> bool:
         tile_x, tile_y = pos_dat_tile.get_as_int_tuple()
-        for l in self.overlay_tile_layers:
-            if self._get_tile_image(tile_x, tile_y, l,
+        for layer_idx in self.overlay_tile_layers:
+            if self._get_tile_image(tile_x, tile_y, layer_idx,
                                     image_indexing=False, limit_to_visible=False) is not None:
                 return True
         return False
@@ -208,10 +208,10 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def _get_tile_image(self,
                         x: int,
                         y: int,
-                        l: int,
+                        layer_idx: int,
                         image_indexing: bool = True,
                         limit_to_visible: bool = True) -> Optional[pygame.surface.Surface]:
-        if l not in self.all_tile_layers or (limit_to_visible and l not in self.layers_to_render):
+        if layer_idx not in self.all_tile_layers or (limit_to_visible and layer_idx not in self.layers_to_render):
             return None
 
         if not image_indexing:
@@ -220,9 +220,9 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             x = x + int(self.image_pad_tiles[0])
             y = y + int(self.image_pad_tiles[1])
 
-        if l == LegacyMapData.BASE_MAP_LAYER:
+        if layer_idx == LegacyMapData.BASE_MAP_LAYER:
             return self.base_map_images[y][x]
-        elif l == LegacyMapData.OVERLAY_MAP_LAYER and self.overlay_images is not None:
+        elif layer_idx == LegacyMapData.OVERLAY_MAP_LAYER and self.overlay_images is not None:
             return self.overlay_images[y][x]
 
         return None
@@ -245,12 +245,12 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         y1 = min(max(y1, 0), tiles_h - 1)
         y2 = min(max(y2, 0), tiles_h - 1)
 
-        for l in self.visible_tile_layers:
+        for layer_idx in self.visible_tile_layers:
             for y in range(y1, y2+1):
                 for x in range(x1, x2+1):
-                    tile_image = self._get_tile_image(x, y, l)
+                    tile_image = self._get_tile_image(x, y, layer_idx)
                     if tile_image is not None:
-                        yield x, y, l, tile_image
+                        yield x, y, layer_idx, tile_image
 
 
 class ScrollTest:

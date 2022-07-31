@@ -4,9 +4,10 @@ from typing import Any, Callable, Dict, List, Optional
 
 import abc
 import math
+import random
+
 import pygame
 import pyscroll
-import random
 
 from generic_utils.point import Point
 
@@ -340,8 +341,8 @@ class GameMap(GameMapInterface):
         if isinstance(self.map_data, PaddedTiledMapData):
             tile_name = None
             tile_x, tile_y = tile.get_as_int_tuple()
-            for l in reversed(self.map_data.base_tile_layers):
-                tile_properties = self.map_data.get_tile_properties(tile_x, tile_y, l)
+            for layer_idx in reversed(self.map_data.base_tile_layers):
+                tile_properties = self.map_data.get_tile_properties(tile_x, tile_y, layer_idx)
                 if tile_properties is not None and 'type' in tile_properties and \
                         tile_properties['type'] is not None and len(tile_properties['type']) > 0:
                     tile_name = tile_properties['type']

@@ -4,11 +4,12 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import concurrent.futures
 import os
-import pygame
 import numpy
 import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude
 # import lxml.etree as ET  # May desire to use in future for better xinclude support
+
+import pygame
 
 from generic_utils.point import Point
 
@@ -1086,7 +1087,7 @@ class GameInfo:
                     for line in map_dat_file:
                         line = line.strip('\n')
                         map_dat.append(line)
-                        # TODO: Validate the map is rectangular and all tiles are defined`
+                        # TODO: Validate the map is rectangular and all tiles are defined
                 map_dat_size = Point(len(map_dat[0]), len(map_dat))
 
                 # Conditionally load map dat overlap file
@@ -1126,7 +1127,7 @@ class GameInfo:
             # Load the encounter image
             # print('Load the encounter image', flush=True)
             encounter_background = None
-            if len(monster_zones) and 'encounterBackground' in element.attrib:
+            if len(monster_zones) > 0 and 'encounterBackground' in element.attrib:
                 encounter_background = self.encounter_backgrounds[element.attrib['encounterBackground']]
 
             # Save the map information
@@ -1339,7 +1340,7 @@ class GameInfo:
                         dialog_vendor_sell_options.append(option_element.attrib['type'])
                 dialog.append(DialogVendorSellOptions(dialog_vendor_sell_options))
 
-            elif element.tag == 'DialogAssert' or element.tag == 'DialogCheck':
+            elif element.tag in ('DialogAssert', 'DialogCheck'):
                 conditional_dialog = self.parse_dialog(element)
                 dialog.append(DialogCheck(DialogCheckEnum[element.attrib['type']],
                                           dialog=conditional_dialog,

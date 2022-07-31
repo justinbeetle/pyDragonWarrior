@@ -2,8 +2,9 @@
 
 from typing import List
 
-from opensimplex import OpenSimplex
 import os
+
+from opensimplex import OpenSimplex
 
 from pydw.game_map_viewer import GameMapViewer
 from pydw.game_types import Map

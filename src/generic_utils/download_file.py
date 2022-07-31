@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-import certifi
 import os
 import ssl
 import urllib.request
 import zipfile
+
+import certifi
 
 
 def download_file(url: str, filepath: str) -> bool:

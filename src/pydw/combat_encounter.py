@@ -2,8 +2,9 @@
 
 from typing import cast, List, Optional, Tuple, Union
 
-import pygame
 import random
+
+import pygame
 
 from generic_utils.point import Point
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import os
-import pygame
 import sys
+
+import pygame
 
 
 # Run like this: MapImageToDatConverter.py ..\unusedAssets\maps\brecconary.png data\maps\brecconary.dat

@@ -99,7 +99,8 @@ class GameDialog:
         # Determine font size by sizing it based on the tile size
         def calc_font_size(font_name: Optional[str]) -> int:
             font_size = 1
-            while create_font(font_name, font_size).get_height() < tile_size_pixels - GameDialog.internal_spacing_pixels:
+            while create_font(font_name, font_size).get_height() < \
+                    tile_size_pixels - GameDialog.internal_spacing_pixels:
                 font_size += 1
             font_size -= 1
             # print('Calculated font size of {} for font {}'.format(font_name, font_size), flush=True)

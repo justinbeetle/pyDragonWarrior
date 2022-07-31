@@ -238,7 +238,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             if frames:
                 yield gid, frames
 
-    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool=False) -> None:
+    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool = False) -> None:
         """ Convert all images in the data to match the parent
 
         :param parent: pygame.surface.Surface

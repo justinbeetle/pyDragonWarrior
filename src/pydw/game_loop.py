@@ -5,8 +5,9 @@ from typing import cast, List, Optional
 # import datetime
 import glob
 import os
-import pygame
 import random
+
+import pygame
 
 from generic_utils.point import Point
 

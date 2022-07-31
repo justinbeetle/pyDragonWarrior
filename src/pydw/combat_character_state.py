@@ -71,9 +71,8 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             return False
         if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
             return False
-        if isinstance(self, type(target)) and (DialogActionEnum.SLEEP == action
-                                               or DialogActionEnum.STOPSPELL == action
-                                               or DialogActionEnum.DAMAGE_TARGET == action):
+        if isinstance(self, type(target)) \
+                and action in (DialogActionEnum.SLEEP, DialogActionEnum.STOPSPELL, DialogActionEnum.DAMAGE_TARGET):
             # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
             return False
         return True

@@ -2,9 +2,10 @@
 
 from typing import cast, Optional, List, Tuple, Union
 
-import pygame
 import random
 import time
+
+import pygame
 
 from generic_utils.point import Point
 
@@ -423,7 +424,7 @@ class GameDialogEvaluator:
 
                 check_result = True
 
-                if item.type == DialogCheckEnum.HAS_ITEM or item.type == DialogCheckEnum.LACKS_ITEM:
+                if item.type in (DialogCheckEnum.HAS_ITEM, DialogCheckEnum.LACKS_ITEM):
                     # Perform variable replacement
                     item_name = str(item.name)
                     item_count = 1
@@ -488,7 +489,7 @@ class GameDialogEvaluator:
                 elif item.type == DialogCheckEnum.IS_TARGET_MONSTER:
                     check_result = len(self.targets) > 0 and not isinstance(self.targets[0], HeroState)
 
-                elif item.type == DialogCheckEnum.IS_DEFINED or item.type == DialogCheckEnum.IS_NOT_DEFINED:
+                elif item.type in (DialogCheckEnum.IS_DEFINED, DialogCheckEnum.IS_NOT_DEFINED):
                     # Perform variable replacement
                     item_name = str(item.name)
                     for variable in self.replacement_variables.generic:
@@ -526,7 +527,7 @@ class GameDialogEvaluator:
                 if item.type == DialogActionEnum.SAVE_GAME:
                     self.game_state.save()
 
-                elif item.type == DialogActionEnum.GAIN_ITEM or item.type == DialogActionEnum.LOSE_ITEM:
+                elif item.type in (DialogActionEnum.GAIN_ITEM, DialogActionEnum.LOSE_ITEM):
                     # Perform variable replacement
                     item_name = str(item.name)
                     item_count = 1
@@ -549,8 +550,7 @@ class GameDialogEvaluator:
                                     hero.hp = 0
                                 else:
                                     hero.hp -= item_count
-                                if hero.hp < 0:
-                                    hero.hp = 0
+                                hero.hp = max(hero.hp, 0)
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item_name == 'gp':
                         if item.type == DialogActionEnum.GAIN_ITEM:
@@ -560,8 +560,7 @@ class GameDialogEvaluator:
                                 self.hero_party.gp = 0
                             else:
                                 self.hero_party.gp -= item_count
-                            if self.hero_party.gp < 0:
-                                self.hero_party.gp = 0
+                            self.hero_party.gp = max(self.hero_party.gp, 0)
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item_name == 'mp':
                         for hero in self.hero_party.members:
@@ -572,8 +571,7 @@ class GameDialogEvaluator:
                                     hero.mp = 0
                                 else:
                                     hero.mp -= item_count
-                                if hero.mp < 0:
-                                    hero.mp = 0
+                                hero.mp = max(hero.mp, 0)
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item_name == 'xp':
                         for hero in self.hero_party.members:
@@ -585,8 +583,7 @@ class GameDialogEvaluator:
                                     hero.xp = 0
                                 else:
                                     hero.xp -= item_count
-                                if hero.xp < 0:
-                                    hero.xp = 0
+                                hero.xp = max(hero.xp, 0)
                         self.update_status_dialog(flip_buffer=not item.bypass, message_dialog=message_dialog)
                     elif item.type == DialogActionEnum.GAIN_ITEM:
                         item_to_gain = self.game_info.get_item(item_name)
