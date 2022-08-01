@@ -2,7 +2,7 @@
 
 ![pyDragonWarrior](/data/images/title.png "pyDragonWarrior Title Image")
 
-A Python based Dragon Warrior clone.  Dragon Warrior was chosen as a game with which I have sentimental attachment but
+A Python based Dragon Warrior clone. Dragon Warrior was chosen as a game with which I have sentimental attachment but
 the intent is that it eventually evolves into a unique fantasy game in the spirit of Dragon Warrior instead of being an
 out-and-out clone or reimagining.
 
@@ -37,14 +37,25 @@ Note: Running game.py runs a subshell command to install the required Python lib
 
 Note: Gamepad support has only been tested with an XBox One controller.
 
+## Features
+
+* Fully playable game
+  * Unlike Dragon Warrior, weapons and armor must be manually equipped and multiple pieces can be owned
+  * Unlike Dragon Warrior, stairs are automatically traversed
+  * Cursed items have no implemented behavior
+* Overworld encounter backgrounds are selected based on nearby terrain
+* Provides both a classic and math (default) combat mode, where the math mode is hardcoded to reinforce the learning of
+my fourth grader
+* Game content is (mostly) configurable, providing a game engine capable of being repurposed to tell alternate stories
+
 ## Credits
 
 ### Source Material
 
-#### Dragon Warrior
+#### The original Dragon Warrior
 
-Any [Dragon Warrior](https://en.wikipedia.org/wiki/Dragon_Quest_(video_game)) inspired project or remake is indebted to
-the creators of Dragon Warrior.  The 8-bit chip tunes from Dragon Warrior I especially enjoy, much to the chagrin of my
+Any [Dragon Warrior](https://en.wikipedia.org/wiki/Dragon_Quest_(video_game)) inspired project or clone is indebted to
+the creators of Dragon Warrior. The 8-bit chip tunes from Dragon Warrior I especially enjoy, much to the chagrin of my
 family!
 
 * Developer: Chunsoft
@@ -57,11 +68,12 @@ family!
 * Writer: Yuji Horii
 * Composer: Koichi Sugiyama
 
-#### Dragon Warrior Online Archives
+#### Archived Dragon Warrior Materials
 
-Thanks to the people who have preserved the information from Dragon Warrior to share it with future generations.
+Thanks to the people who have preserved the artwork and information from Dragon Warrior to share it with future
+generations.
 
-* [Forumlas](https://gamefaqs.gamespot.com/nes/563408-dragon-warrior/faqs/61640): Very informative guide on the
+* [Formulas](https://gamefaqs.gamespot.com/nes/563408-dragon-warrior/faqs/61640): Very informative guide on the
 mechanics of Dragon Warrior.
 * [Gameplay](https://www.youtube.com/watch?v=Fj_eA0f_KtY): My old NES died at some point after I started, so when I want
 to compare to the source material now I skip through the speed runs on YouTube.
@@ -75,19 +87,19 @@ to compare to the source material now I skip through the speed runs on YouTube.
 
 #### Tilesets
 
-* [Pita Madgwick](https://pita.itch.io/): Beautiful 16x16 pixel tilesets.  Looking at them makes me happy!  These assets
-are licenced and as such are not stored in the repo.  Distributions of the game will eventually include them.
-  * [Village Tileset](https://pita.itch.io/rpg-village-tileset)
-  * [Overworld Tileset](https://pita.itch.io/rpg-overworld-tileset)
-  * [Dungeon Tileset](https://pita.itch.io/rpg-dungeon-tileset)
+* [Pita Madgwick](https://pita.itch.io/): Beautiful 16x16 pixel tilesets. Looking at them makes me happy! These assets
+are licenced and as such are not stored in the repo. Distributions of the game will eventually include them.
+  * [WONDERDOT RPG Asset Series - Village Tileset<br><img src="https://img.itch.zone/aW1nLzE1MjU5NjMuZ2lm/original/Q5Zcnx.gif" width=600>](https://pita.itch.io/rpg-village-tileset) 
+  * [WONDERDOT RPG Asset Series - Overworld Tileset<br><img src="https://img.itch.zone/aW1nLzEzMjA3MzUuZ2lm/original/QaINOc.gif" width=600>](https://pita.itch.io/rpg-overworld-tileset)
+  * [WONDERDOT RPG Asset Series - Dungeon Tileset<br><img src="https://img.itch.zone/aW1hZ2UvMTUyMDU3LzcwMjI2My5wbmc=/original/kcqpkf.png" width=600>](https://pita.itch.io/rpg-dungeon-tileset)
 
 #### Character Sprites
 
-* [Mega Tiles](https://megatiles.itch.io/): Adorable 16x20 character sprites.  These assets are licenced and as such are
-not stored in the repo.  Distributions of the game will eventually include them.
-  * [Tiny Tales Character Sprites - NPC Advanced](https://megatiles.itch.io/tiny-tales-human-npc-advanced-sprite-pack)
-  * [Tiny Tales Character Sprites - NPC Knights](https://megatiles.itch.io/tiny-tales-human-npc-advanced-sprite-pack)
-  * [Tiny Tales Character Sprites - NPC Nobility](https://megatiles.itch.io/tiny-tales-human-npc-nobility-sprite-pack)
+* [Mega Tiles](https://megatiles.itch.io/): Adorable 16x20 character sprites. These assets are licenced and as such are
+not stored in the repo. Distributions of the game will eventually include them.
+  * [Tiny Tales Character Sprites - NPC Advanced<br>![](https://img.itch.zone/aW1hZ2UvMTA0OTE4Ny82MDAyNTMzLmdpZg==/347x500/jWHe53.gif)](https://megatiles.itch.io/tiny-tales-human-npc-advanced-sprite-pack)
+  * [Tiny Tales Character Sprites - NPC Knights<br>![](https://img.itch.zone/aW1hZ2UvMTA0OTE5Ni82MDAyNTI0LmdpZg==/347x500/U070LY.gif)](https://megatiles.itch.io/tiny-tales-human-npc-knights-sprite-pack)
+  * [Tiny Tales Character Sprites - NPC Nobility<br>![](https://img.itch.zone/aW1hZ2UvMTA0OTIwNi82MDAyNTI3LmdpZg==/347x500/CyUWin.gif)](https://megatiles.itch.io/tiny-tales-human-npc-nobility-sprite-pack)
 
 #### Fonts
 
@@ -137,10 +149,14 @@ not stored in the repo.  Distributions of the game will eventually include them.
 
 ### Python Libraries
 
+The pygame library is integral to this project. Migrating to using Tiled maps and leveraging pytmx and pyscroll have
+been a really nice improvement, but one that you only see with the licensed assets that are not included in the repo. A
+future distribution of the game will include these.
+
 * [pygame](https://github.com/pygame/pygame): Python library for multimedia applications
 * [Leif Theden](https://github.com/bitcraft)
-  * [pytmx](https://github.com/bitcraft/pytmx): Python library to read and render Tiled maps
-  * [pyscroll](https://github.com/bitcraft/pyscroll): Python library to read and render Tiled maps
+  * [pytmx](https://github.com/bitcraft/pytmx): Python library to read Tiled maps
+  * [pyscroll](https://github.com/bitcraft/pyscroll): Python library to render Tiled maps
 
 ### Tools
 
