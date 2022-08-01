@@ -281,15 +281,16 @@ class GameInfo:
                     # Favor the first image added
                     continue
                 image_filename = image_element.attrib['source']
-                credits = 'Uncredited'
-                if 'credits' in image_element.attrib:
-                    credits = image_element.attrib['credits']
+
                 # print('Loading', encounter_background_name, flush=True)
                 try:
                     encounter_background_image = pygame.image.load(os.path.join(element_encounter_path, image_filename))
-                    encounter_backgrounds[encounter_background_name] = EncounterBackground(encounter_background_name,
-                                                                                           encounter_background_image,
-                                                                                           credits)
+                    encounter_backgrounds[encounter_background_name] = EncounterBackground(
+                        encounter_background_name,
+                        encounter_background_image,
+                        image_element.attrib['artist'] if 'artist' in image_element.attrib else 'Uncredited',
+                        image_element.attrib['artist_url'] if 'artist_url' in image_element.attrib else None,
+                        image_element.attrib['url'] if 'url' in image_element.attrib else None)
                 except Exception:
                     print('ERROR: Failed to load', encounter_background_name, flush=True)
         return encounter_backgrounds
