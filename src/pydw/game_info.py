@@ -288,6 +288,7 @@ class GameInfo:
                     encounter_backgrounds[encounter_background_name] = EncounterBackground(
                         encounter_background_name,
                         encounter_background_image,
+                        os.path.join(element_encounter_path, image_filename),
                         image_element.attrib['artist'] if 'artist' in image_element.attrib else 'Uncredited',
                         image_element.attrib['artist_url'] if 'artist_url' in image_element.attrib else None,
                         image_element.attrib['url'] if 'url' in image_element.attrib else None)

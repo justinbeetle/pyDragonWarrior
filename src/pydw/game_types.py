@@ -717,6 +717,7 @@ class MapImageInfo(NamedTuple):
 class EncounterBackground(NamedTuple):
     name: str
     image: pygame.surface.Surface
+    image_path: str
     artist: str = 'Uncredited'
     artist_url: Optional[str] = None
     image_url: Optional[str] = None
