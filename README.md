@@ -8,9 +8,9 @@ out-and-out clone or reimagining.
 
 [![language](https://img.shields.io/badge/python-3-blue.svg)](https://www.python.org/downloads/)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-![Python application](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml/badge.svg)
-![mypy](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml/badge.svg)
-![Pylint](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml/badge.svg)
+[![Python application](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml)
+[![mypy](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml)
+[![Pylint](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/context:python)
 
