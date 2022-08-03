@@ -781,7 +781,12 @@ class GameMap(GameMapInterface):
                 combined_image = pygame.transform.smoothscale(background_image_without_gate,
                                                               (target_width, target_height))
                 combined_image.blit(gate_background.image, (0, 0))
-                return EncounterBackground(encounter_background_name, combined_image)
+                return EncounterBackground(encounter_background_name,
+                                           combined_image,
+                                           gate_background.image_path,
+                                           gate_background.artist,
+                                           gate_background.artist_url,
+                                           gate_background.image_url)
 
         print(f'WARN: No encounter background for {encounter_background_name} at {tile}', flush=True)
         return None
