@@ -5,156 +5,38 @@
    <PointTransition decoration="downstairs"          x="30"  y="30"  dir="SOUTH" toMap="tantegel_lvl0"/>
    <MapDecoration type="door"  x="5"  y="14"/>
    <MapDecoration type="door"  x="19" y="7"/>
-   <MapDecoration type="chest" x="2"  y="14">
-      <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
-      <DialogGoTo label="gold_chest"/></MapDecoration>
-   <MapDecoration type="chest" x="2"  y="16">
-      <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
-      <DialogGoTo label="gold_chest"/></MapDecoration>
-   <MapDecoration type="chest" x="3"  y="15">
-      <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
-      <DialogGoTo label="gold_chest"/></MapDecoration>
-   <MapDecoration type="chest" x="4"  y="16">
-      <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
-      <DialogGoTo label="gold_chest"/></MapDecoration>
+   <MapDecoration type="door"  x="5"  y="14"/>
+   <MapDecoration type="door"  x="19" y="7"/>
 
-   <NonPlayerCharacter type="king" x="12" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord">
-      <DialogAssert type="LACKS_ITEM" name="PM_Offered_The_Realm">
-         <Dialog>"Thou will forever be a hero of the realm, [NAME]!"</Dialog>
-         <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
-         <DialogAction type="WAIT" count="250"/>
-         <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call -->
-         <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="PLAY_MUSIC" name="final_victory"/></DialogAssert>
-      <Dialog>"The legends have proven true.  Thou art indeed of the line of Erdrick.  It is thy right to rule over this land.  Will thou take my place?"</Dialog>
-      <Dialog>[NAME] thought carefully before answering.  "I cannot," said [NAME].  "If ever I am to rule a country, it must be a land that I myself find."</Dialog>
-      <DialogCheck type="HAS_ITEM" name="PM_Rescued_Princess">
-         <Dialog>Gwaelin said "Please, wait.  I wish to go with thee on thy journey.  May I travel as thy companion?"</Dialog>
-         <DialogOptions label="but_thou_must_take_me_with_you">
-            <DialogOption name="Yes">
-               <Dialog>"I'm so happy!"</Dialog>
-               <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
-               <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/>
-               <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess as an NPC and add her to the hero party -->
-            <DialogOption name="No">
-               <Dialog>"But thou must."</Dialog>
-               <Dialog>"May I travel as thy companion?"</Dialog>
-               <DialogGoTo label="but_thou_must_take_me_with_you"/></DialogOption></DialogOptions></DialogCheck>
-         <Dialog>CONGRATULATIONS!</Dialog>
-         <Dialog>THOU HAST RESTORED PEACE UNTO THE WORLD BUT THERE ARE MANY ROADS YET TO TRAVEL.</Dialog>
-         <Dialog>MAY THE LIGHT SHINE UPON THEE.</Dialog>
-         <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
-         <DialogAction type="WAIT" count="250"/>
-         <DialogAction type="GAIN_ITEM" name="PM_Offered_The_Realm"/>
-         <DialogAction type="GAIN_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="GOTO_COORDINATES" dir="SOUTH"/> <!-- The GOTO_COORDINATES forces a setMap call -->
-         <DialogAction type="LOSE_ITEM" name="PM_Trumpet_Salute"/>
-         <DialogAction type="PLAY_MUSIC" name="final_victory"/></NonPlayerCharacter>
+   <MapLocation x="2"  y="14" name="chest1"/>
+   <MapLocation x="2"  y="16" name="chest2"/>
+   <MapLocation x="3"  y="15" name="chest3"/>
+   <MapLocation x="4"  y="16" name="chest4"/>
+   <MapLocation x="12" y="8"  name="king"/>
+   <MapLocation x="11" y="8"  name="princess"/>
+   <MapLocation x="10" y="10" name="east facing trumpeter 1"/>
+   <MapLocation x="10" y="12" name="east facing trumpeter 2"/>
+   <MapLocation x="10" y="14" name="east facing trumpeter 3"/>
+   <MapLocation x="13" y="10" name="west facing trumpeter 1"/>
+   <MapLocation x="13" y="12" name="west facing trumpeter 2"/>
+   <MapLocation x="13" y="14" name="west facing trumpeter 3"/>
+   <MapLocation x="9"  y="7"  name="guard 1"/>
+   <MapLocation x="9"  y="9"  name="guard 2"/>
+   <MapLocation x="12" y="12" name="boy 1"/>
+   <MapLocation x="9"  y="14" name="girl 1"/>
+   <MapLocation x="3"  y="22" name="merchant 1"/>
+   <MapLocation x="7"  y="24" name="merchant 2"/>
+   <MapLocation x="3"  y="13" name="guard 3"/>
+   <MapLocation x="20" y="14" name="sage 1"/>
+   <MapLocation x="27" y="16" name="guard 4"/>
+   <MapLocation x="3"  y="9"  name="boy 2"/>
+   <MapLocation x="28" y="6"  name="girl 2"/>
+   <MapLocation x="10" y="28" name="guard 5"/>
+   <MapLocation x="13" y="28" name="guard 6"/>
+   <MapLocation x="16" y="21" name="guard 7"/>
+   <MapLocation x="21" y="27" name="sage 2"/>
+   <MapLocation x="25" y="22" name="warrior"/>
+   <MapLocation x="25" y="2"  name="key vendor"/>
 
-   <NonPlayerCharacter type="princess" name="Princess Gwaelin" x="11" y="8" dir="SOUTH" walking="no" progressMarker="PM_Defeated_Dragonlord and PM_Princess_Returned_To_Castle" inverseProgressMarker="PM_Carrying_Princess">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="10" y="10" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="10" y="12" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="10" y="14" dir="EAST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="13" y="10" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="13" y="12" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="13" y="14" dir="WEST" walking="no" progressMarker="PM_Defeated_Dragonlord and not PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="10" y="10" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="10" y="12" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="10" y="14" dir="EAST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="13" y="10" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="13" y="12" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="trumpeter" x="13" y="14" dir="WEST" walking="no" progressMarker="PM_Trumpet_Salute">
-      <Dialog>"Come now, King Lorik awaits."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="9" y="7" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
-      <Dialog>"King Lorik will record thy deeds in his Imperial Scroll so thou may return to thy quest later."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="9" y="9" dir="NORTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
-      <Dialog>"If thou art planning to take a rest, first see King Lorik."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="boy" x="12" y="12" dir="SOUTH" walking="yes" inverseProgressMarker="PM_Defeated_Dragonlord">
-      <Dialog>"There was a time when Brecconary was a paradise.  Then the Dragonlord's minions came."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="girl" x="9" y="14" dir="SOUTH" walking="yes" inverseProgressMarker="PM_Defeated_Dragonlord">
-      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Thank you for saving the Princess."</Dialog></DialogAssert>
-      <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="merchant" x="3" y="22" dir="EAST" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"We are merchants who have traveled much in this land.  Many of our colleagues have been killed by servants of the Dragonlord."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="merchant" x="7" y="24" dir="NORTH" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"Rumor has it that entire towns have been destroyed by the Dragonlord's servants."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="3" y="13" dir="NORTH" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"Never does a brave person steal."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="sage" x="20" y="14" dir="SOUTH" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"Let us wish the warrior well!  May the light be thy strength!"</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="27" y="16" dir="NORTH" walking="no">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"If thy hit points are high enough, by all means, enter."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="boy" x="3" y="9" dir="EAST" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"To become strong enough to face future trials thou must first battle many foes."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="girl" x="28" y="6" dir="WEST" walking="no">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"When the sun and rain meet, a Rainbow Bridge shall appear.  It's a legend."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="10" y="28" dir="EAST" walking="no">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="13" y="28" dir="WEST" walking="no">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"Welcome to Tantegel Castle."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="guard" x="16" y="21" dir="EAST" walking="no">
-      <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, my dearest Gwaelin!  I hate thee, [NAME]."</Dialog></DialogAssert>
-      <Dialog>"Where oh where can I find Princess Gwaelin?"</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="sage" x="21" y="27" dir="WEST" walking="no">
-      <Dialog>"[NAME]'s coming was foretold by legend.  May the light shine upon this brave warrior."</Dialog>
-      <DialogAction type="PLAY_SOUND" name="cast_spell"/>
-      <DialogAction type="VISUAL_EFFECT" name="flickering"/>
-      <DialogAction type="MAGIC_RESTORE" count="unlimited"/></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="warrior" x="25" y="22" dir="NORTH" walking="yes">
-      <DialogAssert type="LACKS_ITEM" name="PM_Defeated_Dragonlord"><Dialog>"Come now, King Lorik awaits."</Dialog></DialogAssert>
-      <Dialog>"In Garinham, look for the grave of Garin.  Thou must push on a wall of darkness there."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="merchant" x="25" y="2" dir="SOUTH" walking="no">
-      <DialogVariable name="[COST]" value="85"/>
-      <DialogGoTo label="key_vendor"/></NonPlayerCharacter>
+   <xi:include href="map_tantegel_lvl1_common.xml" parse="xml"/>
 </Map>

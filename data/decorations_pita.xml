@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Decoration name="chest"                        image="../../licensed_assets/itch.io/pita/decorations/chest.png"
+                                           removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
+               widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="chest"/>
+   <Decoration name="door"                         image="../../licensed_assets/itch.io/pita/decorations/door_wood.png"
+               widthTiles="1" heightTiles="1" walkable="no"  removeWithSearch="no"  removeWithKey="no"  removeWithOpen="yes" removeSound="unlock"/>
+
    <Decoration name="unlocked_chest"               image="../../licensed_assets/itch.io/pita/decorations/chest.png"
                                            removed_image="../../licensed_assets/itch.io/pita/decorations/chest_open.png"
                widthTiles="1" heightTiles="1" walkable="yes" removeWithSearch="yes" removeWithKey="no"  removeWithOpen="yes" removeSound="chest"/>

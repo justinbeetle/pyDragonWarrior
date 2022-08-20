@@ -1,35 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.2.2" name="overworld" tilewidth="16" tileheight="16" tilecount="3200" columns="40">
+<tileset version="1.8" tiledversion="1.8.5" name="overworld" tilewidth="16" tileheight="16" tilecount="3200" columns="40">
  <image source="Overworld_Tileset.png" width="640" height="1280"/>
- <terraintypes>
-  <terrain name="trees (object layer)" tile="286"/>
-  <terrain name="regular grass" tile="1"/>
-  <terrain name="light grass" tile="81"/>
-  <terrain name="Hills" tile="161"/>
-  <terrain name="cliffs" tile="481"/>
-  <terrain name="ocean (upper layer)" tile="140"/>
-  <terrain name="beach" tile="681"/>
-  <terrain name="shallow ocean (under layer)" tile="826"/>
-  <terrain name="ocean (under layer)" tile="801"/>
-  <terrain name="deep ocean (under layer)" tile="896"/>
-  <terrain name="swamp" tile="977"/>
-  <terrain name="pine trees (object layer)" tile="698"/>
-  <terrain name="village grass" tile="1640"/>
-  <terrain name="village dirt" tile="1571"/>
-  <terrain name="village path" tile="1576"/>
-  <terrain name="village light grass" tile="1561"/>
- </terraintypes>
- <tile id="0" terrain="1,1,1,1">
+ <tile id="0">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1" terrain="1,1,1,1" probability="0.25">
+ <tile id="1" probability="0.25">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="2" terrain="1,1,1,1" probability="0.25">
+ <tile id="2" probability="0.25">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -273,37 +255,37 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="40" terrain="1,1,1,2">
+ <tile id="40">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="41" terrain="1,1,2,2">
+ <tile id="41">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="42" terrain="1,1,2,1">
+ <tile id="42">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="43" terrain="1,2,2,2">
+ <tile id="43">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="44" terrain="2,1,2,2">
+ <tile id="44">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="45" terrain="2,2,2,2" probability="0.1">
+ <tile id="45" probability="0.1">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="46" terrain="2,2,2,2" probability="0.1">
+ <tile id="46" probability="0.1">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -527,37 +509,37 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="80" terrain="1,2,1,2">
+ <tile id="80">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="81" terrain="2,2,2,2">
+ <tile id="81">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="82" terrain="2,1,2,1">
+ <tile id="82">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="83" terrain="2,2,1,2">
+ <tile id="83">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="84" terrain="2,2,2,1">
+ <tile id="84">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="85" terrain="2,2,2,2" probability="0.1">
+ <tile id="85" probability="0.1">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="86" terrain="2,2,2,2" probability="0.1">
+ <tile id="86" probability="0.1">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -781,27 +763,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="120" terrain="1,2,1,1">
+ <tile id="120">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="121" terrain="2,2,1,1">
+ <tile id="121">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="122" terrain="2,1,1,1">
+ <tile id="122">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="123" terrain="1,2,2,1">
+ <tile id="123">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="124" terrain="2,1,1,2">
+ <tile id="124">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -1029,17 +1011,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="160" terrain="1,1,1,3">
+ <tile id="160">
   <properties>
    <property name="type" value="hill"/>
   </properties>
  </tile>
- <tile id="161" terrain="1,1,3,3">
+ <tile id="161">
   <properties>
    <property name="type" value="hill"/>
   </properties>
  </tile>
- <tile id="162" terrain="1,1,3,1">
+ <tile id="162">
   <properties>
    <property name="type" value="hill"/>
   </properties>
@@ -1129,7 +1111,7 @@
    <property name="type" value="bridge"/>
   </properties>
  </tile>
- <tile id="180" terrain="5,5,4,1">
+ <tile id="180">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1142,7 +1124,7 @@
    <frame tileid="184" duration="240"/>
   </animation>
  </tile>
- <tile id="181" terrain="5,5,1,4">
+ <tile id="181">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1155,7 +1137,7 @@
    <frame tileid="185" duration="240"/>
   </animation>
  </tile>
- <tile id="182" terrain="5,4,5,1">
+ <tile id="182">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1168,7 +1150,7 @@
    <frame tileid="186" duration="240"/>
   </animation>
  </tile>
- <tile id="183" terrain="4,5,1,5">
+ <tile id="183">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1267,17 +1249,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="200" terrain="1,3,1,3">
+ <tile id="200">
   <properties>
    <property name="type" value="hill"/>
   </properties>
  </tile>
- <tile id="201" terrain="3,3,3,3">
+ <tile id="201">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="202" terrain="3,1,3,1">
+ <tile id="202">
   <properties>
    <property name="type" value="hill"/>
   </properties>
@@ -1367,7 +1349,7 @@
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="220" terrain="4,1,5,5">
+ <tile id="220">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1380,7 +1362,7 @@
    <frame tileid="224" duration="240"/>
   </animation>
  </tile>
- <tile id="221" terrain="1,4,5,5">
+ <tile id="221">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1393,7 +1375,7 @@
    <frame tileid="225" duration="240"/>
   </animation>
  </tile>
- <tile id="222" terrain="5,1,5,4">
+ <tile id="222">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1406,7 +1388,7 @@
    <frame tileid="226" duration="240"/>
   </animation>
  </tile>
- <tile id="223" terrain="1,5,4,5">
+ <tile id="223">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1505,17 +1487,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="240" terrain="1,3,1,1">
+ <tile id="240">
   <properties>
    <property name="type" value="hill"/>
   </properties>
  </tile>
- <tile id="241" terrain="3,3,1,1">
+ <tile id="241">
   <properties>
    <property name="type" value="hill"/>
   </properties>
  </tile>
- <tile id="242" terrain="3,1,1,1">
+ <tile id="242">
   <properties>
    <property name="type" value="hill"/>
   </properties>
@@ -1605,7 +1587,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="260" terrain="5,5,4,6">
+ <tile id="260">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1618,7 +1600,7 @@
    <frame tileid="264" duration="240"/>
   </animation>
  </tile>
- <tile id="261" terrain="5,5,6,4">
+ <tile id="261">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1631,7 +1613,7 @@
    <frame tileid="265" duration="240"/>
   </animation>
  </tile>
- <tile id="262" terrain="5,4,5,6">
+ <tile id="262">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1644,7 +1626,7 @@
    <frame tileid="266" duration="240"/>
   </animation>
  </tile>
- <tile id="263" terrain="4,5,6,5">
+ <tile id="263">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1737,32 +1719,32 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="280" terrain=",,,0">
+ <tile id="280">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="281" terrain=",,0,0">
+ <tile id="281">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="282" terrain=",,0,">
+ <tile id="282">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="283" terrain=",0,0,0">
+ <tile id="283">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="284" terrain="0,,0,0">
+ <tile id="284">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="285" terrain="0,0,0,0" probability="0.5">
+ <tile id="285" probability="0.5">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
@@ -1837,7 +1819,7 @@
    <property name="type" value="mountain"/>
   </properties>
  </tile>
- <tile id="300" terrain="4,6,5,5">
+ <tile id="300">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1850,7 +1832,7 @@
    <frame tileid="304" duration="240"/>
   </animation>
  </tile>
- <tile id="301" terrain="6,4,5,5">
+ <tile id="301">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1863,7 +1845,7 @@
    <frame tileid="305" duration="240"/>
   </animation>
  </tile>
- <tile id="302" terrain="5,6,5,4">
+ <tile id="302">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1876,7 +1858,7 @@
    <frame tileid="306" duration="240"/>
   </animation>
  </tile>
- <tile id="303" terrain="6,5,4,5">
+ <tile id="303">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -1969,32 +1951,32 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="320" terrain=",0,,0">
+ <tile id="320">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="321" terrain="0,0,0,0">
+ <tile id="321">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="322" terrain="0,,0,">
+ <tile id="322">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="323" terrain="0,0,,0">
+ <tile id="323">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="324" terrain="0,0,0,">
+ <tile id="324">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="325" terrain="0,0,0,0" probability="0.5">
+ <tile id="325" probability="0.5">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
@@ -2069,7 +2051,7 @@
    <property name="type" value="mountain"/>
   </properties>
  </tile>
- <tile id="340" terrain="5,5,1,6">
+ <tile id="340">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2082,7 +2064,7 @@
    <frame tileid="344" duration="240"/>
   </animation>
  </tile>
- <tile id="341" terrain="5,5,6,1">
+ <tile id="341">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2095,7 +2077,7 @@
    <frame tileid="345" duration="240"/>
   </animation>
  </tile>
- <tile id="342" terrain="5,1,5,6">
+ <tile id="342">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2108,7 +2090,7 @@
    <frame tileid="346" duration="240"/>
   </animation>
  </tile>
- <tile id="343" terrain="1,5,6,5">
+ <tile id="343">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2209,37 +2191,37 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="360" terrain=",0,,">
+ <tile id="360">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="361" terrain="0,0,,">
+ <tile id="361">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="362" terrain="0,,,">
+ <tile id="362">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="363" terrain=",0,0,">
+ <tile id="363">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="364" terrain="0,,,0">
+ <tile id="364">
   <properties>
    <property name="type" value="deciduous_forest"/>
   </properties>
  </tile>
- <tile id="365" terrain=",4,,">
+ <tile id="365">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="366" terrain="4,,,">
+ <tile id="366">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -2309,7 +2291,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="380" terrain="1,6,5,5">
+ <tile id="380">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2322,7 +2304,7 @@
    <frame tileid="384" duration="240"/>
   </animation>
  </tile>
- <tile id="381" terrain="6,1,5,5">
+ <tile id="381">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2335,7 +2317,7 @@
    <frame tileid="385" duration="240"/>
   </animation>
  </tile>
- <tile id="382" terrain="5,6,5,1">
+ <tile id="382">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2348,7 +2330,7 @@
    <frame tileid="386" duration="240"/>
   </animation>
  </tile>
- <tile id="383" terrain="6,5,1,5">
+ <tile id="383">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2449,27 +2431,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="400" terrain="1,1,1,4">
+ <tile id="400">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="401" terrain="1,1,4,4">
+ <tile id="401">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="402" terrain="1,1,4,1">
+ <tile id="402">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="403" terrain="1,4,4,4">
+ <tile id="403">
   <properties>
    <property name="type" value="cliff_walkable"/>
   </properties>
  </tile>
- <tile id="404" terrain="4,1,4,4">
+ <tile id="404">
   <properties>
    <property name="type" value="cliff_walkable"/>
   </properties>
@@ -2549,7 +2531,7 @@
    <property name="type" value="walls"/>
   </properties>
  </tile>
- <tile id="420" terrain="1,1,1,5">
+ <tile id="420">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -2562,7 +2544,7 @@
    <frame tileid="425" duration="240"/>
   </animation>
  </tile>
- <tile id="421" terrain="1,1,5,5">
+ <tile id="421">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -2575,7 +2557,7 @@
    <frame tileid="426" duration="240"/>
   </animation>
  </tile>
- <tile id="422" terrain="1,1,5,1">
+ <tile id="422">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -2588,7 +2570,7 @@
    <frame tileid="427" duration="240"/>
   </animation>
  </tile>
- <tile id="423" terrain="1,5,5,5">
+ <tile id="423">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2601,7 +2583,7 @@
    <frame tileid="428" duration="240"/>
   </animation>
  </tile>
- <tile id="424" terrain="5,1,5,5">
+ <tile id="424">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2689,27 +2671,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="440" terrain="1,4,1,4">
+ <tile id="440">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="441" terrain="4,4,4,4">
+ <tile id="441">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="442" terrain="4,1,4,1">
+ <tile id="442">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="443" terrain="4,4,1,4">
+ <tile id="443">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="444" terrain="4,4,4,1">
+ <tile id="444">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -2789,7 +2771,7 @@
    <property name="type" value="walls"/>
   </properties>
  </tile>
- <tile id="460" terrain="1,5,1,5">
+ <tile id="460">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -2802,12 +2784,12 @@
    <frame tileid="465" duration="240"/>
   </animation>
  </tile>
- <tile id="461" terrain="5,5,5,5">
+ <tile id="461">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="462" terrain="5,1,5,1">
+ <tile id="462">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -2820,7 +2802,7 @@
    <frame tileid="467" duration="240"/>
   </animation>
  </tile>
- <tile id="463" terrain="5,5,1,5">
+ <tile id="463">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2833,7 +2815,7 @@
    <frame tileid="468" duration="240"/>
   </animation>
  </tile>
- <tile id="464" terrain="5,5,5,1">
+ <tile id="464">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -2921,27 +2903,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="480" terrain="1,4,1,1">
+ <tile id="480">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="481" terrain="4,4,1,1">
+ <tile id="481">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="482" terrain="4,1,1,1">
+ <tile id="482">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="483" terrain="1,4,4,1">
+ <tile id="483">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="484" terrain="4,1,1,4">
+ <tile id="484">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -3021,7 +3003,7 @@
    <property name="type" value="walls"/>
   </properties>
  </tile>
- <tile id="500" terrain="1,5,1,1">
+ <tile id="500">
   <properties>
    <property name="type" value="shore_walkable"/>
   </properties>
@@ -3034,7 +3016,7 @@
    <frame tileid="505" duration="240"/>
   </animation>
  </tile>
- <tile id="501" terrain="5,5,1,1">
+ <tile id="501">
   <properties>
    <property name="type" value="shore"/>
   </properties>
@@ -3047,7 +3029,7 @@
    <frame tileid="506" duration="240"/>
   </animation>
  </tile>
- <tile id="502" terrain="5,1,1,1">
+ <tile id="502">
   <properties>
    <property name="type" value="shore_walkable"/>
   </properties>
@@ -3060,7 +3042,7 @@
    <frame tileid="507" duration="240"/>
   </animation>
  </tile>
- <tile id="503" terrain="1,5,5,1">
+ <tile id="503">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -3073,7 +3055,7 @@
    <frame tileid="508" duration="240"/>
   </animation>
  </tile>
- <tile id="504" terrain="5,1,1,5">
+ <tile id="504">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -3161,27 +3143,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="520" terrain="6,6,6,4">
+ <tile id="520">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="521" terrain="6,6,4,4">
+ <tile id="521">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="522" terrain="6,6,4,6">
+ <tile id="522">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="523" terrain="6,4,4,4">
+ <tile id="523">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="524" terrain="4,6,4,4">
+ <tile id="524">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -3267,7 +3249,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="540" terrain="4,4,4,5">
+ <tile id="540">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3280,7 +3262,7 @@
    <frame tileid="545" duration="240"/>
   </animation>
  </tile>
- <tile id="541" terrain="4,4,5,5">
+ <tile id="541">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3293,7 +3275,7 @@
    <frame tileid="546" duration="240"/>
   </animation>
  </tile>
- <tile id="542" terrain="4,4,5,4">
+ <tile id="542">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3306,7 +3288,7 @@
    <frame tileid="547" duration="240"/>
   </animation>
  </tile>
- <tile id="543" terrain="4,5,5,5">
+ <tile id="543">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3319,7 +3301,7 @@
    <frame tileid="548" duration="240"/>
   </animation>
  </tile>
- <tile id="544" terrain="5,4,5,5">
+ <tile id="544">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3407,27 +3389,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="560" terrain="6,4,6,4">
+ <tile id="560">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="561" terrain="4,4,4,4">
+ <tile id="561">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="562" terrain="4,6,4,6">
+ <tile id="562">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="563" terrain="4,4,6,4">
+ <tile id="563">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="564" terrain="4,4,4,6">
+ <tile id="564">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -3507,7 +3489,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="580" terrain="4,5,4,5">
+ <tile id="580">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3520,12 +3502,12 @@
    <frame tileid="585" duration="240"/>
   </animation>
  </tile>
- <tile id="581" terrain="5,5,5,5" probability="0">
+ <tile id="581" probability="0">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="582" terrain="5,4,5,4">
+ <tile id="582">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3538,7 +3520,7 @@
    <frame tileid="587" duration="240"/>
   </animation>
  </tile>
- <tile id="583" terrain="5,5,4,5">
+ <tile id="583">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -3551,7 +3533,7 @@
    <frame tileid="588" duration="240"/>
   </animation>
  </tile>
- <tile id="584" terrain="5,5,5,4">
+ <tile id="584">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -3639,27 +3621,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="600" terrain="6,4,6,6">
+ <tile id="600">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="601" terrain="4,4,6,6">
+ <tile id="601">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="602" terrain="4,6,6,6">
+ <tile id="602">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="603" terrain="6,4,4,6">
+ <tile id="603">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="604" terrain="4,6,6,4">
+ <tile id="604">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -3739,7 +3721,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="620" terrain="4,5,4,4">
+ <tile id="620">
   <properties>
    <property name="type" value="shore_cliff_walkable"/>
   </properties>
@@ -3752,7 +3734,7 @@
    <frame tileid="625" duration="240"/>
   </animation>
  </tile>
- <tile id="621" terrain="5,5,4,4">
+ <tile id="621">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3765,7 +3747,7 @@
    <frame tileid="626" duration="240"/>
   </animation>
  </tile>
- <tile id="622" terrain="5,4,4,4">
+ <tile id="622">
   <properties>
    <property name="type" value="shore_cliff_walkable"/>
   </properties>
@@ -3778,7 +3760,7 @@
    <frame tileid="627" duration="240"/>
   </animation>
  </tile>
- <tile id="623" terrain="4,5,5,4">
+ <tile id="623">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3791,7 +3773,7 @@
    <frame tileid="628" duration="240"/>
   </animation>
  </tile>
- <tile id="624" terrain="5,4,4,5">
+ <tile id="624">
   <properties>
    <property name="type" value="shore_cliff"/>
   </properties>
@@ -3879,27 +3861,27 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="640" terrain="1,1,1,6">
+ <tile id="640">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="641" terrain="1,1,6,6">
+ <tile id="641">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="642" terrain="1,1,6,1">
+ <tile id="642">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="643" terrain="1,1,1,6">
+ <tile id="643">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="644" terrain="1,1,6,1">
+ <tile id="644">
   <properties>
    <property name="type" value="desert"/>
   </properties>
@@ -3939,32 +3921,32 @@
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="652" terrain=",,,11">
+ <tile id="652">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="653" terrain=",,11,11">
+ <tile id="653">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="654" terrain=",,11,">
+ <tile id="654">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="655" terrain=",11,11,11">
+ <tile id="655">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="656" terrain="11,,11,11">
+ <tile id="656">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="657" terrain="11,11,11,11">
+ <tile id="657">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
@@ -3979,7 +3961,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="660" terrain="6,6,6,5">
+ <tile id="660">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -3992,7 +3974,7 @@
    <frame tileid="665" duration="240"/>
   </animation>
  </tile>
- <tile id="661" terrain="6,6,5,5">
+ <tile id="661">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -4005,7 +3987,7 @@
    <frame tileid="666" duration="240"/>
   </animation>
  </tile>
- <tile id="662" terrain="6,6,5,6">
+ <tile id="662">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -4018,7 +4000,7 @@
    <frame tileid="667" duration="240"/>
   </animation>
  </tile>
- <tile id="663" terrain="6,5,5,5">
+ <tile id="663">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4031,7 +4013,7 @@
    <frame tileid="668" duration="240"/>
   </animation>
  </tile>
- <tile id="664" terrain="5,6,5,5">
+ <tile id="664">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4119,47 +4101,47 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="680" terrain="1,6,1,6">
+ <tile id="680">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="681" terrain="6,6,6,6">
+ <tile id="681">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="682" terrain="6,1,6,1">
+ <tile id="682">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="683" terrain="1,6,1,1">
+ <tile id="683">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="684" terrain="6,1,1,1">
+ <tile id="684">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="685" terrain="4,1,4,6">
+ <tile id="685">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="686" terrain="1,4,6,4">
+ <tile id="686">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="687" terrain="4,4,1,6">
+ <tile id="687">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="688" terrain="4,4,6,1">
+ <tile id="688">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -4179,32 +4161,32 @@
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="692" terrain=",11,,11">
+ <tile id="692">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="693" terrain="11,11,11,11">
+ <tile id="693">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="694" terrain="11,,11,">
+ <tile id="694">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="695" terrain="11,11,,11">
+ <tile id="695">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="696" terrain="11,11,11,">
+ <tile id="696">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="697" terrain="11,11,11,11">
+ <tile id="697">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
@@ -4219,7 +4201,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="700" terrain="6,5,6,5">
+ <tile id="700">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -4232,12 +4214,12 @@
    <frame tileid="705" duration="240"/>
   </animation>
  </tile>
- <tile id="701" terrain="5,5,5,5">
+ <tile id="701">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="702" terrain="5,6,5,6">
+ <tile id="702">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -4250,7 +4232,7 @@
    <frame tileid="707" duration="240"/>
   </animation>
  </tile>
- <tile id="703" terrain="5,5,6,5">
+ <tile id="703">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4263,7 +4245,7 @@
    <frame tileid="708" duration="240"/>
   </animation>
  </tile>
- <tile id="704" terrain="5,5,5,6">
+ <tile id="704">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4351,17 +4333,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="720" terrain="1,6,1,1">
+ <tile id="720">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="721" terrain="6,6,1,1">
+ <tile id="721">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="722" terrain="6,1,1,1">
+ <tile id="722">
   <properties>
    <property name="type" value="desert"/>
   </properties>
@@ -4376,22 +4358,22 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="725" terrain="4,6,4,1">
+ <tile id="725">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="726" terrain="6,4,1,4">
+ <tile id="726">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="727" terrain="1,6,4,4">
+ <tile id="727">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="728" terrain="6,1,4,4">
+ <tile id="728">
   <properties>
    <property name="type" value="cliff"/>
   </properties>
@@ -4411,32 +4393,32 @@
    <property name="type" value="cliff"/>
   </properties>
  </tile>
- <tile id="732" terrain=",11,,">
+ <tile id="732">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="733" terrain="11,11,,">
+ <tile id="733">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="734" terrain="11,,,">
+ <tile id="734">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="735" terrain=",11,11,">
+ <tile id="735">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="736" terrain="11,,,11">
+ <tile id="736">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
  </tile>
- <tile id="737" terrain="11,11,11,11">
+ <tile id="737">
   <properties>
    <property name="type" value="pine_forest"/>
   </properties>
@@ -4451,7 +4433,7 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="740" terrain="6,5,6,6">
+ <tile id="740">
   <properties>
    <property name="type" value="beach_walkable"/>
   </properties>
@@ -4464,7 +4446,7 @@
    <frame tileid="745" duration="240"/>
   </animation>
  </tile>
- <tile id="741" terrain="5,5,6,6">
+ <tile id="741">
   <properties>
    <property name="type" value="beach"/>
   </properties>
@@ -4477,7 +4459,7 @@
    <frame tileid="746" duration="240"/>
   </animation>
  </tile>
- <tile id="742" terrain="5,6,6,6">
+ <tile id="742">
   <properties>
    <property name="type" value="beach_walkable"/>
   </properties>
@@ -4490,7 +4472,7 @@
    <frame tileid="747" duration="240"/>
   </animation>
  </tile>
- <tile id="743" terrain="6,5,5,6">
+ <tile id="743">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4503,7 +4485,7 @@
    <frame tileid="748" duration="240"/>
   </animation>
  </tile>
- <tile id="744" terrain="5,6,6,5">
+ <tile id="744">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4591,7 +4573,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="760" terrain="9,9,9,8">
+ <tile id="760">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4604,7 +4586,7 @@
    <frame tileid="765" duration="240"/>
   </animation>
  </tile>
- <tile id="761" terrain="9,9,8,8">
+ <tile id="761">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4617,7 +4599,7 @@
    <frame tileid="766" duration="240"/>
   </animation>
  </tile>
- <tile id="762" terrain="9,9,8,9">
+ <tile id="762">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4630,7 +4612,7 @@
    <frame tileid="767" duration="240"/>
   </animation>
  </tile>
- <tile id="763" terrain="9,8,8,8">
+ <tile id="763">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4643,7 +4625,7 @@
    <frame tileid="768" duration="240"/>
   </animation>
  </tile>
- <tile id="764" terrain="8,9,8,8">
+ <tile id="764">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4731,7 +4713,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="780" terrain="8,8,8,7">
+ <tile id="780">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4744,7 +4726,7 @@
    <frame tileid="785" duration="240"/>
   </animation>
  </tile>
- <tile id="781" terrain="8,8,7,7">
+ <tile id="781">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4757,7 +4739,7 @@
    <frame tileid="786" duration="240"/>
   </animation>
  </tile>
- <tile id="782" terrain="8,8,7,8">
+ <tile id="782">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4770,7 +4752,7 @@
    <frame tileid="787" duration="240"/>
   </animation>
  </tile>
- <tile id="783" terrain="8,7,7,7">
+ <tile id="783">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4783,7 +4765,7 @@
    <frame tileid="788" duration="240"/>
   </animation>
  </tile>
- <tile id="784" terrain="7,8,7,7">
+ <tile id="784">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4871,7 +4853,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="800" terrain="9,8,9,8">
+ <tile id="800">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4884,12 +4866,12 @@
    <frame tileid="805" duration="240"/>
   </animation>
  </tile>
- <tile id="801" terrain="8,8,8,8">
+ <tile id="801">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="802" terrain="8,9,8,9">
+ <tile id="802">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4902,7 +4884,7 @@
    <frame tileid="807" duration="240"/>
   </animation>
  </tile>
- <tile id="803" terrain="8,8,9,8">
+ <tile id="803">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -4915,7 +4897,7 @@
    <frame tileid="808" duration="240"/>
   </animation>
  </tile>
- <tile id="804" terrain="8,8,8,9">
+ <tile id="804">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5003,7 +4985,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="820" terrain="8,7,8,7">
+ <tile id="820">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5016,12 +4998,12 @@
    <frame tileid="825" duration="240"/>
   </animation>
  </tile>
- <tile id="821" terrain="7,7,7,7">
+ <tile id="821">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="822" terrain="7,8,7,8">
+ <tile id="822">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5034,7 +5016,7 @@
    <frame tileid="827" duration="240"/>
   </animation>
  </tile>
- <tile id="823" terrain="7,7,8,7">
+ <tile id="823">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5047,7 +5029,7 @@
    <frame tileid="828" duration="240"/>
   </animation>
  </tile>
- <tile id="824" terrain="7,7,7,8">
+ <tile id="824">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5135,7 +5117,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="840" terrain="9,8,9,9">
+ <tile id="840">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5148,7 +5130,7 @@
    <frame tileid="845" duration="240"/>
   </animation>
  </tile>
- <tile id="841" terrain="8,8,9,9">
+ <tile id="841">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5161,7 +5143,7 @@
    <frame tileid="846" duration="240"/>
   </animation>
  </tile>
- <tile id="842" terrain="8,9,9,9">
+ <tile id="842">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5174,7 +5156,7 @@
    <frame tileid="847" duration="240"/>
   </animation>
  </tile>
- <tile id="843" terrain="9,8,8,9">
+ <tile id="843">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5187,7 +5169,7 @@
    <frame tileid="848" duration="240"/>
   </animation>
  </tile>
- <tile id="844" terrain="8,9,9,8">
+ <tile id="844">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5275,7 +5257,7 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="860" terrain="8,7,8,8">
+ <tile id="860">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5288,7 +5270,7 @@
    <frame tileid="865" duration="240"/>
   </animation>
  </tile>
- <tile id="861" terrain="7,7,8,8">
+ <tile id="861">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5301,7 +5283,7 @@
    <frame tileid="866" duration="240"/>
   </animation>
  </tile>
- <tile id="862" terrain="7,8,8,8">
+ <tile id="862">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5314,7 +5296,7 @@
    <frame tileid="867" duration="240"/>
   </animation>
  </tile>
- <tile id="863" terrain="8,7,7,8">
+ <tile id="863">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5327,7 +5309,7 @@
    <frame tileid="868" duration="240"/>
   </animation>
  </tile>
- <tile id="864" terrain="7,8,8,7">
+ <tile id="864">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -5527,22 +5509,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="896" terrain="9,9,9,9">
+ <tile id="896">
   <properties>
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="897" terrain="10,10,10,10">
+ <tile id="897">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="898" terrain="10,10,10,10">
+ <tile id="898">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="899" terrain="10,10,10,10">
+ <tile id="899">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -5791,22 +5773,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="936" terrain="1,1,1,10">
+ <tile id="936">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="937" terrain="1,1,10,10">
+ <tile id="937">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="938" terrain="1,1,10,1">
+ <tile id="938">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="939" terrain="10,10,10,10">
+ <tile id="939">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -6055,17 +6037,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="976" terrain="1,10,1,10">
+ <tile id="976">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="977" terrain="10,10,10,10">
+ <tile id="977">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="978" terrain="10,1,10,1">
+ <tile id="978">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -6319,17 +6301,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1016" terrain="1,10,1,1">
+ <tile id="1016">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1017" terrain="10,10,1,1">
+ <tile id="1017">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1018" terrain="10,1,1,1">
+ <tile id="1018">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -6584,22 +6566,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1056" terrain="1,10,10,10">
+ <tile id="1056">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="1057" terrain="10,1,10,10">
+ <tile id="1057">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="1058" terrain="1,10,10,1">
+ <tile id="1058">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="1059" terrain="10,1,1,10">
+ <tile id="1059">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -6848,12 +6830,12 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1096" terrain="10,10,1,10">
+ <tile id="1096">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="1097" terrain="10,10,10,1">
+ <tile id="1097">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -7112,22 +7094,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1136" terrain="5,5,1,10">
+ <tile id="1136">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1137" terrain="5,5,10,1">
+ <tile id="1137">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1138" terrain="5,1,5,10">
+ <tile id="1138">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1139" terrain="1,5,10,5">
+ <tile id="1139">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -7376,22 +7358,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1176" terrain="1,10,5,5">
+ <tile id="1176">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1177" terrain="10,1,5,5">
+ <tile id="1177">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1178" terrain="5,10,5,1">
+ <tile id="1178">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1179" terrain="10,5,1,5">
+ <tile id="1179">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -7641,17 +7623,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1216" terrain="10,10,10,5">
+ <tile id="1216">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1217" terrain="10,10,5,5">
+ <tile id="1217">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1218" terrain="10,10,5,10">
+ <tile id="1218">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -7905,17 +7887,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1256" terrain="10,5,10,5">
+ <tile id="1256">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1257" terrain="5,5,5,5">
+ <tile id="1257">
   <properties>
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="1258" terrain="5,10,5,10">
+ <tile id="1258">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -8170,17 +8152,17 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1296" terrain="10,5,10,10">
+ <tile id="1296">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
  </tile>
- <tile id="1297" terrain="5,5,10,10">
+ <tile id="1297">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1298" terrain="5,10,10,10">
+ <tile id="1298">
   <properties>
    <property name="type" value="swamp"/>
   </properties>
@@ -8434,12 +8416,12 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1336" terrain="10,5,5,5">
+ <tile id="1336">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1337" terrain="5,10,5,5">
+ <tile id="1337">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -8698,12 +8680,12 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1376" terrain="5,5,10,5">
+ <tile id="1376">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1377" terrain="5,5,5,10">
+ <tile id="1377">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -8830,22 +8812,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1396" terrain="1,3,3,3">
+ <tile id="1396">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1397" terrain="3,1,3,3">
+ <tile id="1397">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1398" terrain="1,6,6,6">
+ <tile id="1398">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="1399" terrain="6,1,6,6">
+ <tile id="1399">
   <properties>
    <property name="type" value="desert"/>
   </properties>
@@ -8963,12 +8945,12 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1416" terrain="10,5,5,10">
+ <tile id="1416">
   <properties>
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1417" terrain="5,10,10,5">
+ <tile id="1417">
   <properties>
    <property name="type" value="water"/>
   </properties>
@@ -9095,22 +9077,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1436" terrain="3,3,1,3">
+ <tile id="1436">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1437" terrain="3,3,3,1">
+ <tile id="1437">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1438" terrain="6,6,1,6">
+ <tile id="1438">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="1439" terrain="6,6,6,1">
+ <tile id="1439">
   <properties>
    <property name="type" value="desert"/>
   </properties>
@@ -9391,22 +9373,22 @@
    <property name="type" value="water"/>
   </properties>
  </tile>
- <tile id="1476" terrain="1,3,3,1">
+ <tile id="1476">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1477" terrain="3,1,1,3">
+ <tile id="1477">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1478" terrain="1,6,6,1">
+ <tile id="1478">
   <properties>
    <property name="type" value="desert"/>
   </properties>
  </tile>
- <tile id="1479" terrain="6,1,1,6">
+ <tile id="1479">
   <properties>
    <property name="type" value="desert"/>
   </properties>
@@ -9707,62 +9689,52 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="1520" terrain="12,12,12,15"/>
- <tile id="1521" terrain="12,12,15,15"/>
- <tile id="1522" terrain="12,12,15,12"/>
- <tile id="1523" terrain="12,15,15,15"/>
- <tile id="1524" terrain="15,12,15,15"/>
- <tile id="1525" terrain="12,12,12,1"/>
- <tile id="1526" terrain="12,12,1,1"/>
- <tile id="1527" terrain="12,12,1,12"/>
- <tile id="1528" terrain="12,1,1,1"/>
- <tile id="1529" terrain="1,12,1,1"/>
- <tile id="1530" terrain="12,12,12,13">
+ <tile id="1530">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1531" terrain="12,12,13,13">
+ <tile id="1531">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1532" terrain="12,12,13,12">
+ <tile id="1532">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1533" terrain="12,13,13,13">
+ <tile id="1533">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1534" terrain="13,12,13,13">
+ <tile id="1534">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1535" terrain="13,13,13,14">
+ <tile id="1535">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1536" terrain="13,13,14,14">
+ <tile id="1536">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1537" terrain="13,13,14,13">
+ <tile id="1537">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1538" terrain="13,14,14,14">
+ <tile id="1538">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1539" terrain="14,13,14,14">
+ <tile id="1539">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -9797,61 +9769,62 @@
    <property name="type" value="bridge"/>
   </properties>
  </tile>
- <tile id="1560" terrain="12,15,12,15"/>
- <tile id="1561" terrain="15,15,15,15"/>
- <tile id="1562" terrain="15,12,15,12"/>
- <tile id="1563" terrain="15,15,12,15"/>
- <tile id="1564" terrain="15,15,15,12"/>
- <tile id="1565" terrain="12,1,12,1"/>
- <tile id="1567" terrain="1,12,1,12"/>
- <tile id="1568" terrain="1,1,12,1"/>
- <tile id="1569" terrain="1,1,1,12"/>
- <tile id="1570" terrain="12,13,12,13">
+ <tile id="1547">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1548">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1570">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1571" terrain="13,13,13,13">
+ <tile id="1571">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1572" terrain="13,12,13,12">
+ <tile id="1572">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1573" terrain="13,13,12,13">
+ <tile id="1573">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1574" terrain="13,13,13,12">
+ <tile id="1574">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1575" terrain="13,14,13,14">
+ <tile id="1575">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1576" terrain="14,14,14,14">
+ <tile id="1576">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1577" terrain="14,13,14,13">
+ <tile id="1577">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1578" terrain="14,14,13,14">
+ <tile id="1578">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1579" terrain="14,14,14,13">
+ <tile id="1579">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -9886,62 +9859,62 @@
    <property name="type" value="bridge"/>
   </properties>
  </tile>
- <tile id="1600" terrain="12,15,12,12"/>
- <tile id="1601" terrain="15,15,12,12"/>
- <tile id="1602" terrain="15,12,12,12"/>
- <tile id="1603" terrain="12,15,15,12"/>
- <tile id="1604" terrain="15,12,12,15"/>
- <tile id="1605" terrain="12,1,12,12"/>
- <tile id="1606" terrain="1,1,12,12"/>
- <tile id="1607" terrain="1,12,12,12"/>
- <tile id="1608" terrain="12,1,1,12"/>
- <tile id="1609" terrain="1,12,12,1"/>
- <tile id="1610" terrain="12,13,12,12">
+ <tile id="1587">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1588">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1610">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1611" terrain="13,13,12,12">
+ <tile id="1611">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1612" terrain="13,12,12,12">
+ <tile id="1612">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1613" terrain="12,13,13,12">
+ <tile id="1613">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1614" terrain="13,12,12,13">
+ <tile id="1614">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1615" terrain="13,14,13,13">
+ <tile id="1615">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1616" terrain="14,14,13,13">
+ <tile id="1616">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1617" terrain="14,13,13,13">
+ <tile id="1617">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1618" terrain="13,14,14,13">
+ <tile id="1618">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1619" terrain="14,13,13,14">
+ <tile id="1619">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -9976,30 +9949,39 @@
    <property name="type" value="bridge"/>
   </properties>
  </tile>
- <tile id="1640" terrain="12,12,12,12"/>
- <tile id="1641" terrain="12,12,12,12" probability="0.03"/>
- <tile id="1642" terrain="12,12,12,12" probability="0.03"/>
- <tile id="1646" terrain="13,13,13,13">
+ <tile id="1627">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1628">
+  <properties>
+   <property name="type" value="bridge"/>
+  </properties>
+ </tile>
+ <tile id="1641" probability="0.03"/>
+ <tile id="1642" probability="0.03"/>
+ <tile id="1646">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1647" terrain="13,13,13,13" probability="0.1">
+ <tile id="1647" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1648" terrain="13,13,13,13" probability="0.1">
+ <tile id="1648" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1649" terrain="13,13,13,13" probability="0.1">
+ <tile id="1649" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1650" terrain="13,13,13,13" probability="0.05">
+ <tile id="1650" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10039,12 +10021,12 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1658" terrain="14,14,14,14" probability="0.025">
+ <tile id="1658" probability="0.025">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1659" terrain="14,14,14,14" probability="0.05">
+ <tile id="1659" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10079,42 +10061,42 @@
    <property name="type" value="bridge"/>
   </properties>
  </tile>
- <tile id="1680" terrain="1,1,1,13">
+ <tile id="1680">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1681" terrain="1,1,13,13">
+ <tile id="1681">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1682" terrain="1,1,13,1">
+ <tile id="1682">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1683" terrain="1,13,13,13">
+ <tile id="1683">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1684" terrain="13,1,13,13">
+ <tile id="1684">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1686" terrain="13,13,13,13" probability="0.05">
+ <tile id="1686" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1687" terrain="13,13,13,13" probability="0.05">
+ <tile id="1687" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1688" terrain="13,13,13,13" probability="0.05">
+ <tile id="1688" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10164,37 +10146,37 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1698" terrain="14,14,14,14" probability="0.05">
+ <tile id="1698" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1699" terrain="14,14,14,14" probability="0.05">
+ <tile id="1699" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1720" terrain="1,13,1,13">
+ <tile id="1720">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1721" terrain="13,13,13,13">
+ <tile id="1721">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1722" terrain="13,1,13,1">
+ <tile id="1722">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1723" terrain="13,13,1,13">
+ <tile id="1723">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1724" terrain="13,13,13,1">
+ <tile id="1724">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10276,27 +10258,27 @@
    <frame tileid="1736" duration="250"/>
   </animation>
  </tile>
- <tile id="1760" terrain="1,13,1,1">
+ <tile id="1760">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1761" terrain="13,13,1,1">
+ <tile id="1761">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1762" terrain="13,1,1,1">
+ <tile id="1762">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1763" terrain="1,13,13,1">
+ <tile id="1763">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1764" terrain="13,1,1,13">
+ <tile id="1764">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10326,7 +10308,7 @@
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1800" terrain="1,1,1,13">
+ <tile id="1800">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10336,7 +10318,7 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1802" terrain="1,1,13,1">
+ <tile id="1802">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10381,7 +10363,7 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1880" terrain="1,13,1,1">
+ <tile id="1880">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10391,7 +10373,7 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="1882" terrain="13,1,1,1">
+ <tile id="1882">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -10446,7 +10428,6 @@
    <property name="type" value="walls"/>
   </properties>
  </tile>
- <tile id="1964" terrain=",1,,"/>
  <tile id="1965">
   <properties>
    <property name="type" value="walls"/>
@@ -10532,4 +10513,391 @@
    <property name="type" value="walls"/>
   </properties>
  </tile>
+ <wangsets>
+  <wangset name="Terrains" type="corner" tile="-1">
+   <wangcolor name="trees (object layer)" color="#ff0000" tile="286" probability="1"/>
+   <wangcolor name="regular grass" color="#00ff00" tile="1" probability="1"/>
+   <wangcolor name="light grass" color="#0000ff" tile="81" probability="1"/>
+   <wangcolor name="Hills" color="#ff7700" tile="161" probability="1"/>
+   <wangcolor name="cliffs" color="#00e9ff" tile="481" probability="1"/>
+   <wangcolor name="ocean (upper layer)" color="#ff00d8" tile="140" probability="1"/>
+   <wangcolor name="beach" color="#ffff00" tile="681" probability="1"/>
+   <wangcolor name="shallow ocean (under layer)" color="#a000ff" tile="826" probability="1"/>
+   <wangcolor name="ocean (under layer)" color="#00ffa1" tile="801" probability="1"/>
+   <wangcolor name="deep ocean (under layer)" color="#ffa8a8" tile="896" probability="1"/>
+   <wangcolor name="swamp" color="#b4a8ff" tile="977" probability="1"/>
+   <wangcolor name="pine trees (object layer)" color="#96ffa7" tile="698" probability="1"/>
+   <wangcolor name="village grass" color="#8e7848" tile="1640" probability="1"/>
+   <wangcolor name="village dirt" color="#5a5a5a" tile="1571" probability="1"/>
+   <wangcolor name="village path" color="#0e7a46" tile="1576" probability="1"/>
+   <wangcolor name="village light grass" color="#00000000" tile="1561" probability="1"/>
+   <wangtile tileid="0" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="1" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="2" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="40" wangid="0,2,0,3,0,2,0,2"/>
+   <wangtile tileid="41" wangid="0,2,0,3,0,3,0,2"/>
+   <wangtile tileid="42" wangid="0,2,0,2,0,3,0,2"/>
+   <wangtile tileid="43" wangid="0,3,0,3,0,3,0,2"/>
+   <wangtile tileid="44" wangid="0,2,0,3,0,3,0,3"/>
+   <wangtile tileid="45" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="46" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="80" wangid="0,3,0,3,0,2,0,2"/>
+   <wangtile tileid="81" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="82" wangid="0,2,0,2,0,3,0,3"/>
+   <wangtile tileid="83" wangid="0,3,0,3,0,2,0,3"/>
+   <wangtile tileid="84" wangid="0,3,0,2,0,3,0,3"/>
+   <wangtile tileid="85" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="86" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="120" wangid="0,3,0,2,0,2,0,2"/>
+   <wangtile tileid="121" wangid="0,3,0,2,0,2,0,3"/>
+   <wangtile tileid="122" wangid="0,2,0,2,0,2,0,3"/>
+   <wangtile tileid="123" wangid="0,3,0,2,0,3,0,2"/>
+   <wangtile tileid="124" wangid="0,2,0,3,0,2,0,3"/>
+   <wangtile tileid="160" wangid="0,2,0,4,0,2,0,2"/>
+   <wangtile tileid="161" wangid="0,2,0,4,0,4,0,2"/>
+   <wangtile tileid="162" wangid="0,2,0,2,0,4,0,2"/>
+   <wangtile tileid="180" wangid="0,6,0,2,0,5,0,6"/>
+   <wangtile tileid="181" wangid="0,6,0,5,0,2,0,6"/>
+   <wangtile tileid="182" wangid="0,5,0,2,0,6,0,6"/>
+   <wangtile tileid="183" wangid="0,6,0,6,0,2,0,5"/>
+   <wangtile tileid="200" wangid="0,4,0,4,0,2,0,2"/>
+   <wangtile tileid="201" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="202" wangid="0,2,0,2,0,4,0,4"/>
+   <wangtile tileid="220" wangid="0,2,0,6,0,6,0,5"/>
+   <wangtile tileid="221" wangid="0,5,0,6,0,6,0,2"/>
+   <wangtile tileid="222" wangid="0,2,0,5,0,6,0,6"/>
+   <wangtile tileid="223" wangid="0,6,0,6,0,5,0,2"/>
+   <wangtile tileid="240" wangid="0,4,0,2,0,2,0,2"/>
+   <wangtile tileid="241" wangid="0,4,0,2,0,2,0,4"/>
+   <wangtile tileid="242" wangid="0,2,0,2,0,2,0,4"/>
+   <wangtile tileid="260" wangid="0,6,0,7,0,5,0,6"/>
+   <wangtile tileid="261" wangid="0,6,0,5,0,7,0,6"/>
+   <wangtile tileid="262" wangid="0,5,0,7,0,6,0,6"/>
+   <wangtile tileid="263" wangid="0,6,0,6,0,7,0,5"/>
+   <wangtile tileid="280" wangid="0,0,0,1,0,0,0,0"/>
+   <wangtile tileid="281" wangid="0,0,0,1,0,1,0,0"/>
+   <wangtile tileid="282" wangid="0,0,0,0,0,1,0,0"/>
+   <wangtile tileid="283" wangid="0,1,0,1,0,1,0,0"/>
+   <wangtile tileid="284" wangid="0,0,0,1,0,1,0,1"/>
+   <wangtile tileid="285" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="300" wangid="0,7,0,6,0,6,0,5"/>
+   <wangtile tileid="301" wangid="0,5,0,6,0,6,0,7"/>
+   <wangtile tileid="302" wangid="0,7,0,5,0,6,0,6"/>
+   <wangtile tileid="303" wangid="0,6,0,6,0,5,0,7"/>
+   <wangtile tileid="320" wangid="0,1,0,1,0,0,0,0"/>
+   <wangtile tileid="321" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="322" wangid="0,0,0,0,0,1,0,1"/>
+   <wangtile tileid="323" wangid="0,1,0,1,0,0,0,1"/>
+   <wangtile tileid="324" wangid="0,1,0,0,0,1,0,1"/>
+   <wangtile tileid="325" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="340" wangid="0,6,0,7,0,2,0,6"/>
+   <wangtile tileid="341" wangid="0,6,0,2,0,7,0,6"/>
+   <wangtile tileid="342" wangid="0,2,0,7,0,6,0,6"/>
+   <wangtile tileid="343" wangid="0,6,0,6,0,7,0,2"/>
+   <wangtile tileid="360" wangid="0,1,0,0,0,0,0,0"/>
+   <wangtile tileid="361" wangid="0,1,0,0,0,0,0,1"/>
+   <wangtile tileid="362" wangid="0,0,0,0,0,0,0,1"/>
+   <wangtile tileid="363" wangid="0,1,0,0,0,1,0,0"/>
+   <wangtile tileid="364" wangid="0,0,0,1,0,0,0,1"/>
+   <wangtile tileid="365" wangid="0,5,0,0,0,0,0,0"/>
+   <wangtile tileid="366" wangid="0,0,0,0,0,0,0,5"/>
+   <wangtile tileid="380" wangid="0,7,0,6,0,6,0,2"/>
+   <wangtile tileid="381" wangid="0,2,0,6,0,6,0,7"/>
+   <wangtile tileid="382" wangid="0,7,0,2,0,6,0,6"/>
+   <wangtile tileid="383" wangid="0,6,0,6,0,2,0,7"/>
+   <wangtile tileid="400" wangid="0,2,0,5,0,2,0,2"/>
+   <wangtile tileid="401" wangid="0,2,0,5,0,5,0,2"/>
+   <wangtile tileid="402" wangid="0,2,0,2,0,5,0,2"/>
+   <wangtile tileid="403" wangid="0,5,0,5,0,5,0,2"/>
+   <wangtile tileid="404" wangid="0,2,0,5,0,5,0,5"/>
+   <wangtile tileid="420" wangid="0,2,0,6,0,2,0,2"/>
+   <wangtile tileid="421" wangid="0,2,0,6,0,6,0,2"/>
+   <wangtile tileid="422" wangid="0,2,0,2,0,6,0,2"/>
+   <wangtile tileid="423" wangid="0,6,0,6,0,6,0,2"/>
+   <wangtile tileid="424" wangid="0,2,0,6,0,6,0,6"/>
+   <wangtile tileid="440" wangid="0,5,0,5,0,2,0,2"/>
+   <wangtile tileid="441" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="442" wangid="0,2,0,2,0,5,0,5"/>
+   <wangtile tileid="443" wangid="0,5,0,5,0,2,0,5"/>
+   <wangtile tileid="444" wangid="0,5,0,2,0,5,0,5"/>
+   <wangtile tileid="460" wangid="0,6,0,6,0,2,0,2"/>
+   <wangtile tileid="461" wangid="0,6,0,6,0,6,0,6"/>
+   <wangtile tileid="462" wangid="0,2,0,2,0,6,0,6"/>
+   <wangtile tileid="463" wangid="0,6,0,6,0,2,0,6"/>
+   <wangtile tileid="464" wangid="0,6,0,2,0,6,0,6"/>
+   <wangtile tileid="480" wangid="0,5,0,2,0,2,0,2"/>
+   <wangtile tileid="481" wangid="0,5,0,2,0,2,0,5"/>
+   <wangtile tileid="482" wangid="0,2,0,2,0,2,0,5"/>
+   <wangtile tileid="483" wangid="0,5,0,2,0,5,0,2"/>
+   <wangtile tileid="484" wangid="0,2,0,5,0,2,0,5"/>
+   <wangtile tileid="500" wangid="0,6,0,2,0,2,0,2"/>
+   <wangtile tileid="501" wangid="0,6,0,2,0,2,0,6"/>
+   <wangtile tileid="502" wangid="0,2,0,2,0,2,0,6"/>
+   <wangtile tileid="503" wangid="0,6,0,2,0,6,0,2"/>
+   <wangtile tileid="504" wangid="0,2,0,6,0,2,0,6"/>
+   <wangtile tileid="520" wangid="0,7,0,5,0,7,0,7"/>
+   <wangtile tileid="521" wangid="0,7,0,5,0,5,0,7"/>
+   <wangtile tileid="522" wangid="0,7,0,7,0,5,0,7"/>
+   <wangtile tileid="523" wangid="0,5,0,5,0,5,0,7"/>
+   <wangtile tileid="524" wangid="0,7,0,5,0,5,0,5"/>
+   <wangtile tileid="540" wangid="0,5,0,6,0,5,0,5"/>
+   <wangtile tileid="541" wangid="0,5,0,6,0,6,0,5"/>
+   <wangtile tileid="542" wangid="0,5,0,5,0,6,0,5"/>
+   <wangtile tileid="543" wangid="0,6,0,6,0,6,0,5"/>
+   <wangtile tileid="544" wangid="0,5,0,6,0,6,0,6"/>
+   <wangtile tileid="560" wangid="0,5,0,5,0,7,0,7"/>
+   <wangtile tileid="561" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="562" wangid="0,7,0,7,0,5,0,5"/>
+   <wangtile tileid="563" wangid="0,5,0,5,0,7,0,5"/>
+   <wangtile tileid="564" wangid="0,5,0,7,0,5,0,5"/>
+   <wangtile tileid="580" wangid="0,6,0,6,0,5,0,5"/>
+   <wangtile tileid="581" wangid="0,6,0,6,0,6,0,6"/>
+   <wangtile tileid="582" wangid="0,5,0,5,0,6,0,6"/>
+   <wangtile tileid="583" wangid="0,6,0,6,0,5,0,6"/>
+   <wangtile tileid="584" wangid="0,6,0,5,0,6,0,6"/>
+   <wangtile tileid="600" wangid="0,5,0,7,0,7,0,7"/>
+   <wangtile tileid="601" wangid="0,5,0,7,0,7,0,5"/>
+   <wangtile tileid="602" wangid="0,7,0,7,0,7,0,5"/>
+   <wangtile tileid="603" wangid="0,5,0,7,0,5,0,7"/>
+   <wangtile tileid="604" wangid="0,7,0,5,0,7,0,5"/>
+   <wangtile tileid="620" wangid="0,6,0,5,0,5,0,5"/>
+   <wangtile tileid="621" wangid="0,6,0,5,0,5,0,6"/>
+   <wangtile tileid="622" wangid="0,5,0,5,0,5,0,6"/>
+   <wangtile tileid="623" wangid="0,6,0,5,0,6,0,5"/>
+   <wangtile tileid="624" wangid="0,5,0,6,0,5,0,6"/>
+   <wangtile tileid="640" wangid="0,2,0,7,0,2,0,2"/>
+   <wangtile tileid="641" wangid="0,2,0,7,0,7,0,2"/>
+   <wangtile tileid="642" wangid="0,2,0,2,0,7,0,2"/>
+   <wangtile tileid="643" wangid="0,2,0,7,0,2,0,2"/>
+   <wangtile tileid="644" wangid="0,2,0,2,0,7,0,2"/>
+   <wangtile tileid="652" wangid="0,0,0,12,0,0,0,0"/>
+   <wangtile tileid="653" wangid="0,0,0,12,0,12,0,0"/>
+   <wangtile tileid="654" wangid="0,0,0,0,0,12,0,0"/>
+   <wangtile tileid="655" wangid="0,12,0,12,0,12,0,0"/>
+   <wangtile tileid="656" wangid="0,0,0,12,0,12,0,12"/>
+   <wangtile tileid="657" wangid="0,12,0,12,0,12,0,12"/>
+   <wangtile tileid="660" wangid="0,7,0,6,0,7,0,7"/>
+   <wangtile tileid="661" wangid="0,7,0,6,0,6,0,7"/>
+   <wangtile tileid="662" wangid="0,7,0,7,0,6,0,7"/>
+   <wangtile tileid="663" wangid="0,6,0,6,0,6,0,7"/>
+   <wangtile tileid="664" wangid="0,7,0,6,0,6,0,6"/>
+   <wangtile tileid="680" wangid="0,7,0,7,0,2,0,2"/>
+   <wangtile tileid="681" wangid="0,7,0,7,0,7,0,7"/>
+   <wangtile tileid="682" wangid="0,2,0,2,0,7,0,7"/>
+   <wangtile tileid="683" wangid="0,7,0,2,0,2,0,2"/>
+   <wangtile tileid="684" wangid="0,2,0,2,0,2,0,7"/>
+   <wangtile tileid="685" wangid="0,2,0,7,0,5,0,5"/>
+   <wangtile tileid="686" wangid="0,5,0,5,0,7,0,2"/>
+   <wangtile tileid="687" wangid="0,5,0,7,0,2,0,5"/>
+   <wangtile tileid="688" wangid="0,5,0,2,0,7,0,5"/>
+   <wangtile tileid="692" wangid="0,12,0,12,0,0,0,0"/>
+   <wangtile tileid="693" wangid="0,12,0,12,0,12,0,12"/>
+   <wangtile tileid="694" wangid="0,0,0,0,0,12,0,12"/>
+   <wangtile tileid="695" wangid="0,12,0,12,0,0,0,12"/>
+   <wangtile tileid="696" wangid="0,12,0,0,0,12,0,12"/>
+   <wangtile tileid="697" wangid="0,12,0,12,0,12,0,12"/>
+   <wangtile tileid="700" wangid="0,6,0,6,0,7,0,7"/>
+   <wangtile tileid="701" wangid="0,6,0,6,0,6,0,6"/>
+   <wangtile tileid="702" wangid="0,7,0,7,0,6,0,6"/>
+   <wangtile tileid="703" wangid="0,6,0,6,0,7,0,6"/>
+   <wangtile tileid="704" wangid="0,6,0,7,0,6,0,6"/>
+   <wangtile tileid="720" wangid="0,7,0,2,0,2,0,2"/>
+   <wangtile tileid="721" wangid="0,7,0,2,0,2,0,7"/>
+   <wangtile tileid="722" wangid="0,2,0,2,0,2,0,7"/>
+   <wangtile tileid="725" wangid="0,7,0,2,0,5,0,5"/>
+   <wangtile tileid="726" wangid="0,5,0,5,0,2,0,7"/>
+   <wangtile tileid="727" wangid="0,7,0,5,0,5,0,2"/>
+   <wangtile tileid="728" wangid="0,2,0,5,0,5,0,7"/>
+   <wangtile tileid="732" wangid="0,12,0,0,0,0,0,0"/>
+   <wangtile tileid="733" wangid="0,12,0,0,0,0,0,12"/>
+   <wangtile tileid="734" wangid="0,0,0,0,0,0,0,12"/>
+   <wangtile tileid="735" wangid="0,12,0,0,0,12,0,0"/>
+   <wangtile tileid="736" wangid="0,0,0,12,0,0,0,12"/>
+   <wangtile tileid="737" wangid="0,12,0,12,0,12,0,12"/>
+   <wangtile tileid="740" wangid="0,6,0,7,0,7,0,7"/>
+   <wangtile tileid="741" wangid="0,6,0,7,0,7,0,6"/>
+   <wangtile tileid="742" wangid="0,7,0,7,0,7,0,6"/>
+   <wangtile tileid="743" wangid="0,6,0,7,0,6,0,7"/>
+   <wangtile tileid="744" wangid="0,7,0,6,0,7,0,6"/>
+   <wangtile tileid="760" wangid="0,10,0,9,0,10,0,10"/>
+   <wangtile tileid="761" wangid="0,10,0,9,0,9,0,10"/>
+   <wangtile tileid="762" wangid="0,10,0,10,0,9,0,10"/>
+   <wangtile tileid="763" wangid="0,9,0,9,0,9,0,10"/>
+   <wangtile tileid="764" wangid="0,10,0,9,0,9,0,9"/>
+   <wangtile tileid="780" wangid="0,9,0,8,0,9,0,9"/>
+   <wangtile tileid="781" wangid="0,9,0,8,0,8,0,9"/>
+   <wangtile tileid="782" wangid="0,9,0,9,0,8,0,9"/>
+   <wangtile tileid="783" wangid="0,8,0,8,0,8,0,9"/>
+   <wangtile tileid="784" wangid="0,9,0,8,0,8,0,8"/>
+   <wangtile tileid="800" wangid="0,9,0,9,0,10,0,10"/>
+   <wangtile tileid="801" wangid="0,9,0,9,0,9,0,9"/>
+   <wangtile tileid="802" wangid="0,10,0,10,0,9,0,9"/>
+   <wangtile tileid="803" wangid="0,9,0,9,0,10,0,9"/>
+   <wangtile tileid="804" wangid="0,9,0,10,0,9,0,9"/>
+   <wangtile tileid="820" wangid="0,8,0,8,0,9,0,9"/>
+   <wangtile tileid="821" wangid="0,8,0,8,0,8,0,8"/>
+   <wangtile tileid="822" wangid="0,9,0,9,0,8,0,8"/>
+   <wangtile tileid="823" wangid="0,8,0,8,0,9,0,8"/>
+   <wangtile tileid="824" wangid="0,8,0,9,0,8,0,8"/>
+   <wangtile tileid="840" wangid="0,9,0,10,0,10,0,10"/>
+   <wangtile tileid="841" wangid="0,9,0,10,0,10,0,9"/>
+   <wangtile tileid="842" wangid="0,10,0,10,0,10,0,9"/>
+   <wangtile tileid="843" wangid="0,9,0,10,0,9,0,10"/>
+   <wangtile tileid="844" wangid="0,10,0,9,0,10,0,9"/>
+   <wangtile tileid="860" wangid="0,8,0,9,0,9,0,9"/>
+   <wangtile tileid="861" wangid="0,8,0,9,0,9,0,8"/>
+   <wangtile tileid="862" wangid="0,9,0,9,0,9,0,8"/>
+   <wangtile tileid="863" wangid="0,8,0,9,0,8,0,9"/>
+   <wangtile tileid="864" wangid="0,9,0,8,0,9,0,8"/>
+   <wangtile tileid="896" wangid="0,10,0,10,0,10,0,10"/>
+   <wangtile tileid="897" wangid="0,11,0,11,0,11,0,11"/>
+   <wangtile tileid="898" wangid="0,11,0,11,0,11,0,11"/>
+   <wangtile tileid="899" wangid="0,11,0,11,0,11,0,11"/>
+   <wangtile tileid="936" wangid="0,2,0,11,0,2,0,2"/>
+   <wangtile tileid="937" wangid="0,2,0,11,0,11,0,2"/>
+   <wangtile tileid="938" wangid="0,2,0,2,0,11,0,2"/>
+   <wangtile tileid="939" wangid="0,11,0,11,0,11,0,11"/>
+   <wangtile tileid="976" wangid="0,11,0,11,0,2,0,2"/>
+   <wangtile tileid="977" wangid="0,11,0,11,0,11,0,11"/>
+   <wangtile tileid="978" wangid="0,2,0,2,0,11,0,11"/>
+   <wangtile tileid="1016" wangid="0,11,0,2,0,2,0,2"/>
+   <wangtile tileid="1017" wangid="0,11,0,2,0,2,0,11"/>
+   <wangtile tileid="1018" wangid="0,2,0,2,0,2,0,11"/>
+   <wangtile tileid="1056" wangid="0,11,0,11,0,11,0,2"/>
+   <wangtile tileid="1057" wangid="0,2,0,11,0,11,0,11"/>
+   <wangtile tileid="1058" wangid="0,11,0,2,0,11,0,2"/>
+   <wangtile tileid="1059" wangid="0,2,0,11,0,2,0,11"/>
+   <wangtile tileid="1096" wangid="0,11,0,11,0,2,0,11"/>
+   <wangtile tileid="1097" wangid="0,11,0,2,0,11,0,11"/>
+   <wangtile tileid="1136" wangid="0,6,0,11,0,2,0,6"/>
+   <wangtile tileid="1137" wangid="0,6,0,2,0,11,0,6"/>
+   <wangtile tileid="1138" wangid="0,2,0,11,0,6,0,6"/>
+   <wangtile tileid="1139" wangid="0,6,0,6,0,11,0,2"/>
+   <wangtile tileid="1176" wangid="0,11,0,6,0,6,0,2"/>
+   <wangtile tileid="1177" wangid="0,2,0,6,0,6,0,11"/>
+   <wangtile tileid="1178" wangid="0,11,0,2,0,6,0,6"/>
+   <wangtile tileid="1179" wangid="0,6,0,6,0,2,0,11"/>
+   <wangtile tileid="1216" wangid="0,11,0,6,0,11,0,11"/>
+   <wangtile tileid="1217" wangid="0,11,0,6,0,6,0,11"/>
+   <wangtile tileid="1218" wangid="0,11,0,11,0,6,0,11"/>
+   <wangtile tileid="1256" wangid="0,6,0,6,0,11,0,11"/>
+   <wangtile tileid="1257" wangid="0,6,0,6,0,6,0,6"/>
+   <wangtile tileid="1258" wangid="0,11,0,11,0,6,0,6"/>
+   <wangtile tileid="1296" wangid="0,6,0,11,0,11,0,11"/>
+   <wangtile tileid="1297" wangid="0,6,0,11,0,11,0,6"/>
+   <wangtile tileid="1298" wangid="0,11,0,11,0,11,0,6"/>
+   <wangtile tileid="1336" wangid="0,6,0,6,0,6,0,11"/>
+   <wangtile tileid="1337" wangid="0,11,0,6,0,6,0,6"/>
+   <wangtile tileid="1376" wangid="0,6,0,6,0,11,0,6"/>
+   <wangtile tileid="1377" wangid="0,6,0,11,0,6,0,6"/>
+   <wangtile tileid="1396" wangid="0,4,0,4,0,4,0,2"/>
+   <wangtile tileid="1397" wangid="0,2,0,4,0,4,0,4"/>
+   <wangtile tileid="1398" wangid="0,7,0,7,0,7,0,2"/>
+   <wangtile tileid="1399" wangid="0,2,0,7,0,7,0,7"/>
+   <wangtile tileid="1416" wangid="0,6,0,11,0,6,0,11"/>
+   <wangtile tileid="1417" wangid="0,11,0,6,0,11,0,6"/>
+   <wangtile tileid="1436" wangid="0,4,0,4,0,2,0,4"/>
+   <wangtile tileid="1437" wangid="0,4,0,2,0,4,0,4"/>
+   <wangtile tileid="1438" wangid="0,7,0,7,0,2,0,7"/>
+   <wangtile tileid="1439" wangid="0,7,0,2,0,7,0,7"/>
+   <wangtile tileid="1476" wangid="0,4,0,2,0,4,0,2"/>
+   <wangtile tileid="1477" wangid="0,2,0,4,0,2,0,4"/>
+   <wangtile tileid="1478" wangid="0,7,0,2,0,7,0,2"/>
+   <wangtile tileid="1479" wangid="0,2,0,7,0,2,0,7"/>
+   <wangtile tileid="1520" wangid="0,13,0,16,0,13,0,13"/>
+   <wangtile tileid="1521" wangid="0,13,0,16,0,16,0,13"/>
+   <wangtile tileid="1522" wangid="0,13,0,13,0,16,0,13"/>
+   <wangtile tileid="1523" wangid="0,16,0,16,0,16,0,13"/>
+   <wangtile tileid="1524" wangid="0,13,0,16,0,16,0,16"/>
+   <wangtile tileid="1525" wangid="0,13,0,2,0,13,0,13"/>
+   <wangtile tileid="1526" wangid="0,13,0,2,0,2,0,13"/>
+   <wangtile tileid="1527" wangid="0,13,0,13,0,2,0,13"/>
+   <wangtile tileid="1528" wangid="0,2,0,2,0,2,0,13"/>
+   <wangtile tileid="1529" wangid="0,13,0,2,0,2,0,2"/>
+   <wangtile tileid="1530" wangid="0,13,0,14,0,13,0,13"/>
+   <wangtile tileid="1531" wangid="0,13,0,14,0,14,0,13"/>
+   <wangtile tileid="1532" wangid="0,13,0,13,0,14,0,13"/>
+   <wangtile tileid="1533" wangid="0,14,0,14,0,14,0,13"/>
+   <wangtile tileid="1534" wangid="0,13,0,14,0,14,0,14"/>
+   <wangtile tileid="1535" wangid="0,14,0,15,0,14,0,14"/>
+   <wangtile tileid="1536" wangid="0,14,0,15,0,15,0,14"/>
+   <wangtile tileid="1537" wangid="0,14,0,14,0,15,0,14"/>
+   <wangtile tileid="1538" wangid="0,15,0,15,0,15,0,14"/>
+   <wangtile tileid="1539" wangid="0,14,0,15,0,15,0,15"/>
+   <wangtile tileid="1560" wangid="0,16,0,16,0,13,0,13"/>
+   <wangtile tileid="1561" wangid="0,16,0,16,0,16,0,16"/>
+   <wangtile tileid="1562" wangid="0,13,0,13,0,16,0,16"/>
+   <wangtile tileid="1563" wangid="0,16,0,16,0,13,0,16"/>
+   <wangtile tileid="1564" wangid="0,16,0,13,0,16,0,16"/>
+   <wangtile tileid="1565" wangid="0,2,0,2,0,13,0,13"/>
+   <wangtile tileid="1567" wangid="0,13,0,13,0,2,0,2"/>
+   <wangtile tileid="1568" wangid="0,2,0,2,0,13,0,2"/>
+   <wangtile tileid="1569" wangid="0,2,0,13,0,2,0,2"/>
+   <wangtile tileid="1570" wangid="0,14,0,14,0,13,0,13"/>
+   <wangtile tileid="1571" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1572" wangid="0,13,0,13,0,14,0,14"/>
+   <wangtile tileid="1573" wangid="0,14,0,14,0,13,0,14"/>
+   <wangtile tileid="1574" wangid="0,14,0,13,0,14,0,14"/>
+   <wangtile tileid="1575" wangid="0,15,0,15,0,14,0,14"/>
+   <wangtile tileid="1576" wangid="0,15,0,15,0,15,0,15"/>
+   <wangtile tileid="1577" wangid="0,14,0,14,0,15,0,15"/>
+   <wangtile tileid="1578" wangid="0,15,0,15,0,14,0,15"/>
+   <wangtile tileid="1579" wangid="0,15,0,14,0,15,0,15"/>
+   <wangtile tileid="1600" wangid="0,16,0,13,0,13,0,13"/>
+   <wangtile tileid="1601" wangid="0,16,0,13,0,13,0,16"/>
+   <wangtile tileid="1602" wangid="0,13,0,13,0,13,0,16"/>
+   <wangtile tileid="1603" wangid="0,16,0,13,0,16,0,13"/>
+   <wangtile tileid="1604" wangid="0,13,0,16,0,13,0,16"/>
+   <wangtile tileid="1605" wangid="0,2,0,13,0,13,0,13"/>
+   <wangtile tileid="1606" wangid="0,2,0,13,0,13,0,2"/>
+   <wangtile tileid="1607" wangid="0,13,0,13,0,13,0,2"/>
+   <wangtile tileid="1608" wangid="0,2,0,13,0,2,0,13"/>
+   <wangtile tileid="1609" wangid="0,13,0,2,0,13,0,2"/>
+   <wangtile tileid="1610" wangid="0,14,0,13,0,13,0,13"/>
+   <wangtile tileid="1611" wangid="0,14,0,13,0,13,0,14"/>
+   <wangtile tileid="1612" wangid="0,13,0,13,0,13,0,14"/>
+   <wangtile tileid="1613" wangid="0,14,0,13,0,14,0,13"/>
+   <wangtile tileid="1614" wangid="0,13,0,14,0,13,0,14"/>
+   <wangtile tileid="1615" wangid="0,15,0,14,0,14,0,14"/>
+   <wangtile tileid="1616" wangid="0,15,0,14,0,14,0,15"/>
+   <wangtile tileid="1617" wangid="0,14,0,14,0,14,0,15"/>
+   <wangtile tileid="1618" wangid="0,15,0,14,0,15,0,14"/>
+   <wangtile tileid="1619" wangid="0,14,0,15,0,14,0,15"/>
+   <wangtile tileid="1640" wangid="0,13,0,13,0,13,0,13"/>
+   <wangtile tileid="1641" wangid="0,13,0,13,0,13,0,13"/>
+   <wangtile tileid="1642" wangid="0,13,0,13,0,13,0,13"/>
+   <wangtile tileid="1646" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1647" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1648" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1649" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1650" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1658" wangid="0,15,0,15,0,15,0,15"/>
+   <wangtile tileid="1659" wangid="0,15,0,15,0,15,0,15"/>
+   <wangtile tileid="1680" wangid="0,2,0,14,0,2,0,2"/>
+   <wangtile tileid="1681" wangid="0,2,0,14,0,14,0,2"/>
+   <wangtile tileid="1682" wangid="0,2,0,2,0,14,0,2"/>
+   <wangtile tileid="1683" wangid="0,14,0,14,0,14,0,2"/>
+   <wangtile tileid="1684" wangid="0,2,0,14,0,14,0,14"/>
+   <wangtile tileid="1686" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1687" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1688" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1698" wangid="0,15,0,15,0,15,0,15"/>
+   <wangtile tileid="1699" wangid="0,15,0,15,0,15,0,15"/>
+   <wangtile tileid="1720" wangid="0,14,0,14,0,2,0,2"/>
+   <wangtile tileid="1721" wangid="0,14,0,14,0,14,0,14"/>
+   <wangtile tileid="1722" wangid="0,2,0,2,0,14,0,14"/>
+   <wangtile tileid="1723" wangid="0,14,0,14,0,2,0,14"/>
+   <wangtile tileid="1724" wangid="0,14,0,2,0,14,0,14"/>
+   <wangtile tileid="1760" wangid="0,14,0,2,0,2,0,2"/>
+   <wangtile tileid="1761" wangid="0,14,0,2,0,2,0,14"/>
+   <wangtile tileid="1762" wangid="0,2,0,2,0,2,0,14"/>
+   <wangtile tileid="1763" wangid="0,14,0,2,0,14,0,2"/>
+   <wangtile tileid="1764" wangid="0,2,0,14,0,2,0,14"/>
+   <wangtile tileid="1800" wangid="0,2,0,14,0,2,0,2"/>
+   <wangtile tileid="1802" wangid="0,2,0,2,0,14,0,2"/>
+   <wangtile tileid="1880" wangid="0,14,0,2,0,2,0,2"/>
+   <wangtile tileid="1882" wangid="0,2,0,2,0,2,0,14"/>
+   <wangtile tileid="1964" wangid="0,2,0,0,0,0,0,0"/>
+  </wangset>
+ </wangsets>
 </tileset>

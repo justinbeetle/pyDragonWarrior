@@ -127,39 +127,41 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return None
 
     def get_overlapping_overlay_mask_layer_index(self, pos_dat_tile: Point) -> Optional[int]:
-        def name_filter(name: Optional[str]) -> bool:
-            return not name or not name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
-        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, name_filter)
+        def layer_filter(layer: pytmx.pytmx.TiledObjectGroup) -> bool:
+            return 'is_overlay' in layer.properties and layer.properties['is_overlay']
+        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, layer_filter)
         if object_group_info:
             return object_group_info[0]
         return None
 
     def get_overlapping_monster_set_layer_name(self, pos_dat_tile: Point) -> Optional[str]:
-        def name_filter(name: Optional[str]) -> bool:
-            return isinstance(name, str) and name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
-        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, name_filter)
+        # TODO: Change this to be property driven
+        def layer_filter(layer: pytmx.pytmx.TiledObjectGroup) -> bool:
+            return isinstance(layer.name, str) and \
+                   layer.name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
+        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, layer_filter)
         if object_group_info:
             return object_group_info[1]
         return None
 
     def get_overlapping_object_group_info(self,
                                           pos_dat_tile: Point,
-                                          name_filter: Optional[Callable[[Optional[str]], bool]] = None) \
+                                          layer_filter: Optional[Callable[[pytmx.pytmx.TiledObjectGroup], bool]] = None) \
             -> Optional[Tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
-        for idx, l in enumerate(self.tmx.layers):
-            if not isinstance(l, pytmx.pytmx.TiledObjectGroup):
+        for idx, layer in enumerate(self.tmx.layers):
+            if not isinstance(layer, pytmx.pytmx.TiledObjectGroup):
                 continue
-            for obj in l:
-                if name_filter and not name_filter(l.name):
-                    # If a name filter was specified, skip layer names which do not conform to the filter
+            for obj in layer:
+                if layer_filter and not layer_filter(layer):
+                    # If a layer filter was specified, skip layers which do not conform to the filter
                     continue
                 rect = pygame.Rect(obj.x / self.tmx.tilewidth,
                                    obj.y / self.tmx.tileheight,
                                    obj.width / self.tmx.tilewidth,
                                    obj.height / self.tmx.tileheight)
                 if rect.collidepoint(pos_dat_tile.get_as_int_tuple()):
-                    return idx, l.name
+                    return idx, layer.name
         return None
 
     def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:

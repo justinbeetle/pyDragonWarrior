@@ -73,7 +73,8 @@
 
       <xi:include href="data/maps/map_tantegel_lvl2_legacy.xml" parse="xml"/>
 
-      <xi:include href="data/maps/map_tantegel_lvl1_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl1_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_tantegel_lvl1_tiled.xml" parse="xml"/>
 
       <xi:include href="data/maps/map_tantegel_lvl0_legacy.xml" parse="xml"/>
 
