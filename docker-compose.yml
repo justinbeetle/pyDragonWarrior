@@ -1,0 +1,7 @@
+version: '3.10'
+
+services:
+app:
+    build: .
+    environment:
+    DISPLAY: host.docker.internal:0

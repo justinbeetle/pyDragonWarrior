@@ -17,7 +17,8 @@ out-and-out clone or reimagining.
 ## Installation
 
 1. Install python: Install the latest Python 3 version from https://www.python.org/downloads
-2. Install pyDragonWarrior: git clone https://github.com/justinbeetle/pyDragonWarrior.git
+2. Install git: Install the latest git version from https://git-scm.com/downloads
+3. Install pyDragonWarrior: git clone https://github.com/justinbeetle/pyDragonWarrior.git
  
 ## Running
 
@@ -47,6 +48,23 @@ Note: Gamepad support has only been tested with an XBox One controller.
 * Provides both a classic and math (default) combat mode, where the math mode is hardcoded to reinforce the learning of
 my fourth grader
 * Game content is (mostly) configurable, providing a game engine capable of being repurposed to tell alternate stories
+
+## Building for Distribution
+
+### Using PyInstaller on Windows
+
+1. python -m venv pyinstaller_venv
+2. source pyinstaller_venv/Scripts/activate
+3. pip install .
+4. pip install pyinstaller
+5. pyinstaller --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./"
+--add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png
+src/pydw/game.py
+
+### Using Docker
+
+1. docker build -t pydw .
+2. docker run pydw (requires X11 forwarding!)
 
 ## Credits
 
