@@ -91,7 +91,7 @@ def main() -> None:
                     print(f'Not running in a venv, will switch to {venv_path}', flush=True)
             else:
                 venv_path = None
-                print('ERROR: Failed to identify a venv path to which the current user has write access', deaflush=True)
+                print('ERROR: Failed to identify a venv path to which the current user has write access', flush=True)
         else:
             venv_path = os.environ['VIRTUAL_ENV']
             if args.verbose:
