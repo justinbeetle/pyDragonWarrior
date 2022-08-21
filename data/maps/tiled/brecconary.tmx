@@ -580,7 +580,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
   </layer>
-  <layer id="38" name="decoration (populated)" width="80" height="64" locked="1">
+  <layer id="38" name="decoration (populated)" width="80" height="64" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="false"/>
    </properties>
@@ -1082,50 +1082,50 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
   </layer>
-  <objectgroup id="46" name="tower" locked="1">
+  <objectgroup id="46" name="tower" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="48" x="1024" y="112" width="48" height="48"/>
   </objectgroup>
-  <objectgroup id="47" name="walls" locked="1">
+  <objectgroup id="47" name="walls" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="49" x="944" y="160" width="48" height="16"/>
   </objectgroup>
-  <objectgroup id="23" name="roof inn" locked="1">
+  <objectgroup id="23" name="roof inn" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="7" x="480" y="544" width="176" height="208"/>
    <object id="9" x="656" y="544" width="80" height="48"/>
   </objectgroup>
-  <objectgroup id="25" name="roof house 2" locked="1">
+  <objectgroup id="25" name="roof house 2" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="25" x="880" y="384" width="80" height="48"/>
   </objectgroup>
-  <objectgroup id="24" name="roof house 1" locked="1">
+  <objectgroup id="24" name="roof house 1" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="24" x="784" y="384" width="80" height="48"/>
   </objectgroup>
-  <objectgroup id="26" name="roof blacksmith" locked="1">
+  <objectgroup id="26" name="roof blacksmith" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="23" x="480" y="272" width="112" height="64"/>
   </objectgroup>
-  <objectgroup id="27" name="roof tool shop" locked="1">
+  <objectgroup id="27" name="roof tool shop" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>
    <object id="26" x="896" y="640" width="48" height="48"/>
   </objectgroup>
-  <objectgroup id="29" name="roof fairy shop" locked="1">
+  <objectgroup id="29" name="roof fairy shop" visible="0" locked="1">
    <properties>
     <property name="is_overlay" type="bool" value="true"/>
    </properties>

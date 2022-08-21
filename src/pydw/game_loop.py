@@ -160,7 +160,8 @@ class GameLoop:
                     pc_name_or_file_name = self.gde.wait_for_user_input(message_dialog,  'What is your name?')[0]
 
                     if pc_name_or_file_name in saved_games:
-                        message_dialog.add_message('Thou hast already started a quest.  Dost thou want to start over?')
+                        self.gde.add_and_wait_for_message(
+                            'Thou hast already started a quest.  Dost thou want to start over?', message_dialog)
                         message_dialog.add_yes_no_prompt()
                         message_dialog.blit(self.game_state.screen, True)
                         menu_result = self.gde.get_menu_result(message_dialog)
