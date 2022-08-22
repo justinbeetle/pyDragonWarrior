@@ -1417,9 +1417,13 @@
    <property name="type" value="barrier"/>
   </properties>
   <animation>
-   <frame tileid="280" duration="800"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
    <frame tileid="281" duration="200"/>
-   <frame tileid="282" duration="400"/>
+   <frame tileid="282" duration="200"/>
+   <frame tileid="282" duration="200"/>
    <frame tileid="283" duration="200"/>
   </animation>
  </tile>
@@ -1429,9 +1433,13 @@
   </properties>
   <animation>
    <frame tileid="281" duration="200"/>
-   <frame tileid="282" duration="400"/>
+   <frame tileid="282" duration="200"/>
+   <frame tileid="282" duration="200"/>
    <frame tileid="283" duration="200"/>
-   <frame tileid="280" duration="800"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
+   <frame tileid="280" duration="200"/>
   </animation>
  </tile>
  <tile id="283">
