@@ -399,6 +399,8 @@ class GameDialogEvaluator:
                 item_row_data = self.hero_party.get_item_row_data(True, item_types)
                 if len(item_row_data) == 0:
                     self.traverse_dialog(message_dialog, 'Thou dost not have any items to sell.', depth + 1, npc=npc)
+                    self.replacement_variables.generic.pop('[ITEM]', None)
+                    self.replacement_variables.generic.pop('[COST]', None)
                     continue
                 self.wait_before_new_text = False
                 # print( 'Set self.traverse_dialog_wait_before_new_text to False', flush=True )

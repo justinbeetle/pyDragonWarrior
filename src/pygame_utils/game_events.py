@@ -127,6 +127,8 @@ def _remap_keyboard_event(translate_wasd_to_uldr: bool,
             print(f'Failed to translate {event} to a KEYDOWN event', flush=True)
 
     if pygame.KEYDOWN == event.type:
+        # Convert KEYDOWN events on the number pad to regular number keys (with num lock) or arrow keys
+
         if translate_wasd_to_uldr:
             # Convert WASD to Up/Left/Down/Right
             if pygame.K_w == event.key:
@@ -137,7 +139,42 @@ def _remap_keyboard_event(translate_wasd_to_uldr: bool,
                 event.__dict__['key'] = pygame.K_DOWN
             elif pygame.K_d == event.key:
                 event.__dict__['key'] = pygame.K_RIGHT
-        if pygame.K_KP_ENTER == event.key:
+
+        if event.key in [pygame.K_KP0, pygame.K_KP1, pygame.K_KP2, pygame.K_KP3, pygame.K_KP4, pygame.K_KP5,
+                         pygame.K_KP6, pygame.K_KP7, pygame.K_KP8, pygame.K_KP9]:
+            if event.mod & pygame.KMOD_NUM:
+                # Convert numpad keys to numbers when numlock is on
+                if pygame.K_KP0 == event.key:
+                    event.__dict__['key'] = pygame.K_0
+                elif pygame.K_KP1 == event.key:
+                    event.__dict__['key'] = pygame.K_1
+                elif pygame.K_KP2 == event.key:
+                    event.__dict__['key'] = pygame.K_2
+                elif pygame.K_KP3 == event.key:
+                    event.__dict__['key'] = pygame.K_3
+                elif pygame.K_KP4 == event.key:
+                    event.__dict__['key'] = pygame.K_4
+                elif pygame.K_KP5 == event.key:
+                    event.__dict__['key'] = pygame.K_5
+                elif pygame.K_KP6 == event.key:
+                    event.__dict__['key'] = pygame.K_6
+                elif pygame.K_KP7 == event.key:
+                    event.__dict__['key'] = pygame.K_7
+                elif pygame.K_KP8 == event.key:
+                    event.__dict__['key'] = pygame.K_8
+                elif pygame.K_KP9 == event.key:
+                    event.__dict__['key'] = pygame.K_9
+            else:
+                # Convert numpad keys to arrow keys when numlock is off
+                if pygame.K_KP8 == event.key:
+                    event.__dict__['key'] = pygame.K_UP
+                if pygame.K_KP4 == event.key:
+                    event.__dict__['key'] = pygame.K_LEFT
+                if pygame.K_KP2 == event.key:
+                    event.__dict__['key'] = pygame.K_DOWN
+                if pygame.K_KP6 == event.key:
+                    event.__dict__['key'] = pygame.K_RIGHT
+        elif pygame.K_KP_ENTER == event.key:
             event.__dict__['key'] = pygame.K_RETURN
         elif pygame.K_e == event.key:
             if translate_e_to_enter:
@@ -171,15 +208,28 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
 
 
 def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
-    """ Generate key down events from pressed keys """
+    """ Generate key down events from pressed keys
+
+    Generate KEYDOWN event for help arrow keys, including WASD when they should be translated to the arrow keys and
+    the keypad keys when numlock is off.
+    """
     pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_UP] or (translate_wasd_to_uldr and pressed[pygame.K_w]):
+    not_num_lock = not pygame.key.get_mods() & pygame.KMOD_NUM
+    if pressed[pygame.K_UP] or \
+            (translate_wasd_to_uldr and pressed[pygame.K_w]) or \
+            (not_num_lock and pressed[pygame.K_KP8]):
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_UP}))
-    elif pressed[pygame.K_DOWN] or (translate_wasd_to_uldr and pressed[pygame.K_s]):
+    elif pressed[pygame.K_DOWN] or \
+            (translate_wasd_to_uldr and pressed[pygame.K_s]) or \
+            (not_num_lock and pressed[pygame.K_KP2]):
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_DOWN}))
-    if pressed[pygame.K_LEFT] or (translate_wasd_to_uldr and pressed[pygame.K_a]):
+    if pressed[pygame.K_LEFT] or \
+            (translate_wasd_to_uldr and pressed[pygame.K_a]) or \
+            (not_num_lock and pressed[pygame.K_KP4]):
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_LEFT}))
-    elif pressed[pygame.K_RIGHT] or (translate_wasd_to_uldr and pressed[pygame.K_d]):
+    elif pressed[pygame.K_RIGHT] or \
+            (translate_wasd_to_uldr and pressed[pygame.K_d]) or \
+            (not_num_lock and pressed[pygame.K_KP6]):
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_RIGHT}))
 
 
@@ -208,6 +258,15 @@ def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.
         for existing_event in events:
             if pygame.KEYDOWN == existing_event.type and existing_event.key == event.key:
                 # A KEYDOWN event of this type is already in events
+                if ( ('unicode' not in existing_event.__dict__ or '' == existing_event.__dict__['unicode']) and
+                     ('unicode' in event.__dict__ and '' != event.__dict__['unicode']) ):
+                    # Sometimes the unicode field of the KEYDOWN (and KEYUP) events is incorrectly set to ''.  If this
+                    # event has it where the existing event was missing it, then populate it in the existing event.
+                    # The TEXTINPUT events don't seem to have this glitch, but this implementation is all in on the
+                    # KEYDOWN events and translates TEXTINPUT events to KEYDOWN events.  This if statement will repair
+                    # offending KEYDOWN events using the TEXTINPUT event we have translated to a KEYDOWN event.
+                    print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
+                    existing_event.__dict__['unicode'] = event.__dict__['unicode']
                 # print('Not adding event as a duplicate is already present:', event, flush=True)
                 return
     events.append(event)
