@@ -1,4 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<MapDecoration type="chest" x="11" y="5">
-   <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
-   <Dialog>The tablet reads as follows:  "I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!"</Dialog></MapDecoration>
+<root>
+   <MapDecoration type="chest" x="11" y="5">
+      <Dialog>Fortune smiles upon thee, [NAME].  Thou hast found Erdrick's Tablet.</Dialog>
+      <Dialog>The tablet reads as follows:  "I am Erdrick and thou art my descendant. Three items were needed to reach the Isle of Dragons, which is south of Brecconary. I gathered these items, reached the island, and there defeated a creature of great evil. Now I have entrusted the three items to three worthy keepers. Their descendants will protect the items until thy quest leads thee to seek them out. When a new evil arises, find the three items, then fight!"</Dialog></MapDecoration>
+</root>

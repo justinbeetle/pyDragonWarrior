@@ -71,12 +71,14 @@
       <!--<xi:include href="data/maps/map_alefgard_legacy.xml" parse="xml"/>-->
       <xi:include href="data/maps/map_alefgard_tiled.xml" parse="xml"/>
 
-      <xi:include href="data/maps/map_tantegel_lvl2_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl2_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_tantegel_lvl2_tiled.xml" parse="xml"/>
 
       <!--<xi:include href="data/maps/map_tantegel_lvl1_legacy.xml" parse="xml"/>-->
       <xi:include href="data/maps/map_tantegel_lvl1_tiled.xml" parse="xml"/>
 
-      <xi:include href="data/maps/map_tantegel_lvl0_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl0_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_tantegel_lvl0_tiled.xml" parse="xml"/>
 
       <!--<xi:include href="data/maps/map_brecconary_legacy.xml" parse="xml"/>-->
       <xi:include href="data/maps/map_brecconary_tiled.xml" parse="xml"/>

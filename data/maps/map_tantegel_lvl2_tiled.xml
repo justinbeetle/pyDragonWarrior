@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Map name="tantegel_lvl2" tiles="tiled/tantegel_lvl2.tmx" music="throne" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
+      <PointTransition                                  x="9"   y="9"   dir="WEST"  toMap="tantegel_lvl1"/>
+
+      <MapLocation x="4" y="3" name="king"/>
+      <MapLocation x="7" y="3" name="princess"/>
+
+      <xi:include href="map_tantegel_lvl2_common.xml" parse="xml"/>
+   </Map>
+</root>

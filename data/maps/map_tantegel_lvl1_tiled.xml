@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Map name="tantegel_lvl1" tiles="tiled/tantegel_lvl1.tmx" music="castle" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-   <LeavingTransition x="37" y="58" dir="NORTH" toMap="overworld" leftX="27" rightX="57" topY="29" bottomY="59"/>
+   <LeavingTransition x="37" y="60" dir="NORTH" toMap="overworld" leftX="27" rightX="60" topY="29" bottomY="61"/>
    <PointTransition   x="34" y="36" dir="EAST"  toMap="tantegel_lvl2"/>
    <PointTransition   x="56" y="58" dir="SOUTH" toMap="tantegel_lvl0"/>
    <MapDecoration type="locked_sideways_metal_door"  x="31" y="42"/>
