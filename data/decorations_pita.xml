@@ -45,4 +45,6 @@
                widthTiles="1" heightTiles="1" walkable="yes"/>
    <Decoration name="barrier"                      image="clear.png"
                widthTiles="1" heightTiles="1" walkable="no"/>
+   <Decoration name="talking_bridge"               image="clear.png"
+               widthTiles="1" heightTiles="1" canTalkOver="yes"/>
 </root>

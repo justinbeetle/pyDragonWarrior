@@ -2053,7 +2053,7 @@
  </tile>
  <tile id="340">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="340" duration="240"/>
@@ -2066,7 +2066,7 @@
  </tile>
  <tile id="341">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="341" duration="240"/>
@@ -2079,7 +2079,7 @@
  </tile>
  <tile id="342">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="342" duration="240"/>
@@ -2092,7 +2092,7 @@
  </tile>
  <tile id="343">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="343" duration="240"/>
@@ -2293,7 +2293,7 @@
  </tile>
  <tile id="380">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="380" duration="240"/>
@@ -2306,7 +2306,7 @@
  </tile>
  <tile id="381">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="381" duration="240"/>
@@ -2319,7 +2319,7 @@
  </tile>
  <tile id="382">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="382" duration="240"/>
@@ -2332,7 +2332,7 @@
  </tile>
  <tile id="383">
   <properties>
-   <property name="type" value="water"/>
+   <property name="type" value="beach"/>
   </properties>
   <animation>
    <frame tileid="383" duration="240"/>

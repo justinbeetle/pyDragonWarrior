@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="14" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="55" nextobjectid="50">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="14" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="55" nextobjectid="50">
  <tileset firstgid="1" source="../../licensed_assets/itch.io/pita/rpg-dungeon-pack_v1.1/dungeon_tileset.tsx"/>
  <layer id="49" name="ground" width="14" height="14" locked="1">
   <properties>
@@ -22,7 +22,7 @@
 4,4,4,4,4,4,4,4,4,4,4,4,4,4
 </data>
  </layer>
- <layer id="50" name="object" width="14" height="14" locked="1">
+ <layer id="50" name="object" width="14" height="14">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>
   </properties>
@@ -37,7 +37,7 @@
 0,0,0,0,0,0,0,0,267,268,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,369,0,0,0,0,0,310,0,0,0,
+0,0,0,0,369,0,0,0,0,0,290,0,0,0,
 0,0,0,0,0,0,0,0,0,0,330,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -97,7 +97,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="51" name="object upper" width="14" height="14" locked="1">
+ <layer id="51" name="object upper" width="14" height="14">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -109,7 +109,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,349,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,310,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0

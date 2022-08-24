@@ -336,12 +336,13 @@ class Decoration(NamedTuple):
     width_tiles: int
     height_tiles: int
     image: pygame.surface.Surface
-    walkable: bool = True
+    walkable: Optional[bool] = True
     remove_with_search: bool = False
     remove_with_open: bool = False
     remove_with_key: bool = False
     remove_sound: Optional[str] = None
     removed_image: Optional[pygame.surface.Surface] = None
+    can_talk_over: Optional[bool] = None
 
 
 class CharacterType(NamedTuple):

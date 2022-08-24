@@ -30,13 +30,14 @@
 
    <!-- Bridge decoration needed for Rainbow Bridge -->
    <Decoration name="bridge"              image="bridge.png"              widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
-   <Decoration name="bridge_left_top"     image="clear.png"               widthTiles="1" heightTiles="1" walkable="no" boatable="yes"/>
-   <Decoration name="bridge_right_top"    image="clear.png"               widthTiles="1" heightTiles="1" walkable="no" boatable="yes"/>
+   <Decoration name="bridge_left_top"     image="clear.png"               widthTiles="1" heightTiles="1" walkable="no"  boatable="yes"/>
+   <Decoration name="bridge_right_top"    image="clear.png"               widthTiles="1" heightTiles="1" walkable="no"  boatable="yes"/>
    <Decoration name="bridge_left"         image="bridge.png"              widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
    <Decoration name="bridge_right"        image="bridge.png"              widthTiles="1" heightTiles="1" walkable="yes" boatable="yes"/>
 
    <Decoration name="pass"                image="clear.png"               widthTiles="1" heightTiles="1" walkable="yes"/>
    <Decoration name="barrier"             image="clear.png"               widthTiles="1" heightTiles="1" walkable="no"/>
+   <Decoration name="talking_bridge"      image="clear.png"               widthTiles="1" heightTiles="1" canTalkOver="yes"/>
 
    <!-- Decorations used in legacy maps -->
    <Decoration name="downstairs"          image="stairs_down.png"         widthTiles="1" heightTiles="1" walkable="yes"/>

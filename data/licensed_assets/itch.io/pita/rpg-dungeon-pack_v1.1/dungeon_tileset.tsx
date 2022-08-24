@@ -1449,12 +1449,12 @@
  </tile>
  <tile id="284">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="285">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="286">
@@ -1807,42 +1807,42 @@
  </tile>
  <tile id="352">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="353">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="354">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="355">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="356">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="357">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="358">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="359">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="360">
@@ -1970,6 +1970,12 @@
   <properties>
    <property name="type" value=""/>
   </properties>
+  <animation>
+   <frame tileid="383" duration="250"/>
+   <frame tileid="384" duration="250"/>
+   <frame tileid="385" duration="250"/>
+   <frame tileid="386" duration="250"/>
+  </animation>
  </tile>
  <tile id="384">
   <properties>
@@ -2138,17 +2144,17 @@
  </tile>
  <tile id="417">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="418">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="419">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="420">
@@ -2223,7 +2229,7 @@
  </tile>
  <tile id="434">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="435">
@@ -2343,12 +2349,12 @@
  </tile>
  <tile id="458">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="459">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="460">

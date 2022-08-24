@@ -6,6 +6,9 @@
       <MapLocation x="4" y="3" name="king"/>
       <MapLocation x="7" y="3" name="princess"/>
 
+      <MapDecoration type="talking_bridge" x="4" y="4"/>
+      <MapDecoration type="talking_bridge" x="7" y="4"/>
+
       <xi:include href="map_tantegel_lvl2_common.xml" parse="xml"/>
    </Map>
 </root>

@@ -548,17 +548,21 @@ class GameInfo:
             decoration_name = element.attrib['name']
             width_tiles = 1
             height_tiles = 1
-            walkable = True
+            walkable = None
             remove_with_search = False
             remove_with_open = False
             remove_with_key = False
             remove_sound = None
+            can_talk_over = None
             if 'widthTiles' in element.attrib:
                 width_tiles = int(element.attrib['widthTiles'])
             if 'heightTiles' in element.attrib:
                 height_tiles = int(element.attrib['heightTiles'])
             if 'walkable' in element.attrib:
-                walkable = element.attrib['walkable'] == 'yes'
+                if element.attrib['walkable'] == 'yes':
+                    walkable = True
+                elif element.attrib['walkable'] == 'no':
+                    walkable = False
             if 'removeWithSearch' in element.attrib:
                 remove_with_search = element.attrib['removeWithSearch'] == 'yes'
             if 'removeWithOpen' in element.attrib:
@@ -567,6 +571,11 @@ class GameInfo:
                 remove_with_key = element.attrib['removeWithKey'] == 'yes'
             if 'removeSound' in element.attrib:
                 remove_sound = element.attrib['removeSound']
+            if 'canTalkOver' in element.attrib:
+                if element.attrib['canTalkOver'] == 'yes':
+                    can_talk_over = True
+                elif element.attrib['canTalkOver'] == 'no':
+                    can_talk_over = False
             decoration_image_scaled = load_decoration_image(element.attrib['image'])
             decoration_removed_image_scaled: Optional[pygame.surface.Surface] = None
             if 'removed_image' in element.attrib:
@@ -581,7 +590,8 @@ class GameInfo:
                                                       remove_with_open,
                                                       remove_with_key,
                                                       remove_sound,
-                                                      decoration_removed_image_scaled)
+                                                      decoration_removed_image_scaled,
+                                                      can_talk_over)
         return decorations
 
     def parse_spells(self, xml_root: ET.Element) -> Dict[str, Spell]:

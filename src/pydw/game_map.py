@@ -404,38 +404,62 @@ class GameMap(GameMapInterface):
         return decoration
 
     def get_npc_to_talk_to(self) -> Optional[NpcState]:
+        def get_npc_sprite_at_tile(pos_dat_tile: Point) -> Optional[NpcState]:
+            for sprite in self.group:
+                if isinstance(sprite, NpcSprite):
+                    npc_state = sprite.character
+                    npc_info = npc_state.npc_info
+                else:
+                    continue
+
+                if (npc_info is not None and
+                        (pos_dat_tile == sprite.character.curr_pos_dat_tile or
+                         pos_dat_tile == sprite.character.dest_pos_dat_tile)):
+                    # NPC should turn to face you if they have something to say
+                    if npc_info.dialog is not None:
+                        sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = pos_dat_tile
+                        sprite.character.curr_pos_offset_img_px = Point(0, 0)
+                        sprite.character.direction = self.game_state.get_hero_party().members[0].direction.get_opposite()
+                        sprite.update_count = 0
+                        sprite.update()
+
+                        # Stationary characters should resume looking in the default direction after talking to the player.
+                        if not npc_info.walking:
+                            sprite.character.direction = npc_info.direction
+
+                    return npc_state
+            return None
+
         talk_dest_dat_tile = self.game_state.get_hero_party().members[0].curr_pos_dat_tile \
                              + self.game_state.get_hero_party().members[0].direction.get_vector()
-        talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
-        if talk_dest_tile_type.can_talk_over:
-            talk_dest_dat_tile = talk_dest_dat_tile \
-                                 + self.game_state.get_hero_party().members[0].direction.get_vector()
+        npc_to_talk_to = get_npc_sprite_at_tile(talk_dest_dat_tile)
+        if npc_to_talk_to is None:
+            talk_dest_tile_type = self.game_state.get_tile_info(talk_dest_dat_tile)
+            can_talk_over = talk_dest_tile_type.can_talk_over
 
-        for sprite in self.group:
-            if isinstance(sprite, NpcSprite):
-                npc_state = sprite.character
-                npc_info = npc_state.npc_info
-            else:
-                continue
+            # Check if a decoration prevents talking over a tile that otherwise allowed talking
+            if can_talk_over:
+                for decoration in self.map_decorations:
+                    if decoration.type is not None and decoration.type.can_talk_over is False \
+                            and decoration.overlaps(talk_dest_dat_tile):
+                        can_talk_over = False
+                        # print('Talking over not allowed: decoration', decoration, flush=True)
+                        break
+            # Check if a decoration allows talking over a tile to where talking was otherwise prevented
+            if not can_talk_over:
+                for decoration in self.map_decorations:
+                    if decoration.type is not None and decoration.type.can_talk_over is True \
+                            and decoration.overlaps(talk_dest_dat_tile):
+                        can_talk_over = True
+                        # print('Talking over allowed: decoration', decoration, flush=True)
+                        break
 
-            if (npc_info is not None and
-                    (talk_dest_dat_tile == sprite.character.curr_pos_dat_tile or
-                     talk_dest_dat_tile == sprite.character.dest_pos_dat_tile)):
-                # NPC should turn to face you if they have something to say
-                if npc_info.dialog is not None:
-                    sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = talk_dest_dat_tile
-                    sprite.character.curr_pos_offset_img_px = Point(0, 0)
-                    sprite.character.direction = self.game_state.get_hero_party().members[0].direction.get_opposite()
-                    sprite.update_count = 0
-                    sprite.update()
+            if can_talk_over:
+                talk_dest_dat_tile = talk_dest_dat_tile \
+                                     + self.game_state.get_hero_party().members[0].direction.get_vector()
+                npc_to_talk_to = get_npc_sprite_at_tile(talk_dest_dat_tile)
 
-                    # Stationary characters should resume looking in the default direction after talking to the player.
-                    if not npc_info.walking:
-                        sprite.character.direction = npc_info.direction
-
-                return npc_state
-
-        return None
+        return npc_to_talk_to
 
     def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
         for sprite in self.group:
@@ -476,14 +500,14 @@ class GameMap(GameMapInterface):
         # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
             for decoration in self.map_decorations:
-                if decoration.type is not None and not decoration.type.walkable and decoration.overlaps(tile):
+                if decoration.type is not None and decoration.type.walkable is False and decoration.overlaps(tile):
                     movement_allowed = False
                     # print('Movement not allowed: decoration not walkable', decoration, flush=True)
                     break
         # Check if a decoration allows movement to a tile to which movement was otherwise prevented
         if not movement_allowed:
             for decoration in self.map_decorations:
-                if decoration.type is not None and decoration.type.walkable and decoration.overlaps(tile):
+                if decoration.type is not None and decoration.type.walkable is True and decoration.overlaps(tile):
                     movement_allowed = True
                     # print('Movement allowed: decoration walkable', decoration, flush=True)
                     break

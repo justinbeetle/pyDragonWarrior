@@ -1,109 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.2.2" name="Village_Tileset" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
+<tileset version="1.8" tiledversion="1.8.5" name="Village_Tileset" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
  <image source="Village_Tileset.png" width="512" height="512"/>
- <terraintypes>
-  <terrain name="Grass" tile="96"/>
-  <terrain name="Light Grass" tile="33"/>
-  <terrain name="Dark Grass" tile="38"/>
-  <terrain name="Dirt" tile="102"/>
-  <terrain name="Pavement" tile="48"/>
- </terraintypes>
- <tile id="0" terrain="0,0,0,1">
+ <tile id="0">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="1" terrain="0,0,1,1">
+ <tile id="1">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="2" terrain="0,0,1,0">
+ <tile id="2">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="3" terrain="0,1,1,1">
+ <tile id="3">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="4" terrain="1,0,1,1">
+ <tile id="4">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="5" terrain="0,0,0,2">
+ <tile id="5">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="6" terrain="0,0,2,2">
+ <tile id="6">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="7" terrain="0,0,2,0">
+ <tile id="7">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="8" terrain="0,2,2,2">
+ <tile id="8">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="9" terrain="2,0,2,2">
+ <tile id="9">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="10" terrain="0,0,0,3">
+ <tile id="10">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="11" terrain="0,0,3,3">
+ <tile id="11">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="12" terrain="0,0,3,0">
+ <tile id="12">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="13" terrain="0,3,3,3">
+ <tile id="13">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="14" terrain="3,0,3,3">
+ <tile id="14">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="15" terrain="3,3,3,4">
+ <tile id="15">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="16" terrain="3,3,4,4">
+ <tile id="16">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="17" terrain="3,3,4,3">
+ <tile id="17">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="18" terrain="3,4,4,4">
+ <tile id="18">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="19" terrain="4,3,4,4">
+ <tile id="19">
   <properties>
    <property name="type" value=""/>
   </properties>
@@ -168,102 +161,102 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="32" terrain="0,1,0,1">
+ <tile id="32">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="33" terrain="1,1,1,1">
+ <tile id="33">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="34" terrain="1,0,1,0">
+ <tile id="34">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="35" terrain="1,1,0,1">
+ <tile id="35">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="36" terrain="1,1,1,0">
+ <tile id="36">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="37" terrain="0,2,0,2">
+ <tile id="37">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="38" terrain="2,2,2,2">
+ <tile id="38">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="39" terrain="2,0,2,0">
+ <tile id="39">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="40" terrain="2,2,0,2">
+ <tile id="40">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="41" terrain="2,2,2,0">
+ <tile id="41">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="42" terrain="0,3,0,3">
+ <tile id="42">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="43" terrain="3,3,3,3">
+ <tile id="43">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="44" terrain="3,0,3,0">
+ <tile id="44">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="45" terrain="3,3,0,3">
+ <tile id="45">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="46" terrain="3,3,3,0">
+ <tile id="46">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="47" terrain="3,4,3,4">
+ <tile id="47">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="48" terrain="4,4,4,4">
+ <tile id="48">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="49" terrain="4,3,4,3">
+ <tile id="49">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="50" terrain="4,4,3,4">
+ <tile id="50">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="51" terrain="4,4,4,3">
+ <tile id="51">
   <properties>
    <property name="type" value=""/>
   </properties>
@@ -328,102 +321,102 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="64" terrain="0,1,0,0">
+ <tile id="64">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="65" terrain="1,1,0,0">
+ <tile id="65">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="66" terrain="1,0,0,0">
+ <tile id="66">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="67" terrain="0,1,1,0">
+ <tile id="67">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="68" terrain="1,0,0,1">
+ <tile id="68">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="69" terrain="0,2,0,0">
+ <tile id="69">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="70" terrain="2,2,0,0">
+ <tile id="70">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="71" terrain="2,0,0,0">
+ <tile id="71">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="72" terrain="0,2,2,0">
+ <tile id="72">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="73" terrain="2,0,0,2">
+ <tile id="73">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="74" terrain="0,3,0,0">
+ <tile id="74">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="75" terrain="3,3,0,0">
+ <tile id="75">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="76" terrain="3,0,0,0">
+ <tile id="76">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="77" terrain="0,3,3,0">
+ <tile id="77">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="78" terrain="3,0,0,3">
+ <tile id="78">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="79" terrain="3,4,3,3">
+ <tile id="79">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="80" terrain="4,4,3,3">
+ <tile id="80">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="81" terrain="4,3,3,3">
+ <tile id="81">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="82" terrain="3,4,4,3">
+ <tile id="82">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="83" terrain="4,3,3,4">
+ <tile id="83">
   <properties>
    <property name="type" value=""/>
   </properties>
@@ -488,17 +481,17 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="96" terrain="0,0,0,0">
+ <tile id="96">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="97" terrain="0,0,0,0" probability="0.03">
+ <tile id="97" probability="0.03">
   <properties>
    <property name="type" value="plain"/>
   </properties>
  </tile>
- <tile id="98" terrain="0,0,0,0" probability="0.03">
+ <tile id="98" probability="0.03">
   <properties>
    <property name="type" value="plain"/>
   </properties>
@@ -518,27 +511,27 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="102" terrain="3,3,3,3">
+ <tile id="102">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="103" terrain="3,3,3,3" probability="0.1">
+ <tile id="103" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="104" terrain="3,3,3,3" probability="0.1">
+ <tile id="104" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="105" terrain="3,3,3,3" probability="0.1">
+ <tile id="105" probability="0.1">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="106" terrain="3,3,3,3" probability="0.05">
+ <tile id="106" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -578,12 +571,12 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="114" terrain="4,4,4,4" probability="0.025">
+ <tile id="114" probability="0.025">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="115" terrain="4,4,4,4" probability="0.05">
+ <tile id="115" probability="0.05">
   <properties>
    <property name="type" value=""/>
   </properties>
@@ -678,17 +671,17 @@
    <property name="type" value=""/>
   </properties>
  </tile>
- <tile id="134" terrain="3,3,3,3" probability="0.05">
+ <tile id="134" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="135" terrain="3,3,3,3" probability="0.05">
+ <tile id="135" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="136" terrain="3,3,3,3" probability="0.05">
+ <tile id="136" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
@@ -738,12 +731,12 @@
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="146" terrain="4,4,4,4" probability="0.05">
+ <tile id="146" probability="0.05">
   <properties>
    <property name="type" value="path"/>
   </properties>
  </tile>
- <tile id="147" terrain="4,4,4,4" probability="0.05">
+ <tile id="147" probability="0.05">
   <properties>
    <property name="type" value=""/>
   </properties>
@@ -2310,12 +2303,12 @@
  </tile>
  <tile id="460">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="461">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="462">
@@ -2470,12 +2463,12 @@
  </tile>
  <tile id="492">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="493">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="494">
@@ -3605,22 +3598,22 @@
  </tile>
  <tile id="719">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="720">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="721">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="722">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="723">
@@ -5128,4 +5121,88 @@
    <property name="type" value=""/>
   </properties>
  </tile>
+ <wangsets>
+  <wangset name="Terrains" type="corner" tile="-1">
+   <wangcolor name="Grass" color="#ff0000" tile="96" probability="1"/>
+   <wangcolor name="Light Grass" color="#00ff00" tile="33" probability="1"/>
+   <wangcolor name="Dark Grass" color="#0000ff" tile="38" probability="1"/>
+   <wangcolor name="Dirt" color="#ff7700" tile="102" probability="1"/>
+   <wangcolor name="Pavement" color="#00e9ff" tile="48" probability="1"/>
+   <wangtile tileid="0" wangid="0,1,0,2,0,1,0,1"/>
+   <wangtile tileid="1" wangid="0,1,0,2,0,2,0,1"/>
+   <wangtile tileid="2" wangid="0,1,0,1,0,2,0,1"/>
+   <wangtile tileid="3" wangid="0,2,0,2,0,2,0,1"/>
+   <wangtile tileid="4" wangid="0,1,0,2,0,2,0,2"/>
+   <wangtile tileid="5" wangid="0,1,0,3,0,1,0,1"/>
+   <wangtile tileid="6" wangid="0,1,0,3,0,3,0,1"/>
+   <wangtile tileid="7" wangid="0,1,0,1,0,3,0,1"/>
+   <wangtile tileid="8" wangid="0,3,0,3,0,3,0,1"/>
+   <wangtile tileid="9" wangid="0,1,0,3,0,3,0,3"/>
+   <wangtile tileid="10" wangid="0,1,0,4,0,1,0,1"/>
+   <wangtile tileid="11" wangid="0,1,0,4,0,4,0,1"/>
+   <wangtile tileid="12" wangid="0,1,0,1,0,4,0,1"/>
+   <wangtile tileid="13" wangid="0,4,0,4,0,4,0,1"/>
+   <wangtile tileid="14" wangid="0,1,0,4,0,4,0,4"/>
+   <wangtile tileid="15" wangid="0,4,0,5,0,4,0,4"/>
+   <wangtile tileid="16" wangid="0,4,0,5,0,5,0,4"/>
+   <wangtile tileid="17" wangid="0,4,0,4,0,5,0,4"/>
+   <wangtile tileid="18" wangid="0,5,0,5,0,5,0,4"/>
+   <wangtile tileid="19" wangid="0,4,0,5,0,5,0,5"/>
+   <wangtile tileid="32" wangid="0,2,0,2,0,1,0,1"/>
+   <wangtile tileid="33" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="34" wangid="0,1,0,1,0,2,0,2"/>
+   <wangtile tileid="35" wangid="0,2,0,2,0,1,0,2"/>
+   <wangtile tileid="36" wangid="0,2,0,1,0,2,0,2"/>
+   <wangtile tileid="37" wangid="0,3,0,3,0,1,0,1"/>
+   <wangtile tileid="38" wangid="0,3,0,3,0,3,0,3"/>
+   <wangtile tileid="39" wangid="0,1,0,1,0,3,0,3"/>
+   <wangtile tileid="40" wangid="0,3,0,3,0,1,0,3"/>
+   <wangtile tileid="41" wangid="0,3,0,1,0,3,0,3"/>
+   <wangtile tileid="42" wangid="0,4,0,4,0,1,0,1"/>
+   <wangtile tileid="43" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="44" wangid="0,1,0,1,0,4,0,4"/>
+   <wangtile tileid="45" wangid="0,4,0,4,0,1,0,4"/>
+   <wangtile tileid="46" wangid="0,4,0,1,0,4,0,4"/>
+   <wangtile tileid="47" wangid="0,5,0,5,0,4,0,4"/>
+   <wangtile tileid="48" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="49" wangid="0,4,0,4,0,5,0,5"/>
+   <wangtile tileid="50" wangid="0,5,0,5,0,4,0,5"/>
+   <wangtile tileid="51" wangid="0,5,0,4,0,5,0,5"/>
+   <wangtile tileid="64" wangid="0,2,0,1,0,1,0,1"/>
+   <wangtile tileid="65" wangid="0,2,0,1,0,1,0,2"/>
+   <wangtile tileid="66" wangid="0,1,0,1,0,1,0,2"/>
+   <wangtile tileid="67" wangid="0,2,0,1,0,2,0,1"/>
+   <wangtile tileid="68" wangid="0,1,0,2,0,1,0,2"/>
+   <wangtile tileid="69" wangid="0,3,0,1,0,1,0,1"/>
+   <wangtile tileid="70" wangid="0,3,0,1,0,1,0,3"/>
+   <wangtile tileid="71" wangid="0,1,0,1,0,1,0,3"/>
+   <wangtile tileid="72" wangid="0,3,0,1,0,3,0,1"/>
+   <wangtile tileid="73" wangid="0,1,0,3,0,1,0,3"/>
+   <wangtile tileid="74" wangid="0,4,0,1,0,1,0,1"/>
+   <wangtile tileid="75" wangid="0,4,0,1,0,1,0,4"/>
+   <wangtile tileid="76" wangid="0,1,0,1,0,1,0,4"/>
+   <wangtile tileid="77" wangid="0,4,0,1,0,4,0,1"/>
+   <wangtile tileid="78" wangid="0,1,0,4,0,1,0,4"/>
+   <wangtile tileid="79" wangid="0,5,0,4,0,4,0,4"/>
+   <wangtile tileid="80" wangid="0,5,0,4,0,4,0,5"/>
+   <wangtile tileid="81" wangid="0,4,0,4,0,4,0,5"/>
+   <wangtile tileid="82" wangid="0,5,0,4,0,5,0,4"/>
+   <wangtile tileid="83" wangid="0,4,0,5,0,4,0,5"/>
+   <wangtile tileid="96" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="97" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="98" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="102" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="103" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="104" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="105" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="106" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="114" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="115" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="134" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="135" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="136" wangid="0,4,0,4,0,4,0,4"/>
+   <wangtile tileid="146" wangid="0,5,0,5,0,5,0,5"/>
+   <wangtile tileid="147" wangid="0,5,0,5,0,5,0,5"/>
+  </wangset>
+ </wangsets>
 </tileset>
