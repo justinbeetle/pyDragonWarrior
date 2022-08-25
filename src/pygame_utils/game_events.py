@@ -265,7 +265,10 @@ def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.
                     # The TEXTINPUT events don't seem to have this glitch, but this implementation is all in on the
                     # KEYDOWN events and translates TEXTINPUT events to KEYDOWN events.  This if statement will repair
                     # offending KEYDOWN events using the TEXTINPUT event we have translated to a KEYDOWN event.
-                    print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
+                    #
+                    # TODO: Get a better handle on this issue and submit an issue against pygame.  It looks to be
+                    #       related to https://github.com/pygame/pygame/issues/3229.
+                    #print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
                     existing_event.__dict__['unicode'] = event.__dict__['unicode']
                 # print('Not adding event as a duplicate is already present:', event, flush=True)
                 return

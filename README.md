@@ -36,17 +36,37 @@ Note: Running game.py runs a subshell command to install the required Python lib
 | Exit                         | Escape             | Select           |
 | Quick Save                   | F1                 | Menu             |
 
-Note: Gamepad support has only been tested with an XBox One controller.
+The interact control does the following in order of precedence:
+1. Talks to an NPC if the player character is facing one
+2. Opens a chest or door if the player character is on or facing one
+3. Takes the stairs if the player character is on a staircase
+4. Searches in all other cases
+
+Note: Gamepad support is based on an XBox One controller.  Other controllers have not been tested and may have different
+button naming schemes.
 
 ## Features
 
-* Fully playable game
-  * Unlike Dragon Warrior, weapons and armor must be manually equipped and multiple pieces can be owned
-  * Unlike Dragon Warrior, stairs are automatically traversed
-  * Cursed items have no implemented behavior
+* Fully playable game with a few deviations from Dragon Warrior.  If you get stuck, try using a [Dragon Warrior
+walkthrough](https://gamefaqs.gamespot.com/nes/563408-dragon-warrior/faqs) while keeping in mind the following notable
+deltas from Dragon Warrior:
+  * The [controls](#Controls) are different.  They are streamlined but clumsy and will probably be retooled at some
+point.  Stairs are traversed automatically, which can be really annoying in dungeons.
+  * Item management is different.  Unlike Dragon Warrior, armor and weapons must be manually equipped and multiple
+pieces can be owned.  Items followed by an 'E' are equipped.  Items must be unequipped before they can be sold.  There
+are no item caps on the number of herbs and keys you are carrying.  The item menus don't support scrolling yet, so
+collect lots of different items at your own peril.
+  * Cursed items have no implemented behavior.  Implementing them has never made it to the top of my TODO list because
+no one that knows what they were doing would equip them in the first place.
+  * Once I make the new Tiled maps using licensed art available, there will be more differences:
+    * The new maps frequently have more doors.  Most of the new doors are not locked and can be opened without a key.
+They are visually identical to locked doors, so you'll have to try to open them to see.  Don't wait until you have keys!
+    * In the new maps I'm coming up with new ways to hide stuff that was previously hidden by the ridiculously few
+tiles we could see on screen back in the 1980s.  Be prepared.
 * Overworld encounter backgrounds are selected based on nearby terrain
 * Provides both a classic and math (default) combat mode, where the math mode is hardcoded to reinforce the learning of
-my fourth grader
+my fourth grader.  Until I make it configurable, you can modify src/pydw/combat_encounter.py to customize the selection
+of problems in the add_problem_to_use_dialog method.
 * Game content is (mostly) configurable, providing a game engine capable of being repurposed to tell alternate stories
 
 ## Building for Distribution
@@ -64,7 +84,7 @@ src/pydw/game.py
 ### Using Docker
 
 1. docker build -t pydw .
-2. docker run pydw (requires X11 forwarding!)
+2. docker run pydw (requires X11 forwarding and I haven't tested it yet)
 
 ## Credits
 
