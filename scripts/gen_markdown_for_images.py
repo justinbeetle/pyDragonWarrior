@@ -16,7 +16,7 @@ def main() -> None:
     table_markdown_lines: List[str] = []
     table_markdown_lines.append('<table>')
     table_markdown_lines.append('   <tr>')
-    columns_per_row = 3
+    columns_per_row = 2
     current_columns_in_row = 0
     for encounter_background in viewer.game_info.encounter_backgrounds.values():
         if encounter_background.artist != 'Uncredited':
