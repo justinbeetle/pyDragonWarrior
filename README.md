@@ -144,44 +144,73 @@ not stored in the repo. Distributions of the game will eventually include them.
 
 * [Unsplash](https://unsplash.com/): Encounter background images were sourced from a variety of contributors.  Some
 images have been modified.  In game the images are pixelated to better jive with the other pixel graphics.
-  * [Lopez Robin](https://unsplash.com/@lopezrobin): [beach<br><img alt="beach" src="data\images\encounter_backgrounds\unsplash\beach.jfif" width=200>](https://unsplash.com/photos/apax4M-4kFI)
-  * [Rowan Heuvel](https://unsplash.com/@insolitus): [beach_jungle<br><img alt="beach_jungle" src="data\images\encounter_backgrounds\unsplash\beach_jungle.jfif" width=200>](https://unsplash.com/photos/U6t80TWJ1DM)
-  * [Arash Bal](https://unsplash.com/@arashbal): [deciduous_forest<br><img alt="deciduous_forest" src="data\images\encounter_backgrounds\unsplash\deciduous_forest.jfif" width=200>](https://unsplash.com/photos/2Y2sF4lB4-Y)
-  * [Imat Bagja Gumilar](https://unsplash.com/@imatbagjagumilar): [deciduous_forest_dark<br><img alt="deciduous_forest_dark" src="data\images\encounter_backgrounds\unsplash\deciduous_forest_dark.jfif" width=200>](https://unsplash.com/photos/jwTvCQQJXh0)
-  * [Raimond Klavins](https://unsplash.com/@raimondklavins): [deciduous_forest_light<br><img alt="deciduous_forest_light" src="data\images\encounter_backgrounds\unsplash\deciduous_forest_light.jfif" width=200>](https://unsplash.com/photos/WKfnhCADseQ)
-  * [Keith Hardy](https://unsplash.com/@keithhardy2001): [desert<br><img alt="desert" src="data\images\encounter_backgrounds\unsplash\desert.jfif" width=200>](https://unsplash.com/photos/PP8Escz15d8)
-  * [Dann Zepeda](https://unsplash.com/@idannzepeda): [desert_city_ruins<br><img alt="desert_city_ruins" src="data\images\encounter_backgrounds\unsplash\desert_city_ruins.jfif" width=200>](https://unsplash.com/photos/uP8Yvwggvmk)
-  * [Paul Chambers](https://unsplash.com/@ummmmpaul): [desert_cliff<br><img alt="desert_cliff" src="data\images\encounter_backgrounds\unsplash\desert_cliff.jfif" width=200>](https://unsplash.com/photos/6OFxfVuLUEs)
-  * [Austin Anderson](https://unsplash.com/@aanderson0329): [desert_close_mountain<br><img alt="desert_close_mountain" src="data\images\encounter_backgrounds\unsplash\desert_close_mountain.jfif" width=200>](https://unsplash.com/photos/YrYeghM0OgE)
-  * [Parastoo Maleki](https://unsplash.com/@blueswallow): [desert_distant_mountain<br><img alt="desert_distant_mountain" src="data\images\encounter_backgrounds\unsplash\desert_distant_mountain.jfif" width=200>](https://unsplash.com/photos/CUDoVGSfUPg)
-  * [Mostapha Abidour](https://unsplash.com/@mostaphaabidour): [desert_hill<br><img alt="desert_hill" src="data\images\encounter_backgrounds\unsplash\desert_hill.jfif" width=200>](https://unsplash.com/photos/2zgGXQsGXtQ)
-  * [Ivan Aleksic](https://unsplash.com/@ivalex): [gate<br><img alt="gate" src="data\images\encounter_backgrounds\unsplash\gate.png" width=200>](https://unsplash.com/photos/16YxCJSoAek)
-  * [Jeremy Cai](https://unsplash.com/@j): [hill_distant_mountain<br><img alt="hill_distant_mountain" src="data\images\encounter_backgrounds\unsplash\hill_distant_mountain.jfif" width=200>](https://unsplash.com/photos/eT1ef3tPglU)
-  * [Isaac Quesada](https://unsplash.com/@isaacquesada): [jungle<br><img alt="jungle" src="data\images\encounter_backgrounds\unsplash\jungle.jfif" width=200>](https://unsplash.com/photos/6xxxvB72qB0)
-  * [Ehud Neuhaus](https://unsplash.com/@paramir): [jungle_dark<br><img alt="jungle_dark" src="data\images\encounter_backgrounds\unsplash\jungle_dark.jfif" width=200>](https://unsplash.com/photos/iulSk5ChQso)
-  * [Conscious Design](https://unsplash.com/@conscious_design): [jungle_light<br><img alt="jungle_light" src="data\images\encounter_backgrounds\unsplash\jungle_light.jfif" width=200>](https://unsplash.com/photos/mLpbHWquEYM)
-  * [Hugo Delauney](https://unsplash.com/@ugodly): [pine_forest<br><img alt="pine_forest" src="data\images\encounter_backgrounds\unsplash\pine_forest.jfif" width=200>](https://unsplash.com/photos/ykjsf518lZY)
-  * [Dylan Leagh](https://unsplash.com/@dylanleagh): [pine_forest_dark<br><img alt="pine_forest_dark" src="data\images\encounter_backgrounds\unsplash\pine_forest_dark.jfif" width=200>](https://unsplash.com/photos/k5Vj3gx4vHE)
-  * [Andrey Kigay](https://unsplash.com/@k1gabyt0): [pine_forest_light<br><img alt="pine_forest_light" src="data\images\encounter_backgrounds\unsplash\pine_forest_light.jfif" width=200>](https://unsplash.com/photos/BWpKTSsiBas)
-  * [Stanislav Klimanskii](https://unsplash.com/@klimy4): [plain<br><img alt="plain" src="data\images\encounter_backgrounds\unsplash\plain.jfif" width=200>](https://unsplash.com/photos/8krv1j-huaQ)
-  * [Tim Nieland](https://unsplash.com/@timnieland): [plain_cliff<br><img alt="plain_cliff" src="data\images\encounter_backgrounds\unsplash\plain_cliff.jfif" width=200>](https://unsplash.com/photos/gufUJAz_y-A)
-  * [Edan Cohen](https://unsplash.com/@edan): [plain_close_mountain<br><img alt="plain_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_close_mountain.jfif" width=200>](https://unsplash.com/photos/IyjhDTTQitM)
-  * [Viateur Hwang](https://unsplash.com/@secretasianman): [plain_deciduous_forest<br><img alt="plain_deciduous_forest" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest.jfif" width=200>](https://unsplash.com/photos/-By1_DpPsBk)
-  * [Kirill Shavlo](https://unsplash.com/@svl_photo): [plain_deciduous_forest_cliff<br><img alt="plain_deciduous_forest_cliff" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_cliff.jfif" width=200>](https://unsplash.com/photos/eDguN_ifJjA)
-  * [Mathew MacQuarrie](https://unsplash.com/@matmacq): [plain_deciduous_forest_close_mountain<br><img alt="plain_deciduous_forest_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_close_mountain.jfif" width=200>](https://unsplash.com/photos/Lzx4J_Pb3sk)
-  * [Angela Loria](https://unsplash.com/@a_lo): [plain_deciduous_forest_distant_mountain<br><img alt="plain_deciduous_forest_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_distant_mountain.jfif" width=200>](https://unsplash.com/photos/ZAy8srF4rRM)
-  * [Achim Ruhnau](https://unsplash.com/@achimr): [plain_deciduous_forest_hill<br><img alt="plain_deciduous_forest_hill" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_hill.jfif" width=200>](https://unsplash.com/photos/tXzU28GOy5k)
-  * [Claudel Rheault](https://unsplash.com/@claudelrheault): [plain_distant_mountain<br><img alt="plain_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_distant_mountain.jfif" width=200>](https://unsplash.com/photos/ZVbv1akA-l4)
-  * [Hayarpi Mkhitaryan](https://unsplash.com/@hayarpi_1): [plain_hill<br><img alt="plain_hill" src="data\images\encounter_backgrounds\unsplash\plain_hill.jfif" width=200>](https://unsplash.com/photos/ppEPKpdPK-0)
-  * [Paul Trienekens](https://unsplash.com/@paultrienekens): [plain_pine_forest<br><img alt="plain_pine_forest" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest.jfif" width=200>](https://unsplash.com/photos/9goYHROaqMo)
-  * [Mick Haupt](https://unsplash.com/@rocinante_11): [plain_pine_forest_cliff<br><img alt="plain_pine_forest_cliff" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_cliff.jfif" width=200>](https://unsplash.com/photos/hb09G5FZG5k)
-  * [Gabriel Phipps](https://unsplash.com/@gabe7753): [plain_pine_forest_close_mountain<br><img alt="plain_pine_forest_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_close_mountain.jfif" width=200>](https://unsplash.com/photos/9CxIoNz41KY)
-  * [Christina Brinza](https://unsplash.com/@cbrin): [plain_pine_forest_distant_mountain<br><img alt="plain_pine_forest_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_distant_mountain.jfif" width=200>](https://unsplash.com/photos/fA2AbDSwEMo)
-  * [Kseniia Rastvorova](https://unsplash.com/@hixenia): [plain_pine_forest_hill<br><img alt="plain_pine_forest_hill" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_hill.jfif" width=200>](https://unsplash.com/photos/YhZt03_OJKs)
-  * [Daniil Lobachev](https://unsplash.com/@danilal): [river<br><img alt="river" src="data\images\encounter_backgrounds\unsplash\river.jfif" width=200>](https://unsplash.com/photos/Pi1ER8QiK9o)
-  * [Jordan McQueen](https://unsplash.com/@jordanfmcqueen): [shore<br><img alt="shore" src="data\images\encounter_backgrounds\unsplash\shore.jfif" width=200>](https://unsplash.com/photos/SDsosT_RRPk)
-  * [Yves Sinoir](https://unsplash.com/@neo13): [shore_cliff<br><img alt="shore_cliff" src="data\images\encounter_backgrounds\unsplash\shore_cliff.jfif" width=200>](https://unsplash.com/photos/hZpWdqIMMGw)
-  * [Gunnar Ridderström](https://unsplash.com/@gunnarridder): [swamp<br><img alt="swamp" src="data\images\encounter_backgrounds\unsplash\swamp.jfif" width=200>](https://unsplash.com/photos/WHrBWOnfypI)
+<table>
+   <tr>
+      <td><a href="https://unsplash.com/@lopezrobin">Lopez Robin</a>: <a href="https://unsplash.com/photos/apax4M-4kFI">beach<br><img alt="beach" src="data\images\encounter_backgrounds\unsplash\beach.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@insolitus">Rowan Heuvel</a>: <a href="https://unsplash.com/photos/U6t80TWJ1DM">beach_jungle<br><img alt="beach_jungle" src="data\images\encounter_backgrounds\unsplash\beach_jungle.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@arashbal">Arash Bal</a>: <a href="https://unsplash.com/photos/2Y2sF4lB4-Y">deciduous_forest<br><img alt="deciduous_forest" src="data\images\encounter_backgrounds\unsplash\deciduous_forest.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@imatbagjagumilar">Imat Bagja Gumilar</a>: <a href="https://unsplash.com/photos/jwTvCQQJXh0">deciduous_forest_dark<br><img alt="deciduous_forest_dark" src="data\images\encounter_backgrounds\unsplash\deciduous_forest_dark.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@raimondklavins">Raimond Klavins</a>: <a href="https://unsplash.com/photos/WKfnhCADseQ">deciduous_forest_light<br><img alt="deciduous_forest_light" src="data\images\encounter_backgrounds\unsplash\deciduous_forest_light.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@keithhardy2001">Keith Hardy</a>: <a href="https://unsplash.com/photos/PP8Escz15d8">desert<br><img alt="desert" src="data\images\encounter_backgrounds\unsplash\desert.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@idannzepeda">Dann Zepeda</a>: <a href="https://unsplash.com/photos/uP8Yvwggvmk">desert_city_ruins<br><img alt="desert_city_ruins" src="data\images\encounter_backgrounds\unsplash\desert_city_ruins.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@ummmmpaul">Paul Chambers</a>: <a href="https://unsplash.com/photos/6OFxfVuLUEs">desert_cliff<br><img alt="desert_cliff" src="data\images\encounter_backgrounds\unsplash\desert_cliff.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@aanderson0329">Austin Anderson</a>: <a href="https://unsplash.com/photos/YrYeghM0OgE">desert_close_mountain<br><img alt="desert_close_mountain" src="data\images\encounter_backgrounds\unsplash\desert_close_mountain.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@blueswallow">Parastoo Maleki</a>: <a href="https://unsplash.com/photos/CUDoVGSfUPg">desert_distant_mountain<br><img alt="desert_distant_mountain" src="data\images\encounter_backgrounds\unsplash\desert_distant_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@mostaphaabidour">Mostapha Abidour</a>: <a href="https://unsplash.com/photos/2zgGXQsGXtQ">desert_hill<br><img alt="desert_hill" src="data\images\encounter_backgrounds\unsplash\desert_hill.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@ivalex">Ivan Aleksic</a>: <a href="https://unsplash.com/photos/16YxCJSoAek">gate<br><img alt="gate" src="data\images\encounter_backgrounds\unsplash\gate.png" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@j">Jeremy Cai</a>: <a href="https://unsplash.com/photos/eT1ef3tPglU">hill_distant_mountain<br><img alt="hill_distant_mountain" src="data\images\encounter_backgrounds\unsplash\hill_distant_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@isaacquesada">Isaac Quesada</a>: <a href="https://unsplash.com/photos/6xxxvB72qB0">jungle<br><img alt="jungle" src="data\images\encounter_backgrounds\unsplash\jungle.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@paramir">Ehud Neuhaus</a>: <a href="https://unsplash.com/photos/iulSk5ChQso">jungle_dark<br><img alt="jungle_dark" src="data\images\encounter_backgrounds\unsplash\jungle_dark.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@conscious_design">Conscious Design</a>: <a href="https://unsplash.com/photos/mLpbHWquEYM">jungle_light<br><img alt="jungle_light" src="data\images\encounter_backgrounds\unsplash\jungle_light.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@ugodly">Hugo Delauney</a>: <a href="https://unsplash.com/photos/ykjsf518lZY">pine_forest<br><img alt="pine_forest" src="data\images\encounter_backgrounds\unsplash\pine_forest.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@dylanleagh">Dylan Leagh</a>: <a href="https://unsplash.com/photos/k5Vj3gx4vHE">pine_forest_dark<br><img alt="pine_forest_dark" src="data\images\encounter_backgrounds\unsplash\pine_forest_dark.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@k1gabyt0">Andrey Kigay</a>: <a href="https://unsplash.com/photos/BWpKTSsiBas">pine_forest_light<br><img alt="pine_forest_light" src="data\images\encounter_backgrounds\unsplash\pine_forest_light.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@klimy4">Stanislav Klimanskii</a>: <a href="https://unsplash.com/photos/8krv1j-huaQ">plain<br><img alt="plain" src="data\images\encounter_backgrounds\unsplash\plain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@timnieland">Tim Nieland</a>: <a href="https://unsplash.com/photos/gufUJAz_y-A">plain_cliff<br><img alt="plain_cliff" src="data\images\encounter_backgrounds\unsplash\plain_cliff.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@edan">Edan Cohen</a>: <a href="https://unsplash.com/photos/IyjhDTTQitM">plain_close_mountain<br><img alt="plain_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_close_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@secretasianman">Viateur Hwang</a>: <a href="https://unsplash.com/photos/-By1_DpPsBk">plain_deciduous_forest<br><img alt="plain_deciduous_forest" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@svl_photo">Kirill Shavlo</a>: <a href="https://unsplash.com/photos/eDguN_ifJjA">plain_deciduous_forest_cliff<br><img alt="plain_deciduous_forest_cliff" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_cliff.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@matmacq">Mathew MacQuarrie</a>: <a href="https://unsplash.com/photos/Lzx4J_Pb3sk">plain_deciduous_forest_close_mountain<br><img alt="plain_deciduous_forest_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_close_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@a_lo">Angela Loria</a>: <a href="https://unsplash.com/photos/ZAy8srF4rRM">plain_deciduous_forest_distant_mountain<br><img alt="plain_deciduous_forest_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_distant_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@achimr">Achim Ruhnau</a>: <a href="https://unsplash.com/photos/tXzU28GOy5k">plain_deciduous_forest_hill<br><img alt="plain_deciduous_forest_hill" src="data\images\encounter_backgrounds\unsplash\plain_deciduous_forest_hill.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@claudelrheault">Claudel Rheault</a>: <a href="https://unsplash.com/photos/ZVbv1akA-l4">plain_distant_mountain<br><img alt="plain_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_distant_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@hayarpi_1">Hayarpi Mkhitaryan</a>: <a href="https://unsplash.com/photos/ppEPKpdPK-0">plain_hill<br><img alt="plain_hill" src="data\images\encounter_backgrounds\unsplash\plain_hill.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@paultrienekens">Paul Trienekens</a>: <a href="https://unsplash.com/photos/9goYHROaqMo">plain_pine_forest<br><img alt="plain_pine_forest" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@rocinante_11">Mick Haupt</a>: <a href="https://unsplash.com/photos/hb09G5FZG5k">plain_pine_forest_cliff<br><img alt="plain_pine_forest_cliff" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_cliff.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@gabe7753">Gabriel Phipps</a>: <a href="https://unsplash.com/photos/9CxIoNz41KY">plain_pine_forest_close_mountain<br><img alt="plain_pine_forest_close_mountain" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_close_mountain.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@cbrin">Christina Brinza</a>: <a href="https://unsplash.com/photos/fA2AbDSwEMo">plain_pine_forest_distant_mountain<br><img alt="plain_pine_forest_distant_mountain" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_distant_mountain.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@hixenia">Kseniia Rastvorova</a>: <a href="https://unsplash.com/photos/YhZt03_OJKs">plain_pine_forest_hill<br><img alt="plain_pine_forest_hill" src="data\images\encounter_backgrounds\unsplash\plain_pine_forest_hill.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@danilal">Daniil Lobachev</a>: <a href="https://unsplash.com/photos/Pi1ER8QiK9o">river<br><img alt="river" src="data\images\encounter_backgrounds\unsplash\river.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@jordanfmcqueen">Jordan McQueen</a>: <a href="https://unsplash.com/photos/SDsosT_RRPk">shore<br><img alt="shore" src="data\images\encounter_backgrounds\unsplash\shore.jfif" width=200></a></td>
+   </tr>
+   <tr>
+      <td><a href="https://unsplash.com/@neo13">Yves Sinoir</a>: <a href="https://unsplash.com/photos/hZpWdqIMMGw">shore_cliff<br><img alt="shore_cliff" src="data\images\encounter_backgrounds\unsplash\shore_cliff.jfif" width=200></a></td>
+      <td><a href="https://unsplash.com/@gunnarridder">Gunnar Ridderström</a>: <a href="https://unsplash.com/photos/WHrBWOnfypI">swamp<br><img alt="swamp" src="data\images\encounter_backgrounds\unsplash\swamp.jfif" width=200></a></td>
+   </tr>
+</table>
+
 
 #### Fonts
 
