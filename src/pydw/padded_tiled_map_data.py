@@ -8,6 +8,8 @@ Source copied and modified from https://github.com/bitcraft/pyscroll
 """
 from typing import Any, Callable, cast, Dict, Iterator, List, Optional, Tuple
 
+import xml.etree.ElementTree as ET
+
 import pygame
 import pyscroll
 import pytmx
@@ -27,8 +29,17 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                  desired_tile_size: Optional[int] = None):
         super().__init__()
 
+        # Extract out any image layers - image layers are only being used to compare the Tiled map to a template image.
+        # The template images are not being controlled and pytmx errors out upon failing to load an image.
+        xml_root = ET.parse(tmx_filename).getroot()
+        for image_layer_element in xml_root.findall(".//imagelayer"):
+            xml_root.remove(image_layer_element)
+
         # load data from pytmx
-        self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
+        # Would use the following if not for the imagelayer issue: pytmx.util_pygame.load_pygame(tmx_filename)
+        self.tmx = pytmx.TiledMap(image_loader=pytmx.util_pygame.pygame_image_loader)
+        self.tmx.filename = tmx_filename
+        self.tmx.parse_xml(xml_root)
 
         # Determine desired amount of pre-zoom
         self.pre_zoom = 1.0
