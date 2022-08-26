@@ -118,16 +118,28 @@ class CharacterSprite(MapSprite):
             self.character.curr_pos_offset_img_px).midbottom
         return char_rect
 
+    def get_character_movement_speed_factor(self) -> float:
+        """Get the movement speed factor for the character"""
+        return self.character.character_type.movement_speed_factor
+
+    def get_nearest_tile_movement_speed_factor(self) -> float:
+        """Get the movement speed factor for the tile nearest the character"""
+        return self.get_nearest_tile_movement_speed_factor_for_character(self.character)
+
+    def get_nearest_tile_movement_speed_factor_for_character(self, character: MapCharacterState) -> float:
+        """Get the movement speed factor for the tile nearest an arbitrary character"""
+        if character.curr_pos_offset_img_px.mag() < MapSprite.tile_size_pixels / 2:
+            nearest_tile = character.curr_pos_dat_tile
+        else:
+            nearest_tile = character.dest_pos_dat_tile
+        return self.game_map.get_tile_info(nearest_tile).movement_speed_factor
+
     def update(self, *args: Any, **kwargs: Any) -> None:
         # Move the character in steps to the destination tile
         if self.character.curr_pos_dat_tile != self.character.dest_pos_dat_tile:
-            if self.character.curr_pos_offset_img_px.mag() < MapSprite.tile_size_pixels / 2:
-                nearest_tile = self.character.curr_pos_dat_tile
-            else:
-                nearest_tile = self.character.dest_pos_dat_tile
             image_px_step_size = max(1, int(round(MapSprite.image_px_step_size *
-                                                  self.character.character_type.movement_speed_factor *
-                                                  self.game_map.get_tile_info(nearest_tile).movement_speed_factor)))
+                                                  self.get_character_movement_speed_factor() *
+                                                  self.get_nearest_tile_movement_speed_factor())))
 
             direction_vector = self.character.direction.get_vector()
             self.character.curr_pos_offset_img_px += direction_vector * image_px_step_size
@@ -158,6 +170,18 @@ class HeroSprite(CharacterSprite):
     def __init__(self, hero: HeroState, hero_party: HeroParty, game_map: GameMapInterface) -> None:
         self.hero_party = hero_party
         super().__init__(hero, game_map)
+
+    def get_character_movement_speed_factor(self) -> float:
+        """Get the movement speed factor for the slowest member of the hero party"""
+        slowest_movement_speed_factor = self.hero_party.members[0].character_type.movement_speed_factor
+        for member in self.hero_party.members[1:]:
+            slowest_movement_speed_factor = min(slowest_movement_speed_factor,
+                                                member.character_type.movement_speed_factor)
+        return slowest_movement_speed_factor
+
+    def get_nearest_tile_movement_speed_factor(self) -> float:
+        """Get the movement speed factor for the tile nearest the lead member of the hero party"""
+        return self.get_nearest_tile_movement_speed_factor_for_character(self.hero_party.members[0])
 
     def get_image(self) -> pygame.surface.Surface:
         if self.character.hp <= 0:
