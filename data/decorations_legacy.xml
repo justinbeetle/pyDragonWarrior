@@ -54,3 +54,4 @@
    <Decoration name="shrine_stone_B"      image="shrine_stone_B.png"      widthTiles="1" heightTiles="1" walkable="yes"/>
    <Decoration name="cave"                image="cave.png"                widthTiles="1" heightTiles="1" walkable="yes"/>
 </root>
+
