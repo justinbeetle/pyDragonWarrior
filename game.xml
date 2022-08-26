@@ -345,7 +345,7 @@
             <DialogVariable name="[CHEST_GOLD]" value="500-755"/>
             <DialogGoTo label="gold_chest"/></MapDecoration>
          <MapDecoration type="chest" x="11" y="13"><DialogGoTo label="key_chest"/></MapDecoration>
-         <MapDecoration type="chest" x="12" y="13"><DialogGoTo label="wing_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="13"><DialogGoTo label="wings_chest"/></MapDecoration>
          <MapDecoration type="chest" x="13" y="13"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
 
          <MapDecoration type="throne_evil" x="16" y="23"/>
