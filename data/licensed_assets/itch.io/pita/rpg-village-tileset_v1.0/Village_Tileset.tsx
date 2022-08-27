@@ -1843,22 +1843,22 @@
  </tile>
  <tile id="368">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="369">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="370">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="371">
   <properties>
-   <property name="type" value="counter"/>
+   <property name="type" value=""/>
   </properties>
  </tile>
  <tile id="372">
@@ -2453,12 +2453,12 @@
  </tile>
  <tile id="490">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="491">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="counter"/>
   </properties>
  </tile>
  <tile id="492">
