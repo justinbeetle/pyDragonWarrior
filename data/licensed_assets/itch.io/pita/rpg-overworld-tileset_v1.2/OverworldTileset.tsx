@@ -10258,6 +10258,136 @@
    <frame tileid="1736" duration="250"/>
   </animation>
  </tile>
+ <tile id="1740">
+  <animation>
+   <frame tileid="1740" duration="480"/>
+   <frame tileid="1780" duration="480"/>
+   <frame tileid="1820" duration="480"/>
+   <frame tileid="1860" duration="480"/>
+   <frame tileid="1820" duration="480"/>
+   <frame tileid="1780" duration="480"/>
+  </animation>
+ </tile>
+ <tile id="1741">
+  <animation>
+   <frame tileid="1741" duration="480"/>
+   <frame tileid="1781" duration="480"/>
+   <frame tileid="1821" duration="480"/>
+   <frame tileid="1861" duration="480"/>
+   <frame tileid="1821" duration="480"/>
+   <frame tileid="1781" duration="480"/>
+  </animation>
+ </tile>
+ <tile id="1742">
+  <animation>
+   <frame tileid="1742" duration="480"/>
+   <frame tileid="1782" duration="480"/>
+   <frame tileid="1822" duration="480"/>
+   <frame tileid="1862" duration="480"/>
+   <frame tileid="1822" duration="480"/>
+   <frame tileid="1782" duration="480"/>
+  </animation>
+ </tile>
+ <tile id="1743">
+  <animation>
+   <frame tileid="1743" duration="480"/>
+   <frame tileid="1783" duration="480"/>
+   <frame tileid="1823" duration="480"/>
+   <frame tileid="1863" duration="480"/>
+   <frame tileid="1823" duration="480"/>
+   <frame tileid="1783" duration="480"/>
+  </animation>
+ </tile>
+ <tile id="1744">
+  <animation>
+   <frame tileid="1744" duration="480"/>
+   <frame tileid="1784" duration="480"/>
+   <frame tileid="1824" duration="480"/>
+   <frame tileid="1864" duration="480"/>
+   <frame tileid="1824" duration="480"/>
+   <frame tileid="1784" duration="480"/>
+  </animation>
+ </tile>
+ <tile id="1745">
+  <animation>
+   <frame tileid="1745" duration="240"/>
+   <frame tileid="1785" duration="240"/>
+   <frame tileid="1825" duration="240"/>
+   <frame tileid="1865" duration="240"/>
+   <frame tileid="1825" duration="240"/>
+   <frame tileid="1785" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1746">
+  <animation>
+   <frame tileid="1746" duration="240"/>
+   <frame tileid="1786" duration="240"/>
+   <frame tileid="1826" duration="240"/>
+   <frame tileid="1866" duration="240"/>
+   <frame tileid="1826" duration="240"/>
+   <frame tileid="1786" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1747">
+  <animation>
+   <frame tileid="1747" duration="240"/>
+   <frame tileid="1787" duration="240"/>
+   <frame tileid="1827" duration="240"/>
+   <frame tileid="1867" duration="240"/>
+   <frame tileid="1827" duration="240"/>
+   <frame tileid="1787" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1748">
+  <animation>
+   <frame tileid="1748" duration="240"/>
+   <frame tileid="1788" duration="240"/>
+   <frame tileid="1828" duration="240"/>
+   <frame tileid="1868" duration="240"/>
+   <frame tileid="1828" duration="240"/>
+   <frame tileid="1788" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1749">
+  <animation>
+   <frame tileid="1749" duration="240"/>
+   <frame tileid="1789" duration="240"/>
+   <frame tileid="1829" duration="240"/>
+   <frame tileid="1869" duration="240"/>
+   <frame tileid="1829" duration="240"/>
+   <frame tileid="1789" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1750">
+  <animation>
+   <frame tileid="1750" duration="240"/>
+   <frame tileid="1790" duration="240"/>
+   <frame tileid="1830" duration="240"/>
+   <frame tileid="1870" duration="240"/>
+   <frame tileid="1830" duration="240"/>
+   <frame tileid="1790" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1751">
+  <animation>
+   <frame tileid="1751" duration="240"/>
+   <frame tileid="1791" duration="240"/>
+   <frame tileid="1831" duration="240"/>
+   <frame tileid="1871" duration="240"/>
+   <frame tileid="1831" duration="240"/>
+   <frame tileid="1791" duration="240"/>
+  </animation>
+ </tile>
+ <tile id="1752">
+  <animation>
+   <frame tileid="1752" duration="240"/>
+   <frame tileid="1792" duration="240"/>
+   <frame tileid="1832" duration="240"/>
+   <frame tileid="1872" duration="240"/>
+   <frame tileid="1832" duration="240"/>
+   <frame tileid="1792" duration="240"/>
+  </animation>
+ </tile>
  <tile id="1760">
   <properties>
    <property name="type" value="path"/>
