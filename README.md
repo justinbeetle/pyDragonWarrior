@@ -1,6 +1,6 @@
 # pyDragonWarrior
 
-![pyDragonWarrior](/data/images/title.png "pyDragonWarrior Title Image")
+![pyDragonWarrior Title Image](/data/images/title.png)
 
 A Python based Dragon Warrior clone. Dragon Warrior was chosen as a game with which I have sentimental attachment but
 the intent is that it eventually evolves into a unique fantasy game in the spirit of Dragon Warrior instead of being an
@@ -131,6 +131,17 @@ will eventually include them.
   * [WONDERDOT RPG Asset Series - Dungeon Tileset<br><img src="https://img.itch.zone/aW1hZ2UvMTUyMDU3LzcwMjI2My5wbmc=/original/kcqpkf.png" width=300>](https://pita.itch.io/rpg-dungeon-tileset)
   * [WONDERDOT RPG Asset Series - Overworld Tileset](https://pita.itch.io/rpg-overworld-tileset)<br><img src="https://img.itch.zone/aW1nLzEzMjA3MzUuZ2lm/original/QaINOc.gif" width=300>
   * [WONDERDOT RPG Asset Series - Village Tileset](https://pita.itch.io/rpg-village-tileset)<br><img src="https://img.itch.zone/aW1nLzE1MjU5NjMuZ2lm/original/Q5Zcnx.gif" width=300>
+
+I've extended Pita's tilesets for use on this project.  Here are some sample images of the new maps.
+  * Tantegel Castle Throne Room<br>
+![Tantegel Castle Throne Room](/samples/tantegel_lvl2.gif)
+  * Map of Alefgard<br>
+![Map of Alefgard](/samples/alefgard.png)
+  * Brecconary<br>
+![Brecconary](/samples/brecconary.gif)
+  * Erdrick's Tomb<br>
+![Erdrick's Tomb Upper Level](/samples/erdricks_tomb_lvl1.gif)
+![Erdrick's Tomb Lower Level](/samples/erdricks_tomb_lvl2.gif)
 
 #### Character Sprites
 

@@ -1156,8 +1156,6 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_2"/>
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_3"/>
       </ProgressMarkers>
-
-      <MapDecoration type="door" x="5" y="8"/>
    </InitialState>
 
    <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">

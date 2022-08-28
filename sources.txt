@@ -99,6 +99,15 @@ python -m pip install --upgrade numpy
 python setup.py install
 
 
+
+Generate sample GIFs using https://github.com/lightlike/Tiled-Gif-Export:
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/alefgard.tmx -d 240 -n 1 -o ../pyDragonWarrior/samples/alefgard.gif
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/tantegel_lvl2.tmx -d 250 -n 4 -o ../pyDragonWarrior/samples/tantegel_lvl2.gif
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/tantegel_lvl1.tmx -d 250 -n 4 -o ../pyDragonWarrior/samples/tantegel_lvl1.gif
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/brecconary.tmx -d 250 -n 4 -o ../pyDragonWarrior/samples/brecconary.gif
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/erdricks_tomb_lvl1.tmx -d 250 -n 1 -o ../pyDragonWarrior/samples/erdricks_tomb_lvl1.gif
+    python src/tiled_gif_export.py -f ../pyDragonWarrior/data/maps/tiled/erdricks_tomb_lvl2.tmx -d 250 -n 1 -o ../pyDragonWarrior/samples/erdricks_tomb_lvl2.gif
+
 Generate PyInstaller single file package:
    Run the game, to ensure the venv is fully populated: src/pydw/game.py
    Activate the venv: source venv/Scripts/activate

@@ -1144,7 +1144,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
       </Tools>
    </Items>
 
-   <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero">
+   <InitialState map="tantegel_lvl2" x="4" y="6" dir="NORTH" name="Hero">
       <Dialog>"Descendant of Erdrick, listen now to my words.  It is told that in ages past Erdrick fought demons with a Ball of Light.  Then came the Dragonlord who stole the precious globe and hid it in the darkness."</Dialog>
       <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
       <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>
@@ -1156,10 +1156,8 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_2"/>
          <ProgressMarker name="PM_Not_Taken_Initial_Chest_3"/>
       </ProgressMarkers>
-
-      <MapDecoration type="door" x="5" y="8"/>
    </InitialState>
 
-   <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">
+   <DeathState map="tantegel_lvl2" x="4" y="6" dir="NORTH">
       <Dialog>"Death should not have taken thee [NAME]."</Dialog></DeathState>
 </Game>

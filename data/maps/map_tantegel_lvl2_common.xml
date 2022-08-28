@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-   <NonPlayerCharacter type="king" location="king" dir="SOUTH" walking="no" progressMarker="PM_Not_Finished_Preparing">
-      <Dialog>"When thou art finished preparing for thy departure, please see me.  I shall wait."</Dialog></NonPlayerCharacter>
-
-   <NonPlayerCharacter type="king" location="king" dir="SOUTH" walking="no" progressMarker="not PM_Not_Finished_Preparing and not PM_Defeated_Dragonlord">
+   <NonPlayerCharacter type="king" location="king" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
+      <DialogAssert type="LACKS_ITEM" name="PM_Not_Finished_Preparing">
+         <Dialog>"When thou art finished preparing for thy departure, please see me.  I shall wait."</Dialog></DialogAssert>
       <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess">
          <Dialog>"Forever shall I be grateful for the gift of my daughter returned to her home, [NAME].  Accept my thanks."</Dialog>
          <Dialog>"Now, Gwaelin, come to my side."</Dialog>
@@ -38,17 +37,17 @@
              <Dialog>"Dost thou love me, [NAME]?"</Dialog>
              <DialogGoTo label="but_thou_must_love_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
 
-   <NonPlayerCharacter type="guard" x="4" y="7" dir="EAST" walking="no">
+   <NonPlayerCharacter type="guard" location="guard 1" dir="EAST" walking="no">
       <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"A word of advice.  Save thy money for more expensive armor."</Dialog></DialogAssert>
       <Dialog>"East of this castle is a town where armor, weapons, and many other items may be purchased."</Dialog>
       <Dialog>"Return to the Inn for a rest if thou art wounded in battle, [NAME].  Sleep heals all."</Dialog></NonPlayerCharacter>
 
-   <NonPlayerCharacter type="guard" x="6" y="7" dir="WEST" walking="no">
+   <NonPlayerCharacter type="guard" location="guard 2" dir="WEST" walking="no">
       <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Listen to what people say.  It can be of great help."</Dialog></DialogAssert>
       <Dialog>"If thou hast collected all the treasure chests, a key will be found."</Dialog>
       <Dialog>"Once used, the key will disappear, but the door will be open and thou may pass through."</Dialog></NonPlayerCharacter>
 
-   <NonPlayerCharacter type="guard" x="8" y="6" dir="WEST" walking="yes">
+   <NonPlayerCharacter type="guard" location="guard 3" dir="WEST" walking="yes">
       <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Oh, brave [NAME]."</Dialog></DialogAssert>
       <Dialog>"Dost thou know about Princess Gwaelin?"</Dialog>
       <DialogOptions>
@@ -58,18 +57,17 @@
             <Dialog>"Half a year now hath passed since the Princess was kidnapped by the enemy.  Never does the King speak of it, but he must be suffering much."</Dialog>
             <Dialog>"[NAME], please save the Princess."</Dialog></DialogOption></DialogOptions></NonPlayerCharacter>
 
-   <MapDecoration type="chest" x="6" y="2" progressMarker="PM_Not_Taken_Initial_Chest_1">
+   <MapDecoration type="chest" location="chest 1" progressMarker="PM_Not_Taken_Initial_Chest_1">
       <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_1"/>
-      <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/>
       <DialogGoTo label="key_chest"/></MapDecoration>
-   <MapDecoration type="chest" x="8" y="2" progressMarker="PM_Not_Taken_Initial_Chest_2">
+   <MapDecoration type="chest" location="chest 2" progressMarker="PM_Not_Taken_Initial_Chest_2">
       <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_2"/>
       <DialogVariable name="[CHEST_GOLD]" value="120"/>
       <DialogGoTo label="gold_chest"/></MapDecoration>
-   <MapDecoration type="chest" x="6" y="5" progressMarker="PM_Not_Taken_Initial_Chest_3">
+   <MapDecoration type="chest" location="chest 3" progressMarker="PM_Not_Taken_Initial_Chest_3">
       <DialogAction type="LOSE_ITEM" name="PM_Not_Taken_Initial_Chest_3"/>
       <DialogGoTo label="torch_chest"/></MapDecoration>
 
-   <MapDecoration type="None" x="2" y="2">
+   <MapDecoration type="None" location="bad smell">
       <Dialog>Something here smells foul...</Dialog></MapDecoration>
 </root>

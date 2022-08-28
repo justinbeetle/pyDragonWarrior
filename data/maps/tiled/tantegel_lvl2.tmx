@@ -1,47 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="12" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="57" nextobjectid="50">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="12" height="13" tilewidth="16" tileheight="16" infinite="0" nextlayerid="57" nextobjectid="50">
  <tileset firstgid="1" source="../../licensed_assets/itch.io/pita/rpg-dungeon-pack_v1.1/dungeon_tileset.tsx"/>
  <tileset firstgid="481" source="../../licensed_assets/itch.io/pita/rpg-village-tileset_v1.0/Village_Tileset.tsx"/>
- <layer id="49" name="ground" width="12" height="12" locked="1">
+ <tileset firstgid="1505" source="../../licensed_assets/itch.io/pita/rpg-overworld-tileset_v1.2/OverworldTileset.tsx"/>
+ <layer id="49" name="ground" width="12" height="13" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>
   </properties>
   <data encoding="csv">
 4,4,4,4,4,4,4,4,4,4,4,4,
-4,162,306,306,223,223,223,223,306,306,164,4,
+4,161,145,146,145,145,145,145,146,145,161,4,
+4,181,141,141,141,141,141,141,141,141,181,4,
 4,181,1,1,1,1,1,1,1,1,181,4,
 4,181,1,1,1,1,1,1,1,1,181,4,
 4,181,192,171,172,172,172,172,191,192,181,4,
 4,181,1,1,1,1,1,1,1,1,181,4,
 4,181,1,1,1,1,1,1,1,1,181,4,
 4,181,1,1,1,1,1,1,1,1,181,4,
-4,182,306,306,213,1,214,223,306,306,184,4,
+4,182,223,306,213,1,214,223,306,223,184,4,
 4,181,1,1,1,1,1,1,1,331,181,4,
 4,202,223,223,223,223,223,223,223,223,204,4,
 4,4,4,4,4,4,4,4,4,4,4,4
 </data>
  </layer>
- <layer id="50" name="object" width="12" height="12" locked="1">
+ <layer id="50" name="object" width="12" height="13" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,223,301,0,0,0,0,301,223,0,0,
-0,0,0,321,0,0,0,0,321,0,0,0,
+0,0,0,301,574,575,575,576,301,0,0,0,
+0,0,0,321,638,639,639,640,321,0,0,0,
+0,0,1146,0,0,0,0,0,0,1146,0,0,
 0,0,0,0,435,0,0,435,0,0,0,0,
 0,0,1114,0,0,0,0,0,0,1114,0,0,
 0,0,1146,574,575,575,575,575,576,1146,0,0,
 0,0,0,606,607,607,607,607,608,0,0,0,
 0,0,0,638,639,639,639,639,640,0,0,0,
-0,0,223,301,0,0,0,0,301,223,0,0,
+0,0,0,301,0,0,0,0,301,0,0,0,
 0,0,0,321,0,0,0,0,321,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="55" name="decoration" width="12" height="12" locked="1">
+ <layer id="55" name="decoration" width="12" height="13" locked="1">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -56,8 +60,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="56" name="decoration (populated)" width="12" height="12" visible="0" locked="1">
+ <layer id="56" name="decoration (populated)" width="12" height="13" visible="0" locked="1">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,416,0,416,0,0,0,
@@ -72,8 +77,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="51" name="character" width="12" height="12" locked="1">
+ <layer id="51" name="character" width="12" height="13" locked="1">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
@@ -88,10 +94,11 @@
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="54" name="object upper" width="12" height="12" locked="1">
+ <layer id="54" name="object upper" width="12" height="13" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,1114,0,0,0,0,0,0,1114,0,0,
 0,0,0,0,415,0,0,415,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,

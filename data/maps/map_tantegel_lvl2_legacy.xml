@@ -2,9 +2,19 @@
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
    <Map name="tantegel_lvl2" tiles="legacy/tantegel_lvl2.dat" music="throne" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
       <PointTransition decoration="downstairs"          x="9"   y="9"   dir="WEST"  toMap="tantegel_lvl1"/>
+      <MapDecoration type="door" x="5" y="8" progressMarker="PM_Not_Finished_Preparing">
+         <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/></MapDecoration>
+
+      <MapLocation x="6" y="2" name="chest 1"/>
+      <MapLocation x="8" y="2" name="chest 2"/>
+      <MapLocation x="6" y="5" name="chest 3"/>
+      <MapLocation x="2" y="2" name="bad smell"/>
 
       <MapLocation x="4" y="4" name="king"/>
       <MapLocation x="7" y="4" name="princess"/>
+      <MapLocation x="4" y="7" name="guard 1"/>
+      <MapLocation x="6" y="7" name="guard 2"/>
+      <MapLocation x="8" y="6" name="guard 3"/>
 
       <MapDecoration type="throne" location="king"/>
       <MapDecoration type="pass"   location="king"/>

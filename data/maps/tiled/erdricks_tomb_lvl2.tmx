@@ -22,7 +22,7 @@
 4,4,4,4,4,4,4,4,4,4,4,4,4,4
 </data>
  </layer>
- <layer id="50" name="object" width="14" height="14">
+ <layer id="50" name="object" width="14" height="14" locked="1">
   <properties>
    <property name="is_overlay" type="bool" value="false"/>
   </properties>

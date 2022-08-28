@@ -1,13 +1,24 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root xmlns:xi="http://www.w3.org/2001/XInclude">
    <Map name="tantegel_lvl2" tiles="tiled/tantegel_lvl2.tmx" music="throne" lightDiameter="unlimited" isOutside="yes" xmlns:xi="http://www.w3.org/2001/XInclude">
-      <PointTransition                                  x="9"   y="9"   dir="WEST"  toMap="tantegel_lvl1"/>
+      <PointTransition                                  x="9"   y="10"   dir="WEST"  toMap="tantegel_lvl1"/>
+      <MapDecoration type="locked_wood_door" x="5" y="9" progressMarker="PM_Not_Finished_Preparing">
+         <DialogAction type="LOSE_ITEM" name="PM_Not_Finished_Preparing"/></MapDecoration>
+      <MapDecoration type="unlocked_wood_door" x="5" y="9" inverseProgressMarker="PM_Not_Finished_Preparing"/>
 
-      <MapLocation x="4" y="3" name="king"/>
-      <MapLocation x="7" y="3" name="princess"/>
+      <MapLocation x="6" y="3" name="chest 1"/>
+      <MapLocation x="8" y="3" name="chest 2"/>
+      <MapLocation x="6" y="6" name="chest 3"/>
+      <MapLocation x="2" y="4" name="bad smell"/>
 
-      <MapDecoration type="talking_bridge" x="4" y="4"/>
-      <MapDecoration type="talking_bridge" x="7" y="4"/>
+      <MapLocation x="4" y="4" name="king"/>
+      <MapLocation x="7" y="4" name="princess"/>
+      <MapLocation x="4" y="8" name="guard 1"/>
+      <MapLocation x="6" y="8" name="guard 2"/>
+      <MapLocation x="8" y="7" name="guard 3"/>
+
+      <MapDecoration type="talking_bridge" x="4" y="5"/>
+      <MapDecoration type="talking_bridge" x="7" y="5"/>
 
       <xi:include href="map_tantegel_lvl2_common.xml" parse="xml"/>
    </Map>
