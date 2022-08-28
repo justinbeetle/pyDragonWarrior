@@ -1,35 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.2.2" name="tropical extras" tilewidth="16" tileheight="16" tilecount="64" columns="8">
- <image source="TropicalExtras_Tileset.png" width="128" height="128"/>
- <terraintypes>
-  <terrain name="Jungle" tile="0"/>
- </terraintypes>
- <tile id="0" terrain=",,,0">
+<tileset version="1.8" tiledversion="1.8.5" name="tropical extras" tilewidth="16" tileheight="16" tilecount="72" columns="8">
+ <image source="TropicalExtras_Tileset.png" width="128" height="144"/>
+ <tile id="0">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="1" terrain=",,0,0">
+ <tile id="1">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="2" terrain=",,0,">
+ <tile id="2">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="3" terrain=",0,0,0">
+ <tile id="3">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="4" terrain="0,,0,0">
+ <tile id="4">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="5" terrain="0,0,0,0">
+ <tile id="5">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
@@ -44,27 +41,27 @@
    <property name="type" value="volcano"/>
   </properties>
  </tile>
- <tile id="8" terrain=",0,,0">
+ <tile id="8">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="9" terrain="0,0,0,0">
+ <tile id="9">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="10" terrain="0,,0,">
+ <tile id="10">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="11" terrain="0,0,,0">
+ <tile id="11">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="12" terrain="0,0,0,">
+ <tile id="12">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
@@ -84,27 +81,27 @@
    <property name="type" value="volcano"/>
   </properties>
  </tile>
- <tile id="16" terrain=",0,,">
+ <tile id="16">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="17" terrain="0,0,,">
+ <tile id="17">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="18" terrain="0,,,">
+ <tile id="18">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="19" terrain=",0,0,">
+ <tile id="19">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
  </tile>
- <tile id="20" terrain="0,,,0">
+ <tile id="20">
   <properties>
    <property name="type" value="jungle"/>
   </properties>
@@ -246,27 +243,27 @@
  </tile>
  <tile id="48">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="49">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="50">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="51">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="52">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="53">
@@ -286,27 +283,27 @@
  </tile>
  <tile id="56">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="57">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="58">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="59">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="60">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="jungle"/>
   </properties>
  </tile>
  <tile id="61">
@@ -324,4 +321,50 @@
    <property name="type" value=""/>
   </properties>
  </tile>
+ <tile id="64">
+  <properties>
+   <property name="type" value="jungle"/>
+  </properties>
+ </tile>
+ <tile id="65">
+  <properties>
+   <property name="type" value="jungle"/>
+  </properties>
+ </tile>
+ <tile id="66">
+  <properties>
+   <property name="type" value="jungle"/>
+  </properties>
+ </tile>
+ <tile id="67">
+  <properties>
+   <property name="type" value="jungle"/>
+  </properties>
+ </tile>
+ <tile id="68">
+  <properties>
+   <property name="type" value="jungle"/>
+  </properties>
+ </tile>
+ <wangsets>
+  <wangset name="Terrains" type="corner" tile="-1">
+   <wangcolor name="Jungle" color="#ff0000" tile="0" probability="1"/>
+   <wangtile tileid="0" wangid="0,0,0,1,0,0,0,0"/>
+   <wangtile tileid="1" wangid="0,0,0,1,0,1,0,0"/>
+   <wangtile tileid="2" wangid="0,0,0,0,0,1,0,0"/>
+   <wangtile tileid="3" wangid="0,1,0,1,0,1,0,0"/>
+   <wangtile tileid="4" wangid="0,0,0,1,0,1,0,1"/>
+   <wangtile tileid="5" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="8" wangid="0,1,0,1,0,0,0,0"/>
+   <wangtile tileid="9" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="10" wangid="0,0,0,0,0,1,0,1"/>
+   <wangtile tileid="11" wangid="0,1,0,1,0,0,0,1"/>
+   <wangtile tileid="12" wangid="0,1,0,0,0,1,0,1"/>
+   <wangtile tileid="16" wangid="0,1,0,0,0,0,0,0"/>
+   <wangtile tileid="17" wangid="0,1,0,0,0,0,0,1"/>
+   <wangtile tileid="18" wangid="0,0,0,0,0,0,0,1"/>
+   <wangtile tileid="19" wangid="0,1,0,0,0,1,0,0"/>
+   <wangtile tileid="20" wangid="0,0,0,1,0,0,0,1"/>
+  </wangset>
+ </wangsets>
 </tileset>
