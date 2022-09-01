@@ -646,7 +646,7 @@
       <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
          <MonsterActionRule type="Stopspell" probability="0.25"/>
          <MonsterActionRule type="Hurtmore" probability="0.75"/></Monster>
-      <Monster name="Dragonlord's True Form" image="Dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
+      <Monster name="Dragonlord's True Form" image="dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
          <MonsterActionRule type="BreathStrongFire" probability="0.5"/></Monster>
    </Monsters>
 
@@ -1161,3 +1161,4 @@ All part members gain # experience points.  You obtain X pieces of gold.
    <DeathState map="tantegel_lvl2" x="4" y="6" dir="NORTH">
       <Dialog>"Death should not have taken thee [NAME]."</Dialog></DeathState>
 </Game>
+
