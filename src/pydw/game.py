@@ -66,13 +66,13 @@ def main() -> None:
         # Executing as a PyInstaller binary executable
         if args.verbose:
             print('Running as a PyInstaller binary executable', flush=True)
-        application_path = os.path.dirname(sys.executable)
+        application_path = os.path.dirname(os.path.abspath(sys.executable))
         base_path = os.path.dirname(os.path.abspath(__file__))
     else:
         # Normal execution
         if args.verbose:
             print('Running as a Python script', flush=True)
-        application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # Set the current working directory to the base path so that the game can be run from any path
     # First ensure sys.argv[0] is an absolute path
