@@ -1050,7 +1050,8 @@ class GameInfo:
                                     self.parse_dialog(npc_element),
                                     progress_marker,
                                     inverse_progress_marker,
-                                    name))
+                                    name,
+                                    self.parse_waypoints(map_name, npc_element)))
 
             # Parse special monsters
             # print( 'Parse special monsters', flush=True )
@@ -1445,6 +1446,12 @@ class GameInfo:
             return dialog
 
         return None
+
+    def parse_waypoints(self, map_name: Optional[str], waypoints_root_element: ET.Element) -> List[Point]:
+        waypoints = []
+        for waypoint_element in waypoints_root_element.findall("./Waypoint"):
+            waypoints.append(self.get_location(map_name, waypoint_element))
+        return waypoints
 
     def get_item(self, name: str) -> Optional[ItemType]:
         if name in self.items:

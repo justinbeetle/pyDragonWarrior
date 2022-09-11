@@ -399,6 +399,7 @@ class NpcInfo(NamedTuple):
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
     name: Optional[str] = None
+    waypoints: List[Point] = []
 
     @staticmethod
     def create_null(name: str = 'null') -> NpcInfo:
