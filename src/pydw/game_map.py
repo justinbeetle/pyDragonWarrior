@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import abc
 from heapq import heappush, heappop
@@ -46,12 +46,13 @@ class GameMapInterface(metaclass=abc.ABCMeta):
         return self.can_move_to_tile(tile, enforce_npc_hp_penalty_limit, enforce_npc_dof_limit, True, prev_tile)
 
     def compute_npc_path(self, start: Point, goal: Point) -> Optional[List[Point]]:
+        """Compute a path from start to goal for an NPC using A* search"""
         verbose = False
         if verbose:
             print(f'in compute_npc_path; start={start}; goal={goal}', flush=True)
         def h(n: Point) -> float:
             return abs(goal.x - n.x) + abs(goal.y - n.y)
-        open_set = []
+        open_set: List[Tuple[float, Point]] = []
         heappush(open_set, (h(start), start))
         came_from: Dict[Point, Point] = {}
         g_score: Dict[Point, float] = {start: 0.0}
@@ -317,7 +318,7 @@ class NpcSprite(CharacterSprite):
                     # Randomly choose a directions
                     self.character.direction = random.choice(list(Direction))
                     dest_tile = self.character.curr_pos_dat_tile + self.character.direction.get_vector()
-                    if self.game_map.can_npc_move_to_tile(dest_tile, self.character.curr_pos_dat_tile):
+                    if self.game_map.can_npc_move_to_tile(dest_tile, prev_tile=self.character.curr_pos_dat_tile):
                         self.character.dest_pos_dat_tile = dest_tile
 
         super().update(args, kwargs)
