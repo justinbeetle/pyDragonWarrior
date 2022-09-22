@@ -130,3 +130,20 @@ Profile:
    /c/users/justin/appdata/roaming/python/Python39/Scripts/snakeviz.exe <name>.profile
 
 Push tags:  git push origin --tags
+
+Running stable-diffusion
+    Clone https://github.com/CompVis/stable-diffusion.git
+    cd stable-diffusion
+    Install https://docs.conda.io/en/latest/miniconda.html
+    ~/miniconda3/Scripts/conda env create -f environment.yaml
+    ~/miniconda3/Scripts/conda init bash
+    conda activate ldm
+    mkdir models/ldm/stable-diffusion-v1
+    Download sd-v1-4.ckpt (https://huggingface.co/CompVis/stable-diffusion-v-1-4-original) and move to to models/ldm/stable-diffusion-v1/model.ckpt
+    python scripts/txt2img.py --prompt "Cotton candy monster holding a big sword" --plms -W 128 -H 128
+    python scripts/img2img.py --prompt "Cotton candy monster holding a big sword" --init-img=monsters/stopper128.png --n_samples=1 --strength=0.7 --n_iter=10 --seed=1789234
+
+Testing with Python 3.8:
+   /c/Users/justi/AppData/Local/Programs/Python/Python38/python -m venv venv
+   source venv/Scripts/activate
+   rm -rf build/ venv/Lib/site-packages/pydw; ./setup.py install --force; src/pydw/game.py -v -s -c game_low_mem.xml --width 1600 --height 1200

@@ -1,0 +1,1164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Game xmlns:xi="http://www.w3.org/2001/XInclude" dataPath="data" imagePath="images" musicPath="music" soundPath="sounds" characterPath="characters" monsterPath="monsters" mapsPath="maps" encounterPath="encounter_backgrounds">
+   <Title music="title" image="title.png"/>
+
+   <Dialogs image="dialog.png">
+      <Font name="data/fonts/itch.io/somepx/hf-free-complete/compass-pro-v1.1/CompassPro.ttf" credits="somepx - https://itch.io/profile/somepx"/>
+   </Dialogs>
+
+   <!--<xi:include href="data/music/music_dw1.xml" parse="xml"/>
+
+   <xi:include href="data/sounds/sounds_dw1.xml" parse="xml"/>
+
+   <xi:include href="data/images/encounter_backgrounds/encounter_backgrounds_unsplash.xml" parse="xml"/>
+   <xi:include href="data/images/encounter_backgrounds/encounter_backgrounds_custom.xml" parse="xml"/>-->
+
+   <Tiles imagePath="tiles_ios_hybrid">
+      <Tile name="water"            image="water.png"    symbol="w" walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="0"    type="complex"/>
+      <Tile name="mountain"         image="mountain.png" symbol="M" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="complex"/>
+      <Tile name="plain"            image="plain.png"    symbol="_" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24" type="simple"/>
+      <Tile name="deciduous_forest" image="forest.png"   symbol="f" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.875" spawnRate="1/12" type="complex"/>
+      <Tile name="hill"             image="hill.png"     symbol="m" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75"  spawnRate="1/8"  type="complex"/>
+      <Tile name="desert"           image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.875" spawnRate="1/8"  type="simple"/>
+      <Tile name="swamp"            image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="0.5"   spawnRate="1/8"  type="simple"/>
+      <Tile name="bridge"           image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24" type="complex"/>
+      <Tile name="stone"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="complex"/>
+      <Tile name="roof"             image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="simple"/>
+      <Tile name="path"             image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/16" type="simple"/>
+      <Tile name="counter"          image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                             type="complex"/>
+      <Tile name="inn"              image="inn.png"      symbol="i" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="simple"/>
+      <Tile name="armor"            image="armor.png"    symbol="a" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="simple"/>
+      <Tile name="barrier"          image="barrier.png"  symbol="B" walkable="yes" boatable="no"  hpPenalty="10" speed="1.0"   spawnRate="1/16" type="simple"/>
+      <Tile name="darkness"         image="darkness.png" symbol="d" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="simple"/>
+
+      <Tile name="beach"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="beach_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="1/16"/>
+      <Tile name="shore"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="shore_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
+      <Tile name="shore_cliff"                                      walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="shore_cliff_walkable"                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
+      <Tile name="river"                                            walkable="no"  boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="river_walkable"                                   walkable="yes" boatable="yes" hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
+      <Tile name="volcano"                                          walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+  <!--<Tile name="deciduous_forest"                                 walkable="yes" boatable="no"  hpPenalty="0"  speed="0.875" spawnRate="1/12"/>-->
+      <Tile name="pine_forest"                                      walkable="yes" boatable="no"  hpPenalty="0"  speed="0.875" spawnRate="1/12"/>
+      <Tile name="jungle"                                           walkable="yes" boatable="no"  hpPenalty="0"  speed="0.75"  spawnRate="1/8"/>
+      <Tile name="cliff"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="cliff_walkable"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
+      <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+   </Tiles>
+
+   <Decorations imagePath="decorations_20">
+      <xi:include href="data/decorations_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/decorations_pita.xml" parse="xml"/>-->
+   </Decorations>
+
+   <xi:include href="data/levels.xml" parse="xml"/>
+
+   <CharacterTypes>
+      <xi:include href="data/characters_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/characters_tiny_tales.xml" parse="xml"/>-->
+      <!--<xi:include href="data/characters_time_fantasy.xml" parse="xml"/>-->
+
+      <CharacterType type="ghost"                  image="ghost.png"                  phases="2"/>
+      <CharacterType type="cat"                    image="cat.png"                    phases="2" levels="cat"/>
+      <CharacterType type="mocha"                  image="mocha.png"                  phases="2" levels="cat"/>
+      <CharacterType type="little_boy"             image="little_boy.png"             phases="2"/>
+   </CharacterTypes>
+
+   <Maps>
+      <xi:include href="data/maps/map_alefgard_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_alefgard_tiled.xml" parse="xml"/>-->
+
+      <xi:include href="data/maps/map_tantegel_lvl2_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl2_tiled.xml" parse="xml"/>-->
+
+      <xi:include href="data/maps/map_tantegel_lvl1_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl1_tiled.xml" parse="xml"/>-->
+
+      <xi:include href="data/maps/map_tantegel_lvl0_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_tantegel_lvl0_tiled.xml" parse="xml"/>-->
+
+      <xi:include href="data/maps/map_brecconary_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_brecconary_tiled.xml" parse="xml"/>-->
+
+      <xi:include href="data/maps/map_garinham_legacy.xml" parse="xml"/>
+
+      <xi:include href="data/maps/map_kol_legacy.xml" parse="xml"/>
+
+      <xi:include href="data/maps/map_rimuldar_legacy.xml" parse="xml"/>
+
+      <xi:include href="data/maps/map_hauksness_legacy.xml" parse="xml"/>
+
+      <xi:include href="data/maps/map_cantlin_legacy.xml" parse="xml"/>
+
+      <!--<xi:include href="data/maps/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
+      <xi:include href="data/maps/map_erdricks_tomb_tiled.xml" parse="xml"/>
+
+      <Map name="mountain_cave_lvl1" tiles="legacy/mountain_cave_lvl1.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
+         <PointTransition decoration="downstairs" name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="A"/>
+         <PointTransition decoration="downstairs" name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl2" toName="B"/>
+         <PointTransition decoration="downstairs" name="C" x="14"  y="14"  dir="SOUTH" toMap="mountain_cave_lvl2" toName="C"/>
+
+         <MapDecoration type="chest" x="15" y="7">
+            <DialogAction type="GAIN_ITEM" name="Herb"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="mountain_cave_lvl2" tiles="legacy/mountain_cave_lvl2.dat" music="dungeon_lvl_2" monsterSet="14" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="A" x="2"   y="2"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="A"/>
+         <PointTransition decoration="upstairs"   name="B" x="8"   y="7"   dir="SOUTH" toMap="mountain_cave_lvl1" toName="B"/>
+         <PointTransition decoration="upstairs"   name="C" x="14"  y="14"  dir="SOUTH" toMap="mountain_cave_lvl1" toName="C"/>
+
+         <MapDecoration type="chest" x="4" y="4"><DialogGoTo label="torch_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="5" y="4">
+            <DialogAction type="GAIN_ITEM" name="Fighter's Ring"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Fighter's Ring.</Dialog></MapDecoration>
+         <MapDecoration type="chest" x="3" y="8">
+            <DialogVariable name="[CHEST_GOLD]" value="10-17"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="11"> <!-- TODO: This chest should provide a 1/32 chance of instead containing a Death Necklace, which can only be obtained once -->
+            <DialogVariable name="[CHEST_GOLD]" value="100-131"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+      </Map>
+
+      <Map name="swamp_cave" tiles="legacy/swamp_cave.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="N" x="2"   y="2"   dir="SOUTH" toMap="overworld" toName="N"/>
+         <PointTransition decoration="upstairs"   name="S" x="2"   y="32"  dir="EAST"  toMap="overworld" toName="S"/>
+         <MapDecoration type="door"  x="7"  y="22"/>
+
+         <Monster name="Green Dragon" x="6" y="16" inverseProgressMarker="PM_Rescued_Princess">
+            <RunAwayDialog><DialogAction type="GOTO_COORDINATES" x="6" y="15"/></RunAwayDialog></Monster>
+
+         <NonPlayerCharacter type="princess" name="Princess Gwaelin" x="7" y="20" dir="SOUTH" walking="no" inverseProgressMarker="PM_Rescued_Princess">
+            <Dialog>"Thou art brave indeed to rescue me, [NAME]."</Dialog>
+            <Dialog>"I am Gwaelin, daughter of Lorik."</Dialog>
+            <Dialog>"Will thou take me to the castle?"</Dialog>
+            <DialogOptions label="but_thou_must_rescue_me">
+               <DialogOption name="Yes">
+                  <DialogAction type="PLAY_MUSIC" name="love"/>
+                  <Dialog>Princess Gwaelin embraces thee.</Dialog>
+                  <Dialog>"I'm so happy!"</Dialog>
+                  <DialogAction type="GAIN_ITEM" name="PM_Rescued_Princess"/>
+                  <DialogAction type="GAIN_ITEM" name="PM_Carrying_Princess"/>
+                  <DialogAction type="JOIN_PARTY" name="Princess Gwaelin"/>
+                  <DialogAction type="GOTO_COORDINATES"/></DialogOption> <!-- The GOTO_COORDINATES forces a setMap call to remove the princess as an NPC and add her to the hero party -->
+               <DialogOption name="No">
+                   <Dialog>"But thou must."</Dialog>
+                   <Dialog>"Will thou take me to the castle?"</Dialog>
+                   <DialogGoTo label="but_thou_must_rescue_me"/></DialogOption></DialogOptions></NonPlayerCharacter>
+      </Map>
+
+      <Map name="northern_shrine" tiles="legacy/northern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
+         <PointTransition decoration="upstairs"            x="6"   y="11"  dir="NORTH" toMap="overworld"/>
+
+         <NonPlayerCharacter type="sage" x="6" y="6" dir="EAST" walking="no" inverseProgressMarker="PM_Northern_Shrine_Sage_Vanished">
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Silver_Harp">
+               <Dialog>"Thy bravery must be proven.  Thus, I propose a test."</Dialog>
+               <Dialog>"There is a Silver Harp that beckons to the creatures of the Dragonlord."</Dialog>
+               <Dialog>"Bring this to me and I will reward thee with the Staff of Rain."</Dialog></DialogAssert>
+            <Dialog>"Thou hast brought the harp.  Good.  I have been waiting long for one such as thee.  Take the treasure chest."</Dialog>
+            <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
+            <DialogAction type="LOSE_ITEM" name="Silver Harp"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/>
+            <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
+            <DialogAction type="LOSE_ITEM" name="PM_Northern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
+
+         <MapDecoration type="chest" x="5" y="6">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="empty_chest"/></DialogAssert>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Staff_of_Rain"/>
+            <DialogAction type="GAIN_ITEM" name="Staff of Rain"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Staff of Rain.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="southern_shrine" tiles="legacy/southern_shrine.dat" music="castle" lightDiameter="unlimited" isOutside="no">
+         <PointTransition decoration="upstairs"            x="2"   y="6"   dir="EAST"  toMap="overworld"/>
+
+         <NonPlayerCharacter type="sage" x="6" y="7" dir="WEST" walking="no" inverseProgressMarker="PM_Southern_Shrine_Sage_Vanished">
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><Dialog>"Thou hast no business here.  Go away."</Dialog></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Stones_of_Sunlight" label="southern_shrine_go_now">
+               <Dialog>"In thy task thou hast failed.  Alas, I fear thou art not the one Erdrick predicted would save us."</Dialog>
+               <Dialog>"Go now!"</Dialog>
+               <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+               <DialogAction type="PLAY_SOUND" name="walk_away"/>
+               <DialogAction type="GOTO_COORDINATES" map="overworld" location="Southern Shrine" dir="SOUTH"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="PM_Acquired_Staff_of_Rain"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
+            <DialogAssert type="HAS_ITEM" name="Erdrick's Token"><DialogGoTo label="southern_shrine_go_now"/></DialogAssert>
+            <Dialog>"Now the sun and rain shall meet and the Rainbow Drop passes to thy keeping."</Dialog>
+            <DialogAction type="VISUAL_EFFECT" name="hideDialog"/>
+            <DialogAction type="LOSE_ITEM" name="Stones of Sunlight"/>
+            <DialogAction type="LOSE_ITEM" name="Staff of Rain"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/>
+            <DialogAction type="GOTO_COORDINATES"/> <!-- The GOTO_COORDINATES forces a setMap call to remove the sage from the map -->
+            <DialogAction type="LOSE_ITEM" name="PM_Southern_Shrine_Sage_Vanished"/></NonPlayerCharacter>
+
+         <MapDecoration type="chest" x="7" y="7">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Rainbow_Drop"><DialogGoTo label="empty_chest"/></DialogAssert>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Rainbow_Drop"/>
+            <DialogAction type="GAIN_ITEM" name="Rainbow Drop"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Rainbow Drop.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="garins_grave_lvl1" tiles="legacy/garins_grave_lvl1.dat" music="dungeon_lvl_1" monsterSet="14" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"            x="8"   y="13"  dir="EAST"  toMap="garinham"/>
+         <PointTransition decoration="downstairs"          x="3"   y="20"  dir="WEST"  toMap="garins_grave_lvl2"/>
+         <MapDecoration type="door"  x="19" y="19"/>
+         <MapDecoration type="chest" x="13" y="2">
+            <DialogVariable name="[CHEST_GOLD]" value="6-13"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="14" y="2">
+            <DialogVariable name="[CHEST_GOLD]" value="5-20"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="15" y="2"><DialogGoTo label="herb_chest"/></MapDecoration>
+      </Map>
+
+      <Map name="garins_grave_lvl2" tiles="legacy/garins_grave_lvl2.dat" music="dungeon_lvl_2" monsterSet="7" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"            x="13"  y="4"   dir="EAST"  toMap="garins_grave_lvl1"/>
+         <PointTransition decoration="downstairs" name="C" x="3"   y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="C"/>
+         <PointTransition decoration="downstairs" name="B" x="14"  y="3"   dir="WEST"  toMap="garins_grave_lvl3" toName="B"/>
+         <PointTransition decoration="downstairs" name="D" x="7"   y="8"   dir="WEST"  toMap="garins_grave_lvl3" toName="D"/>
+         <PointTransition decoration="downstairs" name="E" x="3"   y="12"  dir="WEST"  toMap="garins_grave_lvl3" toName="E"/>
+         <PointTransition decoration="downstairs" name="F" x="14"  y="12"  dir="WEST"  toMap="garins_grave_lvl3" toName="F"/>
+      </Map>
+
+      <Map name="garins_grave_lvl3" tiles="legacy/garins_grave_lvl3.dat" music="dungeon_lvl_3" monsterSet="15" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="C" x="16"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="C"/>
+         <PointTransition decoration="upstairs"   name="B" x="20"  y="3"   dir="EAST"  toMap="garins_grave_lvl2" toName="B"/>
+         <PointTransition decoration="upstairs"   name="D" x="8"   y="13"  dir="EAST"  toMap="garins_grave_lvl2" toName="D"/>
+         <PointTransition decoration="upstairs"   name="F" x="20"  y="15"  dir="EAST"  toMap="garins_grave_lvl2" toName="F"/>
+         <PointTransition decoration="upstairs"   name="E" x="4"   y="19"  dir="EAST"  toMap="garins_grave_lvl2" toName="E"/>
+         <PointTransition decoration="downstairs" name="G" x="11"  y="7"   dir="WEST"  toMap="garins_grave_lvl4" toName="G"/>
+         <PointTransition decoration="downstairs" name="H" x="12"  y="11"  dir="WEST"  toMap="garins_grave_lvl4" toName="H"/>
+
+         <MapDecoration type="chest" x="3"  y="3"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="15" y="8">
+            <!-- Using a progress marker so that the quest item can only be obtained once. -->
+            <DialogAssert type="LACKS_ITEM" name="PM_Acquired_Silver_Harp"><DialogGoTo label="empty_chest"/></DialogAssert>
+            <DialogAction type="GAIN_ITEM" name="PM_Acquired_Silver_Harp"/>
+            <DialogAction type="GAIN_ITEM" name="Silver Harp"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Silver Harp.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="garins_grave_lvl4" tiles="legacy/garins_grave_lvl4.dat" music="dungeon_lvl_4" monsterSet="15" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="G" x="2"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="G"/>
+         <PointTransition decoration="upstairs"   name="H" x="7"   y="6"   dir="EAST"  toMap="garins_grave_lvl3" toName="H"/>
+      </Map>
+
+      <Map name="charlock_lvl1" tiles="legacy/charlock_lvl1.dat" music="dungeon_lvl_1" monsterSet="16" encounterBackground="darkness" lightDiameter="unlimited" isOutside="no">
+         <LeavingTransition                                x="11"  y="20"  dir="NORTH" toMap="overworld"/>
+         <PointTransition decoration="downstairs" name="A" x="11"  y="2"   dir="WEST"  toMap="charlock_lvl2"  toName="A" progressMarker="PM_Found_Secret_Passage"/>
+         <PointTransition decoration="downstairs" name="B" x="5"   y="15"  dir="WEST"  toMap="charlock_lvl2"  toName="B"/>
+         <PointTransition decoration="downstairs" name="C" x="16"  y="15"  dir="WEST"  toMap="charlock_lvl2"  toName="C"/>
+
+         <MapDecoration type="door"  x="5"  y="9"/>
+         <MapDecoration type="door"  x="16" y="9"/>
+
+         <MapDecoration type="throne_evil" x="11" y="4"/>
+         <MapDecoration type="pass"        x="11" y="4">
+            <Dialog>[NAME] searched the ground all about.</Dialog>
+            <Dialog>[NAME] felt the wind blowing from behind the throne.</Dialog></MapDecoration>
+         <MapDecoration type="None" x="11" y="2" inprogressMarker="PM_Found_Secret_Passage">
+            <Dialog>[NAME] searched the ground all about.</Dialog>
+            <Dialog>[NAME] discovered the secret passage.</Dialog>
+            <DialogAction type="GAIN_ITEM" name="PM_Found_Secret_Passage"/>
+            <DialogAction type="GOTO_COORDINATES"/></MapDecoration> <!-- The GOTO_COORDINATES forces a setMap call to add the secret passage to the map -->
+      </Map>
+
+      <Map name="charlock_lvl2" tiles="legacy/charlock_lvl2.dat" music="dungeon_lvl_2" monsterSet="16" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="A" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl1"  toName="A"/>
+         <PointTransition decoration="upstairs"   name="B" x="10"  y="15"  dir="EAST"  toMap="charlock_lvl1"  toName="B"/>
+         <PointTransition decoration="upstairs"   name="C" x="19"  y="17"  dir="EAST"  toMap="charlock_lvl1"  toName="C"/>
+         <PointTransition decoration="downstairs" name="F" x="17"  y="3"   dir="WEST"  toMap="charlock_lvl3"  toName="F"/>
+         <PointTransition decoration="downstairs" name="D" x="4"   y="6"   dir="WEST"  toMap="charlock_lvl3"  toName="D"/>
+         <PointTransition decoration="downstairs" name="G" x="15"  y="9"   dir="WEST"  toMap="charlock_lvl3"  toName="G"/>
+         <PointTransition decoration="downstairs" name="I" x="21"  y="9"   dir="WEST"  toMap="charlock_lvl3"  toName="I"/>
+         <PointTransition decoration="downstairs" name="H" x="16"  y="11"  dir="WEST"  toMap="charlock_lvl3"  toName="H"/>
+         <PointTransition decoration="downstairs" name="E" x="4"   y="16"  dir="WEST"  toMap="charlock_lvl3"  toName="E"/>
+         <PointTransition decoration="downstairs" name="J" x="10"  y="21"  dir="WEST"  toMap="charlock_lvl3"  toName="J"/>
+      </Map>
+
+      <Map name="charlock_lvl3" tiles="legacy/charlock_lvl3.dat" music="dungeon_lvl_3" monsterSet="17" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="F" x="10"  y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="F"/>
+         <PointTransition decoration="upstairs"   name="D" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="D"/>
+         <PointTransition decoration="upstairs"   name="G" x="6"   y="6"   dir="EAST"  toMap="charlock_lvl2"  toName="G"/>
+         <PointTransition decoration="upstairs"   name="I" x="11"  y="10"  dir="EAST"  toMap="charlock_lvl2"  toName="I"/>
+         <PointTransition decoration="upstairs"   name="H" x="10"  y="11"  dir="EAST"  toMap="charlock_lvl2"  toName="H"/>
+         <PointTransition decoration="upstairs"   name="E" x="2"   y="3"   dir="EAST"  toMap="charlock_lvl2"  toName="E"/>
+         <PointTransition decoration="upstairs"   name="J" x="7"   y="2"   dir="EAST"  toMap="charlock_lvl2"  toName="J"/>
+         <PointTransition decoration="downstairs" name="K" x="5"   y="2"   dir="WEST"  toMap="charlock_lvl4"  toName="K"/>
+         <PointTransition decoration="downstairs" name="L" x="11"  y="3"   dir="WEST"  toMap="charlock_lvl4"  toName="L"/>
+         <PointTransition decoration="downstairs" name="M" x="2"   y="10"  dir="WEST"  toMap="charlock_lvl4"  toName="M"/>
+         <PointTransition decoration="downstairs" name="N" x="3"   y="11"  dir="WEST"  toMap="charlock_lvl4"  toName="N"/>
+
+         <MapDecoration type="chest" x="7" y="7">
+            <DialogAssert type="LACKS_ITEM" name="Erdrick's Sword"><DialogGoTo label="empty_chest"/></DialogAssert>
+            <DialogAction type="GAIN_ITEM" name="Erdrick's Sword"/>
+            <Dialog>Fortune smiles upon thee!  Thou hast found the Erdrick's Sword.</Dialog></MapDecoration>
+      </Map>
+
+      <Map name="charlock_lvl4" tiles="legacy/charlock_lvl4.dat" music="dungeon_lvl_4" monsterSet="17" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="K" x="9"   y="2"   dir="EAST"  toMap="charlock_lvl3"  toName="K"/>
+         <PointTransition decoration="upstairs"   name="L" x="4"   y="4"   dir="EAST"  toMap="charlock_lvl3"  toName="L"/>
+         <PointTransition decoration="upstairs"   name="M" x="7"   y="6"   dir="EAST"  toMap="charlock_lvl3"  toName="M"/>
+         <PointTransition decoration="upstairs"   name="N" x="2"   y="11"  dir="EAST"  toMap="charlock_lvl3"  toName="N"/>
+         <PointTransition decoration="downstairs" name="O" x="3"   y="8"   dir="WEST"  toMap="charlock_lvl5"  toName="O"/>
+         <PointTransition decoration="downstairs" name="P" x="9"   y="9"   dir="WEST"  toMap="charlock_lvl5"  toName="P"/>
+      </Map>
+
+      <Map name="charlock_lvl5" tiles="legacy/charlock_lvl5.dat" music="dungeon_lvl_5" monsterSet="17" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="O" x="2"   y="11"  dir="EAST"  toMap="charlock_lvl4"  toName="O"/>
+         <PointTransition decoration="upstairs"   name="P" x="9"   y="9"   dir="EAST"  toMap="charlock_lvl4"  toName="P"/>
+         <PointTransition decoration="downstairs" name="R" x="10"  y="3"   dir="WEST"  toMap="charlock_lvl6"  toName="R"/>
+         <PointTransition decoration="downstairs" name="Q" x="4"   y="4"   dir="WEST"  toMap="charlock_lvl6"  toName="Q"/>
+      </Map>
+
+      <Map name="charlock_lvl6" tiles="legacy/charlock_lvl6.dat" music="dungeon_lvl_6" monsterSet="18" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="R" x="6"   y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="R"/>
+         <PointTransition decoration="upstairs"   name="Q" x="11"  y="2"   dir="EAST"  toMap="charlock_lvl5"  toName="Q"/>
+         <PointTransition decoration="downstairs" name="T" x="2"   y="2"   dir="WEST"  toMap="charlock_lvl7a" toName="T"/>
+         <PointTransition decoration="downstairs" name="S" x="7"   y="7"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
+      </Map>
+
+      <Map name="charlock_lvl7a" tiles="legacy/charlock_lvl7a.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="T" x="2"   y="4"   dir="EAST"  toMap="charlock_lvl6"  toName="T"/>
+         <PointTransition decoration="downstairs" name="U" x="11"  y="4"   dir="WEST"  toMap="charlock_lvl8"  toName="U"/>
+      </Map>
+
+      <Map name="charlock_lvl7b" tiles="legacy/charlock_lvl7b.dat" music="dungeon_lvl_7" monsterSet="18" lightDiameter="1" isOutside="no">
+         <PointTransition decoration="upstairs"   name="S" x="2"   y="2"   dir="EAST"  toMap="charlock_lvl6"  toName="S"/>
+         <PointTransition decoration="downstairs"          x="11"  y="2"   dir="WEST"  toMap="charlock_lvl7b" toName="S"/>
+      </Map>
+
+      <Map name="charlock_lvl8" tiles="legacy/charlock_lvl8.dat" music="dungeon_lvl_8" monsterSet="18" encounterBackground="darkness" lightDiameter="unlimited" isOutside="no">
+         <PointTransition decoration="upstairs"   name="U" x="10"  y="29"  dir="NORTH" toMap="charlock_lvl7a" toName="U"/>
+
+         <MapDecoration type="door"  x="17" y="12"/>
+
+         <MapDecoration type="chest" x="11" y="11"><DialogGoTo label="herb_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="12"><DialogGoTo label="herb_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="12">
+            <DialogVariable name="[CHEST_GOLD]" value="500-755"/>
+            <DialogGoTo label="gold_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="11" y="13"><DialogGoTo label="key_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="12" y="13"><DialogGoTo label="wings_chest"/></MapDecoration>
+         <MapDecoration type="chest" x="13" y="13"><DialogGoTo label="cursed_belt_chest"/></MapDecoration>
+
+         <MapDecoration type="throne_evil" x="16" y="23"/>
+         <MapDecoration type="pass"        x="16" y="23"/>
+
+         <NonPlayerCharacter type="dragonlord" x="16" y="23" dir="SOUTH" walking="no" inverseProgressMarker="PM_Defeated_Dragonlord">
+            <Dialog>"Welcome, [NAME]. I am the Dragonlord--King of Kings."</Dialog>
+            <Dialog>"I have been waiting long for one such as thee."</Dialog>
+            <Dialog>"I give thee now a chance to share this world and to rule half of it if thou will now stand beside me."</Dialog>
+            <Dialog>"What sayest thou?  Will the great warrior stand with me?"</Dialog>
+            <DialogOptions>
+               <DialogOption name="Yes">
+                  <Dialog>"Really?"</Dialog>
+                  <DialogOptions>
+                     <DialogOption name="Yes">
+                        <Dialog>"Then half of this world is thine, half of the darkness, and..."</Dialog>
+                        <Dialog>"If thou dies I can bring thee back for another attempt without loss of thy deeds to date."</Dialog>
+                        <Dialog>"Thy journey is over.  Take now a long, long rest."</Dialog>
+                        <Dialog>"Hahahaha..."</Dialog>
+                        <DialogAction type="LOSE_ITEM" name="gp" count="unlimited" bypass="yes"/>
+                        <DialogAction type="LOSE_ITEM" name="xp" count="unlimited" bypass="yes"/>
+                        <DialogAction type="SET_LEVEL" name="Minion" bypass="yes"/>
+                        <DialogAction type="VISUAL_EFFECT" name="evilDeathLoop"/></DialogOption>
+                     <DialogOption name="No">
+                        <DialogGoTo label="fight_dragon_lord"/></DialogOption></DialogOptions></DialogOption>
+               <DialogOption name="No" label="fight_dragon_lord">
+                  <Dialog>"Thou art a fool!"</Dialog>
+                  <DialogAction type="START_ENCOUNTER" name="Dragonlord">
+                     <ApproachDialog><Dialog>The Dragonlord draws near!</Dialog></ApproachDialog>
+                     <VictoryDialog>
+                        <DialogAction type="SET_LIGHT_DIAMETER" count="0"/>
+                        <DialogAction type="START_ENCOUNTER" name="Dragonlord's True Form" encounterMusic="final_combat">
+                           <ApproachDialog><Dialog>The Dragonlord revealed his true self!</Dialog></ApproachDialog>
+                           <VictoryDialog>
+                              <DialogAction type="GAIN_ITEM" name="PM_Defeated_Dragonlord"/>
+                              <DialogAction type="GAIN_ITEM" name="Ball of Light"/>
+                              <Dialog>Thou hast done well in defeating the Dragonlord.</Dialog>
+                              <Dialog>Thou hast found the Ball of Light.</Dialog>
+                              <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog>
+                              <Dialog>Across the land spreads the brilliance until all shadows are banished and peace is restored.</Dialog>
+                              <DialogAction type="PLAY_SOUND" name="walk_away"/>
+                              <DialogAction type="GOTO_COORDINATES" map="overworld" location="Charlock Castle" dir="SOUTH"/></VictoryDialog>
+                           <RunAwayDialog><DialogAction type="SET_LIGHT_DIAMETER" count="unlimited"/></RunAwayDialog>
+                        </DialogAction></VictoryDialog>
+                  </DialogAction></DialogOption></DialogOptions></NonPlayerCharacter>
+      </Map>
+   </Maps>
+
+   <DialogScripts>
+      <DialogScript label="weapon_and_armor_vendor">
+         <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
+            <InventoryItemType type="Weapon"/>
+            <InventoryItemType type="Armor"/>
+            <InventoryItemType type="Shield"/>
+         </DialogVariable>
+         <Dialog>"We deal in weapons and armor.  Dost thou wish to buy or sell anything today?"</Dialog>
+         <DialogOptions label="buy_or_sell_weapon_and_armor_option">
+            <DialogOption name="Buy">
+               <Dialog>"What dost thou wish to buy?"</Dialog>
+               <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
+                  <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
+               <Dialog>"The [ITEM]?  Is that okay?"</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+               <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
+            <DialogOption name="Sell">
+               <Dialog>"What dost thou wish to sell?"</Dialog>
+               <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogAssert>
+               <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+               <DialogGoTo label="buy_or_sell_weapon_and_armor_option"/></DialogOption>
+            <DialogOption name="No Thank Thee">
+               <Dialog>"Very well then.  If you change your mind you know where to find me."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="tool_vendor">
+         <DialogVariable name="[SELL_ITEMS]" value="INVENTORY_ITEM_TYPE_LIST">
+            <InventoryItemType type="Tool"/>
+         </DialogVariable>
+         <Dialog>"Welcome.  We deal in tools.  What can I do for thee?"</Dialog>
+         <DialogOptions label="buy_or_sell_tool_option">
+            <DialogOption name="Buy">
+               <Dialog>"What dost thou want?"</Dialog>
+               <DialogVendorBuyOptions values="[BUY_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
+                  <Dialog>"Sorry.  Thou hast not enough gold."</Dialog>
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
+               <Dialog>"The [ITEM]?  Is that okay?"</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+                     <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+               <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
+            <DialogOption name="Sell">
+               <Dialog>"What dost thou want to sell?"</Dialog>
+               <DialogVendorSellOptions values="[SELL_ITEMS]"/>
+               <DialogAssert type="IS_DEFINED" name="[ITEM]">
+                  <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+                  <DialogGoTo label="buy_or_sell_tool_option"/></DialogAssert>
+               <Dialog>"The [ITEM]?  I will give you [COST] gold pieces for it.  Is that okay?"</Dialog>
+               <DialogOptions>
+                  <DialogOption name="Yes">
+                     <DialogAction type="LOSE_ITEM" name="[ITEM]"/>
+                     <DialogAction type="GAIN_ITEM" name="gp" count="[COST]"/></DialogOption>
+                  <DialogOption name="No"/></DialogOptions>
+               <Dialog>"Dost thou wish to buy or sell anything more?"</Dialog>
+               <DialogGoTo label="buy_or_sell_tool_option"/></DialogOption>
+            <DialogOption name="No Thank Thee">
+               <Dialog>"I will be waiting for thy next visit."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="key_vendor">
+         <DialogVariable name="[ITEM]" value="Key"/>
+         <Dialog>"Magic keys!  They will unlock any door.  Dost thou wish to purchase one for [COST] gold peices?"</Dialog>
+         <DialogOptions label="key_buy_option">
+            <DialogOption name="Yes">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"I will see thee later."</Dialog></DialogAssert>
+               <Dialog>"Here you go."</Dialog>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
+               <Dialog>"Here, take this key.  Dost thou wish to purchase more?"</Dialog>
+               <DialogGoTo label="key_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>"I will see thee later."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="fairy_water_vendor">
+         <DialogVariable name="[ITEM]" value="Fairy Water"/>
+         <Dialog>"Will thou buy some Fairy Water for [COST] gold pieces to keep the Dragonlord's minions away?"</Dialog>
+         <DialogOptions label="fairy_water_buy_option">
+            <DialogOption name="Yes">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"All the best to thee."</Dialog></DialogAssert>
+               <Dialog>"Here you go."</Dialog>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
+               <Dialog>"I thank thee.  Won't thou buy one more bottle?"</Dialog>
+               <DialogGoTo label="fairy_water_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>"All the best to thee."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="single_item_vendor_buy_option">
+         <DialogOptions>
+            <DialogOption name="Yes">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
+                  <Dialog>"Thou dost not have enough gold."</Dialog>
+                  <Dialog>"Please come again when you have more gold!"</Dialog></DialogAssert>
+               <Dialog>"Here you go."</Dialog>
+               <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
+               <Dialog>"Would you like to buy another?"</Dialog>
+               <DialogGoTo label="single_item_vendor_buy_option"/></DialogOption>
+            <DialogOption name="No">
+               <Dialog>"All the best to thee."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="innkeeper">
+         <Dialog>"Welcome to the Traveler's Inn.  Room and board is [COST] gold pieces per night.  Dost thou want a room?"</Dialog>
+         <DialogOptions>
+            <DialogOption name="Yes">
+               <DialogAssert type="HAS_ITEM" name="gp" count="[COST]"><Dialog>Thou dost not have enough gold.</Dialog></DialogAssert>
+               <Dialog>"Have a great night!"</Dialog>
+               <DialogAction type="PLAY_MUSIC" name="night_at_inn"/>
+               <DialogAction type="VISUAL_EFFECT" name="fadeOutToBlack"/>
+               <DialogAction type="MAGIC_RESTORE" count="unlimited" bypass="yes"/>
+               <DialogAction type="HEALTH_RESTORE" count="unlimited" bypass="yes"/>
+               <DialogAction type="LOSE_ITEM" name="gp" count="[COST]" bypass="yes"/>
+               <DialogAction type="VISUAL_EFFECT" name="fadeInFromBlack"/>
+               <Dialog>"Good morning!  Thou seems to have spent a good night.  I shall see thee again."</Dialog></DialogOption>
+            <DialogOption name="No">
+               <Dialog>"Okay.  Goodbye, traveler."</Dialog></DialogOption></DialogOptions></DialogScript>
+
+      <DialogScript label="found_nothing">
+         <Dialog>[NAME] searched the ground and found nothing.</Dialog></DialogScript>
+
+      <DialogScript label="empty_chest">
+         <Dialog>The chest was empty.</Dialog></DialogScript>
+
+      <DialogScript label="key_chest">
+         <DialogAction type="GAIN_ITEM" name="Key"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a key.</Dialog></DialogScript>
+
+      <DialogScript label="gold_chest">
+         <DialogAction type="GAIN_ITEM" name="gp" count="[CHEST_GOLD]"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found [CHEST_GOLD] gold pieces.</Dialog></DialogScript>
+
+      <DialogScript label="torch_chest">
+         <DialogAction type="GAIN_ITEM" name="Torch"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a torch.</Dialog></DialogScript>
+
+      <DialogScript label="herb_chest">
+         <DialogAction type="GAIN_ITEM" name="Herb"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found a herb.</Dialog></DialogScript>
+
+      <DialogScript label="wings_chest">
+         <DialogAction type="GAIN_ITEM" name="Wings"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found the Wings of the Wyvern.</Dialog></DialogScript>
+
+      <DialogScript label="cursed_belt_chest">
+         <DialogAction type="GAIN_ITEM" name="Cursed Belt"/>
+         <Dialog>Fortune smiles upon thee!  Thou hast found the Cursed Belt.</Dialog></DialogScript>
+
+      <DialogScript label="end_of_dialog"/>
+   </DialogScripts>
+
+   <!--<Monsters>
+      <Monster name="Stopper"                image="stopper.png"                strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Slime"                  image="slime.png"                  strength="5"   agility="3"   hp="3"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="1"/>
+      <Monster name="Red Slime"              image="red_slime.png"              strength="7"   agility="3"   hp="4"       sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="1"   gp="2"/>
+      <Monster name="Drakee"                 image="drakee.png"                 strength="9"   agility="6"   hp="5-6"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="2"   gp="2"/>
+      <Monster name="Ghost"                  image="ghost.png"                  strength="11"  agility="8"   hp="6-7"     sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="3"   gp="3-4"/>
+      <Monster name="Magician"               image="magician.png"               strength="11"  agility="12"  hp="10-13"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="4"   gp="9-11">
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
+      <Monster name="Magidrakee"             image="magidrakee.png"             strength="14"  agility="14"  hp="12-15"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="5"   gp="9-11">
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
+      <Monster name="Scorpion"               image="scorpion.png"               strength="18"  agility="16"  hp="16-20"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.25"  xp="6"   gp="12-15"/>
+      <Monster name="Druin"                  image="druin.png"                  strength="20"  agility="18"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="7"   gp="12-15"/>
+      <Monster name="Poltergeist"            image="poltergeist.png"            strength="18"  agility="20"  hp="18-23"   sleepResist="0/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="8"   gp="13-17">
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
+      <Monster name="Droll"                  image="droll.png"                  strength="24"  agility="24"  hp="19-25"   sleepResist="0/16"  stopspellResist="14/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="10"  gp="18-24"/>
+      <Monster name="Drakeema"               image="drakeema.png"               strength="22"  agility="26"  hp="16-20"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="6/64"  blockFactor="0.25"  xp="11"  gp="15-19">
+         <MonsterActionRule type="Heal" probability="0.25" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
+      <Monster name="Skeleton"               image="skeleton.png"               strength="28"  agility="22"  hp="23-30"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="11"  gp="22-29"/>
+      <Monster name="Warlock"                image="warlock.png"                strength="28"  agility="22"  hp="23-30"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="13"  gp="26-34">
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
+      <Monster name="Metal Scorpion"         image="metal_scorpion.png"         strength="36"  agility="42"  hp="17-22"   sleepResist="0/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="14"  gp="30-39"/>
+      <Monster name="Wolf"                   image="wolf.png"                   strength="40"  agility="30"  hp="26-34"   sleepResist="1/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="16"  gp="37-49"/>
+      <Monster name="Wraith"                 image="wraith.png"                 strength="44"  agility="34"  hp="28-36"   sleepResist="7/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="17"  gp="45-59">
+         <MonsterActionRule type="Heal" probability="0.25" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.5"/></Monster>
+      <Monster name="Metal Slime"            image="metal_slime.png"            strength="10"  agility="255" hp="4"       sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="1/64"  blockFactor="0.25"  xp="115" gp="4-5">
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
+      <Monster name="Specter"                image="specter.png"                strength="40"  agility="38"  hp="28-36"   sleepResist="3/16"  stopspellResist="1/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="18"  gp="52-69">
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.75"/></Monster>
+      <Monster name="Wolflord"               image="wolflord.png"               strength="50"  agility="36"  hp="29-38"   sleepResist="4/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.25"  xp="20"  gp="60-79">
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
+      <Monster name="Druinlord"              image="druinlord.png"              strength="47"  agility="40"  hp="27-35"   sleepResist="15/16" stopspellResist="0/16"  hurtResist="0/16"  dodge="4/64"  blockFactor="0.25"  xp="20"  gp="63-84">
+         <MonsterActionRule type="Heal" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurt" probability="0.25"/></Monster>
+      <Monster name="Drollmagi"              image="drollmagi.png"              strength="52"  agility="50"  hp="29-38"   sleepResist="2/16"  stopspellResist="2/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="22"  gp="67-89">
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
+      <Monster name="Wyvern"                 image="wyvern.png"                 strength="56"  agility="48"  hp="32-42"   sleepResist="4/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="24"  gp="75-99"/>
+      <Monster name="Rogue Scorpion"         image="rogue_scorpion.png"         strength="60"  agility="90"  hp="27-35"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="26"  gp="82-109"/>
+      <Monster name="Wraith Knight"          image="wraith_knight.png"          strength="68"  agility="56"  hp="35-46"   sleepResist="5/16"  stopspellResist="0/16"  hurtResist="3/16"  dodge="4/64"  blockFactor="0.375" xp="28"  gp="90-119">
+         <MonsterActionRule type="Heal" probability="0.75" healthRatioThreshold="0.25"/></Monster>
+      <Monster name="Golem"                  image="golem.png"                  strength="120" agility="60"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="0.375" xp="5"   gp="7-9"/>
+      <Monster name="Goldman"                image="goldman.png"                strength="48"  agility="40"  hp="38-50"   sleepResist="13/16" stopspellResist="15/16" hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="6"   gp="150-199"/>
+      <Monster name="Knight"                 image="knight.png"                 strength="76"  agility="78"  hp="42-55"   sleepResist="6/16"  stopspellResist="7/16"  hurtResist="0/16"  dodge="1/64"  blockFactor="0.375" xp="33"  gp="97-129">
+         <MonsterActionRule type="Stopspell" probability="0.5"/></Monster>
+      <Monster name="Magiwyvern"             image="magiwyvern.png"             strength="78"  agility="68"  hp="44-58"   sleepResist="2/16"  stopspellResist="0/16"  hurtResist="0/16"  dodge="2/64"  blockFactor="0.375" xp="34"  gp="105-139">
+         <MonsterActionRule type="Sleep" probability="0.5"/></Monster>
+      <Monster name="Demon Knight"           image="demon_knight.png"           strength="79"  agility="64"  hp="38-50"   sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="15/64" blockFactor="0.375" xp="37"  gp="112-149"/>
+      <Monster name="Werewolf"               image="werewolf.png"               strength="86"  agility="70"  hp="46-60"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="0/16"  dodge="7/64"  blockFactor="0.375" xp="40"  gp="116-154"/>
+      <Monster name="Green Dragon"           image="green_dragon.png"           strength="88"  agility="74"  hp="49-65"   sleepResist="7/16"  stopspellResist="15/16" hurtResist="2/16"  dodge="2/64"  blockFactor="0.5"   xp="45"  gp="120-159">
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
+      <Monster name="Starwyvern"             image="starwyvern.png"             strength="86"  agility="80"  hp="49-65"   sleepResist="8/16"  stopspellResist="0/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="0.5"   xp="43"  gp="120-159">
+         <MonsterActionRule type="Healmore" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
+      <Monster name="Wizard"                 image="wizard.png"                 strength="80"  agility="70"  hp="49-65"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="0.5"   xp="50"  gp="123-164">
+         <MonsterActionRule type="Hurtmore" probability="0.5"/></Monster>
+      <Monster name="Axe Knight"             image="axe_knight.png"             strength="94"  agility="82"  hp="53-70"   sleepResist="15/16" stopspellResist="3/16"  hurtResist="1/16"  dodge="1/64"  blockFactor="0.5"   xp="54"  gp="123-164">
+         <MonsterActionRule type="Sleep" probability="0.25"/></Monster>
+      <Monster name="Blue Dragon"            image="blue_dragon.png"            strength="98"  agility="84"  hp="53-70"   sleepResist="15/16" stopspellResist="15/16" hurtResist="7/16"  dodge="2/64"  blockFactor="0.5"   xp="60"  gp="112-149">
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
+      <Monster name="Stoneman"               image="stoneman.png"               strength="100" agility="40"  hp="121-160" sleepResist="2/16"  stopspellResist="15/16" hurtResist="1/16"  dodge="1/64"  blockFactor="1.0"   xp="65"  gp="105-139"/>
+      <Monster name="Armored Knight"         image="armored_knight.png"         strength="105" agility="86"  hp="68-90"   sleepResist="15/16" stopspellResist="7/16"  hurtResist="1/16"  dodge="2/64"  blockFactor="1.0"   xp="70"  gp="105-139">
+         <MonsterActionRule type="Healmore" probability="0.75" healthRatioThreshold="0.25"/>
+         <MonsterActionRule type="Hurtmore" probability="0.25"/></Monster>
+      <Monster name="Red Dragon"             image="red_dragon.png"             strength="120" agility="90"  hp="76-100"  sleepResist="15/16" stopspellResist="7/16"  hurtResist="15/16" dodge="2/64"  blockFactor="1.0"   xp="100" gp="105-139">
+         <MonsterActionRule type="Sleep" probability="0.25"/>
+         <MonsterActionRule type="BreathFire" probability="0.25"/></Monster>
+      <Monster name="Dragonlord"             image="dragonlord_first_form.png"  strength="90"  agility="75"  hp="76-100"  sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
+         <MonsterActionRule type="Stopspell" probability="0.25"/>
+         <MonsterActionRule type="Hurtmore" probability="0.75"/></Monster>
+      <Monster name="Dragonlord's True Form" image="dragonlord_second_form.png" strength="140" agility="200" hp="130"     sleepResist="15/16" stopspellResist="15/16" hurtResist="15/16" dodge="0/64"  blockFactor="1.0"   xp="0"   gp="0" allowsCriticalHits="no" mayRunAway="no">
+         <MonsterActionRule type="BreathStrongFire" probability="0.5"/></Monster>
+   </Monsters>-->
+
+   <MonsterSets>
+      <MonsterSet name="0">
+         <Monster name="Slime"/>
+         <Monster name="Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+         <Monster name="Stopper"/>
+      </MonsterSet>
+      <MonsterSet name="1">
+         <Monster name="Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+      </MonsterSet>
+      <MonsterSet name="2">
+         <Monster name="Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Ghost"/>
+         <Monster name="Ghost"/>
+      </MonsterSet>
+      <MonsterSet name="3">
+         <Monster name="Red Slime"/>
+         <Monster name="Red Slime"/>
+         <Monster name="Drakee"/>
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+      </MonsterSet>
+      <MonsterSet name="4">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+      </MonsterSet>
+      <MonsterSet name="5">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Skeleton"/>
+      </MonsterSet>
+      <MonsterSet name="6">
+         <Monster name="Magidrakee"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+         <Monster name="Wolf"/>
+      </MonsterSet>
+      <MonsterSet name="7">
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+         <Monster name="Metal Scorpion"/>
+         <Monster name="Wolf"/>
+         <Monster name="Wolf"/>
+      </MonsterSet>
+      <MonsterSet name="8">
+         <Monster name="Metal Scorpion"/>
+         <Monster name="Wraith"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Goldman"/>
+      </MonsterSet>
+      <MonsterSet name="9">
+         <Monster name="Wraith"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Goldman"/>
+         <Monster name="Wyvern"/>
+         <Monster name="Wyvern"/>
+      </MonsterSet>
+      <MonsterSet name="10">
+         <Monster name="Wyvern"/>
+         <Monster name="Rogue Scorpion"/>
+         <Monster name="Wraith Knight"/>
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+      </MonsterSet>
+      <MonsterSet name="11">
+         <Monster name="Wraith Knight"/>
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+         <Monster name="Magiwyvern"/>
+         <Monster name="Metal Slime"/>
+      </MonsterSet>
+      <MonsterSet name="12">
+         <Monster name="Knight"/>
+         <Monster name="Demon Knight"/>
+         <Monster name="Magiwyvern"/>
+         <Monster name="Werewolf"/>
+         <Monster name="Starwyvern"/>
+      </MonsterSet>
+      <MonsterSet name="13">
+         <Monster name="Werewolf"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Green Dragon"/>
+         <Monster name="Wizard"/>
+      </MonsterSet>
+      <MonsterSet name="14">
+         <Monster name="Poltergeist"/>
+         <Monster name="Droll"/>
+         <Monster name="Drakeema"/>
+         <Monster name="Skeleton"/>
+         <Monster name="Warlock"/>
+      </MonsterSet>
+      <MonsterSet name="15">
+         <Monster name="Specter"/>
+         <Monster name="Wolflord"/>
+         <Monster name="Druinlord"/>
+         <Monster name="Drollmagi"/>
+         <Monster name="Wraith Knight"/>
+      </MonsterSet>
+      <MonsterSet name="16">
+         <Monster name="Werewolf"/>
+         <Monster name="Green Dragon"/>
+         <Monster name="Starwyvern"/>
+         <Monster name="Wizard"/>
+         <Monster name="Axe Knight"/>
+      </MonsterSet>
+      <MonsterSet name="17">
+         <Monster name="Wizard"/>
+         <Monster name="Axe Knight"/>
+         <Monster name="Blue Dragon"/>
+         <Monster name="Blue Dragon"/>
+         <Monster name="Stoneman"/>
+      </MonsterSet>
+      <MonsterSet name="18">
+         <Monster name="Wizard"/>
+         <Monster name="Stoneman"/>
+         <Monster name="Armored Knight"/>
+         <Monster name="Armored Knight"/>
+         <Monster name="Red Dragon"/>
+      </MonsterSet>
+      <MonsterSet name="19">
+         <Monster name="Ghost"/>
+         <Monster name="Magician"/>
+         <Monster name="Scorpion"/>
+         <Monster name="Druin"/>
+         <Monster name="Druin"/>
+      </MonsterSet>
+   </MonsterSets>
+
+   <MonsterActions default="Attack">
+      <MonsterAction name="Attack"           target="SINGLE_ENEMY">
+         <DialogAction type="PLAY_SOUND" name="attack"/>
+         <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+         <DialogAction type="DAMAGE_TARGET"  category="PHYSICAL"/></MonsterAction>
+
+      <MonsterAction name="Heal"             spell="Heal"/>
+
+      <MonsterAction name="Hurt"             spell="Hurt"/>
+
+      <MonsterAction name="Sleep"            spell="Sleep"/>
+
+      <MonsterAction name="Stopspell"        spell="Stopspell"/>
+
+      <MonsterAction name="Healmore"         spell="Healmore"/>
+
+      <MonsterAction name="Hurtmore"         spell="Hurtmore"/>
+
+      <MonsterAction name="BreathFire"       target="ALL_ENEMIES">
+         <DialogAction type="PLAY_SOUND" name="fire_attack"/>
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
+         <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="16-23"/></MonsterAction>
+
+      <MonsterAction name="BreathStrongFire" target="ALL_ENEMIES">
+         <DialogAction type="PLAY_SOUND" name="fire_attack"/>
+         <Dialog>[ACTOR] is breathing fire.</Dialog>
+         <DialogAction type="DAMAGE_TARGET"  category="FIRE" count="65-72"/></MonsterAction>
+   </MonsterActions>
+
+<!--
+TODO: Add strings to have localization support in this file
+
+MC = Main Character
+PC = Party Character - member of the party other than the main character
+
+MC/PC actually different for different party members, or branching based on party size?
+
+Monster approach:                         A [ACTOR] draws near!
+
+Monster initiative MC:                    The [ACTOR] attacked before [TARGET] was ready.
+Monster initiative PC:                    The [ACTOR] attacked before [TARGET] was ready.
+
+MC spell cast:                            [ACTOR] cast the spell of [SPELLNAME].
+PC spell cast:                            [ACTOR] cast the spell of [SPELLNAME].
+Monster spell cast:                       The [ACTOR] cast the spell of [SPELLNAME].
+
+TODO: Combine these into the prior sentence
+Spell did not work due to STOPSPELL:      But that spell hath been blocked.
+Spell did not work for any other reason:  But that spell did not work.
+
+sleep success against MC:                 Thou art asleep.
+sleep success against PC:                 [TARGET] is asleep.
+sleep success against monster:            Thou has put the [TARGET] to sleep.
+
+MC still asleep:                          Thou art still asleep.
+PC still asleep:                          [ACTOR] is asleep.
+Monster still asleep:                     The [ACTOR] is asleep.
+
+MC wakes:                                 [ACTOR] awakes.
+PC wakes:                                 [ACTOR] awakes.
+Monster wakes:                            The [ACTOR] hath woken up.
+
+stopspell success against MC:             [ACTOR]'s spells hath been blocked.
+stopspell success against PC:             [ACTOR]'s spells hath been blocked.
+stopspell success against monster:        The [ACTOR]'s spells hath been blocked.
+
+MC healed:                                <none>
+PC healed:                                <none>
+Monster healed:                           The [TARGET] hath recovered.
+
+MC regular attack:                        [ACTOR] attacks!
+PC regular attack:                        [ACTOR] attacks!
+Monster regular attack:                   The [ACTOR] attacks!
+
+Monster fire attack:                      The [ACTOR] is breathing fire.
+
+MC Excellent move:                        Excellent move!
+PC Excellent move:                        Excellent move!
+Monster Excellent move:                   Excellent move!
+
+MC dodge:                                 [TARGET] dodges the strike.
+PC dodge:                                 [TARGET] dodges the strike.
+Monster dodge:                            It is dodging!
+
+No damage on attack to MC:                [TARGET] dodges the strike.
+No damage on attack to PC:                [TARGET] dodges the strike.
+No damage on attach to monster:           A miss! No damage hath been scored!
+
+Damage to MC:                             Thy hit points reduced by [DAMAGE].
+Damage to PC:                             [TARGET]'s hit points reduced by [DAMAGE].
+Damage to monster:                        The [TARGET]'s hit points reduced by [DAMAGE].
+
+MC run away (success):                    [ACTOR] started to run away.
+PC run away (success):                    [ACTOR] started to run away.
+Monster run away (success):               The [ACTOR] is running away.
+
+MC run away (failure):                    [ACTOR] started to run away but was blocked in front.
+PC run away (failure):                    [ACTOR] started to run away but was blocked in front.
+Monster run away (failure):               The [ACTOR] tried to run away but was blocked in front.
+
+
+You have vanquished all your foes.
+All part members gain # experience points.  You obtain X pieces of gold.
+
+[NAME]'s party attemps to flee.  But all escape paths are blocked.
+# monster type and # monster type appear!
+-->
+
+   <Spells>
+      <Spell name="Heal"      mp="4"  availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
+         <Dialog>[ACTOR] cast the spell of heal.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="10-17" category="MAGICAL"/></Spell>
+
+      <Spell name="Hurt"      mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="SINGLE_ENEMY">
+         <Dialog>[ACTOR] cast the spell of hurt.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="5-12" category="MAGICAL"/></DialogAssert>
+         <DialogAction type="DAMAGE_TARGET" count="3-10" category="MAGICAL"/></Spell>
+
+      <Spell name="Sleep"     mp="2"  availableInCombat="yes" availableOutsideCombat="no" target="ALL_ENEMIES">
+         <Dialog>[ACTOR] cast the spell of sleep.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAction type="SLEEP" category="MAGICAL"/></Spell>
+
+      <Spell name="Radiant"   mp="3"  availableInCombat="no"  availableOutsideCombat="yes">
+         <Dialog>[ACTOR] cast the spell of radiant.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogAssert>
+         <DialogAction type="SET_LIGHT_DIAMETER" count="7" decay="70"/></Spell>
+
+      <Spell name="Stopspell" mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="ALL_ENEMIES">
+         <Dialog>[ACTOR] cast the spell of stopspell.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAction type="STOPSPELL" category="MAGICAL"/></Spell>
+
+      <Spell name="Outside"   mp="6"  availableInCombat="no"  availableOutsideCombat="yes" availableOutside="no">
+         <Dialog>[ACTOR] cast the spell of outside.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_INSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAction type="PLAY_SOUND" name="teleport"/>
+         <DialogAction type="GOTO_LAST_OUTSIDE_COORDINATES"/>
+         <Dialog>[NAME] was transported outside.</Dialog></Spell>
+
+      <Spell name="Return"    mp="8"  availableInCombat="no"  availableOutsideCombat="yes" availableInside="no">
+         <Dialog>[ACTOR] cast the spell of return.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_OUTSIDE"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAction type="PLAY_SOUND" name="teleport"/>
+         <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
+         <Dialog>[NAME] was transported to Tantegel Castle.</Dialog></Spell>
+
+      <Spell name="Repel"     mp="2"  availableInCombat="no"  availableOutsideCombat="yes">
+         <Dialog>[ACTOR] cast the spell of repel.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="REPEL_MONSTERS" decay="128"><FadeDialog><Dialog>Repel has lost its effect.</Dialog></FadeDialog></DialogAction></Spell>
+
+      <Spell name="Healmore"  mp="10" availableInCombat="yes" availableOutsideCombat="yes" target="SINGLE_ALLY">
+         <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="85-100"/></Spell>
+
+      <Spell name="Hurtmore"  mp="5"  availableInCombat="yes" availableOutsideCombat="no" target="SINGLE_ENEMY">
+         <Dialog>[ACTOR] cast the spell of hurtmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAssert type="IS_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
+         <DialogAssert type="IS_TARGET_HERO"><DialogAction type="DAMAGE_TARGET" count="58-65" category="MAGICAL"/></DialogAssert>
+         <DialogAction type="DAMAGE_TARGET" count="30-45" category="MAGICAL"/></Spell>
+
+      <Spell name="Healall"  mp="20" availableInCombat="yes" availableOutsideCombat="yes" target="ALL_ALLIES">
+         <Dialog>[ACTOR] cast the spell of healmore.</Dialog>
+         <DialogAction type="PLAY_SOUND" name="cast_spell"/>
+         <DialogAction type="VISUAL_EFFECT" name="flickering"/>
+         <DialogAction type="HEALTH_RESTORE" count="unlimited"/></Spell>
+   </Spells>
+
+   <Items>
+      <Weapons default="Hands">
+         <Weapon name="Hands"            attackBonus="0"   gp="0"   target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Bamboo Pole"      attackBonus="2"   gp="10"   target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Club"             attackBonus="4"   gp="60"   target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Copper Sword"     attackBonus="10"  gp="180"  target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Hand Axe"         attackBonus="15"  gp="560"  target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Broad Sword"      attackBonus="20"  gp="1500" target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Flame Sword"      attackBonus="28"  gp="9800" target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+
+         <Weapon name="Erdrick's Sword"  attackBonus="40"  gp="2"    target="SINGLE_ENEMY">
+            <DialogAction type="PLAY_SOUND" name="attack"/>
+            <Dialog>[ACTOR] attacks [TARGET]!</Dialog>
+            <DialogAction type="DAMAGE_TARGET" category="PHYSICAL"/></Weapon>
+      </Weapons>
+      <Armors>
+         <Armor name="Clothes"           defenseBonus="2"  gp="20"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Leather Armor"     defenseBonus="4"  gp="70"   ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Chain Mail"        defenseBonus="10" gp="300"  ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Half Plate"        defenseBonus="16" gp="1000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Full Plate"        defenseBonus="24" gp="3000" ignoresTilePenalties="no"  hurtDmgModifier="1.0"  fireDmgModifier="1.0"  stopspellResistance="0"   hpRegenTiles="none"/>
+         <Armor name="Magic Armor"       defenseBonus="24" gp="7700" ignoresTilePenalties="no"  hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="0"   hpRegenTiles="3"/>
+         <Armor name="Erdrick's Armor"   defenseBonus="28" gp="2"    ignoresTilePenalties="yes" hurtDmgModifier="0.67" fireDmgModifier="0.67" stopspellResistance="1.0" hpRegenTiles="1"/>
+      </Armors>
+      <Shields>
+         <Shield name="Leather Shield"   defenseBonus="4"  gp="90"/>
+         <Shield name="Iron Shield"      defenseBonus="10" gp="800"/>
+         <Shield name="Silver Shield"    defenseBonus="20" gp="14800"/>
+         <Shield name="Erdrick's Shield" defenseBonus="25" gp="2"/> <!-- TODO: Make this available somewhere in the world -->
+      </Shields>
+      <Tools>
+         <Tool name="Dragon's Scale"     defenseBonus="2"  gp="20"   droppable="yes" equippable="yes"/>
+
+         <Tool name="Fairy Water"                          gp="38"   droppable="yes" equippable="no"  availableInCombat="no">
+            <DialogAction type="REPEL_MONSTERS" decay="128"><FadeDialog><Dialog>The fairy water has lost its effect.</Dialog></FadeDialog></DialogAction>
+            <DialogAction type="LOSE_ITEM" name="Fairy Water"/>
+            <Dialog>[ACTOR] drank the vial of fairy water.</Dialog></Tool>
+
+         <Tool name="Fighter's Ring"     attackBonus="2"   gp="30"   droppable="yes" equippable="yes"/>
+
+         <Tool name="Herb"                                 gp="24"   droppable="yes" equippable="no"  availableInCombat="yes" target="SINGLE_ALLY">
+            <Dialog>[TARGET] ate the herb.</Dialog>
+            <DialogAction type="HEALTH_RESTORE" count="23-30" category="PHYSICAL"/>
+            <DialogAction type="LOSE_ITEM" name="Herb"/></Tool>
+
+         <Tool name="Key"                                  gp="53"   droppable="yes" equippable="no"  availableInCombat="no">
+            <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key will open a lock.</Dialog></DialogAssert>
+            <DialogAction type="PLAY_SOUND" name="unlock"/>
+            <DialogAction type="LOSE_ITEM" name="Key"/>
+            <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
+
+         <Tool name="Key Ring"                             gp="1000" droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
+            <DialogAssert type="IS_FACING_LOCKED_ITEM"><Dialog>A key ring will open a lock.  Unlike a key it is reusable.</Dialog></DialogAssert>
+            <DialogAction type="PLAY_SOUND" name="unlock"/>
+            <DialogAction type="OPEN_LOCKED_ITEM"/></Tool>
+
+         <Tool name="Torch"                                gp="8"    droppable="yes" equippable="no"  availableInCombat="no">
+            <DialogAssert type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogAssert>
+            <DialogAction type="LOSE_ITEM" name="Torch"/>
+            <DialogAction type="SET_LIGHT_DIAMETER" count="3" decay="unlimited"/>
+            <Dialog>[ACTOR] lit a torch.</Dialog></Tool>
+
+         <Tool name="Lantern"                              gp="125"  droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
+            <DialogAssert type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogAssert>
+            <DialogAction type="SET_LIGHT_DIAMETER" count="5" decay="unlimited"/>
+            <Dialog>[ACTOR] lit a lattern.</Dialog></Tool>
+
+         <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no">
+            <Dialog>[ACTOR] threw the Wings of the Wyvern up into the sky.</Dialog>
+            <DialogAssert type="IS_OUTSIDE"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAction type="PLAY_SOUND" name="teleport"/>
+            <DialogAction type="GOTO_COORDINATES" map="overworld" location="Return Spell Location Point" dir="SOUTH"/>
+            <DialogAction type="LOSE_ITEM" name="Wings" count="1"/>
+            <Dialog>[ACTOR] was transported to Tantegel Castle.</Dialog></Tool>
+
+         <Tool name="Ball of Light"                                  droppable="no"  equippable="no">
+            <Dialog>Radiance streams forth as thy hands touch the object and hold it aloft.</Dialog></Tool>
+
+         <Tool name="Fairy Flute"                                    droppable="no"  equippable="no" target="ALL_ENEMIES">
+            <DialogAction type="PLAY_MUSIC" name="flute"/>
+            <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
+            <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happended.</Dialog></DialogAssert>
+            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
+
+         <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
+            <Dialog>[ACTOR] held Erdrick's Token tightly.</Dialog>
+            <Dialog>But nothing happened.</Dialog></Tool>
+
+         <Tool name="Staff of Rain"                                  droppable="no"  equippable="no">
+            <Dialog>[ACTOR] held the Staff of Rain tightly.</Dialog>
+            <Dialog>But nothing happened.</Dialog></Tool>
+
+         <Tool name="Stones of Sunlight"                             droppable="no"  equippable="no">
+            <Dialog>[ACTOR] held the Stones of Sunlight tightly.</Dialog>
+            <Dialog>But nothing happened.</Dialog></Tool>
+
+         <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
+            <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAction type="PLAY_MUSIC" name="rainbow"/>
+            <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>
+            <DialogAction type="GAIN_ITEM" name="PM_Created_Rainbow_Bridge"/>
+            <DialogAction type="LOSE_ITEM" name="Rainbow Drop"/>
+            <Dialog>A rainbow appeared forming a bridge to Charlock Island.</Dialog>
+            <DialogAction type="GOTO_COORDINATES"/></Tool> <!-- The GOTO_COORDINATES forces a setMap call to add the rainbow bridge to the map -->
+
+         <Tool name="Silver Harp"                                    droppable="no"  equippable="no">
+            <DialogAction type="PLAY_MUSIC" name="harp"/>
+            <Dialog>[ACTOR] played a sweet melody on the harp.</Dialog>
+            <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAssert type="IS_COMBAT_ALLOWED"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAction type="START_ENCOUNTER" name="Slime|Red Slime|Drakee|Ghost|Magician|Scorpion"/></Tool>
+
+         <Tool name="Gwaelin's Love"                                 droppable="no"  equippable="no">
+            <Dialog>[ACTOR] held Gwaelin's Love tightly.</Dialog>
+            <DialogAssert type="LACKS_ITEM" name="PM_Carrying_Princess"><Dialog>"[ACTOR], I'm right here!  You are so silly!"</Dialog></DialogAssert>
+            <Dialog>"Heed my voice, [ACTOR], for this is Gwaelin."</Dialog>
+            <Dialog>"To reach the next level thou must raise thy experience points by [NEXT_LEVEL_XP].  My hope is with thee."</Dialog>
+            <DialogCheck type="IS_AT_COORDINATES" map="overworld"><Dialog>"From where thou art now, my castle lies [Y] to the [Y_DIR] and [X] to the [X_DIR]."</Dialog></DialogCheck>
+            <Dialog>"I love thee, [ACTOR]."</Dialog></Tool>
+
+         <Tool name="Cursed Belt"                          gp="180"  droppable="no"  equippable="yes" unequippable="no"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
+         <Tool name="Death Necklace"                       gp="1200" droppable="no"  equippable="yes" unequippable="no"/> <!-- TODO: Implement unequipable behavior; block entry to Tantegel; removal by Brecconary sage -->
+      </Tools>
+   </Items>
+
+   <InitialState map="tantegel_lvl2" x="4" y="5" dir="NORTH" name="Hero">
+      <Dialog>"Descendant of Erdrick, listen now to my words.  It is told that in ages past Erdrick fought demons with a Ball of Light.  Then came the Dragonlord who stole the precious globe and hid it in the darkness."</Dialog>
+      <Dialog>"Now, [NAME], thou must help us recover the Ball of Light and restore peace to our land.  The Dragonlord must be defeated."</Dialog>
+      <Dialog>"Take now whatever thou may find in these treasure chests to aid thee in thy quest.  Then speak with the guards, for they have much knowledge that may aid thee."</Dialog>
+      <Dialog>"May the light shine upon thee, [NAME]."</Dialog>
+
+      <ProgressMarkers>
+         <ProgressMarker name="PM_Not_Finished_Preparing"/>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_1"/>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_2"/>
+         <ProgressMarker name="PM_Not_Taken_Initial_Chest_3"/>
+      </ProgressMarkers>
+   </InitialState>
+
+   <DeathState map="tantegel_lvl2" x="4" y="5" dir="NORTH">
+      <Dialog>"Death should not have taken thee [NAME]."</Dialog></DeathState>
+</Game>
+

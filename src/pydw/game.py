@@ -46,6 +46,8 @@ def main() -> None:
     application_name = 'pyDragonWarrior'
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', default=None,
+                        help='Set the game configuration xml file to use')
     parser.add_argument('-g', '--gamepad', action='store_true', default=None,
                         help='Gamepad (if present) will be used for providing user inputs')
     parser.add_argument('-k', '--keyboard', dest='gamepad', action='store_false',
@@ -56,6 +58,10 @@ def main() -> None:
                         help='Skip performing a pip install to a venv')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
                         help='Enable verbose logging')
+    parser.add_argument('--width', default=None,
+                        help='Window width - should be specified alongside --height')
+    parser.add_argument('--height', default=None,
+                        help='Window height - should be specified alongside --width')
     parser.add_argument('save', nargs='?', help='Load a specific saved game file')
     args = parser.parse_args()
     # print('args =', args, flush=True)
@@ -146,6 +152,7 @@ def main() -> None:
 
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'  # Silence pygame outputs to standard out
     import pygame
+    from generic_utils.point import Point
     from pygame_utils.audio_player import AudioPlayer
     from pydw.game_dialog import GameDialog
     from pydw.game_loop import GameLoop
@@ -164,23 +171,29 @@ def main() -> None:
     GameDialog.force_use_menus_for_text_entry = args.gamepad
 
     # Initialize the game
-    win_size_pixels = None  # Point(2560, 1340)
+    win_size_pixels: Optional[Point] = None  # Point(2560, 1340)
+    if args.width and args.height:
+        win_size_pixels = Point(args.width, args.height)
     tile_size_pixels = 16 * 3
-    use_unlicensed_assets = args.force_use_unlicensed_assets
-    if not use_unlicensed_assets:
-        try:
-            game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
-            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
-                                 verbose=args.verbose)
-        except Exception:
-            use_unlicensed_assets = True
-            if args.verbose:
-                print('ERROR: Failed to load licensed assets', flush=True)
-                traceback.print_exc()
-
-    if use_unlicensed_assets:
-        game_xml_path = os.path.join(base_path, 'game.xml')
+    if args.config is not None:
+        game_xml_path = args.config
         game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+    else:
+        use_unlicensed_assets = args.force_use_unlicensed_assets
+        if not use_unlicensed_assets:
+            try:
+                game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
+                game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
+                                     verbose=args.verbose)
+            except Exception:
+                use_unlicensed_assets = True
+                if args.verbose:
+                    print('ERROR: Failed to load licensed assets', flush=True)
+                    traceback.print_exc()
+
+        if use_unlicensed_assets:
+            game_xml_path = os.path.join(base_path, 'game.xml')
+            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
 
     # Run the game
     game_loop.run(args.save)

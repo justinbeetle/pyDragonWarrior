@@ -700,7 +700,12 @@ class GameState(GameStateInterface):
                 victory_dialog = special_monster_info.victory_dialog
                 run_away_dialog = special_monster_info.run_away_dialog
             else:
-                monster_info = self.game_info.monsters[random.choice(self.get_tile_monsters())]
+                random_monster = random.choice(self.get_tile_monsters())
+                if random_monster not in self.game_info.monsters:
+                    print(f'ERROR: Failed to initiate combat encounter due to lack of monster {random_monster}',
+                          flush=True)
+                    return
+                monster_info = self.game_info.monsters[random_monster]
                 monster_party = MonsterParty([MonsterState(monster_info)])
         else:
             monster_party = MonsterParty([MonsterState(monster_info)])
@@ -713,7 +718,7 @@ class GameState(GameStateInterface):
         if encounter_background is None:
             encounter_background = self.get_encounter_background()
             if encounter_background is None:
-                print('Failed to initiate combat encounter due to lack of encounter image in map ' +
+                print('ERROR: Failed to initiate combat encounter due to lack of encounter image in map',
                       self.get_map_name(), flush=True)
                 return
 

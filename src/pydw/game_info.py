@@ -5,9 +5,15 @@ from typing import Dict, List, Optional, Tuple, Union
 import concurrent.futures
 import os
 import numpy
-import xml.etree.ElementTree as ET
-import xml.etree.ElementInclude
-# import lxml.etree as ET  # May desire to use in future for better xinclude support
+import sys
+# xml.etree doesn't support nested xincludes prior to Python 3.9 (see https://github.com/python/cpython/issues/65127)
+# Prior to Python 3.9, use lxml.etree
+if sys.version_info[0] == 3 and sys.version_info[1] < 9:
+    import lxml.etree as ET
+    import lxml.ElementInclude as ETI
+else:
+    import xml.etree.ElementTree as ET
+    import xml.etree.ElementInclude as ETI
 
 import pygame
 
@@ -54,7 +60,7 @@ class GameInfo:
 
         # Parse XML
         xml_root = ET.parse(game_xml_path).getroot()
-        xml.etree.ElementInclude.include(xml_root)
+        ETI.include(xml_root)
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         image_path = os.path.join(data_path, xml_root.attrib['imagePath'])
 
@@ -117,7 +123,7 @@ class GameInfo:
     def static_init(base_path: str, game_xml_path: str, win_size_tiles: Point, tile_size_pixels: int) \
             -> Tuple[pygame.surface.Surface, str]:
         xml_root = ET.parse(game_xml_path).getroot()
-        xml.etree.ElementInclude.include(xml_root)
+        ETI.include(xml_root)
 
         data_path = os.path.join(base_path, xml_root.attrib['dataPath'])
         GameInfo.init_audio_player(xml_root, data_path)
@@ -1077,6 +1083,10 @@ class GameInfo:
                 inverse_progress_marker = None
                 if 'inverseProgressMarker' in monster_element.attrib:
                     inverse_progress_marker = monster_element.attrib['inverseProgressMarker']
+                if monster_element.attrib['name'] not in self.monsters:
+                    print(f'ERROR: Skipping special monster of unknown type {monster_element.attrib["name"]}',
+                          flush=True)
+                    continue
                 special_monsters.append(SpecialMonster(
                     self.monsters[monster_element.attrib['name']],
                     self.get_location(map_name, monster_element),
@@ -1140,7 +1150,8 @@ class GameInfo:
             # Load the encounter image
             # print('Load the encounter image', flush=True)
             encounter_background = None
-            if len(monster_zones) > 0 and 'encounterBackground' in element.attrib:
+            if len(monster_zones) > 0 and 'encounterBackground' in element.attrib and \
+                    element.attrib['encounterBackground'] in self.encounter_backgrounds:
                 encounter_background = self.encounter_backgrounds[element.attrib['encounterBackground']]
 
             # Save the map information
