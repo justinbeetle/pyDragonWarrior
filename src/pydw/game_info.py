@@ -11,6 +11,18 @@ import sys
 if sys.version_info[0] == 3 and sys.version_info[1] < 9:
     import lxml.etree as ET
     import lxml.ElementInclude as ETI
+
+    # lxml.etree._Element is not natively pickleable
+    # See https://stackoverflow.com/questions/25991860/unable-to-pass-an-lxml-etree-object-to-a-separate-process/25994232#25994232
+    def element_unpickler(data: str) -> ET._Element:
+        return ET.fromstring(data)
+
+    def element_pickler(element: ET._Element) -> str:
+        data = ET.tostring(element)
+        return element_unpickler, (data,)
+
+    import copyreg
+    copyreg.pickle(ET._Element, element_pickler, element_unpickler)
 else:
     import xml.etree.ElementTree as ET
     import xml.etree.ElementInclude as ETI
