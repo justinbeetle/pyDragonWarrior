@@ -3,6 +3,7 @@ pygame
 pyscroll
 pytmx
 certifi
+lxml;python_version<'3.9'
 opensimplex
 pytest
 mypy

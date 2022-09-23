@@ -1,1 +1,6 @@
-.
+numpy==1.22.1
+pygame==2.1.2
+pyscroll==2.29
+pytmx==3.31
+certifi
+lxml;python_version<'3.9'
