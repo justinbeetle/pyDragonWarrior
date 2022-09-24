@@ -1,7 +1,7 @@
 #run = "PYTHONPATH=src python3 src/pydw/game.py -s -v --width 1600 --height 1200 --config game_low_mem.xml"
 #run = "PYTHONPATH=src python3 src/pydw/game.py -s -u -v --width 1600 --height 1200"
-onBoot = "python3 -m pip install ."
-run = "PYTHONPATH=src python3 src/pydw/game.py -s -u"
+#onBoot = "python3 -m pip install ."
+run = "PYTHONPATH=src python3 src/pydw/game.py -u"
 language = "python3"
 hidden = ["venv", ".config", "**/__pycache__", "**/.mypy_cache", "**/*.pyc"]
 
