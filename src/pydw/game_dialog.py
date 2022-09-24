@@ -55,6 +55,10 @@ class GameDialog:
                     border_image_filename: Optional[str] = None) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
+        GameDialog.outside_spacing_pixels = tile_size_pixels // 2
+        GameDialog.internal_spacing_pixels = tile_size_pixels // 4
+        GameDialog.selection_indicator_pixels = tile_size_pixels // 3
+
         if border_image_filename is not None:
             try:
                 image = pygame.image.load(border_image_filename)
@@ -95,12 +99,18 @@ class GameDialog:
 
         # Determine font size by sizing it based on the tile size
         def calc_font_size(font_name: Optional[str]) -> int:
+            message_dialog_size_tiles = GameDialog.get_message_dialog_size_tiles()
+            if message_dialog_size_tiles.x < 10 or message_dialog_size_tiles.y < 5:
+                print('Reducing font size for small window size', flush=True)
+                desired_font_height = tile_size_pixels / 2
+            else:
+                desired_font_height = tile_size_pixels
             font_size = 1
             while create_font(font_name, font_size).get_height() < \
-                    tile_size_pixels - GameDialog.internal_spacing_pixels:
+                    desired_font_height - GameDialog.internal_spacing_pixels:
                 font_size += 1
             font_size -= 1
-            # print('Calculated font size of {} for font {}'.format(font_name, font_size), flush=True)
+            # print(f'Calculated font size of {font_size} for font {font_name}', flush=True)
             return font_size
 
         # Create fonts
@@ -389,10 +399,24 @@ class GameDialog:
             self.image.blit(title_image, (title_image_pos_x, 0))
 
     @staticmethod
+    def get_message_dialog_size_tiles(win_size_tiles: Optional[Point] = None) -> Point:
+        # Cap the maximum size of the message dialog
+        if win_size_tiles is None:
+            win_size_tiles = GameDialog.win_size_tiles
+        return Point(min(50, win_size_tiles.x - 4),
+                     min(10, (win_size_tiles.y - 1) // 2 - 1))
+
+    @staticmethod
     def create_message_dialog(message_content: Optional[str] = None) -> GameDialog:
-        dialog = GameDialog(
-            Point(2, GameDialog.win_size_tiles.y / 2 + 1.5),
-            Point(GameDialog.win_size_tiles.x - 4, (GameDialog.win_size_tiles.y - 1) / 2 - 2))
+        size_tiles = GameDialog.get_message_dialog_size_tiles()
+
+        # Determine the y position for the message dialog
+        pos_tile_y = (GameDialog.win_size_tiles.y - 1) / 2 + 1.5
+        spare_y = GameDialog.win_size_tiles.y - pos_tile_y - size_tiles.y - 2
+        if spare_y > 0:
+            pos_tile_y += spare_y
+
+        dialog = GameDialog(Point((GameDialog.win_size_tiles.x - size_tiles.x) / 2, pos_tile_y), size_tiles)
         if message_content is not None:
             dialog.add_message(message_content)
         return dialog

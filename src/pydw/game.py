@@ -174,17 +174,19 @@ def main() -> None:
     win_size_pixels: Optional[Point] = None  # Point(2560, 1340)
     if args.width and args.height:
         win_size_pixels = Point(args.width, args.height)
-    tile_size_pixels = 16 * 3
+    tile_size_pixels = 16
+    tile_scaling_factor = 3
     if args.config is not None:
         game_xml_path = args.config
-        game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+        game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
+                             tile_scaling_factor, verbose=args.verbose)
     else:
         use_unlicensed_assets = args.force_use_unlicensed_assets
         if not use_unlicensed_assets:
             try:
                 game_xml_path = os.path.join(base_path, 'game_licensed_assets.xml')
                 game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
-                                     verbose=args.verbose)
+                                     tile_scaling_factor, verbose=args.verbose)
             except Exception:
                 use_unlicensed_assets = True
                 if args.verbose:
@@ -193,7 +195,8 @@ def main() -> None:
 
         if use_unlicensed_assets:
             game_xml_path = os.path.join(base_path, 'game.xml')
-            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels)
+            game_loop = GameLoop(saves_path, base_path, game_xml_path, win_size_pixels, tile_size_pixels,
+                                 tile_scaling_factor, verbose=args.verbose)
 
     # Run the game
     game_loop.run(args.save)

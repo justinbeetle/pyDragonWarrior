@@ -29,24 +29,40 @@ class GameLoop:
                  base_path: str,
                  game_xml_path: str,
                  desired_win_size_pixels: Optional[Point],
-                 tile_size_pixels: int,
+                 unscaled_tile_size_pixels: int,
+                 desired_tile_scaling_factor: int,
                  verbose: bool = False) -> None:
         self.verbose = verbose
 
         # Determine effective window size in both tiles and pixels
         # Initialize the pygame displays
+        tile_scaling_factor = desired_tile_scaling_factor
+        tile_size_pixels = unscaled_tile_size_pixels * tile_scaling_factor
         if desired_win_size_pixels is None:
             screen = pygame.display.set_mode(
                 (0, 0),
                 pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)
             self.win_size_pixels = Point(screen.get_size())
-            win_size_tiles = (self.win_size_pixels / tile_size_pixels).floor()
         else:
-            win_size_tiles = (desired_win_size_pixels / tile_size_pixels).floor()
-            self.win_size_pixels = win_size_tiles * tile_size_pixels
+            self.win_size_pixels = desired_win_size_pixels // tile_size_pixels * tile_size_pixels
             pygame.display.set_mode(
                 self.win_size_pixels.get_as_int_tuple(),
                 pygame.SRCALPHA)
+        win_size_tiles = self.win_size_pixels / tile_size_pixels
+
+        # Determine if the tile scaling factor should be reduced
+        # Base this decision on the size of the message dialog
+        dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(win_size_tiles)
+        while tile_scaling_factor > 1 and (dialog_size_tiles.x < 10 or dialog_size_tiles.y < 5):
+            tile_scaling_factor -= 1
+
+            # Recompute the sizes after reducing tile_scaling_factor
+            tile_size_pixels = unscaled_tile_size_pixels * tile_scaling_factor
+            win_size_tiles = self.win_size_pixels / tile_size_pixels
+            dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(win_size_tiles)
+
+        if verbose and tile_scaling_factor < desired_tile_scaling_factor:
+            print(f'Reduced tile scaling factor to {tile_scaling_factor}', flush=True)
 
         self.title_image, self.title_music = \
             GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
@@ -72,8 +88,13 @@ class GameLoop:
 
         # Scale to up to 90% of the display width and/or 40% of the height
         title_image_size_px = Point(self.title_image.get_size())
-        title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.9 / title_image_size_px.w,
-                                              self.win_size_pixels.h * 0.4 / title_image_size_px.h)))
+        if title_image_size_px.w > self.win_size_pixels.w:
+            # Scale down for small window sizes
+            title_image_size_px *= 0.9 * self.win_size_pixels.w / title_image_size_px.w
+        else:
+            # Scale up for large window sizes
+            title_image_size_px *= max(1, int(min(self.win_size_pixels.w * 0.9 / title_image_size_px.w,
+                                                  self.win_size_pixels.h * 0.4 / title_image_size_px.h)))
         title_image = pygame.transform.scale(self.title_image, title_image_size_px.get_as_int_tuple())
         title_image_dest_px = Point((self.win_size_pixels.w - title_image_size_px.w) / 2,
                                     self.win_size_pixels.h / 2 - title_image_size_px.h)
