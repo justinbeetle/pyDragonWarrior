@@ -147,3 +147,7 @@ Testing with Python 3.8:
    /c/Users/justi/AppData/Local/Programs/Python/Python38/python -m venv venv
    source venv/Scripts/activate
    rm -rf build/ venv/Lib/site-packages/pydw; ./setup.py install --force; src/pydw/game.py -v -s -c game_low_mem.xml --width 1600 --height 1200
+
+Running on replit
+   source venv/bin/activate
+   pip install .

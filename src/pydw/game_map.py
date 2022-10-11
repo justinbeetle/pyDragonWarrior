@@ -45,9 +45,8 @@ class GameMapInterface(metaclass=abc.ABCMeta):
                              prev_tile: Optional[Point] = None) -> bool:
         return self.can_move_to_tile(tile, enforce_npc_hp_penalty_limit, enforce_npc_dof_limit, True, prev_tile)
 
-    def compute_npc_path(self, start: Point, goal: Point) -> Optional[List[Point]]:
+    def compute_npc_path(self, start: Point, goal: Point, verbose: bool = False) -> Optional[List[Point]]:
         """Compute a path from start to goal for an NPC using A* search"""
-        verbose = False
         if verbose:
             print(f'in compute_npc_path; start={start}; goal={goal}', flush=True)
         def h(n: Point) -> float:

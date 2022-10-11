@@ -47,7 +47,7 @@ class GameLoop:
             self.win_size_pixels = desired_win_size_pixels // tile_size_pixels * tile_size_pixels
             pygame.display.set_mode(
                 self.win_size_pixels.get_as_int_tuple(),
-                pygame.SRCALPHA)
+                pygame.RESIZABLE | pygame.SRCALPHA)
         win_size_tiles = self.win_size_pixels / tile_size_pixels
 
         # Determine if the tile scaling factor should be reduced

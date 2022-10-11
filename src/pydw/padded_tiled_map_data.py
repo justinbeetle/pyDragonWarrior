@@ -61,7 +61,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         black_tile.fill('black')
         self.tmx.images.append(black_tile)
 
-        self.image_pad_tiles = image_pad_tiles
+        self.image_pad_tiles = image_pad_tiles.ceil()
         self.reload_animations()
         self.overlay_layer_offset = 0
         self._base_tile_layers = self.calc_base_tile_layers()
