@@ -843,9 +843,9 @@ class GameInfo:
             scaled_monster_image = pygame.transform.scale(unscaled_monster_image,
                                                           (unscaled_monster_image.get_width() * monster_scale_factor,
                                                            unscaled_monster_image.get_height() * monster_scale_factor))
-            monster_image = pygame.Surface((scaled_monster_image.get_width() + 2 * black_border_pixels,
-                                            scaled_monster_image.get_height() + 2 * black_border_pixels),
-                                           pygame.SRCALPHA)
+            monster_image = pygame.surface.Surface((scaled_monster_image.get_width() + 2 * black_border_pixels,
+                                                    scaled_monster_image.get_height() + 2 * black_border_pixels),
+                                                   pygame.SRCALPHA)
 
             # Fill the image with transparency, then perform 4 blits to create the border.
             # Convert the border to black a final fill multiplying the RGB values by 0.

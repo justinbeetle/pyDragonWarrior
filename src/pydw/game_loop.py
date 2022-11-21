@@ -33,6 +33,7 @@ class GameLoop:
                  desired_tile_scaling_factor: int,
                  verbose: bool = False) -> None:
         self.verbose = verbose
+        self.successive_block_count = 0
 
         # Determine effective window size in both tiles and pixels
         # Initialize the pygame displays
@@ -277,6 +278,9 @@ class GameLoop:
                     else:
                         self.game_state.hero_party.members[0].dest_pos_dat_tile = \
                             self.game_state.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
+                else:
+                    # When not moving, reset the successive_block_count
+                    self.successive_block_count = 0
 
                 if menu:
                     AudioPlayer().play_sound('select')
@@ -525,10 +529,16 @@ class GameLoop:
             if dialog_from_inc_step_count is not None:
                 self.gde.dialog_loop(dialog_from_inc_step_count)
 
+        # Handle being blocked by terrain.  Keep a counter in order to forgive the first occurrence as the blocked
+        # sound effect was otherwise a bit excessive.
+        if movement_allowed:
+            self.successive_block_count = 0
         else:
             self.game_state.hero_party.members[0].dest_pos_dat_tile = \
                 self.game_state.hero_party.members[0].curr_pos_dat_tile
-            audio_player.play_sound('blocked')
+            if 0 < self.successive_block_count:
+                audio_player.play_sound('blocked')
+            self.successive_block_count += 1
 
         first_frame = True
         while self.game_state.hero_party.members[0].curr_pos_dat_tile != \

@@ -197,7 +197,7 @@ class GameDialog:
     def render_unicode_character(text: str, color: pygame.Color) -> pygame.surface.Surface:
         width = GameDialog.get_font_width(text)
         height = GameDialog.get_font().get_height()
-        font_surface = pygame.Surface((width, height))
+        font_surface = pygame.surface.Surface((width, height))
 
         inner_border = 4
         half_inner_width = 1
