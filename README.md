@@ -11,6 +11,7 @@ out-and-out clone or reimagining.
 [![Python application](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/python-app.yml)
 [![mypy](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml)
 [![Pylint](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml)
+[![CodeQL](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/context:python)
 
