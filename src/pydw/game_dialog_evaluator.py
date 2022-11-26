@@ -167,9 +167,7 @@ class GameDialogEvaluator:
         start_time = time.time()
         while self.game_state.is_running and is_waiting_for_user_input:
             # Process events
-            events = GameEvents.get_events(translate_e_to_enter=GameDialog.use_menus_for_text_entry())
-            if 0 == len(events):
-                pygame.time.wait(25)
+            events = GameEvents.get_events(True, translate_e_to_enter=GameDialog.use_menus_for_text_entry())
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -193,6 +191,12 @@ class GameDialogEvaluator:
                         message_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
+
+            if 0 == len(events):
+                pygame.time.wait(25)
+            else:
+                pygame.time.wait(100)
+
         stop_time = time.time()
 
         # if self.game_state.is_running:
@@ -205,9 +209,7 @@ class GameDialogEvaluator:
 
         menu_result = None
         while self.game_state.is_running and menu_result is None:
-            events = GameEvents.get_events()
-            if 0 == len(events):
-                pygame.time.wait(25)
+            events = GameEvents.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -223,6 +225,11 @@ class GameDialogEvaluator:
                         menu_dialog.process_event(event, self.game_state.screen)
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
+
+            if 0 == len(events):
+                pygame.time.wait(25)
+            else:
+                pygame.time.wait(200)
 
         if menu_result == '':
             menu_result = None

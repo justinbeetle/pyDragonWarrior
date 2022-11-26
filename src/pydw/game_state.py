@@ -631,6 +631,9 @@ class GameState(GameStateInterface):
             self.draw_map(flip_buffer=False)
 
         if advance_time:
+            # Allow pygame to process internal events for interacting with the OS every frame
+            pygame.event.pump()
+
             self.clock.tick(30)
             # self.tick_count += 1
             # if 10 == self.tick_count % 100:

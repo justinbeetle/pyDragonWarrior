@@ -76,7 +76,7 @@ class GameMapInterface(metaclass=abc.ABCMeta):
                         print(f'\t\t\tin compute_npc_path; cannot move to tile', flush=True)
                     continue
                 neighbor_tile = self.get_tile_info(neighbor)
-                tile_score = (1.0 if neighbor_tile.name == 'path' else 2.0) / neighbor_tile.movement_speed_factor
+                tile_score = (1.0 if neighbor_tile.name == 'path' else 3.0) / neighbor_tile.movement_speed_factor
                 tentative_g_score = g_score[current] + tile_score
                 if verbose:
                     print(f'\t\t\tin compute_npc_path; tentative_g_score={tentative_g_score}', flush=True)

@@ -1192,9 +1192,7 @@ def main() -> None:
         is_awaiting_selection = True
         dialog_with_menu.blit(screen, True)
         while is_awaiting_selection:
-            events = GameEvents.get_events()
-            if 0 == len(events):
-                pygame.time.wait(25)
+            events = GameEvents.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -1207,13 +1205,16 @@ def main() -> None:
                 elif event.type == pygame.QUIT:
                     pygame.quit()
 
+            if 0 == len(events):
+                pygame.time.wait(25)
+            else:
+                pygame.time.wait(200)
+
     def wait_for_user_input(dialog_with_user_input: GameDialog) -> None:
         is_waiting_for_user_input = True
         wait_for_message_to_fully_display(dialog_with_user_input)
         while is_waiting_for_user_input:
-            events = GameEvents.get_events()
-            if 0 == len(events):
-                pygame.time.wait(25)
+            events = GameEvents.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -1239,6 +1240,11 @@ def main() -> None:
                         dialog_with_user_input.process_event(event, screen)
                 elif event.type == pygame.QUIT:
                     pygame.quit()
+
+            if 0 == len(events):
+                pygame.time.wait(25)
+            else:
+                pygame.time.wait(100)
 
     screen.fill('pink')
     GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)

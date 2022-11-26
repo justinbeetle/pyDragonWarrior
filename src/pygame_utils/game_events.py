@@ -210,8 +210,10 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
 def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
     """ Generate key down events from pressed keys
 
-    Generate KEYDOWN event for held arrow keys, including WASD when they should be translated to the arrow keys and
-    the keypad keys when numlock is off.
+    The translation of TEXTINPUT events to KEYDOWN events takes care of this for letters (while handling capitalization)
+    and numbers.  This method is focused on other keys (arrow keys and backspace) and letters and numbers requiring
+    special treatment, including WASD when they should be translated to the arrow keys and the keypad keys when numlock
+    is off.
     """
     pressed = pygame.key.get_pressed()
     not_num_lock = not pygame.key.get_mods() & pygame.KMOD_NUM
@@ -231,6 +233,8 @@ def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pyga
             (translate_wasd_to_uldr and pressed[pygame.K_d]) or \
             (not_num_lock and pressed[pygame.K_KP6]):
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_RIGHT}))
+    elif pressed[pygame.K_BACKSPACE]:
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_BACKSPACE}))
 
 
 def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:

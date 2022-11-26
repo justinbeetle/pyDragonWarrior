@@ -33,7 +33,7 @@ class GameLoop:
                  desired_tile_scaling_factor: int,
                  verbose: bool = False) -> None:
         self.verbose = verbose
-        self.successive_block_count = 0
+        self.first_block_occurred = False
 
         # Determine effective window size in both tiles and pixels
         # Initialize the pygame displays
@@ -227,6 +227,9 @@ class GameLoop:
                 # Draw the map to the screen
                 self.game_state.draw_map()
 
+                # Clear the event queue for a clean start on the new map
+                GameEvents.clear_events()
+
             if self.game_state.pending_dialog is not None:
                 self.gde.dialog_loop(self.game_state.pending_dialog)
                 self.game_state.pending_dialog = None
@@ -267,13 +270,15 @@ class GameLoop:
                         self.game_state.save(quick_save=True)
                     else:
                         move_direction = Direction.get_optional_direction(event.key)
+                        if move_direction is None:
+                            continue
                 else:
                     # print('exploring_loop:  Ignoring event', event, flush=True)
                     continue
 
                 # print(datetime.datetime.now(), 'exploring_loop:  Processed event', event, flush=True)
 
-                # Clear queued events upon launching the menu
+                # Clear queued events upon finding an event to process
                 GameEvents.clear_events()
                 events = []
 
@@ -288,9 +293,6 @@ class GameLoop:
                     else:
                         self.game_state.hero_party.members[0].dest_pos_dat_tile = \
                             self.game_state.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
-                else:
-                    # When not moving, reset the successive_block_count
-                    self.successive_block_count = 0
 
                 if menu:
                     AudioPlayer().play_sound('select')
@@ -471,7 +473,20 @@ class GameLoop:
             if self.game_state.hero_party.members[0].curr_pos_dat_tile != \
                self.game_state.hero_party.members[0].dest_pos_dat_tile:
                 self.scroll_tile()
+            elif changed_direction:
+                # On a direction change, unset first_block_occurred
+                # if self.first_block_occurred: print('Clearing first_block_occurred on direction change', flush=True)
+                self.first_block_occurred = False
+
+                change_of_direction_ticks = max(2, CharacterSprite.get_tile_movement_steps() // 3)
+                # print(f'advancing {change_of_direction_ticks} ticks in exploring_loop', flush=True)
+                for _ in range(change_of_direction_ticks):
+                    self.game_state.advance_tick()
             else:
+                # When not moving, set the first_block_occurred
+                # if not self.first_block_occurred: print('Setting first_block_occurred on stopping', flush=True)
+                self.first_block_occurred = True
+
                 # print('advancing one tick in exploring_loop', flush=True)
                 self.game_state.advance_tick()
 
@@ -542,13 +557,19 @@ class GameLoop:
         # Handle being blocked by terrain.  Keep a counter in order to forgive the first occurrence as the blocked
         # sound effect was otherwise a bit excessive.
         if movement_allowed:
-            self.successive_block_count = 0
+            # On allowed movement, unset first_block_occurred
+            # if self.first_block_occurred: print('Clearing first_block_occurred on allowed movement', flush=True)
+            self.first_block_occurred = False
         else:
             self.game_state.hero_party.members[0].dest_pos_dat_tile = \
                 self.game_state.hero_party.members[0].curr_pos_dat_tile
-            if 0 < self.successive_block_count:
+            if self.first_block_occurred:
+                # print('Successive block - playing blocked sound', flush=True)
                 audio_player.play_sound('blocked')
-            self.successive_block_count += 1
+
+            # On blocked movement, set first_block_occurred
+            # if not self.first_block_occurred: print('First block - not playing blocked sound', flush=True)
+            self.first_block_occurred = True
 
         first_frame = True
         while self.game_state.hero_party.members[0].curr_pos_dat_tile != \
@@ -577,12 +598,13 @@ class GameLoop:
 
             # At destination - now determine if an encounter should start
             if not self.game_state.make_map_transition(transition):
-                # Check for special monster encounters
+                # Check for special monster encounters as well as random monsters
                 if (self.game_state.get_special_monster() is not None or
                         (len(self.game_state.get_tile_monsters()) > 0 and
                          random.uniform(0, 1) < dest_tile_type.spawn_rate)):
                     # NOTE: Comment out the following line to disable encounters
                     self.game_state.initiate_encounter()
+                    GameEvents.clear_events()
         else:
             for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.game_state.advance_tick()
