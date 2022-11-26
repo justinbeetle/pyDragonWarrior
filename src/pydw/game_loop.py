@@ -42,7 +42,12 @@ class GameLoop:
         if desired_win_size_pixels is None:
             # Find index of largest display
             largest_display_index = largest_display_size = 0
-            for display_index, (display_x_size, display_y_size) in enumerate(pygame.display.get_desktop_sizes()):
+
+            # pygame 2.1.2 lacked type annotations for pygame.display.get_desktop_sizes, but they have since been added
+            # See https://github.com/pygame/pygame/commit/7ebd524e84230cc5817249b1a8d2fbedb7b45e57
+            desktop_sizes: List[Tuple[int, int]] = pygame.display.get_desktop_sizes()  # type: ignore
+
+            for display_index, (display_x_size, display_y_size) in enumerate(desktop_sizes):
                 current_display_size = display_x_size * display_y_size
                 if current_display_size > largest_display_size:
                     largest_display_index = display_index
