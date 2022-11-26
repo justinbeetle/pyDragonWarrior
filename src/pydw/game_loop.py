@@ -40,9 +40,19 @@ class GameLoop:
         tile_scaling_factor = desired_tile_scaling_factor
         tile_size_pixels = unscaled_tile_size_pixels * tile_scaling_factor
         if desired_win_size_pixels is None:
+            # Find index of largest display
+            largest_display_index = largest_display_size = 0
+            for display_index, (display_x_size, display_y_size) in enumerate(pygame.display.get_desktop_sizes()):
+                current_display_size = display_x_size * display_y_size
+                if current_display_size > largest_display_size:
+                    largest_display_index = display_index
+                    largest_display_size = current_display_size
+
+            # Launch fullscreen on the largest display
             screen = pygame.display.set_mode(
                 (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA,
+                display=largest_display_index)
             self.win_size_pixels = Point(screen.get_size())
         else:
             self.win_size_pixels = desired_win_size_pixels // tile_size_pixels * tile_size_pixels
