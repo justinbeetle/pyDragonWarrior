@@ -210,7 +210,7 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
 def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
     """ Generate key down events from pressed keys
 
-    Generate KEYDOWN event for help arrow keys, including WASD when they should be translated to the arrow keys and
+    Generate KEYDOWN event for held arrow keys, including WASD when they should be translated to the arrow keys and
     the keypad keys when numlock is off.
     """
     pressed = pygame.key.get_pressed()

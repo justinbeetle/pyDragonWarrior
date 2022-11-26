@@ -303,14 +303,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def is_dodging_attack(self) -> bool:
         return False
 
-    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.STOPSPELL == action and self.armor is not None:
-            return self.armor.stopspell_resistance
-        return 0
-
-    def get_spell_resistance(self, spell: Spell) -> float:
-        if 'STOPSPELL' == spell.name.upper() and self.armor is not None:
             return self.armor.stopspell_resistance
         return 0
 

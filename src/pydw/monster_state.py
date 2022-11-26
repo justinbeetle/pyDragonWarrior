@@ -53,7 +53,6 @@ class MonsterState(CombatCharacterState):
         return (not self.is_asleep
                 and random.uniform(0, 1) < self.monster_info.dodge)
 
-    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.SLEEP == action:
             return self.monster_info.sleep_resist
@@ -61,15 +60,6 @@ class MonsterState(CombatCharacterState):
             return self.monster_info.stopspell_resist
         if DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
             return self.monster_info.hurt_resist
-        return 0
-
-    def get_spell_resistance(self, spell: Spell) -> float:
-        if 'HURT' == spell.name.upper() or 'HURTMORE' == spell.name.upper():
-            return self.monster_info.hurt_resist
-        if 'SLEEP' == spell.name.upper():
-            return self.monster_info.sleep_resist
-        if 'STOPSPELL' == spell.name.upper():
-            return self.monster_info.stopspell_resist
         return 0
 
     def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:

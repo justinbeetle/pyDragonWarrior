@@ -48,7 +48,6 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def is_still_in_combat(self) -> bool:
         return self.is_alive() and not self.has_run_away
 
-    # TODO: In progress work to generalize and replace does_spell_work with does_action_work
     def does_action_work(self,
                          action: DialogActionEnum,
                          category: ActionCategoryTypeEnum,
@@ -74,17 +73,6 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         if isinstance(self, type(target)) \
                 and action in (DialogActionEnum.SLEEP, DialogActionEnum.STOPSPELL, DialogActionEnum.DAMAGE_TARGET):
             # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
-            return False
-        return True
-
-    def does_spell_work(self, spell: Spell, target: CombatCharacterState) -> bool:
-        if self.are_spells_blocked:
-            return False
-        if target.get_spell_resistance(spell) > random.uniform(0, 1):
-            return False
-        if 'SLEEP' == spell.name.upper() and target.is_asleep:
-            return False
-        if 'STOPSPELL' == spell.name.upper() and target.are_spells_blocked:
             return False
         return True
 
@@ -134,13 +122,8 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def is_dodging_attack(self) -> bool:
         pass
 
-    # TODO: In progress work to generalize and replace get_spell_resistance with get_resistance
     @abc.abstractmethod
     def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
-        pass
-
-    @abc.abstractmethod
-    def get_spell_resistance(self, spell: Spell) -> float:
         pass
 
     @abc.abstractmethod
