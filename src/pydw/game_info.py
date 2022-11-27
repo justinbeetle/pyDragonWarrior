@@ -20,7 +20,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] < 9:
 
     def element_pickler(element: ET._Element) -> Tuple[Callable[[str], ET._Element], Tuple[str]]:
         data = ET.tostring(element)
-        return element_unpickler, (data,git )
+        return element_unpickler, (data,)
 
     import copyreg
     copyreg.pickle(ET._Element, element_pickler)
