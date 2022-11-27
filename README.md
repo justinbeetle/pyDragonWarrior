@@ -17,9 +17,11 @@ out-and-out clone or reimagining.
 
 ## Installation
 
-1. Install python: Install the latest Python 3 version from https://www.python.org/downloads
+1. Install python: Install the latest Python 3.10 version from https://www.python.org/downloads
 2. Install git: Install the latest git version from https://git-scm.com/downloads
 3. Install pyDragonWarrior: git clone https://github.com/justinbeetle/pyDragonWarrior.git
+
+Note: Python 3.10 is recommended for the time being as there isn't yet a stable release of pygame for Python 3.11.
  
 ## Running
 
@@ -86,6 +88,11 @@ src/pydw/game.py
 
 1. docker build -t pydw .
 2. docker run pydw (requires X11 forwarding and I haven't tested it yet)
+
+### Using Replit
+
+With a lot of patience, it can be played at https://replit.com/@justinbeetle/pyDragonWarrior?v=1.  It is not a good
+experience due to the limited memory and CPU.
 
 ## Credits
 
