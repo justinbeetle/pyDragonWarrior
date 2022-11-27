@@ -33,5 +33,7 @@ class CombatParty:
         highest_attack_strength = 0
         for member in self.get_combat_members():
             if member.is_still_in_combat():
-                highest_attack_strength = max(highest_attack_strength, member.get_attack_strength())
+                highest_attack_strength = max(
+                    highest_attack_strength, member.get_attack_strength()
+                )
         return highest_attack_strength

@@ -8,5 +8,6 @@ opensimplex
 pytest
 mypy
 pylint
+black
 pyinstaller
 snakeviz

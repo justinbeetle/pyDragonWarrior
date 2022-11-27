@@ -5,7 +5,13 @@ from typing import Optional, Tuple, Union
 import random
 
 from pydw.combat_character_state import CombatCharacterState
-from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, MonsterInfo, SpecialMonster, Spell
+from pydw.game_types import (
+    ActionCategoryTypeEnum,
+    DialogActionEnum,
+    MonsterInfo,
+    SpecialMonster,
+    Spell,
+)
 
 
 class MonsterState(CombatCharacterState):
@@ -16,10 +22,12 @@ class MonsterState(CombatCharacterState):
         else:
             self.monster_info = monster_info
             self.special_monster_info = None
-        super().__init__(hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp))
+        super().__init__(
+            hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp)
+        )
         self.gp = random.randint(self.monster_info.min_gp, self.monster_info.max_gp)
         self.xp = self.monster_info.xp  # TODO: Should this also come from a range?
-        self.name = 'the ' + self.monster_info.name
+        self.name = "the " + self.monster_info.name
 
     def get_name(self) -> str:
         return self.name
@@ -50,25 +58,31 @@ class MonsterState(CombatCharacterState):
 
     # Determine if the monster dodges an attack
     def is_dodging_attack(self) -> bool:
-        return (not self.is_asleep
-                and random.uniform(0, 1) < self.monster_info.dodge)
+        return not self.is_asleep and random.uniform(0, 1) < self.monster_info.dodge
 
-    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
+    def get_resistance(
+        self, action: DialogActionEnum, category: ActionCategoryTypeEnum
+    ) -> float:
         if DialogActionEnum.SLEEP == action:
             return self.monster_info.sleep_resist
         if DialogActionEnum.STOPSPELL == action:
             return self.monster_info.stopspell_resist
-        if DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
+        if (
+            DialogActionEnum.DAMAGE_TARGET == action
+            and ActionCategoryTypeEnum.MAGICAL == category
+        ):
             return self.monster_info.hurt_resist
         return 0
 
     def get_damage_modifier(self, damage_type: ActionCategoryTypeEnum) -> float:
         return 1.0
 
-    def get_attack_damage(self,
-                          target: CombatCharacterState,
-                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
-                          is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
+    def get_attack_damage(
+        self,
+        target: CombatCharacterState,
+        damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
+        is_critical_hit: Optional[bool] = None,
+    ) -> Tuple[int, bool]:
         if is_critical_hit is None:
             is_critical_hit = False
         if target.get_defense_strength() < self.get_strength():
@@ -78,19 +92,18 @@ class MonsterState(CombatCharacterState):
             min_damage = 0
             max_damage = (self.get_strength() + 4) // 6
         damage = CombatCharacterState.calc_damage(
-            min_damage,
-            max_damage,
-            target,
-            damage_type)
+            min_damage, max_damage, target, damage_type
+        )
 
         # For critical hits from monsters, perform a second damage calculation and use the higher of the two damage
         # values.
         if is_critical_hit:
-            damage = max(damage, CombatCharacterState.calc_damage(
-                min_damage,
-                max_damage,
-                target,
-                damage_type))
+            damage = max(
+                damage,
+                CombatCharacterState.calc_damage(
+                    min_damage, max_damage, target, damage_type
+                ),
+            )
 
         return damage, is_critical_hit
 
@@ -98,43 +111,58 @@ class MonsterState(CombatCharacterState):
     # As implemented, special monsters never attack first.
     def has_initiative(self, hero_state: CombatCharacterState) -> bool:
         # TODO: Verify that special monsters never take the initiative
-        return (not self.monster_info.may_run_away and self.special_monster_info is None
-                and hero_state.get_agility() * random.uniform(0, 1) < self.get_agility() * random.uniform(0, 1) * 0.25)
+        return (
+            not self.monster_info.may_run_away
+            and self.special_monster_info is None
+            and hero_state.get_agility() * random.uniform(0, 1)
+            < self.get_agility() * random.uniform(0, 1) * 0.25
+        )
 
     # Determine if the monster will attempt to run away.
     # Special monsters never run away.
     def should_run_away(self, hero_state: CombatCharacterState) -> bool:
-        return (self.monster_info.may_run_away and self.special_monster_info is None
-                and hero_state.get_strength() > self.get_strength() * 2 and random.uniform(0, 1) < 0.25)
+        return (
+            self.monster_info.may_run_away
+            and self.special_monster_info is None
+            and hero_state.get_strength() > self.get_strength() * 2
+            and random.uniform(0, 1) < 0.25
+        )
 
     # Determine if the monster blocks an attempt by the hero to run away
     def is_blocking_escape(self, hero_state: CombatCharacterState) -> bool:
-        return (not self.is_asleep
-                and hero_state.get_agility() * random.uniform(0, 1) <
-                self.get_agility() * random.uniform(0, 1) * self.monster_info.block_factor)
+        return (
+            not self.is_asleep
+            and hero_state.get_agility() * random.uniform(0, 1)
+            < self.get_agility() * random.uniform(0, 1) * self.monster_info.block_factor
+        )
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}(' \
-               f'{super()}, ' \
-               f'{self.monster_info}, ' \
-               f'{self.special_monster_info}, ' \
-               f'{self.gp}, ' \
-               f'{self.xp})'
+        return (
+            f"{self.__class__.__name__}("
+            f"{super()}, "
+            f"{self.monster_info}, "
+            f"{self.special_monster_info}, "
+            f"{self.gp}, "
+            f"{self.xp})"
+        )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(' \
-               f'{super()!r}, ' \
-               f'{self.monster_info!r}, ' \
-               f'{self.special_monster_info!r}, ' \
-               f'{self.gp!r}, ' \
-               f'{self.xp!r})'
+        return (
+            f"{self.__class__.__name__}("
+            f"{super()!r}, "
+            f"{self.monster_info!r}, "
+            f"{self.special_monster_info!r}, "
+            f"{self.gp!r}, "
+            f"{self.xp!r})"
+        )
 
 
 def main() -> None:
     # TODO: Convert to unit test
     import pygame
+
     monster_info = MonsterInfo(
-        name='MonsterName',
+        name="MonsterName",
         image=pygame.surface.Surface((0, 0)),
         strength=1,
         agility=2,
@@ -150,7 +178,8 @@ def main() -> None:
         max_gp=12,
         monster_action_rules=[],
         allows_critical_hits=False,
-        may_run_away=True)
+        may_run_away=True,
+    )
     monster = MonsterState(monster_info)
     print(monster, flush=True)
     while monster.is_alive():
@@ -158,14 +187,18 @@ def main() -> None:
         print(monster, flush=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         import sys
         import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
+
+        print(
+            traceback.format_exception(
+                None, e, e.__traceback__  # <- type(e) by docs, but ignored
+            ),
+            file=sys.stderr,
+            flush=True,
+        )
         traceback.print_exc()

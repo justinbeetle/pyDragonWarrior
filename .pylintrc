@@ -1,5 +1,5 @@
 [FORMAT]
-max-line-length=120
+max-line-length = 120
 
 good-names:gp,h,hp,mp,pc,i,j,k,w,x,x1,x2,xp,y,y1,y2,z,z1,z2
 

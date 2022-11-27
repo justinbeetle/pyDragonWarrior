@@ -120,6 +120,7 @@ Generate PyInstaller tarball package:
    cd dist
    tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
+Run black:  python -m black src scripts tests
 Run mypy:   python -m mypy src/pydw/game.py --strict --ignore-missing-imports
 Run pylint: python -m pylint $(git ls-files '*.py')
 Run tests:  python -m pytest

@@ -10,10 +10,34 @@ from pydw.monster_state import MonsterState
 
 
 class MonsterParty(CombatParty):
-    NUMBERS = ['a', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
-    ORDINAL_NUMBERS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth']
+    NUMBERS = [
+        "a",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+    ]
+    ORDINAL_NUMBERS = [
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "seventh",
+        "eighth",
+        "ninth",
+        "tenth",
+    ]
 
-    def __init__(self, monsters: List[Union[MonsterInfo, SpecialMonster, MonsterState]] = []) -> None:
+    def __init__(
+        self, monsters: List[Union[MonsterInfo, SpecialMonster, MonsterState]] = []
+    ) -> None:
         super().__init__()
         self.members: List[MonsterState] = []
         for monster in monsters:
@@ -22,7 +46,9 @@ class MonsterParty(CombatParty):
     def get_combat_members(self) -> List[CombatCharacterState]:
         return cast(List[CombatCharacterState], self.members)
 
-    def add_monster(self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]) -> None:
+    def add_monster(
+        self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]
+    ) -> None:
         if isinstance(monster, MonsterState):
             self.members.append(monster)
         else:
@@ -49,16 +75,20 @@ class MonsterParty(CombatParty):
             # differentiate between individual instances of the same monster type.
             if monster.monster_info.name not in current_monster_type_to_count_map:
                 current_monster_type_to_count_map[monster.monster_info.name] = 0
-            monster.set_name('the '
-                             + MonsterParty.ORDINAL_NUMBERS[
-                                 current_monster_type_to_count_map[monster.monster_info.name]]
-                             + ' ' + monster.monster_info.name)
+            monster.set_name(
+                "the "
+                + MonsterParty.ORDINAL_NUMBERS[
+                    current_monster_type_to_count_map[monster.monster_info.name]
+                ]
+                + " "
+                + monster.monster_info.name
+            )
             current_monster_type_to_count_map[monster.monster_info.name] += 1
 
     def get_default_approach_dialog(self) -> str:
         if 1 == len(self.members):
-            return 'A ' + self.members[0].monster_info.name + ' draws near!'
-        return MonsterParty.get_monster_summary(self.members) + ' draw near!'
+            return "A " + self.members[0].monster_info.name + " draws near!"
+        return MonsterParty.get_monster_summary(self.members) + " draw near!"
 
     def get_defeated_monster_summary(self) -> str:
         terms = []
@@ -84,9 +114,13 @@ class MonsterParty(CombatParty):
         # Now make a second pass and generate a term for each monster type
         terms = []
         for type_name in type_names:
-            term = MonsterParty.NUMBERS[monster_type_counts[type_name]-1] + ' ' + type_name
+            term = (
+                MonsterParty.NUMBERS[monster_type_counts[type_name] - 1]
+                + " "
+                + type_name
+            )
             if 1 != monster_type_counts[type_name]:
-                term += 's'
+                term += "s"
             terms.append(term)
 
         # Finally concatenate the terms into a single string
@@ -98,10 +132,10 @@ class MonsterParty(CombatParty):
             raise ValueError
         if 1 == len(terms):
             return terms[0]
-        terms[-1] = 'and ' + terms[-1]
+        terms[-1] = "and " + terms[-1]
         if 2 == len(terms):
-            return ' '.join(terms)
-        return ', '.join(terms)
+            return " ".join(terms)
+        return ", ".join(terms)
 
     # Get the number of monsters defeated
     def get_defeated_count(self) -> int:
@@ -128,7 +162,7 @@ class MonsterParty(CombatParty):
         return ret_val
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}({self.members})'
+        return f"{self.__class__.__name__}({self.members})"
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.members!r})'
+        return f"{self.__class__.__name__}({self.members!r})"

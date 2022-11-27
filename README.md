@@ -14,6 +14,7 @@ out-and-out clone or reimagining.
 [![CodeQL](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/justinbeetle/pyDragonWarrior.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/justinbeetle/pyDragonWarrior/context:python)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Installation
 

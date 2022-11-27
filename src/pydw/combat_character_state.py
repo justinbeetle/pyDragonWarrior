@@ -11,12 +11,14 @@ from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum, Spell
 
 
 class CombatCharacterState(metaclass=abc.ABCMeta):
-    def __init__(self,
-                 hp: int,
-                 max_hp: int = 0,
-                 mp: int = 0,
-                 max_mp: int = 0,
-                 is_combat_character: bool = True) -> None:
+    def __init__(
+        self,
+        hp: int,
+        max_hp: int = 0,
+        mp: int = 0,
+        max_mp: int = 0,
+        is_combat_character: bool = True,
+    ) -> None:
         self.hp = hp
         self.max_hp = max(hp, max_hp)
         self.mp = mp
@@ -48,12 +50,14 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     def is_still_in_combat(self) -> bool:
         return self.is_alive() and not self.has_run_away
 
-    def does_action_work(self,
-                         action: DialogActionEnum,
-                         category: ActionCategoryTypeEnum,
-                         target: CombatCharacterState,
-                         bypass_resistance: bool = False,
-                         bypass_type_name: Optional[str] = None) -> bool:
+    def does_action_work(
+        self,
+        action: DialogActionEnum,
+        category: ActionCategoryTypeEnum,
+        target: CombatCharacterState,
+        bypass_resistance: bool = False,
+        bypass_type_name: Optional[str] = None,
+    ) -> bool:
         # Factor in the bypass_type_name
         # If bypass_resistance is True and bypass_type_name is None, bypass_resistance applies to all target types
         # If bypass_resistance is True and bypass_type_name is not None, the bypass_resistance only applies to the
@@ -68,10 +72,15 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             return False
         if DialogActionEnum.STOPSPELL == action and target.are_spells_blocked:
             return False
-        if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
+        if not bypass_resistance and target.get_resistance(
+            action, category
+        ) > random.uniform(0, 1):
             return False
-        if isinstance(self, type(target)) \
-                and action in (DialogActionEnum.SLEEP, DialogActionEnum.STOPSPELL, DialogActionEnum.DAMAGE_TARGET):
+        if isinstance(self, type(target)) and action in (
+            DialogActionEnum.SLEEP,
+            DialogActionEnum.STOPSPELL,
+            DialogActionEnum.DAMAGE_TARGET,
+        ):
             # Hero's shouldn't put other heroes to sleep and monsters shouldn't put other monsters to sleep
             return False
         return True
@@ -86,7 +95,9 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
 
     # Determine if character should remain asleep.  Maintain turns_asleep.
     def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > self.get_wake_probability())
+        ret_val = self.is_asleep and (
+            self.turns_asleep == 0 or random.uniform(0, 1) > self.get_wake_probability()
+        )
         if ret_val:
             self.turns_asleep += 1
         else:
@@ -123,7 +134,9 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
+    def get_resistance(
+        self, action: DialogActionEnum, category: ActionCategoryTypeEnum
+    ) -> float:
         pass
 
     @abc.abstractmethod
@@ -133,29 +146,39 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
     # Return damage along with a bool indicating whether the attack was a critical hit
     # Accounts for and applies the damage modifier
     @abc.abstractmethod
-    def get_attack_damage(self,
-                          target: CombatCharacterState,
-                          damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
-                          is_critical_hit: Optional[bool] = None) -> Tuple[int, bool]:
+    def get_attack_damage(
+        self,
+        target: CombatCharacterState,
+        damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
+        is_critical_hit: Optional[bool] = None,
+    ) -> Tuple[int, bool]:
         pass
 
     @staticmethod
-    def calc_damage(min_damage: int,
-                    max_damage: int,
-                    target: CombatCharacterState,
-                    damage_type: ActionCategoryTypeEnum) -> int:
+    def calc_damage(
+        min_damage: int,
+        max_damage: int,
+        target: CombatCharacterState,
+        damage_type: ActionCategoryTypeEnum,
+    ) -> int:
         # print('min_damage =', min_damage, flush=True)
         # print('max_damage =', max_damage, flush=True)
         modifier = target.get_damage_modifier(damage_type)
-        damage = math.floor((min_damage + random.uniform(0, 1) * (max_damage - min_damage)) * modifier)
+        damage = math.floor(
+            (min_damage + random.uniform(0, 1) * (max_damage - min_damage)) * modifier
+        )
         if damage < 1:
             damage = random.randint(0, 1)
         return damage
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}({self.hp}, {self.max_hp}, ' \
-               f'{self.is_asleep}, {self.turns_asleep}, {self.are_spells_blocked})'
+        return (
+            f"{self.__class__.__name__}({self.hp}, {self.max_hp}, "
+            f"{self.is_asleep}, {self.turns_asleep}, {self.are_spells_blocked})"
+        )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.hp!r}, {self.max_hp!r}, ' \
-               f'{self.is_asleep!r}, {self.turns_asleep!r}, {self.are_spells_blocked!r})'
+        return (
+            f"{self.__class__.__name__}({self.hp!r}, {self.max_hp!r}, "
+            f"{self.is_asleep!r}, {self.turns_asleep!r}, {self.are_spells_blocked!r})"
+        )
