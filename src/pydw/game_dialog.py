@@ -40,7 +40,7 @@ class GameDialog:
     win_size_tiles = Point(20, 15)
     tile_size_pixels = 48
     default_font_color = NOMINAL_HEALTH_FONT_COLOR
-    font: pygame.Font
+    font: pygame.font.Font
     widest_character: int = 0
     anti_alias = True
     outside_spacing_pixels = 24
@@ -78,7 +78,8 @@ class GameDialog:
                 print('ERROR: Failed to load', border_image_filename, flush=True)
 
         # Determine fonts
-        def find_font_by_name(font_names: Optional[List[str]], default_font_name: Optional[str] = None) -> Optional[str]:
+        def find_font_by_name(font_names: Optional[List[str]],
+                              default_font_name: Optional[str] = None) -> Optional[str]:
             if font_names is not None:
                 for name in font_names:
                     if name in pygame.font.get_fonts():
@@ -114,7 +115,7 @@ class GameDialog:
             return font_size
 
         # Create fonts
-        def create_font(font_name: Optional[str], font_size: Optional[int] = None) -> pygame.Font:
+        def create_font(font_name: Optional[str], font_size: Optional[int] = None) -> pygame.font.Font:
             if font_size is None:
                 font_size = calc_font_size(font_name)
             if font_name in pygame.font.get_fonts():
@@ -174,7 +175,7 @@ class GameDialog:
         return Point(math.ceil(width_pixels / GameDialog.tile_size_pixels), height_pixels / GameDialog.tile_size_pixels)
 
     @staticmethod
-    def get_font() -> pygame.Font:
+    def get_font() -> pygame.font.Font:
         return GameDialog.font
 
     @staticmethod
@@ -187,11 +188,10 @@ class GameDialog:
     def render_font(text: str, color: pygame.Color) -> pygame.surface.Surface:
         if text in GameDialog.UNICODE_CHARACTERS:
             return GameDialog.render_unicode_character(text, color)
-        return cast(pygame.surface.Surface,
-                    GameDialog.get_font().render(text,
-                                                 GameDialog.anti_alias,
-                                                 color,
-                                                 pygame.Color('black')))
+        return GameDialog.get_font().render(text,
+                                            GameDialog.anti_alias,
+                                            color,
+                                            pygame.Color('black'))
 
     @staticmethod
     def render_unicode_character(text: str, color: pygame.Color) -> pygame.surface.Surface:
@@ -1017,7 +1017,7 @@ class GameDialog:
              row_pos_y + 3 / 4 * GameDialog.selection_indicator_pixels))
         pygame.draw.polygon(self.image, color, pointlist)
 
-    def process_event(self, event: pygame.Event, screen: pygame.surface.Surface) -> None:
+    def process_event(self, event: pygame.event.Event, screen: pygame.surface.Surface) -> None:
         if self.allow_user_typing:
             # Process as an update to user_text
             if event.type == pygame.KEYDOWN:

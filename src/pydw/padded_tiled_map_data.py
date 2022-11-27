@@ -6,7 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import Any, Callable, cast, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Callable, cast, Deque, Dict, Iterator, List, Optional, Tuple
 
 import xml.etree.ElementTree as ET
 
@@ -565,7 +565,7 @@ class ScrollTest:
         clock = pygame.time.Clock()
         self.running = True
         fps = 60.0
-        fps_log: collections.deque[float] = collections.deque(maxlen=20)
+        fps_log: Deque[float] = collections.deque(maxlen=20)
 
         try:
             while self.running:

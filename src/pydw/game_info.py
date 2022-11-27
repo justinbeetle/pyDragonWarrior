@@ -9,6 +9,7 @@ import sys
 # xml.etree doesn't support nested xincludes prior to Python 3.9 (see https://github.com/python/cpython/issues/65127)
 # Prior to Python 3.9, use lxml.etree
 if sys.version_info[0] == 3 and sys.version_info[1] < 9:
+    from typing import Callable
     import lxml.etree as ET
     import lxml.ElementInclude as ETI
 
@@ -17,12 +18,12 @@ if sys.version_info[0] == 3 and sys.version_info[1] < 9:
     def element_unpickler(data: str) -> ET._Element:
         return ET.fromstring(data)
 
-    def element_pickler(element: ET._Element) -> str:
+    def element_pickler(element: ET._Element) -> Tuple[Callable[[str], ET._Element], Tuple[str]]:
         data = ET.tostring(element)
-        return element_unpickler, (data,)
+        return element_unpickler, (data,git )
 
     import copyreg
-    copyreg.pickle(ET._Element, element_pickler, element_unpickler)
+    copyreg.pickle(ET._Element, element_pickler)
 else:
     import xml.etree.ElementTree as ET
     import xml.etree.ElementInclude as ETI

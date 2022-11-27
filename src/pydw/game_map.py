@@ -534,11 +534,13 @@ class GameMap(GameMapInterface):
                     if npc_info.dialog is not None:
                         sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = pos_dat_tile
                         sprite.character.curr_pos_offset_img_px = Point(0, 0)
-                        sprite.character.direction = self.game_state.get_hero_party().members[0].direction.get_opposite()
+                        sprite.character.direction = \
+                            self.game_state.get_hero_party().members[0].direction.get_opposite()
                         sprite.update_count = 0
                         sprite.update()
 
-                        # Stationary characters should resume looking in the default direction after talking to the player.
+                        # Stationary characters should resume looking in the default direction after talking to the
+                        # player.
                         if not npc_info.walking:
                             sprite.character.direction = npc_info.direction
 

@@ -77,7 +77,11 @@ def get_events(is_keyboard_repeat_enabled: bool = False,
         #     print('Detected gain focus event', flush=True)
 
         # Drop mouse events
-        if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN]:
+        if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN, pygame.MOUSEWHEEL]:
+            continue
+
+        # Drop key up events
+        if event.type in [pygame.KEYUP]:
             continue
 
         # Remap keyboard events
@@ -127,53 +131,14 @@ def _remap_keyboard_event(translate_wasd_to_uldr: bool,
             print(f'Failed to translate {event} to a KEYDOWN event', flush=True)
 
     if pygame.KEYDOWN == event.type:
-        # Convert KEYDOWN events on the number pad to regular number keys (with num lock) or arrow keys
-
-        if translate_wasd_to_uldr:
-            # Convert WASD to Up/Left/Down/Right
-            if pygame.K_w == event.key:
-                event.__dict__['key'] = pygame.K_UP
-            elif pygame.K_a == event.key:
-                event.__dict__['key'] = pygame.K_LEFT
-            elif pygame.K_s == event.key:
-                event.__dict__['key'] = pygame.K_DOWN
-            elif pygame.K_d == event.key:
-                event.__dict__['key'] = pygame.K_RIGHT
-
-        if event.key in [pygame.K_KP0, pygame.K_KP1, pygame.K_KP2, pygame.K_KP3, pygame.K_KP4, pygame.K_KP5,
-                         pygame.K_KP6, pygame.K_KP7, pygame.K_KP8, pygame.K_KP9]:
-            if event.mod & pygame.KMOD_NUM:
-                # Convert numpad keys to numbers when numlock is on
-                if pygame.K_KP0 == event.key:
-                    event.__dict__['key'] = pygame.K_0
-                elif pygame.K_KP1 == event.key:
-                    event.__dict__['key'] = pygame.K_1
-                elif pygame.K_KP2 == event.key:
-                    event.__dict__['key'] = pygame.K_2
-                elif pygame.K_KP3 == event.key:
-                    event.__dict__['key'] = pygame.K_3
-                elif pygame.K_KP4 == event.key:
-                    event.__dict__['key'] = pygame.K_4
-                elif pygame.K_KP5 == event.key:
-                    event.__dict__['key'] = pygame.K_5
-                elif pygame.K_KP6 == event.key:
-                    event.__dict__['key'] = pygame.K_6
-                elif pygame.K_KP7 == event.key:
-                    event.__dict__['key'] = pygame.K_7
-                elif pygame.K_KP8 == event.key:
-                    event.__dict__['key'] = pygame.K_8
-                elif pygame.K_KP9 == event.key:
-                    event.__dict__['key'] = pygame.K_9
-            else:
-                # Convert numpad keys to arrow keys when numlock is off
-                if pygame.K_KP8 == event.key:
-                    event.__dict__['key'] = pygame.K_UP
-                if pygame.K_KP4 == event.key:
-                    event.__dict__['key'] = pygame.K_LEFT
-                if pygame.K_KP2 == event.key:
-                    event.__dict__['key'] = pygame.K_DOWN
-                if pygame.K_KP6 == event.key:
-                    event.__dict__['key'] = pygame.K_RIGHT
+        if event.key in [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]:
+            # Optionally convert WASD events to arrow key events
+            if translate_wasd_to_uldr:
+                _remap_keyboard_wasd_event_to_uldr(event)
+        elif event.key in [pygame.K_KP0, pygame.K_KP1, pygame.K_KP2, pygame.K_KP3, pygame.K_KP4,
+                           pygame.K_KP5, pygame.K_KP6, pygame.K_KP7, pygame.K_KP8, pygame.K_KP9]:
+            # Convert number pad events to either regular number keys (with num lock) or arrow keys
+            _remap_keyboard_numpad_event(event)
         elif pygame.K_KP_ENTER == event.key:
             event.__dict__['key'] = pygame.K_RETURN
         elif pygame.K_e == event.key:
@@ -183,6 +148,63 @@ def _remap_keyboard_event(translate_wasd_to_uldr: bool,
             event.__dict__['key'] = pygame.K_SPACE
 
     return event
+
+
+def _remap_keyboard_wasd_event_to_uldr(event: pygame.event.Event) -> None:
+    """ Convert WASD key events to arrow key events """
+    if pygame.K_w == event.key:
+        event.__dict__['key'] = pygame.K_UP
+    elif pygame.K_a == event.key:
+        event.__dict__['key'] = pygame.K_LEFT
+    elif pygame.K_s == event.key:
+        event.__dict__['key'] = pygame.K_DOWN
+    elif pygame.K_d == event.key:
+        event.__dict__['key'] = pygame.K_RIGHT
+
+
+def _remap_keyboard_numpad_event(event: pygame.event.Event) -> None:
+    """ Convert numpad key events to arrow or number key events """
+    num_lock = pygame.key.get_mods() & pygame.KMOD_NUM
+    if num_lock:
+        _remap_keyboard_numpad_event_to_numbers(event)
+    else:
+        _remap_keyboard_numpad_event_to_uldr(event)
+
+
+def _remap_keyboard_numpad_event_to_uldr(event: pygame.event.Event) -> None:
+    """ Convert numpad key events to arrow key events """
+    if pygame.K_KP8 == event.key:
+        event.__dict__['key'] = pygame.K_UP
+    if pygame.K_KP4 == event.key:
+        event.__dict__['key'] = pygame.K_LEFT
+    if pygame.K_KP2 == event.key:
+        event.__dict__['key'] = pygame.K_DOWN
+    if pygame.K_KP6 == event.key:
+        event.__dict__['key'] = pygame.K_RIGHT
+
+
+def _remap_keyboard_numpad_event_to_numbers(event: pygame.event.Event) -> None:
+    """ Convert numpad key events to number key events """
+    if pygame.K_KP0 == event.key:
+        event.__dict__['key'] = pygame.K_0
+    elif pygame.K_KP1 == event.key:
+        event.__dict__['key'] = pygame.K_1
+    elif pygame.K_KP2 == event.key:
+        event.__dict__['key'] = pygame.K_2
+    elif pygame.K_KP3 == event.key:
+        event.__dict__['key'] = pygame.K_3
+    elif pygame.K_KP4 == event.key:
+        event.__dict__['key'] = pygame.K_4
+    elif pygame.K_KP5 == event.key:
+        event.__dict__['key'] = pygame.K_5
+    elif pygame.K_KP6 == event.key:
+        event.__dict__['key'] = pygame.K_6
+    elif pygame.K_KP7 == event.key:
+        event.__dict__['key'] = pygame.K_7
+    elif pygame.K_KP8 == event.key:
+        event.__dict__['key'] = pygame.K_8
+    elif pygame.K_KP9 == event.key:
+        event.__dict__['key'] = pygame.K_9
 
 
 def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Event]:
@@ -272,7 +294,7 @@ def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.
                     #
                     # TODO: Get a better handle on this issue and submit an issue against pygame.  It looks to be
                     #       related to https://github.com/pygame/pygame/issues/3229.
-                    #print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
+                    # print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
                     existing_event.__dict__['unicode'] = event.__dict__['unicode']
                 # print('Not adding event as a duplicate is already present:', event, flush=True)
                 return
@@ -316,10 +338,10 @@ def main() -> None:
     while is_running:
         # Process events
         print('Getting events...', flush=True)
-        events = get_events(True)
+        events = get_events(True, translate_wasd_to_uldr=True)
 
         for event in events:
-            print('event =', event, flush=True)
+            print('   event =', event, flush=True)
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 is_running = False
 

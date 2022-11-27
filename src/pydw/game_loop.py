@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import cast, List, Optional
+from typing import cast, List, Optional, Tuple
 
 # import datetime
 import glob
@@ -283,10 +283,6 @@ class GameLoop:
 
                 # print(datetime.datetime.now(), 'exploring_loop:  Processed event', event, flush=True)
 
-                # Clear queued events upon finding an event to process
-                GameEvents.clear_events()
-                events = []
-
                 if move_direction:
                     if changed_direction or self.game_state.hero_party.members[0].curr_pos_dat_tile != \
                                             self.game_state.hero_party.members[0].dest_pos_dat_tile:
@@ -474,6 +470,12 @@ class GameLoop:
                             dialog = decoration.dialog
 
                     self.gde.dialog_loop(dialog)
+
+                # Only process the first supported event
+                break
+
+            # Clear any queued events
+            GameEvents.clear_events()
 
             if self.game_state.hero_party.members[0].curr_pos_dat_tile != \
                self.game_state.hero_party.members[0].dest_pos_dat_tile:
