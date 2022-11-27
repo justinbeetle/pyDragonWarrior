@@ -547,18 +547,18 @@ PygameSurfaceFormatType = Union[Literal['P'], Literal['RGB'], Literal['RGBX'], L
 
 
 class SurfacePickable(NamedTuple):
-    pixels: str
+    pixels: bytes
     size: Tuple[int, int]
     format: PygameSurfaceFormatType
 
     @staticmethod
     def from_surface(surface: pygame.surface.Surface, format: PygameSurfaceFormatType = 'RGBA') -> SurfacePickable:
-        return SurfacePickable(pygame.image.tostring(surface, format),
+        return SurfacePickable(pygame.image.tobytes(surface, format),
                                surface.get_size(),
                                format)
 
     def to_surface(self) -> pygame.surface.Surface:
-        return pygame.image.fromstring(self.pixels, self.size, self.format)
+        return pygame.image.frombytes(self.pixels, self.size, self.format)
 
 
 class MonsterInfoPicklable(NamedTuple):

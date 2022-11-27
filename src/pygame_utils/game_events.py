@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 import pygame
 
 # Mapping from unique instance IDs to initialized joysticks/gamepads
-joysticks: Dict[int, pygame.joystick.Joystick] = {}
+joysticks: Dict[int, pygame.joystick.JoystickType] = {}
 
 
 def setup_joystick() -> bool:
