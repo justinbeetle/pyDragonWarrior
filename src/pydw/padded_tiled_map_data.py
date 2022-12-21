@@ -18,15 +18,19 @@ from generic_utils.point import Point
 
 
 class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
-    """ For data loaded from pytmx
+    """For data loaded from pytmx
 
     Use of this class requires a recent version of pytmx.
     """
-    TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX = 'Monster Set '
 
-    def __init__(self, tmx_filename: str,
-                 image_pad_tiles: Point = Point(0, 0),
-                 desired_tile_size: Optional[int] = None):
+    TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX = "Monster Set "
+
+    def __init__(
+        self,
+        tmx_filename: str,
+        image_pad_tiles: Point = Point(0, 0),
+        desired_tile_size: Optional[int] = None,
+    ):
         super().__init__()
 
         # Extract out any image layers - image layers are only being used to compare the Tiled map to a template image.
@@ -58,7 +62,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         # Add an image of black
         black_tile = self.tmx.images[-1].copy()
-        black_tile.fill('black')
+        black_tile.fill("black")
         self.tmx.images.append(black_tile)
 
         self.image_pad_tiles = image_pad_tiles.ceil()
@@ -73,9 +77,9 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         decoration_layer = None
         character_layer = None
         for idx, l in enumerate(self.tmx.layers):
-            if 'decoration' == l.name:
+            if "decoration" == l.name:
                 decoration_layer = idx
-            elif 'character' == l.name:
+            elif "character" == l.name:
                 character_layer = idx
         if decoration_layer is None:
             self.overlay_layer_offset += 1
@@ -86,7 +90,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self._decoration_layer = decoration_layer
         self._character_layer = character_layer
 
-        '''print('self.tmx', self.tmx, flush=True)
+        """print('self.tmx', self.tmx, flush=True)
         print('self.tmx.tilewidth', self.tmx.tilewidth, flush=True)
         print('self.tmx.tileheight', self.tmx.tileheight, flush=True)
         #print('self.tmx.__dict__', self.tmx.__dict__, flush=True)
@@ -110,7 +114,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         for idx, l in enumerate(self.overlay_tile_layers):
             print('overlay_tile_layers: layer', idx, '=', l, flush=True)
         print('decoration layer', self.decoration_layer, flush=True)
-        print('character layer', self.character_layer, flush=True)'''
+        print('character layer', self.character_layer, flush=True)"""
 
     def set_pc_character_tile(self, pos_dat_tile: Point) -> bool:
         """
@@ -118,12 +122,16 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         :return: If a redraw of the map is needed for the new PC position
         """
         object_group_to_bound_rendering_orig = self.object_group_to_bound_rendering
-        self.object_group_to_bound_rendering = self.get_overlapping_overlay_mask_layer_index(pos_dat_tile)
+        self.object_group_to_bound_rendering = (
+            self.get_overlapping_overlay_mask_layer_index(pos_dat_tile)
+        )
         if self.object_group_to_bound_rendering is not None:
             self.set_tile_layers_to_render(self.base_tile_layers)
         else:
             self.set_tile_layers_to_render(self.all_tile_layers)
-        return object_group_to_bound_rendering_orig != self.object_group_to_bound_rendering
+        return (
+            object_group_to_bound_rendering_orig != self.object_group_to_bound_rendering
+        )
 
     def is_interior(self, pos_dat_tile: Point) -> bool:
         return self.get_overlapping_overlay_mask_layer_index(pos_dat_tile) is not None
@@ -134,31 +142,45 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def get_monster_set_name(self, pos_dat_tile: Point) -> Optional[str]:
         layer_name = self.get_overlapping_monster_set_layer_name(pos_dat_tile)
         if layer_name:
-            return layer_name[len(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX):]
+            return layer_name[
+                len(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX) :
+            ]
         return None
 
-    def get_overlapping_overlay_mask_layer_index(self, pos_dat_tile: Point) -> Optional[int]:
+    def get_overlapping_overlay_mask_layer_index(
+        self, pos_dat_tile: Point
+    ) -> Optional[int]:
         def layer_filter(layer: pytmx.pytmx.TiledObjectGroup) -> bool:
-            return 'is_overlay' in layer.properties and layer.properties['is_overlay']
-        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, layer_filter)
+            return "is_overlay" in layer.properties and layer.properties["is_overlay"]
+
+        object_group_info = self.get_overlapping_object_group_info(
+            pos_dat_tile, layer_filter
+        )
         if object_group_info:
             return object_group_info[0]
         return None
 
-    def get_overlapping_monster_set_layer_name(self, pos_dat_tile: Point) -> Optional[str]:
+    def get_overlapping_monster_set_layer_name(
+        self, pos_dat_tile: Point
+    ) -> Optional[str]:
         # TODO: Change this to be property driven
         def layer_filter(layer: pytmx.pytmx.TiledObjectGroup) -> bool:
-            return isinstance(layer.name, str) and \
-                   layer.name.startswith(PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX)
-        object_group_info = self.get_overlapping_object_group_info(pos_dat_tile, layer_filter)
+            return isinstance(layer.name, str) and layer.name.startswith(
+                PaddedTiledMapData.TILED_MAP_MONSTER_SET_LAYER_NAME_PREFIX
+            )
+
+        object_group_info = self.get_overlapping_object_group_info(
+            pos_dat_tile, layer_filter
+        )
         if object_group_info:
             return object_group_info[1]
         return None
 
-    def get_overlapping_object_group_info(self,
-                                          pos_dat_tile: Point,
-                                          layer_filter: Optional[Callable[[pytmx.pytmx.TiledObjectGroup], bool]] = None) \
-            -> Optional[Tuple[int, Optional[str]]]:
+    def get_overlapping_object_group_info(
+        self,
+        pos_dat_tile: Point,
+        layer_filter: Optional[Callable[[pytmx.pytmx.TiledObjectGroup], bool]] = None,
+    ) -> Optional[Tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
         for idx, layer in enumerate(self.tmx.layers):
             if not isinstance(layer, pytmx.pytmx.TiledObjectGroup):
@@ -167,10 +189,12 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 if layer_filter and not layer_filter(layer):
                     # If a layer filter was specified, skip layers which do not conform to the filter
                     continue
-                rect = pygame.Rect(obj.x / self.tmx.tilewidth,
-                                   obj.y / self.tmx.tileheight,
-                                   obj.width / self.tmx.tilewidth,
-                                   obj.height / self.tmx.tileheight)
+                rect = pygame.Rect(
+                    obj.x / self.tmx.tilewidth,
+                    obj.y / self.tmx.tileheight,
+                    obj.width / self.tmx.tilewidth,
+                    obj.height / self.tmx.tileheight,
+                )
                 if rect.collidepoint(pos_dat_tile.get_as_int_tuple()):
                     return idx, layer.name
         return None
@@ -213,7 +237,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 continue
 
             # Assume base layers are the default
-            if layer.visible and ('is_overlay' not in layer.properties or not layer.properties['is_overlay']):
+            if layer.visible and (
+                "is_overlay" not in layer.properties
+                or not layer.properties["is_overlay"]
+            ):
                 tile_layers.append(layer_idx)
         return tile_layers
 
@@ -237,22 +264,28 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 continue
 
             # Assume base layers are the default
-            if layer.visible and 'is_overlay' in layer.properties and layer.properties['is_overlay']:
+            if (
+                layer.visible
+                and "is_overlay" in layer.properties
+                and layer.properties["is_overlay"]
+            ):
                 tile_layers.append(layer_idx + self.overlay_layer_offset)
         return tile_layers
 
     def get_animations(self) -> Iterator[Tuple[int, Any]]:
         for gid, d in self.tmx.tile_properties.items():
             try:
-                frames = d['frames']
+                frames = d["frames"]
             except KeyError:
                 continue
 
             if frames:
                 yield gid, frames
 
-    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool = False) -> None:
-        """ Convert all images in the data to match the parent
+    def convert_surfaces(
+        self, parent: pygame.surface.Surface, alpha: bool = False
+    ) -> None:
+        """Convert all images in the data to match the parent
 
         :param parent: pygame.surface.Surface
         :param alpha: preserve alpha channel or not
@@ -271,27 +304,32 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def tile_size(self) -> Tuple[int, int]:
-        """ This is the pixel size of tiles to be rendered
+        """This is the pixel size of tiles to be rendered
 
         :return: (int, int)
         """
         if self.pre_zoom == 1.0:
             return self.tmx.tilewidth, self.tmx.tileheight
         else:
-            return int(self.pre_zoom*self.tmx.tilewidth), int(self.pre_zoom*self.tmx.tileheight)
+            return int(self.pre_zoom * self.tmx.tilewidth), int(
+                self.pre_zoom * self.tmx.tileheight
+            )
 
     @property
     def map_size(self) -> Tuple[int, int]:
-        """ This is the size of the map in tiles
+        """This is the size of the map in tiles
 
         :return: (int, int)
         """
         # This size INCLUDES the padding
-        return self.tmx.width + 2*self.image_pad_tiles[0], self.tmx.height + 2*self.image_pad_tiles[1]
+        return (
+            self.tmx.width + 2 * self.image_pad_tiles[0],
+            self.tmx.height + 2 * self.image_pad_tiles[1],
+        )
 
     @property
     def visible_tile_layers(self) -> List[int]:
-        """ This must return layer numbers, not objects
+        """This must return layer numbers, not objects
 
         :return: [int, int, ...]
         """
@@ -299,30 +337,39 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def visible_object_layers(self) -> Iterator[pytmx.TiledObjectGroup]:
-        """ This must return layer objects
+        """This must return layer objects
 
         This is not required for custom data formats.
 
         :return: Sequence of pytmx object layers/groups
         """
-        return (layer for layer in self.tmx.visible_layers
-                if isinstance(layer, pytmx.TiledObjectGroup))
+        return (
+            layer
+            for layer in self.tmx.visible_layers
+            if isinstance(layer, pytmx.TiledObjectGroup)
+        )
 
-    def get_tile_properties(self, x: int, y: int, layer_idx: int) -> Optional[Dict[str, str]]:
+    def get_tile_properties(
+        self, x: int, y: int, layer_idx: int
+    ) -> Optional[Dict[str, str]]:
         if layer_idx not in self.base_tile_layers:
             layer_idx -= self.overlay_layer_offset
         if not isinstance(self.tmx.layers[layer_idx], pytmx.pytmx.TiledTileLayer):
             return None
-        x = min(max(0, x), self.tmx.width-1)
-        y = min(max(0, y), self.tmx.height-1)
-        return cast(Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, layer_idx))
+        x = min(max(0, x), self.tmx.width - 1)
+        y = min(max(0, y), self.tmx.height - 1)
+        return cast(
+            Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, layer_idx)
+        )
 
-    def _get_tile_image(self,
-                        x: int,
-                        y: int,
-                        layer_idx: int,
-                        image_indexing: bool = True,
-                        limit_to_visible: bool = True) -> Optional[pygame.surface.Surface]:
+    def _get_tile_image(
+        self,
+        x: int,
+        y: int,
+        layer_idx: int,
+        image_indexing: bool = True,
+        limit_to_visible: bool = True,
+    ) -> Optional[pygame.surface.Surface]:
         if layer_idx not in self.visible_tile_layers and limit_to_visible:
             return None
         if layer_idx not in self.base_tile_layers:
@@ -332,15 +379,17 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         if image_indexing:
             # With image_indexing, coord (0,0) is where the pad starts.
             # Without image_indexing, coord (0,0) is where the Tiled map starts.
-            x = min(max(0, x-self.image_pad_tiles.x), self.tmx.width-1)
-            y = min(max(0, y-self.image_pad_tiles.y), self.tmx.height-1)
+            x = min(max(0, x - self.image_pad_tiles.x), self.tmx.width - 1)
+            y = min(max(0, y - self.image_pad_tiles.y), self.tmx.height - 1)
         if self.object_group_to_bound_rendering is not None:
             render_tile = False
             for obj in self.tmx.layers[self.object_group_to_bound_rendering]:
-                rect = pygame.Rect(obj.x / self.tmx.tilewidth,
-                                   obj.y / self.tmx.tileheight,
-                                   obj.width / self.tmx.tilewidth,
-                                   obj.height / self.tmx.tileheight)
+                rect = pygame.Rect(
+                    obj.x / self.tmx.tilewidth,
+                    obj.y / self.tmx.tileheight,
+                    obj.width / self.tmx.tilewidth,
+                    obj.height / self.tmx.tileheight,
+                )
                 rect.inflate_ip(2, 2)
                 if rect.collidepoint(x, y):
                     render_tile = True
@@ -348,12 +397,15 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             if not render_tile:
                 return cast(Optional[pygame.surface.Surface], self.tmx.images[-1])
         try:
-            return cast(Optional[pygame.surface.Surface], self.tmx.get_tile_image(x, y, layer_idx))
+            return cast(
+                Optional[pygame.surface.Surface],
+                self.tmx.get_tile_image(x, y, layer_idx),
+            )
         except ValueError:
             return None
 
     def _get_tile_image_by_id(self, id: int) -> Optional[pygame.surface.Surface]:
-        """ Return Image by a custom ID
+        """Return Image by a custom ID
 
         Used for animations.  Not required for static maps.
 
@@ -362,8 +414,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """
         return cast(Optional[pygame.surface.Surface], self.tmx.images[id])
 
-    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
-        """ Speed up data access
+    def get_tile_images_by_rect(
+        self, rect: pygame.Rect
+    ) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
+        """Speed up data access
 
         More efficient because data is accessed and cached locally
         """
@@ -383,23 +437,33 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             if not isinstance(layers[layer_idx], pytmx.pytmx.TiledTileLayer):
                 continue
 
-            for y in range(y1, y2+1):
-                row = layers[layer_idx].data[min(max(0, y-self.image_pad_tiles[1]), self.tmx.height-1)]
+            for y in range(y1, y2 + 1):
+                row = layers[layer_idx].data[
+                    min(max(0, y - self.image_pad_tiles[1]), self.tmx.height - 1)
+                ]
 
-                for x in range(x1, x2+1):
-                    gid = row[min(max(0, x-self.image_pad_tiles[0]), self.tmx.width-1)]
+                for x in range(x1, x2 + 1):
+                    gid = row[
+                        min(max(0, x - self.image_pad_tiles[0]), self.tmx.width - 1)
+                    ]
                     if not gid:
                         continue
 
                     if self.object_group_to_bound_rendering is not None:
                         render_tile = False
-                        for obj in self.tmx.layers[self.object_group_to_bound_rendering]:
-                            rect = pygame.Rect(obj.x / self.tmx.tilewidth,
-                                               obj.y / self.tmx.tileheight,
-                                               obj.width / self.tmx.tilewidth,
-                                               obj.height / self.tmx.tileheight)
+                        for obj in self.tmx.layers[
+                            self.object_group_to_bound_rendering
+                        ]:
+                            rect = pygame.Rect(
+                                obj.x / self.tmx.tilewidth,
+                                obj.y / self.tmx.tileheight,
+                                obj.width / self.tmx.tilewidth,
+                                obj.height / self.tmx.tileheight,
+                            )
                             rect.inflate_ip(2, 2)
-                            if rect.collidepoint(x-self.image_pad_tiles[0], y-self.image_pad_tiles[1]):
+                            if rect.collidepoint(
+                                x - self.image_pad_tiles[0], y - self.image_pad_tiles[1]
+                            ):
                                 render_tile = True
                                 break
                         if not render_tile:
@@ -426,6 +490,7 @@ class ScrollTest:
     For normal use, please see the quest demo, not this.
 
     """
+
     def __init__(self, screen: pygame.surface.Surface, filename: str) -> None:
         self.screen = screen
 
@@ -433,19 +498,22 @@ class ScrollTest:
         map_data = PaddedTiledMapData(filename, Point(100, 100))
 
         # create new renderer
-        self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
+        self.map_layer = pyscroll.orthographic.BufferedRenderer(
+            map_data, self.screen.get_size()
+        )
 
         # create a font and pre-render some text to be displayed over the map
         f = pygame.font.Font(pygame.font.get_default_font(), 20)
-        t = ["scroll demo. press escape to quit",
-             "arrow keys move"]
+        t = ["scroll demo. press escape to quit", "arrow keys move"]
 
         # save the rendered text
         self.text_overlay = [f.render(i, True, (180, 180, 0)) for i in t]
 
         # set our initial viewpoint in the center of the map
-        self.center = [self.map_layer.map_rect.width / 2,
-                       self.map_layer.map_rect.height / 2]
+        self.center = [
+            self.map_layer.map_rect.width / 2,
+            self.map_layer.map_rect.height / 2,
+        ]
 
         # the camera vector is used to handle camera movement
         self.camera_acc = [0.0, 0.0, 0.0]
@@ -471,8 +539,7 @@ class ScrollTest:
             y += text.get_height()
 
     def handle_input(self) -> None:
-        """ Simply handle pygame input events
-        """
+        """Simply handle pygame input events"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -495,7 +562,9 @@ class ScrollTest:
 
             # this will be handled if the window is resized
             elif event.type == pygame.VIDEORESIZE:
-                self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                self.screen = pygame.display.set_mode(
+                    (event.w, event.h), pygame.RESIZABLE
+                )
                 self.map_layer.set_size((event.w, event.h))
 
         # these keys will change the camera vector
@@ -522,7 +591,7 @@ class ScrollTest:
     def update(self, td: float) -> None:
         self.last_update_time = td
 
-        friction = pow(.0001, self.last_update_time)
+        friction = pow(0.0001, self.last_update_time)
 
         # update the camera vector
         self.camera_vel[0] += self.camera_acc[0] * td
@@ -570,15 +639,15 @@ class ScrollTest:
         try:
             while self.running:
                 # somewhat smoother way to get fps and limit the framerate
-                clock.tick(int(fps*2))
+                clock.tick(int(fps * 2))
 
                 try:
                     fps_log.append(clock.get_fps())
-                    fps = sum(fps_log)/len(fps_log)
-                    dt = 1/fps
+                    fps = sum(fps_log) / len(fps_log)
+                    dt = 1 / fps
                 except (OverflowError, ZeroDivisionError):
                     fps = 60.0
-                    dt = 1/fps
+                    dt = 1 / fps
 
                 self.handle_input()
                 self.update(dt)
@@ -596,13 +665,13 @@ if __name__ == "__main__":
     pygame.init()
     pygame.font.init()
     screen = pygame.display.set_mode((800, 800), pygame.RESIZABLE)
-    pygame.display.set_caption('pyscroll Test')
+    pygame.display.set_caption("pyscroll Test")
 
     base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
     try:
         filename = sys.argv[1]
     except IndexError:
-        filename = os.path.join('data', 'maps', 'tiled', 'alefgard.tmx')
+        filename = os.path.join("data", "maps", "tiled", "alefgard.tmx")
     filename = os.path.join(base_path, filename)
 
     try:
@@ -610,10 +679,14 @@ if __name__ == "__main__":
         test.run()
     except Exception as e:
         import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
+
+        print(
+            traceback.format_exception(
+                None, e, e.__traceback__  # <- type(e) by docs, but ignored
+            ),
+            file=sys.stderr,
+            flush=True,
+        )
         traceback.print_exc()
 
     pygame.quit()

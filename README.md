@@ -12,6 +12,7 @@ out-and-out clone or reimagining.
 [![mypy](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/mypy.yml)
 [![Pylint](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/pylint.yml)
 [![CodeQL](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Installation
 
