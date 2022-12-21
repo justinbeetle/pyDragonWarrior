@@ -2,7 +2,7 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import cast, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from enum import Enum
 import math
