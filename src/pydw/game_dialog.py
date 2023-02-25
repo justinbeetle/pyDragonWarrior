@@ -23,14 +23,19 @@ class GameDialogSpacing(Enum):
 
 
 class GameDialog:
-    NOMINAL_HEALTH_FONT_COLOR = pygame.Color('white')
+    NOMINAL_HEALTH_FONT_COLOR = pygame.Color("white")
     LOW_HEALTH_FONT_COLOR = pygame.Color(252, 116, 96)
 
-    SHIFT_UNICODE = '\u21e7'
-    CAPSLOCK_UNICODE = '\u21ea'
-    BACKSPACE_UNICODE = '\u232b'
-    ENTER_UNICODE = '\u21b5'
-    UNICODE_CHARACTERS = [SHIFT_UNICODE, CAPSLOCK_UNICODE, BACKSPACE_UNICODE, ENTER_UNICODE]
+    SHIFT_UNICODE = "\u21e7"
+    CAPSLOCK_UNICODE = "\u21ea"
+    BACKSPACE_UNICODE = "\u232b"
+    ENTER_UNICODE = "\u21b5"
+    UNICODE_CHARACTERS = [
+        SHIFT_UNICODE,
+        CAPSLOCK_UNICODE,
+        BACKSPACE_UNICODE,
+        ENTER_UNICODE,
+    ]
 
     # True =  Use menus for all text entry
     # False = Type on keyboard for all text entry
@@ -49,10 +54,12 @@ class GameDialog:
     border_image: Optional[pygame.surface.Surface] = None
 
     @staticmethod
-    def static_init(win_size_tiles: Point,
-                    tile_size_pixels: int,
-                    font_names: Optional[List[str]] = None,
-                    border_image_filename: Optional[str] = None) -> None:
+    def static_init(
+        win_size_tiles: Point,
+        tile_size_pixels: int,
+        font_names: Optional[List[str]] = None,
+        border_image_filename: Optional[str] = None,
+    ) -> None:
         GameDialog.win_size_tiles = win_size_tiles
         GameDialog.tile_size_pixels = tile_size_pixels
         GameDialog.outside_spacing_pixels = tile_size_pixels // 2
@@ -64,22 +71,31 @@ class GameDialog:
                 image = pygame.image.load(border_image_filename)
 
                 # Expect the border image to be square
-                if image.get_width() != image.get_height() and 0 == image.get_width() % 3:
-                    print('ERROR: The dialog border image must be square with a size divisible by 3', flush=True)
+                if (
+                    image.get_width() != image.get_height()
+                    and 0 == image.get_width() % 3
+                ):
+                    print(
+                        "ERROR: The dialog border image must be square with a size divisible by 3",
+                        flush=True,
+                    )
                     GameDialog.border_image = None
                 else:
                     scale_factor = tile_size_pixels // (image.get_width() // 3) - 1
                     if scale_factor > 0:
                         scale_size = image.get_width() * scale_factor
-                        GameDialog.border_image = pygame.transform.scale(image, (scale_size, scale_size))
+                        GameDialog.border_image = pygame.transform.scale(
+                            image, (scale_size, scale_size)
+                        )
                     else:
                         GameDialog.border_image = image
             except Exception:
-                print('ERROR: Failed to load', border_image_filename, flush=True)
+                print("ERROR: Failed to load", border_image_filename, flush=True)
 
         # Determine fonts
-        def find_font_by_name(font_names: Optional[List[str]],
-                              default_font_name: Optional[str] = None) -> Optional[str]:
+        def find_font_by_name(
+            font_names: Optional[List[str]], default_font_name: Optional[str] = None
+        ) -> Optional[str]:
             if font_names is not None:
                 for name in font_names:
                     if name in pygame.font.get_fonts():
@@ -88,34 +104,42 @@ class GameDialog:
                     if os.path.exists(name):
                         # print('Found font', name, flush=True)
                         return name
-                    print('WARN: Failed to load font', name, flush=True)
+                    print("WARN: Failed to load font", name, flush=True)
             return default_font_name
 
         font_name = find_font_by_name(font_names, None)
 
         # Log information about available fonts if using the default font
         if font_name is None:
-            print('pygame.font.get_default_font() =', pygame.font.get_default_font(), flush=True)
-            print('pygame.font.get_fonts() =', pygame.font.get_fonts(), flush=True)
+            print(
+                "pygame.font.get_default_font() =",
+                pygame.font.get_default_font(),
+                flush=True,
+            )
+            print("pygame.font.get_fonts() =", pygame.font.get_fonts(), flush=True)
 
         # Determine font size by sizing it based on the tile size
         def calc_font_size(font_name: Optional[str]) -> int:
             message_dialog_size_tiles = GameDialog.get_message_dialog_size_tiles()
             if message_dialog_size_tiles.x < 10 or message_dialog_size_tiles.y < 5:
-                print('Reducing font size for small window size', flush=True)
+                print("Reducing font size for small window size", flush=True)
                 desired_font_height = tile_size_pixels / 2
             else:
                 desired_font_height = tile_size_pixels
             font_size = 1
-            while create_font(font_name, font_size).get_height() < \
-                    desired_font_height - GameDialog.internal_spacing_pixels:
+            while (
+                create_font(font_name, font_size).get_height()
+                < desired_font_height - GameDialog.internal_spacing_pixels
+            ):
                 font_size += 1
             font_size -= 1
             # print(f'Calculated font size of {font_size} for font {font_name}', flush=True)
             return font_size
 
         # Create fonts
-        def create_font(font_name: Optional[str], font_size: Optional[int] = None) -> pygame.font.Font:
+        def create_font(
+            font_name: Optional[str], font_size: Optional[int] = None
+        ) -> pygame.font.Font:
             if font_size is None:
                 font_size = calc_font_size(font_name)
             if font_name in pygame.font.get_fonts():
@@ -126,24 +150,39 @@ class GameDialog:
 
         # Determine the widest character
         for character in GameDialog.get_all_characters():
-            GameDialog.widest_character = max(GameDialog.widest_character, GameDialog.get_font_width(character))
+            GameDialog.widest_character = max(
+                GameDialog.widest_character, GameDialog.get_font_width(character)
+            )
 
     @staticmethod
-    def get_size_for_content(longest_string: str,
-                             num_rows: int,
-                             title: Optional[str]) -> Point:
-        width_pixels = 2 * GameDialog.outside_spacing_pixels + GameDialog.get_font_width(longest_string)
-        height_pixels = 2 * GameDialog.outside_spacing_pixels + num_rows * GameDialog.font.get_height() + (
-                num_rows - 1) * GameDialog.internal_spacing_pixels
+    def get_size_for_content(
+        longest_string: str, num_rows: int, title: Optional[str]
+    ) -> Point:
+        width_pixels = (
+            2 * GameDialog.outside_spacing_pixels
+            + GameDialog.get_font_width(longest_string)
+        )
+        height_pixels = (
+            2 * GameDialog.outside_spacing_pixels
+            + num_rows * GameDialog.font.get_height()
+            + (num_rows - 1) * GameDialog.internal_spacing_pixels
+        )
         if title is not None:
-            width_pixels = max(width_pixels, 2 * GameDialog.outside_spacing_pixels + GameDialog.get_font_width(title))
+            width_pixels = max(
+                width_pixels,
+                2 * GameDialog.outside_spacing_pixels
+                + GameDialog.get_font_width(title),
+            )
             height_pixels += GameDialog.font.get_height()
-        return Point(math.ceil(width_pixels / GameDialog.tile_size_pixels), height_pixels / GameDialog.tile_size_pixels)
+        return Point(
+            math.ceil(width_pixels / GameDialog.tile_size_pixels),
+            height_pixels / GameDialog.tile_size_pixels,
+        )
 
     @staticmethod
-    def get_size_for_menu(options: Union[List[str], List[List[str]]],
-                          num_cols: int,
-                          title: Optional[str]) -> Point:
+    def get_size_for_menu(
+        options: Union[List[str], List[List[str]]], num_cols: int, title: Optional[str]
+    ) -> Point:
         row_data = GameDialog.convert_options_to_row_data(options, num_cols)
         num_rows = len(row_data)
 
@@ -155,24 +194,37 @@ class GameDialog:
             else:
                 option_pixels = 0
                 for option_col in option:
-                    option_pixels += GameDialog.get_font_width(option_col) + 2 * GameDialog.internal_spacing_pixels
+                    option_pixels += (
+                        GameDialog.get_font_width(option_col)
+                        + 2 * GameDialog.internal_spacing_pixels
+                    )
 
             if option_pixels > longest_option_pixels:
                 longest_option_pixels = option_pixels
 
         width_pixels = 2 * GameDialog.outside_spacing_pixels + num_cols * (
-                1.1 * longest_option_pixels
-                + 2 * GameDialog.internal_spacing_pixels
-                + GameDialog.selection_indicator_pixels)
+            1.1 * longest_option_pixels
+            + 2 * GameDialog.internal_spacing_pixels
+            + GameDialog.selection_indicator_pixels
+        )
 
         # Determine height
         if title is not None:
-            height_pixels = GameDialog.outside_spacing_pixels + (
-                        num_rows + 1) * GameDialog.font.get_height() + num_rows * GameDialog.internal_spacing_pixels
+            height_pixels = (
+                GameDialog.outside_spacing_pixels
+                + (num_rows + 1) * GameDialog.font.get_height()
+                + num_rows * GameDialog.internal_spacing_pixels
+            )
         else:
-            height_pixels = 2 * GameDialog.outside_spacing_pixels + num_rows * GameDialog.font.get_height() + (
-                        num_rows - 1) * GameDialog.internal_spacing_pixels
-        return Point(math.ceil(width_pixels / GameDialog.tile_size_pixels), height_pixels / GameDialog.tile_size_pixels)
+            height_pixels = (
+                2 * GameDialog.outside_spacing_pixels
+                + num_rows * GameDialog.font.get_height()
+                + (num_rows - 1) * GameDialog.internal_spacing_pixels
+            )
+        return Point(
+            math.ceil(width_pixels / GameDialog.tile_size_pixels),
+            height_pixels / GameDialog.tile_size_pixels,
+        )
 
     @staticmethod
     def get_font() -> pygame.font.Font:
@@ -188,13 +240,14 @@ class GameDialog:
     def render_font(text: str, color: pygame.Color) -> pygame.surface.Surface:
         if text in GameDialog.UNICODE_CHARACTERS:
             return GameDialog.render_unicode_character(text, color)
-        return GameDialog.get_font().render(text,
-                                            GameDialog.anti_alias,
-                                            color,
-                                            pygame.Color('black'))
+        return GameDialog.get_font().render(
+            text, GameDialog.anti_alias, color, pygame.Color("black")
+        )
 
     @staticmethod
-    def render_unicode_character(text: str, color: pygame.Color) -> pygame.surface.Surface:
+    def render_unicode_character(
+        text: str, color: pygame.Color
+    ) -> pygame.surface.Surface:
         width = GameDialog.get_font_width(text)
         height = GameDialog.get_font().get_height()
         font_surface = pygame.surface.Surface((width, height))
@@ -209,11 +262,13 @@ class GameDialog:
         half_height = quarter_height * 2
         three_quarters_height = quarter_height * 3
 
-        y_coords = (quarter_height + inner_border,
-                    half_height - half_inner_width,
-                    half_height,
-                    half_height + half_inner_width,
-                    three_quarters_height - inner_border)
+        y_coords = (
+            quarter_height + inner_border,
+            half_height - half_inner_width,
+            half_height,
+            half_height + half_inner_width,
+            three_quarters_height - inner_border,
+        )
 
         if text == GameDialog.BACKSPACE_UNICODE:
             # Draw the outer shape
@@ -222,7 +277,8 @@ class GameDialog:
                 (quarter_width, quarter_height),
                 (full_width, quarter_height),
                 (full_width, three_quarters_height),
-                (quarter_width, three_quarters_height)]
+                (quarter_width, three_quarters_height),
+            ]
             pygame.draw.aalines(font_surface, color, True, pointlist)
             pygame.draw.polygon(font_surface, color, pointlist)
 
@@ -230,9 +286,15 @@ class GameDialog:
             x_start = quarter_width + inner_border
             x_mid = quarter_width + (full_width - quarter_width) // 2
             x_end = x_start + (x_mid - x_start) * 2
-            x_coords = [x_start, x_start + inner_width,
-                        x_mid - half_inner_width, x_mid, x_mid + half_inner_width,
-                        x_end - inner_width, x_end]
+            x_coords = [
+                x_start,
+                x_start + inner_width,
+                x_mid - half_inner_width,
+                x_mid,
+                x_mid + half_inner_width,
+                x_end - inner_width,
+                x_end,
+            ]
             pointlist = [
                 (x_coords[0], y_coords[0]),
                 (x_coords[1], y_coords[0]),
@@ -245,16 +307,18 @@ class GameDialog:
                 (x_coords[3], y_coords[3]),
                 (x_coords[1], y_coords[4]),
                 (x_coords[0], y_coords[4]),
-                (x_coords[2], y_coords[2])]
-            pygame.draw.aalines(font_surface, 'black', True, pointlist)
-            pygame.draw.polygon(font_surface, 'black', pointlist)
+                (x_coords[2], y_coords[2]),
+            ]
+            pygame.draw.aalines(font_surface, "black", True, pointlist)
+            pygame.draw.polygon(font_surface, "black", pointlist)
         elif text == GameDialog.ENTER_UNICODE:
             # Draw the outer shape
             pointlist = [
                 (0, quarter_height),
                 (full_width, quarter_height),
                 (full_width, three_quarters_height),
-                (0, three_quarters_height)]
+                (0, three_quarters_height),
+            ]
             pygame.draw.aalines(font_surface, color, True, pointlist)
             pygame.draw.polygon(font_surface, color, pointlist)
 
@@ -271,11 +335,12 @@ class GameDialog:
                 (x_coords[3], y_coords[0]),
                 (x_coords[3], y_coords[3]),
                 (x_coords[1], y_coords[3]),
-                (x_coords[1], y_coords[4])]
-            pygame.draw.aalines(font_surface, 'black', True, pointlist)
-            pygame.draw.polygon(font_surface, 'black', pointlist)
+                (x_coords[1], y_coords[4]),
+            ]
+            pygame.draw.aalines(font_surface, "black", True, pointlist)
+            pygame.draw.polygon(font_surface, "black", pointlist)
         else:
-            print(f'ERROR: Character {text} is not supported', flush=True)
+            print(f"ERROR: Character {text} is not supported", flush=True)
 
         return font_surface
 
@@ -285,12 +350,13 @@ class GameDialog:
             return GameEvents.setup_joystick()
         return GameDialog.force_use_menus_for_text_entry
 
-    def __init__(self,
-                 pos_tile: Point,
-                 size_tiles: Point,
-                 title: Optional[str] = None) -> None:
+    def __init__(
+        self, pos_tile: Point, size_tiles: Point, title: Optional[str] = None
+    ) -> None:
         if pos_tile.x < 0:
-            self.pos_tile = Point(GameDialog.win_size_tiles.x - size_tiles.x + pos_tile.x, pos_tile.y)
+            self.pos_tile = Point(
+                GameDialog.win_size_tiles.x - size_tiles.x + pos_tile.x, pos_tile.y
+            )
         else:
             self.pos_tile = Point(pos_tile)
         self.size_tiles = Point(size_tiles)
@@ -302,7 +368,7 @@ class GameDialog:
         self.initialize_image()
 
         self.displayed_message_lines: List[str] = []
-        self.remainder_of_current_line: str = ''
+        self.remainder_of_current_line: str = ""
         self.remaining_message_lines: List[str] = []
         self.acknowledged = True
         self.lines_since_last_acknowledgement = 0
@@ -318,20 +384,24 @@ class GameDialog:
         self.menu_data: Optional[List[List[Optional[str]]]] = None
 
         self.allow_user_typing = False
-        self.user_text_prompt = ''
-        self.user_text = ''
+        self.user_text_prompt = ""
+        self.user_text = ""
         self.input_allowed_characters: Optional[str] = None
 
     def initialize_image(self) -> None:
-        self.image = pygame.surface.Surface(self.size_tiles * GameDialog.tile_size_pixels)
-        self.image.fill('black')
+        self.image = pygame.surface.Surface(
+            self.size_tiles * GameDialog.tile_size_pixels
+        )
+        self.image.fill("black")
         if GameDialog.border_image is not None:
             border_image = GameDialog.border_image.convert().copy()
-            pygame.transform.threshold(border_image,
-                                       border_image,
-                                       search_color=pygame.Color('white'),
-                                       set_color=self.font_color,
-                                       inverse_set=True)
+            pygame.transform.threshold(
+                border_image,
+                border_image,
+                search_color=pygame.Color("white"),
+                set_color=self.font_color,
+                inverse_set=True,
+            )
 
             border_px = border_image.get_width() // 3
             src_size = (border_px, border_px)
@@ -344,8 +414,11 @@ class GameDialog:
             # Top Middle
             src_pos = dst_pos = (border_px, 0)
             dst_size = (middle_width_span, border_px)
-            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
-                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            pygame.transform.scale(
+                border_image.subsurface(pygame.Rect(src_pos, src_size)),
+                dst_size,
+                self.image.subsurface(pygame.Rect(dst_pos, dst_size)),
+            )
             # Top Right Corner
             src_pos = (border_px + border_px, 0)
             dst_pos = (border_px + middle_width_span, 0)
@@ -354,15 +427,20 @@ class GameDialog:
             src_pos = (0, border_px)
             dst_pos = (0, border_px)
             dst_size = (border_px, middle_height_span)
-            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
-                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            pygame.transform.scale(
+                border_image.subsurface(pygame.Rect(src_pos, src_size)),
+                dst_size,
+                self.image.subsurface(pygame.Rect(dst_pos, dst_size)),
+            )
             # Right Middle
             src_pos = (border_px + border_px, border_px)
             dst_pos = (border_px + middle_width_span, border_px)
             dst_size = (border_px, middle_height_span)
-            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)),
-                                   dst_size,
-                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            pygame.transform.scale(
+                border_image.subsurface(pygame.Rect(src_pos, src_size)),
+                dst_size,
+                self.image.subsurface(pygame.Rect(dst_pos, dst_size)),
+            )
             # Bottom Left Corner
             src_pos = (0, border_px + border_px)
             dst_pos = (0, border_px + middle_height_span)
@@ -371,8 +449,11 @@ class GameDialog:
             src_pos = (border_px, border_px + border_px)
             dst_pos = (border_px, border_px + middle_height_span)
             dst_size = (middle_width_span, border_px)
-            pygame.transform.scale(border_image.subsurface(pygame.Rect(src_pos, src_size)), dst_size,
-                                   self.image.subsurface(pygame.Rect(dst_pos, dst_size)))
+            pygame.transform.scale(
+                border_image.subsurface(pygame.Rect(src_pos, src_size)),
+                dst_size,
+                self.image.subsurface(pygame.Rect(dst_pos, dst_size)),
+            )
             # Bottom Right Corner
             src_pos = (border_px + border_px, border_px + border_px)
             dst_pos = (border_px + middle_width_span, border_px + middle_height_span)
@@ -380,22 +461,29 @@ class GameDialog:
         else:
             outside_border_width = 5
             inside_border_width = 4
-            pygame.draw.rect(self.image, self.font_color,
-                             pygame.Rect(outside_border_width,
-                                         outside_border_width,
-                                         self.image.get_width() - 2 * outside_border_width,
-                                         self.image.get_height() - 2 * outside_border_width),
-                             inside_border_width)
+            pygame.draw.rect(
+                self.image,
+                self.font_color,
+                pygame.Rect(
+                    outside_border_width,
+                    outside_border_width,
+                    self.image.get_width() - 2 * outside_border_width,
+                    self.image.get_height() - 2 * outside_border_width,
+                ),
+                inside_border_width,
+            )
         if self.title is not None:
             title_image = GameDialog.render_font(self.title, self.font_color)
             title_image_pos_x = (self.image.get_width() - title_image.get_width()) / 2
             self.image.fill(
-                'black',
+                "black",
                 pygame.Rect(
                     title_image_pos_x - GameDialog.internal_spacing_pixels,
                     0,
                     title_image.get_width() + 2 * GameDialog.internal_spacing_pixels,
-                    title_image.get_height()))
+                    title_image.get_height(),
+                ),
+            )
             self.image.blit(title_image, (title_image_pos_x, 0))
 
     @staticmethod
@@ -403,8 +491,9 @@ class GameDialog:
         # Cap the maximum size of the message dialog
         if win_size_tiles is None:
             win_size_tiles = GameDialog.win_size_tiles
-        return Point(min(50, win_size_tiles.x - 4),
-                     min(10, (win_size_tiles.y - 1) // 2 - 1))
+        return Point(
+            min(50, win_size_tiles.x - 4), min(10, (win_size_tiles.y - 1) // 2 - 1)
+        )
 
     @staticmethod
     def create_message_dialog(message_content: Optional[str] = None) -> GameDialog:
@@ -416,18 +505,23 @@ class GameDialog:
         if spare_y > 0:
             pos_tile_y += spare_y
 
-        dialog = GameDialog(Point((GameDialog.win_size_tiles.x - size_tiles.x) / 2, pos_tile_y), size_tiles)
+        dialog = GameDialog(
+            Point((GameDialog.win_size_tiles.x - size_tiles.x) / 2, pos_tile_y),
+            size_tiles,
+        )
         if message_content is not None:
             dialog.add_message(message_content)
         return dialog
 
     @staticmethod
-    def create_menu_dialog(pos_tile: Point,
-                           size_tiles: Optional[Point],
-                           title: Optional[str],
-                           options: Union[List[str], List[List[str]]],
-                           num_cols: int = 2,
-                           spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS) -> GameDialog:
+    def create_menu_dialog(
+        pos_tile: Point,
+        size_tiles: Optional[Point],
+        title: Optional[str],
+        options: Union[List[str], List[List[str]]],
+        num_cols: int = 2,
+        spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
+    ) -> GameDialog:
         if size_tiles is None:
             size_tiles = GameDialog.get_size_for_menu(options, num_cols, title)
         dialog = GameDialog(pos_tile, size_tiles, title)
@@ -439,32 +533,39 @@ class GameDialog:
         return GameDialog.create_menu_dialog(
             Point(-1, 1),
             None,
-            'COMMANDS',
-            ['TALK', 'SPELL', 'ITEM', 'STATUS', 'SEARCH', 'OPEN'],
-            3)
+            "COMMANDS",
+            ["TALK", "SPELL", "ITEM", "STATUS", "SEARCH", "OPEN"],
+            3,
+        )
 
     @staticmethod
     def create_encounter_menu() -> GameDialog:
-        title: Optional[str] = 'COMMANDS'
-        options: List[str] = ['FIGHT', 'SPELL', 'RUN', 'ITEM']
+        title: Optional[str] = "COMMANDS"
+        options: List[str] = ["FIGHT", "SPELL", "RUN", "ITEM"]
         num_cols: int = len(options)
         return GameDialog.create_menu_dialog(
             Point(-1, 1),
             Point(
-                GameDialog.get_size_for_menu(['TALK', 'SPELL', 'ITEM', 'STATUS', 'SEARCH', 'OPEN'], 3, title).w,
-                GameDialog.get_size_for_menu(options, num_cols, title).h),
+                GameDialog.get_size_for_menu(
+                    ["TALK", "SPELL", "ITEM", "STATUS", "SEARCH", "OPEN"], 3, title
+                ).w,
+                GameDialog.get_size_for_menu(options, num_cols, title).h,
+            ),
             title,
             options,
-            num_cols)
+            num_cols,
+        )
 
     @staticmethod
-    def create_yes_no_menu(pos_tile: Point,
-                           prompt: Optional[str],
-                           title: Optional[str] = None) -> GameDialog:
-        size_tiles_menu = GameDialog.get_size_for_menu(['YES', 'NO'], 2, title)
+    def create_yes_no_menu(
+        pos_tile: Point, prompt: Optional[str], title: Optional[str] = None
+    ) -> GameDialog:
+        size_tiles_menu = GameDialog.get_size_for_menu(["YES", "NO"], 2, title)
         if prompt is not None:
             size_tiles_prompt = GameDialog.get_size_for_content(prompt, 2, title)
-            size_tiles = Point(max(size_tiles_prompt.w, size_tiles_menu.w), size_tiles_prompt.h)
+            size_tiles = Point(
+                max(size_tiles_prompt.w, size_tiles_menu.w), size_tiles_prompt.h
+            )
         else:
             size_tiles = size_tiles_menu
         dialog = GameDialog(pos_tile, size_tiles, title)
@@ -474,27 +575,35 @@ class GameDialog:
         return dialog
 
     @staticmethod
-    def create_status_dialog(pos_tile: Point,
-                             size_tiles: Optional[Point],
-                             title: Optional[str],
-                             row_data: List[List[Optional[str]]],
-                             spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
-                             trailing_message: Optional[str] = None) -> GameDialog:
+    def create_status_dialog(
+        pos_tile: Point,
+        size_tiles: Optional[Point],
+        title: Optional[str],
+        row_data: List[List[Optional[str]]],
+        spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
+        trailing_message: Optional[str] = None,
+    ) -> GameDialog:
         if size_tiles is None:
             # TODO: Calculate size based on row_data
-            longest_string = 'Health '+'10000000'*(len(row_data[0])-1)
-            size_tiles = GameDialog.get_size_for_content(longest_string, len(row_data), title)
+            longest_string = "Health " + "10000000" * (len(row_data[0]) - 1)
+            size_tiles = GameDialog.get_size_for_content(
+                longest_string, len(row_data), title
+            )
 
             # Add in length for trailing_message
             if trailing_message is not None:
                 size_pixels = size_tiles * GameDialog.tile_size_pixels
-                trailing_message_lines = GameDialog.convert_message_to_lines(trailing_message, int(size_pixels.w))
-                size_tiles = GameDialog.get_size_for_content(longest_string,
-                                                             len(row_data) + len(trailing_message_lines),
-                                                             title)
+                trailing_message_lines = GameDialog.convert_message_to_lines(
+                    trailing_message, int(size_pixels.w)
+                )
+                size_tiles = GameDialog.get_size_for_content(
+                    longest_string, len(row_data) + len(trailing_message_lines), title
+                )
 
         dialog = GameDialog(pos_tile, size_tiles, title)
-        dialog.add_row_data(row_data, spacing_type=spacing_type, trailing_message=trailing_message)
+        dialog.add_row_data(
+            row_data, spacing_type=spacing_type, trailing_message=trailing_message
+        )
         return dialog
 
     @staticmethod
@@ -503,15 +612,14 @@ class GameDialog:
         if 1 == len(party.combat_members):
             title = party.main_character.name
             spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
-            status_data: List[List[Optional[str]]] = [['Level', party.main_character.level.name],
-                                                      ['Health', str(party.main_character.hp)],
-                                                      ['Magic', str(party.main_character.mp)]]
+            status_data: List[List[Optional[str]]] = [
+                ["Level", party.main_character.level.name],
+                ["Health", str(party.main_character.hp)],
+                ["Magic", str(party.main_character.mp)],
+            ]
         else:
             spacing_type = GameDialogSpacing.EQUAL_COLUMNS
-            status_data = [[''],
-                           ['Level'],
-                           ['Health'],
-                           ['Magic']]
+            status_data = [[""], ["Level"], ["Health"], ["Magic"]]
             for member in party.combat_members:
                 status_data[0].append(member.get_name())
                 status_data[1].append(member.level.name)
@@ -519,11 +627,8 @@ class GameDialog:
                 status_data[3].append(str(member.mp))
 
         return GameDialog.create_status_dialog(
-            Point(1, 1),
-            None,
-            title,
-            status_data,
-            spacing_type=spacing_type)
+            Point(1, 1), None, title, status_data, spacing_type=spacing_type
+        )
 
     @staticmethod
     def create_exploring_status_dialog(party: HeroParty) -> GameDialog:
@@ -536,18 +641,16 @@ class GameDialog:
         if 1 == len(party.combat_members):
             title = party.main_character.name
             spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
-            status_data: List[List[Optional[str]]] = [['Level', party.main_character.level.name],
-                                                      ['Health', str(party.main_character.hp)],
-                                                      ['Magic', str(party.main_character.mp)],
-                                                      ['XP', str(party.main_character.xp)],
-                                                      ['Gold', str(party.gp)]]
+            status_data: List[List[Optional[str]]] = [
+                ["Level", party.main_character.level.name],
+                ["Health", str(party.main_character.hp)],
+                ["Magic", str(party.main_character.mp)],
+                ["XP", str(party.main_character.xp)],
+                ["Gold", str(party.gp)],
+            ]
         else:
             spacing_type = GameDialogSpacing.EQUAL_COLUMNS
-            status_data = [[''],
-                           ['Level'],
-                           ['Health'],
-                           ['Magic'],
-                           ['XP']]
+            status_data = [[""], ["Level"], ["Health"], ["Magic"], ["XP"]]
             for member in party.combat_members:
                 status_data[0].append(member.get_name())
                 status_data[1].append(member.level.name)
@@ -555,7 +658,7 @@ class GameDialog:
                 status_data[3].append(str(member.mp))
                 status_data[4].append(str(member.xp))
 
-            trailing_message = f'Gold: {party.gp}'
+            trailing_message = f"Gold: {party.gp}"
 
         return GameDialog.create_status_dialog(
             Point(1, 1),
@@ -563,16 +666,17 @@ class GameDialog:
             title,
             status_data,
             spacing_type=spacing_type,
-            trailing_message=trailing_message)
+            trailing_message=trailing_message,
+        )
 
     @staticmethod
     def create_full_status_dialog(party: HeroParty) -> GameDialog:
         pc = party.main_character
         title = pc.name
-        weapon_name = 'None'
-        helm_name = 'None'
-        armor_name = 'None'
-        shield_name = 'None'
+        weapon_name = "None"
+        helm_name = "None"
+        armor_name = "None"
+        shield_name = "None"
         if pc.weapon is not None:
             weapon_name = pc.weapon.name
         if pc.helm is not None:
@@ -582,43 +686,50 @@ class GameDialog:
         if pc.shield is not None:
             shield_name = pc.shield.name
         row_data: List[List[Optional[str]]] = [
-            ['Level', pc.level.name],
-            ['Max Hit Points', str(pc.level.hp)],
-            ['Hit Points', str(pc.hp)],
-            ['Max Magic Points', str(pc.level.mp)],
-            ['Magic Points', str(pc.mp)],
-            ['Experience Points', str(pc.xp)],
-            ['Gold Pieces', str(party.gp)],
-            ['Strength', str(pc.level.strength)],
-            ['Agility', str(pc.level.agility)],
-            ['Attack Strength', str(pc.get_attack_strength())],
-            ['Defense Strength', str(pc.get_defense_strength())],
-            ['Weapon', weapon_name],
-            ['Helm', helm_name],
-            ['Armor', armor_name],
-            ['Shield', shield_name]]
+            ["Level", pc.level.name],
+            ["Max Hit Points", str(pc.level.hp)],
+            ["Hit Points", str(pc.hp)],
+            ["Max Magic Points", str(pc.level.mp)],
+            ["Magic Points", str(pc.mp)],
+            ["Experience Points", str(pc.xp)],
+            ["Gold Pieces", str(party.gp)],
+            ["Strength", str(pc.level.strength)],
+            ["Agility", str(pc.level.agility)],
+            ["Attack Strength", str(pc.get_attack_strength())],
+            ["Defense Strength", str(pc.get_defense_strength())],
+            ["Weapon", weapon_name],
+            ["Helm", helm_name],
+            ["Armor", armor_name],
+            ["Shield", shield_name],
+        ]
         return GameDialog.create_status_dialog(
             Point(1, 1),
-            GameDialog.get_size_for_content('Experience Points 1000000000', len(row_data), title),
+            GameDialog.get_size_for_content(
+                "Experience Points 1000000000", len(row_data), title
+            ),
             title,
-            row_data)
+            row_data,
+        )
 
     @staticmethod
     def convert_message_to_lines(message: Optional[str], width_px: int) -> List[str]:
         lines: List[str] = []
         if message is None:
             return lines
-        for line in message.split('\n'):
-            line_to_display = ''
-            for word in line.split(' '):
+        for line in message.split("\n"):
+            line_to_display = ""
+            for word in line.split(" "):
                 # print('word =', word, flush=True)
-                if line_to_display == '':
+                if line_to_display == "":
                     line_to_evaluate = word
                 else:
-                    line_to_evaluate = line_to_display + ' ' + word
+                    line_to_evaluate = line_to_display + " " + word
                 line_to_evaluate_size = Point(GameDialog.font.size(line_to_evaluate))
                 # print('line_to_evaluate =', line_to_evaluate, flush=True)
-                if line_to_evaluate_size[0] + 2 * GameDialog.outside_spacing_pixels <= width_px:
+                if (
+                    line_to_evaluate_size[0] + 2 * GameDialog.outside_spacing_pixels
+                    <= width_px
+                ):
                     line_to_display = line_to_evaluate
                     # print('line_to_display =', line_to_display, flush=True)
                 else:
@@ -629,11 +740,9 @@ class GameDialog:
                 lines.append(line_to_display)
         return lines
 
-    def add_message(self,
-                    new_message: str,
-                    append: bool = True,
-                    fully_populate: bool = False) -> None:
-
+    def add_message(
+        self, new_message: str, append: bool = True, fully_populate: bool = False
+    ) -> None:
         self.acknowledged = False
         self.row_data = None
 
@@ -641,7 +750,9 @@ class GameDialog:
         new_message = GameDialog.fix_capitalization(new_message)
 
         # Turn message into lines of text
-        new_message_lines = GameDialog.convert_message_to_lines(new_message, self.image.get_width())
+        new_message_lines = GameDialog.convert_message_to_lines(
+            new_message, self.image.get_width()
+        )
 
         # Determine the number of lines of text which can be displayed in the dialog
         # Subtract out 1 row to leave room for the waiting indicator
@@ -652,33 +763,47 @@ class GameDialog:
             if fully_populate:
                 if 0 == len(self.remaining_message_lines):
                     if len(new_message_lines) <= num_rows:
-                        if len(self.displayed_message_lines) + len(new_message_lines) <= num_rows:
+                        if (
+                            len(self.displayed_message_lines) + len(new_message_lines)
+                            <= num_rows
+                        ):
                             self.displayed_message_lines += new_message_lines
                         else:
-                            self.displayed_message_lines = self.displayed_message_lines[
-                                                           len(self.displayed_message_lines) +
-                                                           len(new_message_lines) - num_rows:] + new_message_lines
+                            self.displayed_message_lines = (
+                                self.displayed_message_lines[
+                                    len(self.displayed_message_lines)
+                                    + len(new_message_lines)
+                                    - num_rows :
+                                ]
+                                + new_message_lines
+                            )
                     else:
-                        self.displayed_message_lines = new_message_lines[0: num_rows]
+                        self.displayed_message_lines = new_message_lines[0:num_rows]
                         self.remaining_message_lines = new_message_lines[num_rows:]
                 else:
-                    self.displayed_message_lines = self.remaining_message_lines[0: num_rows]
-                    self.remaining_message_lines = self.remaining_message_lines[num_rows:]
+                    self.displayed_message_lines = self.remaining_message_lines[
+                        0:num_rows
+                    ]
+                    self.remaining_message_lines = self.remaining_message_lines[
+                        num_rows:
+                    ]
             else:
-                if 0 == len(self.remainder_of_current_line) and 0 == len(self.remaining_message_lines):
+                if 0 == len(self.remainder_of_current_line) and 0 == len(
+                    self.remaining_message_lines
+                ):
                     if len(self.displayed_message_lines) >= num_rows:
                         self.displayed_message_lines = self.displayed_message_lines[1:]
-                    self.displayed_message_lines += ['']
+                    self.displayed_message_lines += [""]
                     self.remainder_of_current_line = new_message_lines[0]
                     self.remaining_message_lines = new_message_lines[1:]
                 else:
                     self.remaining_message_lines += new_message_lines
         else:
             if fully_populate:
-                self.displayed_message_lines = new_message_lines[0: num_rows]
+                self.displayed_message_lines = new_message_lines[0:num_rows]
                 self.remaining_message_lines = new_message_lines[num_rows:]
             else:
-                self.displayed_message_lines = ['']
+                self.displayed_message_lines = [""]
                 self.remainder_of_current_line = new_message_lines[0]
                 self.remaining_message_lines = new_message_lines[1:]
 
@@ -686,14 +811,15 @@ class GameDialog:
         self.refresh_image()
         self.acknowledged = False
 
-    def add_encounter_prompt(self,
-                             options: List[str] = ['FIGHT', 'RUN', 'SPELL', 'ITEM'],
-                             prompt: str = 'Command?') -> None:
+    def add_encounter_prompt(
+        self,
+        options: List[str] = ["FIGHT", "RUN", "SPELL", "ITEM"],
+        prompt: str = "Command?",
+    ) -> None:
         self.add_menu_prompt(options, len(options), GameDialogSpacing.SPACERS, prompt)
 
-    def add_yes_no_prompt(self,
-                          prompt: Optional[str] = None) -> None:
-        self.add_menu_prompt(['YES', 'NO'], 2, GameDialogSpacing.SPACERS, prompt)
+    def add_yes_no_prompt(self, prompt: Optional[str] = None) -> None:
+        self.add_menu_prompt(["YES", "NO"], 2, GameDialogSpacing.SPACERS, prompt)
 
     @staticmethod
     def get_default_font_color() -> pygame.Color:
@@ -709,13 +835,15 @@ class GameDialog:
             self.refresh_image()
 
     def is_empty(self) -> bool:
-        return (len(self.displayed_message_lines) == 0 and
-                len(self.remainder_of_current_line) == 0 and
-                len(self.remaining_message_lines) == 0)
+        return (
+            len(self.displayed_message_lines) == 0
+            and len(self.remainder_of_current_line) == 0
+            and len(self.remaining_message_lines) == 0
+        )
 
     def clear(self) -> None:
         self.displayed_message_lines = []
-        self.remainder_of_current_line = ''
+        self.remainder_of_current_line = ""
         self.remaining_message_lines = []
         self.row_data = None
 
@@ -723,19 +851,23 @@ class GameDialog:
         if self.is_empty():
             return True
         elif 0 == len(self.remaining_message_lines):
-            return self.displayed_message_lines[-1] + self.remainder_of_current_line == ''
+            return (
+                self.displayed_message_lines[-1] + self.remainder_of_current_line == ""
+            )
         else:
-            return self.remaining_message_lines[-1] == ''
+            return self.remaining_message_lines[-1] == ""
 
     def has_more_content(self) -> bool:
-        return len(self.remainder_of_current_line) + len(self.remaining_message_lines) != 0
+        return (
+            len(self.remainder_of_current_line) + len(self.remaining_message_lines) != 0
+        )
 
     def advance_content(self) -> Tuple[bool, bool]:
-        '''
+        """
         :return (should_wait_for_acknowledgement, is_new_content_part_of_quotation):
         should_wait_for_acknowledgement = Whether an acknowledged is required before rolling to the next line of text
         is_new_content_part_of_quotation = Whether the new characters, whether in part or whole, are part of a quotation
-        '''
+        """
         if not self.has_more_content():
             return False, False
 
@@ -753,7 +885,9 @@ class GameDialog:
             if '"' in new_content:
                 self.is_in_quotation = not self.is_in_quotation
             self.displayed_message_lines[-1] += new_content
-            self.remainder_of_current_line = self.remainder_of_current_line[characters_to_advance:]
+            self.remainder_of_current_line = self.remainder_of_current_line[
+                characters_to_advance:
+            ]
         else:
             # Shift in one row at a time from remaining_message_lines
             self.lines_since_last_acknowledgement += 1
@@ -761,7 +895,7 @@ class GameDialog:
                 if self.lines_since_last_acknowledgement >= num_rows:
                     return True, self.is_in_quotation
                 self.displayed_message_lines = self.displayed_message_lines[1:]
-            self.displayed_message_lines += ['']
+            self.displayed_message_lines += [""]
             self.remainder_of_current_line = self.remaining_message_lines[0]
             self.remaining_message_lines = self.remaining_message_lines[1:]
 
@@ -779,20 +913,33 @@ class GameDialog:
         col_pos_x = GameDialog.outside_spacing_pixels
         row_pos_y = self.get_starting_row_pos_y()
         for lines in self.displayed_message_lines:
-            self.image.blit(GameDialog.render_font(lines, self.font_color), (col_pos_x, row_pos_y))
-            row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+            self.image.blit(
+                GameDialog.render_font(lines, self.font_color), (col_pos_x, row_pos_y)
+            )
+            row_pos_y += (
+                GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+            )
 
         # Blit row data to dialog
         if self.row_data is not None and len(self.row_data) > 0:
             row_pos_y = self.get_row_pos_y(len(self.displayed_message_lines))
             num_cols = len(self.row_data[0])
-            if self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED and num_cols % 2 != 0:
-                print('ERROR: refresh_image invoked with OUTSIDE_JUSTIFIED for odd num_cols =', num_cols, flush=True)
+            if (
+                self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED
+                and num_cols % 2 != 0
+            ):
+                print(
+                    "ERROR: refresh_image invoked with OUTSIDE_JUSTIFIED for odd num_cols =",
+                    num_cols,
+                    flush=True,
+                )
             first_col_pos_x = GameDialog.outside_spacing_pixels
             if self.row_data_prompt is not None:
                 first_col_pos_x += GameDialog.get_font_width(self.row_data_prompt)
-                self.image.blit(GameDialog.render_font(self.row_data_prompt, self.font_color),
-                                (GameDialog.outside_spacing_pixels, row_pos_y))
+                self.image.blit(
+                    GameDialog.render_font(self.row_data_prompt, self.font_color),
+                    (GameDialog.outside_spacing_pixels, row_pos_y),
+                )
 
             # Determine column widths
             col_widths = []
@@ -801,7 +948,9 @@ class GameDialog:
                 for row in range(len(self.row_data)):
                     row_col_text = self.row_data[row][col]
                     if row_col_text is not None:
-                        col_width = max(col_width, GameDialog.get_font_width(row_col_text))
+                        col_width = max(
+                            col_width, GameDialog.get_font_width(row_col_text)
+                        )
                 col_widths.append(col_width)
 
             for row in range(len(self.row_data)):
@@ -811,26 +960,54 @@ class GameDialog:
                     if row_col_text is None:
                         continue
                     if self.row_data_spacing == GameDialogSpacing.SPACERS:
-                        col_pos_x += GameDialog.selection_indicator_pixels + 5 * GameDialog.internal_spacing_pixels
+                        col_pos_x += (
+                            GameDialog.selection_indicator_pixels
+                            + 5 * GameDialog.internal_spacing_pixels
+                        )
                         if col != 0:
-                            col_pos_x += col_widths[col-1]
-                    elif self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED and col % 2 == 1:
-                        col_pos_x = self.image.get_width() * (col + 1) // num_cols \
-                                    - GameDialog.get_font_width(row_col_text) \
-                                    - GameDialog.outside_spacing_pixels
+                            col_pos_x += col_widths[col - 1]
+                    elif (
+                        self.row_data_spacing == GameDialogSpacing.OUTSIDE_JUSTIFIED
+                        and col % 2 == 1
+                    ):
+                        col_pos_x = (
+                            self.image.get_width() * (col + 1) // num_cols
+                            - GameDialog.get_font_width(row_col_text)
+                            - GameDialog.outside_spacing_pixels
+                        )
                     else:
-                        col_pos_x = first_col_pos_x + col * (self.image.get_width() - first_col_pos_x -
-                                                             GameDialog.outside_spacing_pixels) // num_cols
+                        col_pos_x = (
+                            first_col_pos_x
+                            + col
+                            * (
+                                self.image.get_width()
+                                - first_col_pos_x
+                                - GameDialog.outside_spacing_pixels
+                            )
+                            // num_cols
+                        )
                         if self.is_menu:
-                            col_pos_x += GameDialog.selection_indicator_pixels + GameDialog.internal_spacing_pixels
-                    self.image.blit(GameDialog.render_font(row_col_text, self.font_color), (col_pos_x, row_pos_y))
-                row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+                            col_pos_x += (
+                                GameDialog.selection_indicator_pixels
+                                + GameDialog.internal_spacing_pixels
+                            )
+                    self.image.blit(
+                        GameDialog.render_font(row_col_text, self.font_color),
+                        (col_pos_x, row_pos_y),
+                    )
+                row_pos_y += (
+                    GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+                )
 
             col_pos_x = GameDialog.outside_spacing_pixels
             for lines in self.row_data_trailing_message_lines:
-                self.image.blit(GameDialog.render_font(lines, self.font_color),
-                                (col_pos_x, row_pos_y))
-                row_pos_y += GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+                self.image.blit(
+                    GameDialog.render_font(lines, self.font_color),
+                    (col_pos_x, row_pos_y),
+                )
+                row_pos_y += (
+                    GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+                )
 
             if self.is_menu:
                 self.draw_menu_indicator()
@@ -842,8 +1019,13 @@ class GameDialog:
         if self.title is None:
             starting_row_pos_y = GameDialog.outside_spacing_pixels
         else:
-            starting_row_pos_y = GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
-        return int(starting_row_pos_y + row * (GameDialog.font.get_height() + GameDialog.internal_spacing_pixels))
+            starting_row_pos_y = (
+                GameDialog.font.get_height() + GameDialog.internal_spacing_pixels
+            )
+        return int(
+            starting_row_pos_y
+            + row * (GameDialog.font.get_height() + GameDialog.internal_spacing_pixels)
+        )
 
     def get_num_rows(self) -> int:
         # Determine the number of lines of text which can be displayed in the dialog
@@ -852,16 +1034,24 @@ class GameDialog:
             num_rows += 1
         return num_rows - 1
 
-    def add_menu_prompt(self,
-                        options: Union[List[str], List[List[str]]],
-                        num_cols: int,
-                        spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
-                        prompt: Optional[str] = None) -> None:
-        self.add_row_data(GameDialog.convert_options_to_row_data(options, num_cols), spacing_type, True, prompt)
+    def add_menu_prompt(
+        self,
+        options: Union[List[str], List[List[str]]],
+        num_cols: int,
+        spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
+        prompt: Optional[str] = None,
+    ) -> None:
+        self.add_row_data(
+            GameDialog.convert_options_to_row_data(options, num_cols),
+            spacing_type,
+            True,
+            prompt,
+        )
 
     @staticmethod
-    def convert_options_to_row_data(options: Union[List[str], List[List[str]]],
-                                    num_cols: int) -> List[List[Optional[str]]]:
+    def convert_options_to_row_data(
+        options: Union[List[str], List[List[str]]], num_cols: int
+    ) -> List[List[Optional[str]]]:
         num_rows = math.ceil(len(options) / num_cols)
         row_data = []
         cols_per_option = 1
@@ -884,19 +1074,22 @@ class GameDialog:
             row_data.append(temp)
         return row_data
 
-    def add_row_data(self,
-                     row_data: List[List[Optional[str]]],
-                     spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
-                     is_menu: bool = False,
-                     prompt: Optional[str] = None,
-                     trailing_message: Optional[str] = None) -> None:
+    def add_row_data(
+        self,
+        row_data: List[List[Optional[str]]],
+        spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
+        is_menu: bool = False,
+        prompt: Optional[str] = None,
+        trailing_message: Optional[str] = None,
+    ) -> None:
         # NOTE:  spacing_type == OUTSIDE_JUSTIFIED assumes 2 columns in rowData
         # NOTE:  If is_menu and spacing_type == OUTSIDE_JUSTIFIED, each row constitutes a single menu item
         self.row_data = row_data
         self.row_data_prompt = prompt
         self.row_data_spacing = spacing_type
-        self.row_data_trailing_message_lines = GameDialog.convert_message_to_lines(trailing_message,
-                                                                                   self.image.get_width())
+        self.row_data_trailing_message_lines = GameDialog.convert_message_to_lines(
+            trailing_message, self.image.get_width()
+        )
         self.is_menu = is_menu
         self.menu_row = 0
         self.menu_col = 0
@@ -917,27 +1110,41 @@ class GameDialog:
         avail_rows = num_rows - len(self.displayed_message_lines)
         new_rows = len(row_data) + len(self.row_data_trailing_message_lines)
         if new_rows > avail_rows:
-            self.displayed_message_lines = self.displayed_message_lines[new_rows - avail_rows:]
+            self.displayed_message_lines = self.displayed_message_lines[
+                new_rows - avail_rows :
+            ]
 
         # Refresh image
         self.refresh_image()
 
-    def blit(self,
-             surface: pygame.surface.Surface,
-             flip_buffer: bool = False,
-             offset_pixels: Point = Point(0, 0)) -> None:
-        surface.blit(self.image, self.pos_tile * GameDialog.tile_size_pixels + offset_pixels)
+    def blit(
+        self,
+        surface: pygame.surface.Surface,
+        flip_buffer: bool = False,
+        offset_pixels: Point = Point(0, 0),
+    ) -> None:
+        surface.blit(
+            self.image, self.pos_tile * GameDialog.tile_size_pixels + offset_pixels
+        )
         if flip_buffer:
             pygame.display.flip()
 
-    def erase(self,
-              surface: pygame.surface.Surface,
-              background: pygame.surface.Surface,
-              flip_buffer: bool = False,
-              offset_pixels: Point = Point(0, 0)) -> None:
-        surface.blit(background.subsurface(pygame.Rect(self.pos_tile * GameDialog.tile_size_pixels + offset_pixels,
-                                                       self.image.get_size())),
-                     self.pos_tile * GameDialog.tile_size_pixels + offset_pixels)
+    def erase(
+        self,
+        surface: pygame.surface.Surface,
+        background: pygame.surface.Surface,
+        flip_buffer: bool = False,
+        offset_pixels: Point = Point(0, 0),
+    ) -> None:
+        surface.blit(
+            background.subsurface(
+                pygame.Rect(
+                    self.pos_tile * GameDialog.tile_size_pixels + offset_pixels,
+                    self.image.get_size(),
+                )
+            ),
+            self.pos_tile * GameDialog.tile_size_pixels + offset_pixels,
+        )
         if flip_buffer:
             pygame.display.flip()
 
@@ -959,7 +1166,7 @@ class GameDialog:
         return None
 
     def erase_menu_indicator(self) -> None:
-        self.draw_menu_indicator(pygame.Color('black'))
+        self.draw_menu_indicator(pygame.Color("black"))
 
     def draw_menu_indicator(self, color: Optional[pygame.Color] = None) -> None:
         if self.row_data is None or self.menu_data is None or len(self.menu_data) == 0:
@@ -971,7 +1178,10 @@ class GameDialog:
         first_col_pos_x = GameDialog.outside_spacing_pixels
         col_pos_x = first_col_pos_x
         if self.row_data_prompt is not None:
-            first_col_pos_x += GameDialog.get_font_width(self.row_data_prompt) + GameDialog.internal_spacing_pixels
+            first_col_pos_x += (
+                GameDialog.get_font_width(self.row_data_prompt)
+                + GameDialog.internal_spacing_pixels
+            )
             col_pos_x = first_col_pos_x - GameDialog.internal_spacing_pixels
         num_cols = len(self.menu_data[0])
         if self.row_data_spacing == GameDialogSpacing.SPACERS:
@@ -982,26 +1192,46 @@ class GameDialog:
                     for row in range(len(self.row_data)):
                         row_prev_col_text = self.menu_data[row][col - 1]
                         if row_prev_col_text is not None:
-                            prev_col_width = max(prev_col_width, GameDialog.get_font_width(row_prev_col_text))
+                            prev_col_width = max(
+                                prev_col_width,
+                                GameDialog.get_font_width(row_prev_col_text),
+                            )
 
-                    col_pos_x += prev_col_width + GameDialog.selection_indicator_pixels + \
-                                 GameDialog.internal_spacing_pixels
+                    col_pos_x += (
+                        prev_col_width
+                        + GameDialog.selection_indicator_pixels
+                        + GameDialog.internal_spacing_pixels
+                    )
         else:
-            col_pos_x = first_col_pos_x + self.menu_col * (
-                    self.image.get_width() - first_col_pos_x - GameDialog.outside_spacing_pixels) // num_cols
-        row_pos_y = self.get_row_pos_y(len(self.displayed_message_lines) + self.menu_row) + (
-                    GameDialog.font.get_height() - GameDialog.selection_indicator_pixels) / 2
+            col_pos_x = (
+                first_col_pos_x
+                + self.menu_col
+                * (
+                    self.image.get_width()
+                    - first_col_pos_x
+                    - GameDialog.outside_spacing_pixels
+                )
+                // num_cols
+            )
+        row_pos_y = (
+            self.get_row_pos_y(len(self.displayed_message_lines) + self.menu_row)
+            + (GameDialog.font.get_height() - GameDialog.selection_indicator_pixels) / 2
+        )
         pointlist = (
-            (col_pos_x + 1 / 4 * GameDialog.selection_indicator_pixels,
-             row_pos_y),
-            (col_pos_x + 1 / 4 * GameDialog.selection_indicator_pixels,
-             row_pos_y + GameDialog.selection_indicator_pixels),
-            (col_pos_x + 3 / 4 * GameDialog.selection_indicator_pixels,
-             row_pos_y + GameDialog.selection_indicator_pixels / 2))
+            (col_pos_x + 1 / 4 * GameDialog.selection_indicator_pixels, row_pos_y),
+            (
+                col_pos_x + 1 / 4 * GameDialog.selection_indicator_pixels,
+                row_pos_y + GameDialog.selection_indicator_pixels,
+            ),
+            (
+                col_pos_x + 3 / 4 * GameDialog.selection_indicator_pixels,
+                row_pos_y + GameDialog.selection_indicator_pixels / 2,
+            ),
+        )
         pygame.draw.polygon(self.image, color, pointlist)
 
     def erase_waiting_indicator(self) -> None:
-        self.draw_waiting_indicator(pygame.Color('black'))
+        self.draw_waiting_indicator(pygame.Color("black"))
 
     def draw_waiting_indicator(self, color: Optional[pygame.Color] = None) -> None:
         if color is None:
@@ -1009,28 +1239,39 @@ class GameDialog:
         col_pos_x = (self.image.get_width() - GameDialog.selection_indicator_pixels) / 2
         row_pos_y = self.get_row_pos_y(len(self.displayed_message_lines))
         pointlist = (
-            (col_pos_x,
-             row_pos_y + 1 / 4 * GameDialog.selection_indicator_pixels),
-            (col_pos_x + GameDialog.selection_indicator_pixels,
-             row_pos_y + 1 / 4 * GameDialog.selection_indicator_pixels),
-            (col_pos_x + GameDialog.selection_indicator_pixels / 2,
-             row_pos_y + 3 / 4 * GameDialog.selection_indicator_pixels))
+            (col_pos_x, row_pos_y + 1 / 4 * GameDialog.selection_indicator_pixels),
+            (
+                col_pos_x + GameDialog.selection_indicator_pixels,
+                row_pos_y + 1 / 4 * GameDialog.selection_indicator_pixels,
+            ),
+            (
+                col_pos_x + GameDialog.selection_indicator_pixels / 2,
+                row_pos_y + 3 / 4 * GameDialog.selection_indicator_pixels,
+            ),
+        )
         pygame.draw.polygon(self.image, color, pointlist)
 
-    def process_event(self, event: pygame.event.Event, screen: pygame.surface.Surface) -> None:
+    def process_event(
+        self, event: pygame.event.Event, screen: pygame.surface.Surface
+    ) -> None:
         if self.allow_user_typing:
             # Process as an update to user_text
             if event.type == pygame.KEYDOWN:
                 orig_user_text = self.user_text
                 if pygame.K_BACKSPACE == event.key:
                     self.user_text = self.user_text[:-1]
-                elif 'unicode' in event.__dict__ and 1 == len(event.unicode):
-                    if self.input_allowed_characters is None or event.unicode in self.input_allowed_characters:
+                elif "unicode" in event.__dict__ and 1 == len(event.unicode):
+                    if (
+                        self.input_allowed_characters is None
+                        or event.unicode in self.input_allowed_characters
+                    ):
                         self.user_text += event.unicode
 
                 # Refresh image if the user text has changed
                 if orig_user_text != self.user_text:
-                    self.displayed_message_lines[-1] = self.user_text_prompt + ' ' + self.user_text
+                    self.displayed_message_lines[-1] = (
+                        self.user_text_prompt + " " + self.user_text
+                    )
                     self.refresh_image()
                     self.blit(screen, True)
 
@@ -1086,42 +1327,52 @@ class GameDialog:
 
     @staticmethod
     def get_number_characters() -> str:
-        return '7894561230'
+        return "7894561230"
 
     @staticmethod
     def get_text_characters() -> str:
         import string
-        return string.ascii_uppercase + string.ascii_lowercase + '. '
+
+        return string.ascii_uppercase + string.ascii_lowercase + ". "
 
     @staticmethod
     def get_all_characters() -> str:
-        return '1234567890' + GameDialog.get_text_characters()
+        return "1234567890" + GameDialog.get_text_characters()
 
-    def prompt_for_user_text(self, prompt: str = '', input_allowed_characters: Optional[str] = None) -> None:
+    def prompt_for_user_text(
+        self, prompt: str = "", input_allowed_characters: Optional[str] = None
+    ) -> None:
         self.allow_user_typing = True
         self.add_message(prompt)
-        self.user_text_prompt = prompt[prompt.rfind('\n')+1:]
-        self.user_text = ''
+        self.user_text_prompt = prompt[prompt.rfind("\n") + 1 :]
+        self.user_text = ""
         self.input_allowed_characters = input_allowed_characters
 
         if GameDialog.use_menus_for_text_entry():
-            menu_characters = ''
+            menu_characters = ""
             menu_cols = 0
             menu_spacing = GameDialogSpacing.EQUAL_COLUMNS
             if input_allowed_characters is not None:
-                if sorted(input_allowed_characters) == sorted(GameDialog.get_number_characters()):
+                if sorted(input_allowed_characters) == sorted(
+                    GameDialog.get_number_characters()
+                ):
                     menu_characters = GameDialog.get_number_characters()
                     menu_cols = 3
                     menu_spacing = GameDialogSpacing.SPACERS
-                elif sorted(input_allowed_characters) == sorted(GameDialog.get_text_characters()):
+                elif sorted(input_allowed_characters) == sorted(
+                    GameDialog.get_text_characters()
+                ):
                     menu_characters = GameDialog.get_text_characters()
                     menu_cols = 14
             if 0 == len(menu_characters):
                 menu_characters = GameDialog.get_all_characters()
                 menu_cols = 17
-            self.add_menu_prompt(list(menu_characters) + [GameDialog.BACKSPACE_UNICODE, GameDialog.ENTER_UNICODE],
-                                 menu_cols,
-                                 menu_spacing)
+            self.add_menu_prompt(
+                list(menu_characters)
+                + [GameDialog.BACKSPACE_UNICODE, GameDialog.ENTER_UNICODE],
+                menu_cols,
+                menu_spacing,
+            )
 
     def get_user_text(self) -> str:
         self.allow_user_typing = False
@@ -1129,12 +1380,12 @@ class GameDialog:
 
     @staticmethod
     def fix_capitalization(message: str) -> str:
-        for punctuation in ['.', '!', '?']:
+        for punctuation in [".", "!", "?"]:
             sentences = []
             for sentence in message.split(punctuation):
                 # Trim out any duplicated spaces between words
-                words = [word for word in sentence.split(' ') if word != '']
-                sentence = ' '.join(words)
+                words = [word for word in sentence.split(" ") if word != ""]
+                sentence = " ".join(words)
 
                 # Capitalize first letter
                 if len(sentence) > 0:
@@ -1142,7 +1393,7 @@ class GameDialog:
 
                 sentences.append(sentence)
             # Join the sentences back together
-            message = f'{punctuation} '.join(sentences)
+            message = f"{punctuation} ".join(sentences)
         return message.strip()
 
 
@@ -1156,12 +1407,14 @@ def main() -> None:
     tile_size_pixels = 48
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(),
-                                     pygame.SRCALPHA | pygame.HWSURFACE)
+    screen = pygame.display.set_mode(
+        win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA | pygame.HWSURFACE
+    )
 
     # Test out game dialog
-    GameDialog.static_init(win_size_tiles, tile_size_pixels, ['lucidasans', 'arialms'])
+    GameDialog.static_init(win_size_tiles, tile_size_pixels, ["lucidasans", "arialms"])
     from pydw.hero_state import HeroState
+
     hero_party = HeroParty(HeroState.create_null())
 
     GameDialog.force_use_menus_for_text_entry = True
@@ -1199,7 +1452,11 @@ def main() -> None:
                         pygame.quit()
                     elif event.key == pygame.K_RETURN:
                         is_awaiting_selection = False
-                        print('Selection made =', dialog_with_menu.get_selected_menu_option(), flush=True)
+                        print(
+                            "Selection made =",
+                            dialog_with_menu.get_selected_menu_option(),
+                            flush=True,
+                        )
                     else:
                         dialog_with_menu.process_event(event, screen)
                 elif event.type == pygame.QUIT:
@@ -1222,20 +1479,35 @@ def main() -> None:
                     elif event.key == pygame.K_RETURN:
                         if GameDialog.use_menus_for_text_entry():
                             # Get a menu selection and turn that into an event
-                            menu_result = dialog_with_user_input.get_selected_menu_option()
+                            menu_result = (
+                                dialog_with_user_input.get_selected_menu_option()
+                            )
                             if menu_result == GameDialog.ENTER_UNICODE:
                                 is_waiting_for_user_input = False
-                                print('Selection made =', dialog_with_user_input.get_user_text(), flush=True)
+                                print(
+                                    "Selection made =",
+                                    dialog_with_user_input.get_user_text(),
+                                    flush=True,
+                                )
                             elif menu_result == GameDialog.BACKSPACE_UNICODE:
-                                event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_BACKSPACE})
+                                event = pygame.event.Event(
+                                    pygame.KEYDOWN, {"key": pygame.K_BACKSPACE}
+                                )
                             else:
-                                event = pygame.event.Event(pygame.KEYDOWN, {'key': None, 'unicode': menu_result})
+                                event = pygame.event.Event(
+                                    pygame.KEYDOWN,
+                                    {"key": None, "unicode": menu_result},
+                                )
 
                             if is_waiting_for_user_input:
                                 message_dialog.process_event(event, screen)
                         else:
                             is_waiting_for_user_input = False
-                            print('Selection made =', dialog_with_user_input.get_user_text(), flush=True)
+                            print(
+                                "Selection made =",
+                                dialog_with_user_input.get_user_text(),
+                                flush=True,
+                            )
                     else:
                         dialog_with_user_input.process_event(event, screen)
                 elif event.type == pygame.QUIT:
@@ -1246,47 +1518,52 @@ def main() -> None:
             else:
                 pygame.time.wait(100)
 
-    screen.fill('pink')
+    screen.fill("pink")
     GameDialog.create_exploring_status_dialog(hero_party).blit(screen, False)
-    message_dialog = GameDialog.create_message_dialog('Hail!')
-    message_dialog.add_message('Shift=' + GameDialog.SHIFT_UNICODE)
-    message_dialog.add_message('Capslock=' + GameDialog.CAPSLOCK_UNICODE)
-    message_dialog.add_message('Backspace=' + GameDialog.BACKSPACE_UNICODE)
-    message_dialog.add_message('Enter=' + GameDialog.ENTER_UNICODE)
+    message_dialog = GameDialog.create_message_dialog("Hail!")
+    message_dialog.add_message("Shift=" + GameDialog.SHIFT_UNICODE)
+    message_dialog.add_message("Capslock=" + GameDialog.CAPSLOCK_UNICODE)
+    message_dialog.add_message("Backspace=" + GameDialog.BACKSPACE_UNICODE)
+    message_dialog.add_message("Enter=" + GameDialog.ENTER_UNICODE)
     wait_for_message_to_fully_display(message_dialog)
 
     wait_for_menu_selection(GameDialog.create_exploring_menu())
 
-    wait_for_menu_selection(GameDialog.create_menu_dialog(
-        Point(-1, 1),
-        None,
-        'OPTIONS',
-        [f'Option {n}' for n in range(0, 100)],
-        2))
+    wait_for_menu_selection(
+        GameDialog.create_menu_dialog(
+            Point(-1, 1), None, "OPTIONS", [f"Option {n}" for n in range(0, 100)], 2
+        )
+    )
 
-    screen.fill('pink')
+    screen.fill("pink")
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
-    wait_for_message_to_fully_display(GameDialog.create_message_dialog(
-        'word wrap testing...  Word wrap testing...  word wrap testing...  ' +
-        'Word Wrap testing...  word Wrap testing...  Word Wrap testing...'))
+    wait_for_message_to_fully_display(
+        GameDialog.create_message_dialog(
+            "word wrap testing...  Word wrap testing...  word wrap testing...  "
+            + "Word Wrap testing...  word Wrap testing...  Word Wrap testing..."
+        )
+    )
     wait_for_menu_selection(GameDialog.create_encounter_menu())
 
-    screen.fill('pink')
+    screen.fill("pink")
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog = GameDialog.create_message_dialog(
-        'Hail 1!\nHail 2!\nHail 3!\nHail 4!\nHail 5!\nHail 6!\nHail 7!\nHail 8!\nHail 9!\nHail 10!\nHail 11!')
+        "Hail 1!\nHail 2!\nHail 3!\nHail 4!\nHail 5!\nHail 6!\nHail 7!\nHail 8!\nHail 9!\nHail 10!\nHail 11!"
+    )
     wait_for_message_to_fully_display(message_dialog)
 
-    message_dialog.add_menu_prompt(['Yes', 'No'], 2, GameDialogSpacing.SPACERS)
+    message_dialog.add_menu_prompt(["Yes", "No"], 2, GameDialogSpacing.SPACERS)
     GameDialog.set_default_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     message_dialog.set_font_color(GameDialog.LOW_HEALTH_FONT_COLOR)
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)
     wait_for_menu_selection(message_dialog)
-    message_dialog.add_message('\nLexie attacks!')
+    message_dialog.add_message("\nLexie attacks!")
     wait_for_message_to_fully_display(message_dialog)
 
-    message_dialog.prompt_for_user_text('\n1 + 15 =', GameDialog.get_number_characters())
+    message_dialog.prompt_for_user_text(
+        "\n1 + 15 =", GameDialog.get_number_characters()
+    )
     wait_for_user_input(message_dialog)
 
     # Terminate pygame
@@ -1294,14 +1571,18 @@ def main() -> None:
     pygame.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         import sys
         import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
+
+        print(
+            traceback.format_exception(
+                None, e, e.__traceback__  # <- type(e) by docs, but ignored
+            ),
+            file=sys.stderr,
+            flush=True,
+        )
         traceback.print_exc()

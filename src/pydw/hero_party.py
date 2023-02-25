@@ -21,7 +21,9 @@ class HeroParty(CombatParty):
         self.gp = 0
         self.progress_markers: List[str] = []
 
-        self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
+        self.light_diameter: Optional[
+            float
+        ] = None  # None indicates the light diameter is unlimited
         self.light_diameter_decay_steps: Optional[int] = None
         self.light_diameter_decay_steps_remaining: Optional[int] = None
 
@@ -29,7 +31,7 @@ class HeroParty(CombatParty):
         self.repel_monsters_decay_steps_remaining: Optional[int] = None
         self.repel_monster_fade_dialog: Optional[DialogType] = None
 
-        self.last_outside_map_name = ''
+        self.last_outside_map_name = ""
         self.last_outside_pos_dat_tile = Point()
         self.last_outside_dir = Direction.SOUTH
 
@@ -40,7 +42,12 @@ class HeroParty(CombatParty):
     def get_combat_members(self) -> List[CombatCharacterState]:
         return cast(List[CombatCharacterState], self.combat_members)
 
-    def add_member(self, member: HeroState, order: Optional[int] = None, is_main_character: bool = False) -> None:
+    def add_member(
+        self,
+        member: HeroState,
+        order: Optional[int] = None,
+        is_main_character: bool = False,
+    ) -> None:
         if is_main_character:
             self.main_character = member
         if member not in self.members:
@@ -54,14 +61,18 @@ class HeroParty(CombatParty):
             else:
                 self.members.insert(order, member)
         else:
-            print('ERROR: Cannot add a member that is already in the party', flush=True)
+            print("ERROR: Cannot add a member that is already in the party", flush=True)
 
     def add_non_combat_member(self, name: str, member: MapCharacterState) -> None:
-        self.add_member(HeroState(member.character_type,
-                                  member.curr_pos_dat_tile,
-                                  member.direction,
-                                  name,
-                                  is_combat_character=False))
+        self.add_member(
+            HeroState(
+                member.character_type,
+                member.curr_pos_dat_tile,
+                member.direction,
+                name,
+                is_combat_character=False,
+            )
+        )
 
     # Remove party member by name or reference
     def remove_member(self, member: Union[HeroState, str]) -> None:
@@ -70,9 +81,9 @@ class HeroParty(CombatParty):
             if member_to_remove is not self.main_character:
                 self.members.remove(member_to_remove)
             else:
-                print('ERROR: Cannot remove main character from the party', flush=True)
+                print("ERROR: Cannot remove main character from the party", flush=True)
         else:
-            print('ERROR: Cannot remove member that it not in party', flush=True)
+            print("ERROR: Cannot remove member that it not in party", flush=True)
 
     # Set the main character - may add a new member to the party
     def set_main_character(self, member: Union[HeroState, str]) -> None:
@@ -82,7 +93,7 @@ class HeroParty(CombatParty):
         elif isinstance(member, HeroState):
             self.add_member(member, is_main_character=True)
         else:
-            print('ERROR: Cannot add a new character from a name', flush=True)
+            print("ERROR: Cannot add a new character from a name", flush=True)
 
     # Set positional order of a member in the party
     def set_member_order(self, member: Union[HeroState, str], order: int) -> None:
@@ -91,7 +102,7 @@ class HeroParty(CombatParty):
             self.members.remove(existing_member)
             self.members.insert(order, existing_member)
         else:
-            print('ERROR: Cannot set position of member not in party', flush=True)
+            print("ERROR: Cannot set position of member not in party", flush=True)
 
     # Get a member from the party by name or reference
     # Return None if the member is not found in the party
@@ -142,36 +153,51 @@ class HeroParty(CombatParty):
         traversal_list.append(self.main_character)
         remaining_count = count
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item_name, unequipped_only=True), remaining_count)
+            member_lose_count = min(
+                member.get_item_count(item_name, unequipped_only=True), remaining_count
+            )
             if 0 < member_lose_count:
                 member.lose_item(item_name, member_lose_count, unequipped_only=True)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
                 return
         for member in traversal_list:
-            member_lose_count = min(member.get_item_count(item_name, unequipped_only=False), remaining_count)
+            member_lose_count = min(
+                member.get_item_count(item_name, unequipped_only=False), remaining_count
+            )
             if 0 < member_lose_count:
                 member.lose_item(item_name, member_lose_count, unequipped_only=False)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
                 return
         if 0 < remaining_count:
-            print('ERROR: Remaining count of ' + str(remaining_count) + ' on attempt to lose ' + str(count) + ' of '
-                  + item_name, flush=True)
+            print(
+                "ERROR: Remaining count of "
+                + str(remaining_count)
+                + " on attempt to lose "
+                + str(count)
+                + " of "
+                + item_name,
+                flush=True,
+            )
 
     def gain_progress_marker(self, progress_marker: str) -> None:
         if progress_marker not in self.progress_markers:
             self.progress_markers.append(progress_marker)
             # print('Gained progress marker', progress_marker, flush=True)
         else:
-            print('WARN: Did not add previously added progress marker', progress_marker, flush=True)
+            print(
+                "WARN: Did not add previously added progress marker",
+                progress_marker,
+                flush=True,
+            )
 
     def lose_progress_marker(self, progress_marker: str) -> None:
         if progress_marker in self.progress_markers:
             self.progress_markers.remove(progress_marker)
             # print('Lost progress marker', progress_marker, flush=True)
         else:
-            print('WARN: Unable to remove progress marker', progress_marker, flush=True)
+            print("WARN: Unable to remove progress marker", progress_marker, flush=True)
 
     def clear_combat_status_affects(self) -> None:
         for member in self.members:
@@ -207,7 +233,9 @@ class HeroParty(CombatParty):
             member.curr_pos_offset_img_px = Point(0, 0)
             member.direction = direction
 
-    def set_last_outside_pos(self, map_name: str, pos: Point, direction: Direction) -> None:
+    def set_last_outside_pos(
+        self, map_name: str, pos: Point, direction: Direction
+    ) -> None:
         self.last_outside_map_name = map_name
         self.last_outside_pos_dat_tile = pos
         self.last_outside_dir = direction
@@ -220,14 +248,22 @@ class HeroParty(CombatParty):
                 member.inc_step_counter()
 
         # Decay the light radius effect over time
-        if self.light_diameter is not None and self.light_diameter_decay_steps_remaining is not None:
+        if (
+            self.light_diameter is not None
+            and self.light_diameter_decay_steps_remaining is not None
+        ):
             self.light_diameter_decay_steps_remaining -= 1
             if 0 >= self.light_diameter_decay_steps_remaining:
-                self.light_diameter = max(0.5, self.light_diameter-2)
-                self.light_diameter_decay_steps_remaining = self.light_diameter_decay_steps
+                self.light_diameter = max(0.5, self.light_diameter - 2)
+                self.light_diameter_decay_steps_remaining = (
+                    self.light_diameter_decay_steps
+                )
 
         # Decay the repel monsters effect over time
-        if self.repel_monsters and self.repel_monsters_decay_steps_remaining is not None:
+        if (
+            self.repel_monsters
+            and self.repel_monsters_decay_steps_remaining is not None
+        ):
             self.repel_monsters_decay_steps_remaining -= 1
             if 0 >= self.repel_monsters_decay_steps_remaining:
                 self.repel_monsters = False
@@ -239,26 +275,32 @@ class HeroParty(CombatParty):
         lowest_health_ratio = 1.0
         for member in self.members:
             if member.max_hp > 0:
-                lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
+                lowest_health_ratio = min(
+                    lowest_health_ratio, member.hp / member.max_hp
+                )
         return lowest_health_ratio
 
     def get_highest_defense_strength(self) -> int:
         highest_defense_strength = 0
         for member in self.members:
             if member.is_alive():
-                highest_defense_strength = max(highest_defense_strength, member.get_defense_strength())
+                highest_defense_strength = max(
+                    highest_defense_strength, member.get_defense_strength()
+                )
         return highest_defense_strength
 
     def has_low_health(self) -> bool:
         return self.get_lowest_health_ratio() < 0.25
 
     # Get listing of all unequipped items for the party
-    def get_item_row_data(self,
-                          limit_to_droppable: bool = False,
-                          filter_types: Optional[List[str]] = None) -> List[List[str]]:
+    def get_item_row_data(
+        self, limit_to_droppable: bool = False, filter_types: Optional[List[str]] = None
+    ) -> List[List[str]]:
         item_row_data: List[List[str]] = []
         for member in self.members:
-            member_item_row_data = member.get_item_row_data(limit_to_droppable, True, filter_types)
+            member_item_row_data = member.get_item_row_data(
+                limit_to_droppable, True, filter_types
+            )
             if 0 == len(item_row_data):
                 item_row_data = member_item_row_data
             else:
@@ -273,43 +315,56 @@ class HeroParty(CombatParty):
         item_row_data.sort(key=lambda x: x[0])
         return item_row_data
 
-    def is_monster_party_repelled(self, monster_party: MonsterParty, is_outside: bool) -> bool:
+    def is_monster_party_repelled(
+        self, monster_party: MonsterParty, is_outside: bool
+    ) -> bool:
         # Repel only works outside
         if not self.repel_monsters or not is_outside:
             return False
 
-        return (self.get_highest_defense_strength() // 2 >
-                monster_party.get_highest_attack_strength() // 2)
+        return (
+            self.get_highest_defense_strength() // 2
+            > monster_party.get_highest_attack_strength() // 2
+        )
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}({self.main_character}, ' \
-               f'{self.members}, {self.gp}, {self.progress_markers})'
+        return (
+            f"{self.__class__.__name__}({self.main_character}, "
+            f"{self.members}, {self.gp}, {self.progress_markers})"
+        )
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.main_character!r}, ' \
-               f'{self.members!r}, {self.gp!r}, {self.progress_markers!r})'
+        return (
+            f"{self.__class__.__name__}({self.main_character!r}, "
+            f"{self.members!r}, {self.gp!r}, {self.progress_markers!r})"
+        )
 
 
 def main() -> None:
     # TODO: Convert to unit test
     from pydw.game_types import CharacterType
-    character_type = CharacterType('myType', {}, [])
-    hero_state = HeroState(character_type, Point(7, 3), Direction.WEST, 'Sir Me')
+
+    character_type = CharacterType("myType", {}, [])
+    hero_state = HeroState(character_type, Point(7, 3), Direction.WEST, "Sir Me")
     hero_party = HeroParty(hero_state)
-    print(hero_party, '\n', flush=True)
-    for name in ['member1', 'member2', 'member3']:
+    print(hero_party, "\n", flush=True)
+    for name in ["member1", "member2", "member3"]:
         member = HeroState(character_type, Point(7, 3), Direction.WEST, name)
         hero_party.add_member(member)
-        print(hero_party, '\n', flush=True)
+        print(hero_party, "\n", flush=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         import sys
         import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
+
+        print(
+            traceback.format_exception(
+                None, e, e.__traceback__  # <- type(e) by docs, but ignored
+            ),
+            file=sys.stderr,
+            flush=True,
+        )

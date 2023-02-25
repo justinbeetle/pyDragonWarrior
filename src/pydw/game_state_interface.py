@@ -10,7 +10,13 @@ from generic_utils.point import Point
 
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
-from pydw.game_types import DialogReplacementVariables, DialogType, MapDecoration, MonsterInfo, Tile
+from pydw.game_types import (
+    DialogReplacementVariables,
+    DialogType,
+    MapDecoration,
+    MonsterInfo,
+    Tile,
+)
 from pydw.generic_game_state import GenericGameState
 from pydw.hero_party import HeroParty
 from pydw.map_character_state import MapCharacterState
@@ -37,7 +43,9 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
+    def check_progress_markers(
+        self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]
+    ) -> bool:
         pass
 
     @abc.abstractmethod
@@ -70,10 +78,12 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def set_map(self,
-                new_map_name: str,
-                one_time_decorations: Optional[List[MapDecoration]] = None,
-                respawn_decorations: bool = False) -> None:
+    def set_map(
+        self,
+        new_map_name: str,
+        one_time_decorations: Optional[List[MapDecoration]] = None,
+        respawn_decorations: bool = False,
+    ) -> None:
         pass
 
     @abc.abstractmethod
@@ -97,12 +107,14 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def draw_map(self,
-                 flip_buffer: bool = True,
-                 draw_background: bool = True,
-                 draw_combat: bool = True,
-                 draw_status: bool = True,
-                 draw_only_character_sprites: bool = False) -> None:
+    def draw_map(
+        self,
+        flip_buffer: bool = True,
+        draw_background: bool = True,
+        draw_combat: bool = True,
+        draw_status: bool = True,
+        draw_only_character_sprites: bool = False,
+    ) -> None:
         pass
 
     @abc.abstractmethod
@@ -114,13 +126,15 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def initiate_encounter(self,
-                           monster_info: Optional[MonsterInfo] = None,
-                           approach_dialog: Optional[DialogType] = None,
-                           victory_dialog: Optional[DialogType] = None,
-                           run_away_dialog: Optional[DialogType] = None,
-                           encounter_music: Optional[str] = None,
-                           message_dialog: Optional[GameDialog] = None) -> None:
+    def initiate_encounter(
+        self,
+        monster_info: Optional[MonsterInfo] = None,
+        approach_dialog: Optional[DialogType] = None,
+        victory_dialog: Optional[DialogType] = None,
+        run_away_dialog: Optional[DialogType] = None,
+        encounter_music: Optional[str] = None,
+        message_dialog: Optional[GameDialog] = None,
+    ) -> None:
         pass
 
     @abc.abstractmethod

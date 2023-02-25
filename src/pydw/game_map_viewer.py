@@ -31,33 +31,48 @@ class GameMapViewer:
         desired_win_size_pixels = Point(2560, 1340)
         if desired_win_size_pixels is None:
             self.screen: pygame.surface.Surface = pygame.display.set_mode(
-                (0, 0),
-                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA)
+                (0, 0), pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA
+            )
             self.win_size_pixels: Point = Point(self.screen.get_size())
             self.win_size_tiles: Point = self.win_size_pixels // self.tile_size_pixels
         else:
             self.win_size_tiles = desired_win_size_pixels // self.tile_size_pixels
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
-            self.screen = pygame.display.set_mode(self.win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA)
+            self.screen = pygame.display.set_mode(
+                self.win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA
+            )
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
 
         # Initialize GameInfo
-        game_xml_path = os.path.join(base_path, 'game.xml')
+        game_xml_path = os.path.join(base_path, "game.xml")
         from pydw.game_info import GameInfo
-        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
+
+        self.game_info = GameInfo(
+            base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels
+        )
 
         # Initialize the hero party
         self.hero_party = HeroParty(
-            HeroState(self.game_info.character_types['hero'], Point(), Direction.NORTH, 'Camden', 20000))
+            HeroState(
+                self.game_info.character_types["hero"],
+                Point(),
+                Direction.NORTH,
+                "Camden",
+                20000,
+            )
+        )
 
         # Setup a mock game state
         from unittest import mock
         from unittest.mock import MagicMock
+
         self.mock_game_state = mock.create_autospec(spec=GameStateInterface)
         self.mock_game_state.screen = self.screen
         self.mock_game_state.is_running = self.is_running
         self.mock_game_state.get_game_info = MagicMock(return_value=self.game_info)
-        self.mock_game_state.get_image_pad_tiles = MagicMock(return_value=self.image_pad_tiles)
+        self.mock_game_state.get_image_pad_tiles = MagicMock(
+            return_value=self.image_pad_tiles
+        )
         self.mock_game_state.get_hero_party = MagicMock(return_value=self.hero_party)
         self.mock_game_state.check_progress_markers = MagicMock(return_value=True)
 
@@ -95,18 +110,27 @@ class GameMapViewer:
                             self.hero_party.light_diameter += 1
                     elif event.key == pygame.K_MINUS:
                         if self.hero_party.light_diameter is not None:
-                            self.hero_party.light_diameter = max(1, self.hero_party.light_diameter-1)
+                            self.hero_party.light_diameter = max(
+                                1, self.hero_party.light_diameter - 1
+                            )
                     elif event.key == pygame.K_e:
                         if game_map.is_facing_locked_item():
-                            print('Opened door', flush=True)
+                            print("Opened door", flush=True)
                             game_map.open_locked_item()
                         else:
                             for decoration in game_map.get_decorations():
-                                if decoration.type is not None and decoration.type.remove_with_search:
-                                    print('Removing decoration', decoration, flush=True)
+                                if (
+                                    decoration.type is not None
+                                    and decoration.type.remove_with_search
+                                ):
+                                    print("Removing decoration", decoration, flush=True)
                                     game_map.remove_decoration(decoration)
                                 else:
-                                    print('Not removing decoration', decoration, flush=True)
+                                    print(
+                                        "Not removing decoration",
+                                        decoration,
+                                        flush=True,
+                                    )
                     elif event.key == pygame.K_b:
                         game_map.dump_encounter_backgrounds()
                     elif event.key == pygame.K_g:
@@ -117,23 +141,39 @@ class GameMapViewer:
                     self.is_running = False
 
                 if move_direction is not None:
-                    if self.hero_party.members[0].curr_pos_dat_tile != self.hero_party.members[0].dest_pos_dat_tile:
-                        print('Ignoring move as another move is already in progress', flush=True)
+                    if (
+                        self.hero_party.members[0].curr_pos_dat_tile
+                        != self.hero_party.members[0].dest_pos_dat_tile
+                    ):
+                        print(
+                            "Ignoring move as another move is already in progress",
+                            flush=True,
+                        )
                         continue
                     if move_direction != self.hero_party.members[0].direction:
                         self.hero_party.members[0].direction = move_direction
                     else:
-                        dest_tile = self.hero_party.members[0].curr_pos_dat_tile + move_direction.get_vector()
+                        dest_tile = (
+                            self.hero_party.members[0].curr_pos_dat_tile
+                            + move_direction.get_vector()
+                        )
                         if god_mode or game_map.can_move_to_tile(dest_tile):
                             self.hero_party.members[0].dest_pos_dat_tile = dest_tile
                             tile_name = game_map.get_tile_info().name
-                            encounter_background = game_map.get_encounter_background(dest_tile)
-                            print(f'Moved to {dest_tile} of type {tile_name} and background {encounter_background}',
-                                  flush=True)
+                            encounter_background = game_map.get_encounter_background(
+                                dest_tile
+                            )
+                            print(
+                                f"Moved to {dest_tile} of type {tile_name} and background {encounter_background}",
+                                flush=True,
+                            )
 
             updated = False
-            while not updated or \
-                    self.hero_party.members[0].curr_pos_dat_tile != self.hero_party.members[0].dest_pos_dat_tile:
+            while (
+                not updated
+                or self.hero_party.members[0].curr_pos_dat_tile
+                != self.hero_party.members[0].dest_pos_dat_tile
+            ):
                 updated = True
                 game_map.update()
                 game_map.draw()
@@ -143,19 +183,25 @@ class GameMapViewer:
 
 def main() -> None:
     # Iterate through and render the different maps
-    viewer = GameMapViewer(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
+    viewer = GameMapViewer(
+        os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
+    )
     for map_name in viewer.game_info.maps:
         viewer.view_map(map_name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except Exception as e:
         import sys
         import traceback
-        print(traceback.format_exception(None,  # <- type(e) by docs, but ignored
-                                         e,
-                                         e.__traceback__),
-              file=sys.stderr, flush=True)
+
+        print(
+            traceback.format_exception(
+                None, e, e.__traceback__  # <- type(e) by docs, but ignored
+            ),
+            file=sys.stderr,
+            flush=True,
+        )
         traceback.print_exc()
