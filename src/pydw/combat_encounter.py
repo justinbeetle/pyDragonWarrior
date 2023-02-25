@@ -924,7 +924,7 @@ def main() -> None:
 
     # Run a series of combat encounters
     CombatEncounter.static_init("combat")
-    for (hero_party, monster_party) in combat_parties:
+    for hero_party, monster_party in combat_parties:
         if not mock_game_state.is_running:
             break
 

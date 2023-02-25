@@ -378,7 +378,6 @@ class NpcSprite(CharacterSprite):
             if (
                 self.update_count % self.updates_between_npc_moves
             ) == self.updates_between_npc_moves - 1:
-
                 # Determine where to move instead of blindly moving forward
                 if 0 < len(self.character.npc_info.waypoints):
                     # Choose a new waypoint if we don't have one or are already at it

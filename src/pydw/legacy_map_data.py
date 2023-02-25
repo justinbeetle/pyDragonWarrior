@@ -342,7 +342,6 @@ class ScrollTest:
         self.running = False
 
     def draw(self, surface: pygame.surface.Surface) -> None:
-
         # tell the map_layer (BufferedRenderer) to draw to the surface
         # the draw function requires a rect to draw to.
         self.map_layer.draw(surface, surface.get_rect())

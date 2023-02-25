@@ -97,7 +97,6 @@ class GameInfo:
         tile_size_pixels: int,
         win_size_pixels: Point,
     ) -> None:
-
         self.game_xml_path = game_xml_path
         self.tile_size_pixels = tile_size_pixels
         self.dialog_sequences: Dict[str, DialogType] = {}
@@ -926,7 +925,7 @@ class GameInfo:
                     phase_image_scaled_size.w,
                     phase_image_scaled_size.h,
                 )
-                for (idx, direction) in enumerate(
+                for idx, direction in enumerate(
                     [Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.NORTH]
                 ):
                     y_px = idx * phase_image_size.h

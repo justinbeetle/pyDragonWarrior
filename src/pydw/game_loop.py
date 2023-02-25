@@ -255,7 +255,6 @@ class GameLoop:
         map_name = ""
 
         while self.game_state.is_running:
-
             # Generate the map state a mode or map change
             if map_name != self.game_state.get_map_name():
                 map_name = self.game_state.get_map_name()
@@ -617,7 +616,6 @@ class GameLoop:
                 self.game_state.advance_tick()
 
     def scroll_tile(self) -> None:
-
         transition: Optional[OutgoingTransition] = None
 
         # Determine the destination tile and pixel count for the scroll

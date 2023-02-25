@@ -743,7 +743,6 @@ class GameDialog:
     def add_message(
         self, new_message: str, append: bool = True, fully_populate: bool = False
     ) -> None:
-
         self.acknowledged = False
         self.row_data = None
 

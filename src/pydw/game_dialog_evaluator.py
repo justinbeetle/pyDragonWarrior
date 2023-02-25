@@ -1060,7 +1060,6 @@ class GameDialogEvaluator:
                                     damage = max(1, damage)
                                     allow_dodge = False
                                     if is_critical_hit:
-
                                         if target.allows_critical_hits():
                                             add_message("That's right! Excellent move!")
                                         else:
