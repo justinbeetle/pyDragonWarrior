@@ -8,6 +8,7 @@ import os
 import pathlib
 import subprocess
 import sys
+import tarfile
 import traceback
 
 
@@ -240,40 +241,12 @@ def main() -> None:
         win_size_pixels = Point(args.width, args.height)
     tile_size_pixels = 16
     tile_scaling_factor = 3
-    if args.config is not None:
-        game_xml_path = args.config
-        game_loop = GameLoop(
-            saves_path,
-            base_path,
-            game_xml_path,
-            win_size_pixels,
-            tile_size_pixels,
-            tile_scaling_factor,
-            verbose=args.verbose,
-        )
-    else:
-        use_unlicensed_assets = args.force_use_unlicensed_assets
-        if not use_unlicensed_assets:
-            try:
-                game_xml_path = os.path.join(base_path, "game_licensed_assets.xml")
-                game_loop = GameLoop(
-                    saves_path,
-                    base_path,
-                    game_xml_path,
-                    win_size_pixels,
-                    tile_size_pixels,
-                    tile_scaling_factor,
-                    verbose=args.verbose,
-                )
-            except Exception:
-                use_unlicensed_assets = True
-                if args.verbose:
-                    print("ERROR: Failed to load licensed assets", flush=True)
-                    traceback.print_exc()
 
-        if use_unlicensed_assets:
-            game_xml_path = os.path.join(base_path, "game.xml")
-            game_loop = GameLoop(
+    def create_game_loop(
+        game_xml_path: str, error_msg: Optional[str] = None
+    ) -> Optional[GameLoop]:
+        try:
+            return GameLoop(
                 saves_path,
                 base_path,
                 game_xml_path,
@@ -282,9 +255,61 @@ def main() -> None:
                 tile_scaling_factor,
                 verbose=args.verbose,
             )
+        except Exception:
+            if args.verbose:
+                if error_msg is None:
+                    error_msg = f"Failed to load game using {game_xml_path}"
+                print(f"ERROR: {error_msg}", flush=True)
+                traceback.print_exc()
+        return None
+
+    game_loop: Optional[GameLoop] = None
+    if args.config is not None:
+        # Attempt to load game using a user specified configuration
+        game_loop = create_game_loop(args.config)
+
+    if game_loop is None:
+        if not args.force_use_unlicensed_assets:
+            # Attempt to load game using the licensed assets
+            game_xml_path = os.path.join(base_path, "game_licensed_assets.xml")
+            game_loop = create_game_loop(
+                game_xml_path, "Failed to load using licensed assets"
+            )
+
+            if not game_loop:
+                # Attempt to load game using the licensed assets after extracting missing assets from the asset pack
+                asset_pack_path = os.path.join(base_path, "licensed_assets.tgz")
+                if os.path.exists(asset_pack_path):
+                    with tarfile.open(asset_pack_path) as asset_pack_file:
+                        if args.verbose:
+                            print("Extracting assets...", flush=True)
+                        for asset_file in asset_pack_file:
+                            if not os.path.exists(
+                                os.path.join(base_path, asset_file.name)
+                            ):
+                                asset_pack_file.extract(asset_file)
+                                if args.verbose:
+                                    print(f"   {asset_file.name}", flush=True)
+                    game_loop = create_game_loop(
+                        game_xml_path,
+                        "Failed to load licensed assets after extracting from asset pack",
+                    )
+
+        if game_loop is None:
+            # Fallback to using unlicensed assets
+            game_xml_path = os.path.join(base_path, "game.xml")
+            game_loop = create_game_loop(
+                game_xml_path, "ERROR: Failed to load unlicensed assets"
+            )
 
     # Run the game
-    game_loop.run(args.save)
+    if game_loop is not None:
+        game_loop.run(args.save)
+    elif not args.verbose:
+        print(
+            "ERROR: Failed to load the game.  Run with the -v option for more info.",
+            flush=True,
+        )
 
     # Exit the game
     AudioPlayer().terminate()
