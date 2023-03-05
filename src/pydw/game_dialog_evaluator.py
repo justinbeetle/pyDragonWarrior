@@ -619,13 +619,13 @@ class GameDialogEvaluator:
                     )
 
                 elif item.type == DialogCheckEnum.IS_TARGET_MONSTER:
-                    check_result = len(self.targets) > 0 and isinstance(
-                        self.targets[0],
-                        MonsterState
+                    check_result = (
+                        len(self.targets) > 0
+                        and isinstance(self.targets[0], MonsterState)
                         and (
                             item.name is None
                             or item.name == self.targets[0].get_type_name()
-                        ),
+                        )
                     )
 
                 elif item.type in (
