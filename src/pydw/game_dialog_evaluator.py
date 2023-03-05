@@ -37,6 +37,7 @@ from pydw.game_info import GameInfo
 from pydw.game_state_interface import GameStateInterface
 from pydw.hero_state import HeroState
 from pydw.map_character_state import MapCharacterState
+from pydw.monster_state import MonsterState
 
 
 class GameDialogEvaluator:
@@ -618,8 +619,13 @@ class GameDialogEvaluator:
                     )
 
                 elif item.type == DialogCheckEnum.IS_TARGET_MONSTER:
-                    check_result = len(self.targets) > 0 and not isinstance(
-                        self.targets[0], HeroState
+                    check_result = len(self.targets) > 0 and isinstance(
+                        self.targets[0],
+                        MonsterState
+                        and (
+                            item.name is None
+                            or item.name == self.targets[0].get_type_name()
+                        ),
                     )
 
                 elif item.type in (

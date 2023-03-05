@@ -1098,8 +1098,9 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Fairy Flute"                                    droppable="no"  equippable="no" target="ALL_ENEMIES">
             <DialogAction type="PLAY_MUSIC" name="flute"/>
             <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
-            <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happended.</Dialog></DialogAssert>
-            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
+            <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAssert type="IS_TARGET_MONSTER" name="Golem"><Dialog>But nothing happened.</Dialog></DialogAssert>
+            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool>
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
             <Dialog>[ACTOR] held Erdrick's Token tightly.</Dialog>
