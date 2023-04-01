@@ -23,9 +23,10 @@ class Point(Tuple[PointTypeElemType, PointTypeElemType]):
     ScalarOrPointTupleType = Union[PointTypeElemType, PointTupleType]
 
     def __new__(cls, x: ScalarOrPointTupleType = 0, y: PointTypeElemType = 0) -> Point:
+        # TODO: Remove type ignores in this method once mypy bug https://github.com/python/mypy/issues/14890 is fixed
         if isinstance(x, tuple):
-            return tuple.__new__(Point, (x[0], x[1]))
-        return tuple.__new__(Point, (x, y))
+            return tuple.__new__(cls, (x[0], x[1]))  # type: ignore
+        return tuple.__new__(cls, (x, y))  # type: ignore
 
     @property
     def x(self) -> PointTypeElemType:
