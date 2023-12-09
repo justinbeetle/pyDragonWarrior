@@ -120,6 +120,10 @@ def main() -> None:
             print("Running as a PyInstaller binary executable", flush=True)
         application_path = os.path.dirname(os.path.abspath(sys.executable))
         base_path = os.path.dirname(os.path.abspath(__file__))
+
+        # Close the PyInstaller splash screen
+        import pyi_splash
+        pyi_splash.close()
     else:
         # Normal execution
         if args.verbose:
@@ -127,6 +131,11 @@ def main() -> None:
         application_path = base_path = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
+
+        # On Windows, change the app user model so that Windows doesn't use the Python icon in the taskbar.
+        if is_windows():
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
 
     # Set the current working directory to the base path so that the game can be run from any path
     # First ensure sys.argv[0] is an absolute path
@@ -225,7 +234,7 @@ def main() -> None:
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.display.set_caption(application_name)
-    icon_image_filename = os.path.join(base_path, "icon.png")
+    icon_image_filename = os.path.join(base_path, "data", "images", "icon.png")
     if os.path.exists(icon_image_filename):
         try:
             icon_image = pygame.image.load(icon_image_filename)
@@ -271,7 +280,7 @@ def main() -> None:
     if game_loop is None:
         if not args.force_use_unlicensed_assets:
             # Attempt to load game using the licensed assets
-            game_xml_path = os.path.join(base_path, "game_licensed_assets.xml")
+            game_xml_path = os.path.join(base_path, "data", "game_licensed_assets.xml")
             game_loop = create_game_loop(
                 game_xml_path, "Failed to load using licensed assets"
             )
@@ -297,7 +306,7 @@ def main() -> None:
 
         if game_loop is None:
             # Fallback to using unlicensed assets
-            game_xml_path = os.path.join(base_path, "game.xml")
+            game_xml_path = os.path.join(base_path, "data", "game.xml")
             game_loop = create_game_loop(
                 game_xml_path, "ERROR: Failed to load unlicensed assets"
             )

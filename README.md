@@ -77,9 +77,8 @@ of problems in the add_problem_to_use_dialog method.
 2. source pyinstaller_venv/Scripts/activate
 3. pip install .
 4. pip install pyinstaller
-5. pyinstaller --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./"
---add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png
-src/pydw/game.py
+5. pyinstaller --onefile --name pyDragonWarrior --add-data "data;data" --icon data/images/icon.ico --splash
+data/images/title.png src/pydw/game.py
 
 ### Using Docker
 
