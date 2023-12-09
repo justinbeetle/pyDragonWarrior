@@ -1,4 +1,4 @@
-numpy==1.26.2
+numpy
 pygame==2.5.2
 pyscroll==2.31
 pytmx==3.32
