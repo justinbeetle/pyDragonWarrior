@@ -9,12 +9,13 @@ The following can be equipped:
 * Two non-polearm one-handed weapons
 * One polearm or other two-handed weapon
 
-TODO: In future, also allow a dagger and allow combat to devolve to grappling?
+FUTURE: Consider adding a dagger and allow combat to devolve to grappling?
 
 ## Start of combat
 
-Choose hand configuration of weapon and shield. Depending on what is equipped, the following options may be
-available:
+Choose hand configuration of weapon and shield.  Some information about the enemy combatants should be provided to
+inform the selection, such as what enemies with what types of arms and armour.  Depending on what is equipped, the
+following options may be available:
 * Fists (if no weapons equipped)
 * Fist and shield (if no weapons equipped and shield equipped)
 * One-handed weapon one (if equipped)
@@ -28,19 +29,30 @@ Remember what was last used to open combat and make that the default selection. 
 equipped, else one column.  First (only) column is for weapon and the second column is weapon with shield.  Don't
 present an option if the only options is fists, but do prompt the user to obtain and equip weapons and armor.
 
+TBD: When surprised, should this choice still be available?  If not, what selection is made?  I could see making this
+selection for the player in the following order of precedence:
+1. One-handed weapon one and shield (if both equipped)
+2. One-handed weapon one (if equipped)
+3. One-handed weapon two and shield (if both equipped)
+4. One-handed weapon two (if equipped)
+5. Polearm or other two-handed weapon (if equipped)
+6. Fist and shield (if no weapons equipped and shield equipped)
+7. Fists (if no weapons equipped)
+
 ## On-turn (attack)
 
 Choose one of the following actions:
 * Attack
 * Spell (what spells?)
 * Item (what items?)
-* Change weapon
+* Change hand configuration
 * Flee
 
 Don't allow healing, at least non-magic healing, during combat.  Trying to perform first aid on one's self while being
 attacked with a sword would be a sure fire way to punch one's ticket.
 
-TODO:  Attack and spell combos?  Add a category of special attacks for this???
+FUTURE: Consider special attack and spell combos, both of which would be learned?  Add a category of special attacks
+for this???
 
 On attack, depending on weapon, there may be additional choices for the type of attack.
 * Swing: Swing the weapon in an arch toward an opponent.  The verb used for this varies depending on the damage type
@@ -48,42 +60,60 @@ being dealt.  For bludgeon damage, it is a **strike**.  For cutting damage, it i
   * Cut: Swing attack with a sword, axe, or other cutting weapon against a target susceptible to cutting.
   * Strike: Swing attack with any weapon which is not a cutting weapon or against a target not susceptible to cutting.
 * Thrust
-* Riposte: After a successful parry, a riposte attack
+* Riposte: A counterattack after a successful parry.  Has an increased chance to land (perhaps even close to 100%?)
+and deals the best of cut, strike, and thrust damage.
 
-After a successful parry, attack to immediately follow would be a riposte with a 100% chance to 
-* Riposte: After a successful parry (best of cut, string, and thrust)
+FUTURE: Consider second intention attacks where the attack is a feint (false attack) meant to setup an attack based on
+predicting the behavior of the defender.  If the right behavior is predicted, the second attack occurs.  These might be
+special, learned attacks.
 
-TODO: Add any of the following?
+FUTURE: Consider adding any of the following?
 * Slice / Slash / Pull cut: Attack meant to cause a long, not deep, cut.
 * Pommel strike (sword); strike with butt end of polearm or axe
 * Hook: Halberd, axe, etc
 
 Strength of Attack:
-* Swing: A sword or one-handed swing can be delivered from the wrist, elbow, or shoulder, where each progressively
-increases the commitment to the attack.  Similarly, a polearm can be swung either from a grip in the middle of the
-weapon (reducing the range) for from near its end.  These progressively increase the damage, the effort used in the
-attack, and disadvantage suffered should the attack be unsuccessful.
+* Swing: A sword or one-handed swing can be delivered from the wrist, elbow, or shoulder, where each progressively 
+increases the commitment to the attack.  Similarly, a polearm can be swung from different grips which affect how much of
+the weapon's maximum reach is in play, how long the swing takes, and how much kinetic energy it can deliver.  As the
+reach increases so does the damage, the effort used in the attack, and the disadvantage suffered should the attack be
+unsuccessful.
   * Sword and one-handed swing:
     * Wrist: 50% of nominal damage on success; no stamina cost
     * Elbow: 100% of nominal damage on success; stamina cost of weapon; disadvantage on miss
-    * Shoulder: 150% of nominal damage on success; 1.5x stamina cost of weapon; 2x disadvantage on miss
+    * Shoulder: 150% of nominal damage on success; 1.5x stamina cost of weapon; 2x disadvantage on miss; not available
+on weapons with long reach in caves/dungeons when walls on two or more adjacent sides
   * Polearm swing:
     * Middle grip / Quarters grip: 50% of nominal damage on success; no stamina cost; range cut in half
-    * Three quarters grip: 100% of nominal damage on success; stamina cost of weapon; disadvantage on miss
+    * Three quarters grip: 100% of nominal damage on success; stamina cost of weapon; disadvantage on miss; not
+available in caves/dungeons when walls on two or more adjacent sides
     * End grip / Bottom grip / Longsword grip: 150% of nominal damage on success; 2x stamina cost of weapon; 2x
-disadvantage on miss
+disadvantage on miss; not available in caves/dungeons when walls on two or more adjacent sides
 * Thrust
-  * Arm thrust / slide thrust for two-handed polearms: 100% of nominal damage; no stamina cost; disadvantage on miss
-  * Advancing thrust: 150% of nominal damage; evade stamina cost; 2x disadvantage on miss
+  * Arm thrust / slide thrust for two-handed polearms: 100% of nominal damage; no stamina cost
+  * Advancing thrust: 150% of nominal damage; min(evade, weapon) stamina cost; 2x disadvantage on miss
 * Fists:
   * Jab: 50% of nominal damage on success; no stamina cost (same as wrist swing)
   * Cross: 100% of nominal damage on success; stamina cost of weapon; disadvantage on miss (same as elbow swing)
 
 Potential polearm grips names: https://grauenwolf.wordpress.com/2015/03/15/proposed-terminology-for-gripping-the-staff-spear-and-similar-weapons/
 
+| Action                                   | Stamina Cost                                 | Speed  | Damage Modifier | Miss Penalty    |
+|------------------------------------------|----------------------------------------------|--------|-----------------|-----------------|
+| Sword and one-handed swing from wrist    | 0                                            | Fast   | 0.5             | None            |
+| Sword and one-handed swing from elbow    | Weapon stamina cost                          | Medium | 1.0             | Disadvantage    |
+| Sword and one-handed swing from shoulder | Weapon stamina cost * 2                      | Slow   | 1.5             | 2x Disadvantage |
+| Polearm swing from middle grip           | 0                                            | Fast   | 0.5             | None            |
+| Polearm swing from three quarters grip   | Weapon stamina cost                          | Medium | 1.0             | Disadvantage    |
+| Polearm swing from end grip              | Weapon stamina cost * 2                      | Slow   | 1.5             | 2x Disadvantage |
+| Arm/slide thrust                         | 0                                            | Fast   | 0.75            | None            |
+| Advancing thrust                         | min(evade stamina cost, weapon stamina cost) | Fast   | 1.25            | 2x Disadvantage |
+| Fist jab                                 | 0                                            | Fast   | 0.5             | None            |
+| Fist cross                               | 1                                            | Medium | 1.0             | Disadvantage    |
+
 ### Measure and Distance
 
-TODO: Could add additional wrinkles and complexity to track distance of combatants and make footwork selections for the
+FUTURE: Could add additional wrinkles and complexity to track distance of combatants and make footwork selections for the
 attack.
 
 Measure and distance: A figher's measure is their attack range.  You want to be safely outside the measure of your
@@ -104,32 +134,30 @@ References:
 
 Prepare to...
 * Stand ground: No stamina cost
-* Evade: No damage if successful.  Cost is one stamina per TBD (20?) lbs of weight.
+* Evade: No damage if successful.  Cost is one stamina per 10 lbs of weight.
 * Block: No cutting/piercing damage and reduced bludgeoning damage if successful, but costs stamina.
   * with shield: Attempt to block the attack with your shield.
   * with weapon: When not holding a shield, hold your weapon with two hands and attempt to block a cut.  Can meet a cut
-regardless of the force but does not work against thrusts.  An evade and block combo would add protection for thrusts
+regardless of the force but does not work against thrusts.  An evade and block combo would add protection for thrusts.
 * Parry: No damage and sets up a riposte if successful, but costs stamina cost of weapon.  Availability is weapon
 dependent.
 * Counter: Threaten an opponent with your weapon during their attack.  May disrupt their attack or even land damage.
+Not possible when disadvantaged from the prior attack failing.
 * Combos!!!  Evade plus block, parry, or counter
 
-| Action         | Stamina Cost              | Success Rate                                                                  | Damage Reduction                           |
-|----------------|---------------------------|-------------------------------------------------------------------------------|--------------------------------------------|
-| Stand Ground   | 0                         | n/a                                                                           | 0%                                         |
-| Block (shield) | 2                         | Attack speed and shield block rate dependent                                  | 100% slashing/piercing<br/>75% bludgeoning |
-| Block (weapon) | 2                         | Cut: Medium<br/>Thrust: Low                                                   | 100% slashing/piercing<br/>75% bludgeoning |
-| Parry          | Stamina cost of weapon    | Attack speed dependent<br/>Cut: Fails if attack has sufficient kinetic energy | 100%                                       |
-| Counter        | 2x stamina cost of weapon | ???                                                                           | ???                                        |
-| Evade          | Equipped weight dependent | Attack speed and type dependent                                               | 100%                                       |
+| Action         | Stamina Cost           | Success Rate                                                                  | Damage Reduction                           |
+|----------------|------------------------|-------------------------------------------------------------------------------|--------------------------------------------|
+| Stand Ground   | 0                      | n/a                                                                           | 0%                                         |
+| Block (shield) | Stamina cost of shield | Attack speed and shield block rate dependent                                  | 100% slashing/piercing<br/>75% bludgeoning |
+| Block (weapon) | Stamina cost of weapon | Cut: Medium<br/>Thrust: Low                                                   | 100% slashing/piercing<br/>75% bludgeoning |
+| Parry          | Stamina cost of weapon | Attack speed dependent<br/>Cut: Fails if attack has sufficient kinetic energy | 100%                                       |
+| Evade          | Total weight/10        | Attack speed and type dependent                                               | 100%                                       |
 
 |       | Swing                                                                                                          | Thrust                                                                                          |
 |-------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
 | Evade | Harder to evade due to greater attack surface                                                                  | Easier to evade due to lesser attack surface<br>Harder to evade because attack can come quicker |
-| Parry | Easier to meet the attack due to to greater attack surface<br>Harder to stop the attack due to increased force | Harder to meet the attack due to lesser attach surface<br>Easier to stop the attack             |
+| Parry | Easier to meet the attack due to to greater attack surface<br>Harder to stop the attack due to increased force | Harder to meet the attack due to lesser attack surface<br>Easier to stop the attack             |
 | Block | 2                                                                                                              |                                                                                                 |
-Parry
-Evade
 
 Higher probability of success for slower attacks.
 
@@ -200,7 +228,7 @@ Borrowed weights from https://roll20.net/compendium/dnd5e/Armor#content
 | Half Plate      | 2000 | 60 lb. | 50%             | 100%       | 75%           | 25%              |
 | Full Plate      | 3000 | 65 lb. | 75%             | 100%       | 90%           | 30%              |
 | Magic Armor     | 7700 | 50 lb. | 75%             | 100%       | 90%           | 20%              |
-| Erdrick's Armor | n/a  | 50 lb. | 80%             | 100%       | 90%           | 10 %             |
+| Erdrick's Armor | n/a  | 50 lb. | 80%             | 100%       | 90%           | 10%              |
 
 Special Properties:
 * Magic Armor
@@ -223,16 +251,17 @@ a slight curvature to partially deflect blows.
 * Buckler: Small and light metal shield with a curved surface to partially deflect blows.
 * Pavise Shield: Oblong shield large enough to cover the entire body.  Very heavy, so its usage costs mobility.  This
 shield can be planted on the ground, in which case it shifts much of the absorbed bludgeon damage into the ground.
-When planted, its weight no longer factors into stamina costs.  TODO: Need to figure out mechanics of planting and
+When planted, its weight no longer factors into stamina costs.  Blocking with a planted pavise cannot be combined with
+evading or parrying as it lacks the mobility to do either.  TODO: Need to figure out mechanics of planting and
 unplanting the pavise.
 
-| Shield        | Cost | Weight | Bludgeon Resist                   | Magic Resist | Block Chance | Stamina Cost |
-|---------------|------|--------|-----------------------------------|--------------|--------------|--------------|
-| Round Shield  | ?    | 10 lb. | 25%                               | 0%           | 25%          | ?            |
-| Kite Shield   | ?    | 14 lb. | 25%                               | 0%           | 40%          | ?            |
-| Heater Shield | ?    | 8 lb.  | 33%                               | 0%           | 33%          | ?            |
-| Buckler       | ?    | 4 lb.  | 33%                               | 0%           | 25%          | ?            |
-| Pavise Shield | ?    | 40 lb. | 25% when held<br>75% when planted | 0%           | 50%          | ?            |
+| Shield        | Cost | Weight                                 | Bludgeon Resist                   | Magic Resist | Block Chance | Stamina Cost (weight/4)        |
+|---------------|------|----------------------------------------|-----------------------------------|--------------|--------------|--------------------------------|
+| Round Shield  | ?    | 10 lb.                                 | 50%                               | 0%           | 25%          | 2.5                            |
+| Kite Shield   | ?    | 14 lb.                                 | 50%                               | 0%           | 40%          | 3.5                            |
+| Heater Shield | ?    | 8 lb.                                  | 66%                               | 0%           | 33%          | 2                              |
+| Buckler       | ?    | 4 lb.                                  | 66%                               | 0%           | 25%          | 1                              |
+| Pavise Shield | ?    | 40 lb. when held<br>0 lb. when planted | 40% when held<br>80% when planted | 0%           | 80%          | 10 when held<br>4 when planted |
 
 Borrowed weights from https://blackcitadelrpg.com/magic-shields-5e/
 
@@ -240,7 +269,7 @@ Borrowed weights from https://blackcitadelrpg.com/magic-shields-5e/
 
 ### Weapon Types
 
-**Sword:** Metal bladed weapon with medium reach.  The weight distribution is near the weilder allowing fast movement
+**Sword:** Metal bladed weapon with medium reach.  The weight distribution is near the wielder allowing fast movement
 and parrying.
 
 Allows the following attacks:
@@ -255,16 +284,16 @@ Allow the following defenses:
 * Parry: 
 * Block:
 
-**Axe:** Metal bladed weapon with medium reach.  The weight distribution is away from the weilder slowing movement and
+**Axe:** Metal bladed weapon with medium reach.  The weight distribution is away from the wielder slowing movement and
 parrying.  Parry success rate dropped to 50%.
 
-**Bludgeon:** Blunt weapon with short reach.  The weight distribution is away from the weilder.  Can't effectively
+**Bludgeon:** Blunt weapon with short reach.  The weight distribution is away from the wielder.  Can't effectively
 parry or be parried.  Swung but not thrust.
 
-**Polearm:** Staff weapon with long range.  May have allow for cutting and/or piercing damage.  A polearm used in a
+**Polearm:** Staff weapon with long range.  May allow for cutting and/or piercing damage.  A polearm used in a
 one-handed configuration may only be used to thrust, but in all-two handed configurations both swinging and thrusting
 are supported as well as parrying.  The weight distribution is near the center of the weapon, but depending on grip may
-not be far from weilders grip.  Parry success rate dropped to 75%.
+not be far from wielders grip.  Parry success rate dropped to 75%.
 
 ### Weapon Descriptions
 
@@ -272,7 +301,7 @@ not be far from weilders grip.  Parry success rate dropped to 75%.
  
 | Weapon       | Type | Reach    | Cost | Weight  | Center of Mass | Stamina Cost | Speed | Bludgeon Damage | Cut Damage | Pierce Damage | Pierce Mail? | Parry Modifier |
 |--------------|------|----------|------|---------|----------------|--------------|-------|-----------------|------------|---------------|--------------|----------------|
-| Fist         | 1H   | S        | n/a  | 0 lb.   | n/a            | ?            | ?     | Very low        | 0          | 0             | n/a          | 0              |
+| Fist         | 1H   | S        | n/a  | 0 lb.   | n/a            | 1            | ?     | Very low        | 0          | 0             | n/a          | 0              |
 | Club         | 1H   | S (3')   | ?    | 2 lb.   | 0.66           | 1.2          | 1.0   | Low             | 0          | 0             | n/a          | 0.5            |
 | Quarterstaff | 1H   | L (6')   | ?    | 4 lb.   | 0.5            | 1.2          | 1.0   | Medium          | 0          | 0             | n/a          | 0.8            |
 | Spear        | 1H   | L (6')   | ?    | 4 lb.   | 0.55           | 1.0          | ?     | Low             | Low        | High          | Yes          | 0.8            |
@@ -311,7 +340,33 @@ Borrowed weights from https://roll20.net/compendium/dnd5e/Weapons#content
 
 ## Perks
 
-* Battle hardened:
-* Invigorated by battle: 
+### Situational Perks
+
+* Battle hardened: After 5+ successful encounters in a row, nearly across the board bonuses
+* Rush of adrenaline: Up to once per combat encounter, gain 20% of maximum stamina when at low (<25%) health.  This can
+occur at the onset of battle if starting at low health or upon taking damage which put you at low health.
+
+### Earned Perks
+
+* Weapon type masteries:
+  * Sword
+  * Axe
+  * Bludgeon
+  * Polearm
+* Attack type masteries:
+  * Swinging
+  * Thrusting
+* Form masteries:
+  * 1H without shield
+  * 1H with shield
+  * 2H
+* Defense masteries:
+  * Evasion (nimble feet)
+  * Parry / 
+  * Shield mastery
+
+
+* Invigorated by battle: Gain 10% of maximum stamina at the onset of battle
 * Keep your weapon swinging: Attack after a swing attack, parry or counter, and then another swing attack
-* 
+* Magical Adept: Casting is natural and does not require stamina.  Non-adept casters require intense focus to cast
+magic, which has a fixed stamina cost.
