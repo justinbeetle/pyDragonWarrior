@@ -282,7 +282,8 @@ class GameDialogEvaluator:
 
         if menu_result == "":
             menu_result = None
-        else:
+
+        if menu_result is not None:
             AudioPlayer().play_sound("select")
 
         return menu_result
