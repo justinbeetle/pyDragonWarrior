@@ -397,10 +397,12 @@ class OutgoingTransition(NamedTuple):
         str
     ]  # Name of transition (where needed to keep transits unambiguous)
     dest_map: str  # Name of map to which the transition connects
-    dest_name: Optional[
-        str
-    ] = None  # Name of destination transition in the destination map
-    respawn_decorations: bool = False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
+    dest_name: Optional[str] = (
+        None  # Name of destination transition in the destination map
+    )
+    respawn_decorations: bool = (
+        False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
+    )
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
 

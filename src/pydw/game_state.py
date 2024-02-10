@@ -264,9 +264,9 @@ class GameState(GameStateInterface):
                     if "count" in item_element.attrib:
                         item_count = int(item_element.attrib["count"])
                     if item_name in self.game_info.items:
-                        member.unequipped_items[
-                            self.game_info.items[item_name]
-                        ] = item_count
+                        member.unequipped_items[self.game_info.items[item_name]] = (
+                            item_count
+                        )
                     else:
                         print("ERROR: Unsupported item", item_name, flush=True)
 
@@ -955,9 +955,9 @@ class GameState(GameStateInterface):
             gde.add_and_wait_for_message("Thou art dead.", message_dialog)
             gde.wait_for_acknowledgement(message_dialog)
             for hero in self.hero_party.members:
-                hero.curr_pos_dat_tile = (
-                    hero.dest_pos_dat_tile
-                ) = self.game_info.death_hero_pos_dat_tile
+                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = (
+                    self.game_info.death_hero_pos_dat_tile
+                )
                 hero.curr_pos_offset_img_px = Point(0, 0)
                 hero.direction = self.game_info.death_hero_pos_dir
                 hero.hp = hero.level.hp

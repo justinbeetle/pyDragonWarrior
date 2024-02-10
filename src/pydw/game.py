@@ -123,6 +123,7 @@ def main() -> None:
 
         # Close the PyInstaller splash screen
         import pyi_splash
+
         pyi_splash.close()
     else:
         # Normal execution
@@ -135,6 +136,7 @@ def main() -> None:
         # On Windows, change the app user model so that Windows doesn't use the Python icon in the taskbar.
         if is_windows():
             import ctypes
+
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
 
     # Set the current working directory to the base path so that the game can be run from any path
@@ -222,9 +224,9 @@ def main() -> None:
     elif args.verbose:
         print("Running with a save path of", saves_path, flush=True)
 
-    os.environ[
-        "PYGAME_HIDE_SUPPORT_PROMPT"
-    ] = "1"  # Silence pygame outputs to standard out
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = (
+        "1"  # Silence pygame outputs to standard out
+    )
     import pygame
     from generic_utils.point import Point
     from pygame_utils.audio_player import AudioPlayer

@@ -21,9 +21,9 @@ class HeroParty(CombatParty):
         self.gp = 0
         self.progress_markers: List[str] = []
 
-        self.light_diameter: Optional[
-            float
-        ] = None  # None indicates the light diameter is unlimited
+        self.light_diameter: Optional[float] = (
+            None  # None indicates the light diameter is unlimited
+        )
         self.light_diameter_decay_steps: Optional[int] = None
         self.light_diameter_decay_steps_remaining: Optional[int] = None
 

@@ -388,21 +388,27 @@ class GameInfo:
                 # print('Loading', encounter_background_name, flush=True)
                 try:
                     encounter_background_image = pygame.image.load(image_path)
-                    encounter_backgrounds[
-                        encounter_background_name
-                    ] = EncounterBackground(
-                        encounter_background_name,
-                        encounter_background_image,
-                        image_path,
-                        image_element.attrib["artist"]
-                        if "artist" in image_element.attrib
-                        else "Uncredited",
-                        image_element.attrib["artist_url"]
-                        if "artist_url" in image_element.attrib
-                        else None,
-                        image_element.attrib["url"]
-                        if "url" in image_element.attrib
-                        else None,
+                    encounter_backgrounds[encounter_background_name] = (
+                        EncounterBackground(
+                            encounter_background_name,
+                            encounter_background_image,
+                            image_path,
+                            (
+                                image_element.attrib["artist"]
+                                if "artist" in image_element.attrib
+                                else "Uncredited"
+                            ),
+                            (
+                                image_element.attrib["artist_url"]
+                                if "artist_url" in image_element.attrib
+                                else None
+                            ),
+                            (
+                                image_element.attrib["url"]
+                                if "url" in image_element.attrib
+                                else None
+                            ),
+                        )
                     )
                 except Exception:
                     print(
@@ -414,9 +420,9 @@ class GameInfo:
     def parse_map_locations(
         xml_root: ET.Element,
     ) -> Dict[str, Dict[str, NamedLocation]]:
-        locations: Dict[
-            str, Dict[str, NamedLocation]
-        ] = {}  # Map name -> Location name -> NamedLocation
+        locations: Dict[str, Dict[str, NamedLocation]] = (
+            {}
+        )  # Map name -> Location name -> NamedLocation
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib["name"]
             map_locations: Dict[str, NamedLocation] = {}
@@ -1696,9 +1702,9 @@ class GameInfo:
                             "label" in option_element.attrib
                             and option_element.attrib["label"] is not None
                         ):
-                            self.dialog_sequences[
-                                option_element.attrib["label"]
-                            ] = dialog_option
+                            self.dialog_sequences[option_element.attrib["label"]] = (
+                                dialog_option
+                            )
                 if len(dialog_options) > 0:
                     dialog.append(dialog_options)
                     if label is not None:
@@ -1814,9 +1820,9 @@ class GameInfo:
                 name = element.attrib["name"]
                 value = element.attrib["value"]
                 if value == "ITEM_LIST":
-                    value_for_dialog_vendor_buy_options: DialogVendorBuyOptionsParamWithoutReplacementType = (
-                        []
-                    )
+                    value_for_dialog_vendor_buy_options: (
+                        DialogVendorBuyOptionsParamWithoutReplacementType
+                    ) = []
                     for item_element in element.findall("./Item"):
                         item_name = item_element.attrib["name"]
                         item_gp = str(self.items[item_name].gp)
@@ -1829,9 +1835,9 @@ class GameInfo:
                         )
                     )
                 elif value == "INVENTORY_ITEM_TYPE_LIST":
-                    value_for_dialog_vendor_sell_options: DialogVendorSellOptionsParamWithoutReplacementType = (
-                        []
-                    )
+                    value_for_dialog_vendor_sell_options: (
+                        DialogVendorSellOptionsParamWithoutReplacementType
+                    ) = []
                     for item_type_element in element.findall("./InventoryItemType"):
                         value_for_dialog_vendor_sell_options.append(
                             item_type_element.attrib["type"]

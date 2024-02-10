@@ -338,9 +338,9 @@ class GameDialogEvaluator:
             self.replacement_variables = (
                 self.game_state.get_dialog_replacement_variables()
             )
-            self.replacement_variables.generic[
-                "[NAME]"
-            ] = self.hero_party.main_character.get_name()
+            self.replacement_variables.generic["[NAME]"] = (
+                self.hero_party.main_character.get_name()
+            )
             self.replacement_variables.generic["[ACTOR]"] = self.actor.get_name()
             if 1 == len(self.targets):
                 self.replacement_variables.generic["[TARGET]"] = self.targets[
@@ -477,9 +477,9 @@ class GameDialogEvaluator:
                     self.replacement_variables.generic["[ITEM]"] = menu_result
                     for item_name_and_gp in name_and_gp_row_data:
                         if item_name_and_gp[0] == menu_result:
-                            self.replacement_variables.generic[
-                                "[COST]"
-                            ] = item_name_and_gp[1]
+                            self.replacement_variables.generic["[COST]"] = (
+                                item_name_and_gp[1]
+                            )
                 else:
                     self.replacement_variables.generic.pop("[ITEM]", None)
                     self.replacement_variables.generic.pop("[COST]", None)
@@ -794,9 +794,9 @@ class GameDialogEvaluator:
                     for hero in self.hero_party.members:
                         hero.curr_pos_offset_img_px = Point(0, 0)
                         if item.map_pos is not None:
-                            hero.curr_pos_dat_tile = (
-                                hero.dest_pos_dat_tile
-                            ) = item.map_pos
+                            hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = (
+                                item.map_pos
+                            )
                         if item.map_dir is not None:
                             hero.direction = item.map_dir
                     if item.map_name is not None:

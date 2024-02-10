@@ -53,9 +53,9 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.armor: Optional[Armor] = None
         self.shield: Optional[Shield] = None
         self.other_equipped_items: List[Tool] = []
-        self.unequipped_items: Dict[
-            ItemType, int
-        ] = {}  # Dict where keys are items and values are the item counts
+        self.unequipped_items: Dict[ItemType, int] = (
+            {}
+        )  # Dict where keys are items and values are the item counts
 
         self.hp_regen_tiles_remaining: Optional[int] = None
 

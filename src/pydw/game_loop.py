@@ -701,11 +701,9 @@ class GameLoop:
             # if self.first_block_occurred: print('Clearing first_block_occurred on allowed movement', flush=True)
             self.first_block_occurred = False
         else:
-            self.game_state.hero_party.members[
-                0
-            ].dest_pos_dat_tile = self.game_state.hero_party.members[
-                0
-            ].curr_pos_dat_tile
+            self.game_state.hero_party.members[0].dest_pos_dat_tile = (
+                self.game_state.hero_party.members[0].curr_pos_dat_tile
+            )
             if self.first_block_occurred:
                 # print('Successive block - playing blocked sound', flush=True)
                 audio_player.play_sound("blocked")
