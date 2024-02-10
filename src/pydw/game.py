@@ -134,7 +134,7 @@ def main() -> None:
         )
 
         # On Windows, change the app user model so that Windows doesn't use the Python icon in the taskbar.
-        if sys.platform in ("win32", "cygwin"):
+        if sys.platform == "win32" or sys.platform == "cygwin":
             import ctypes
 
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
