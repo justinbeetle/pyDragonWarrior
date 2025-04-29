@@ -43,9 +43,7 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def check_progress_markers(
-        self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]
-    ) -> bool:
+    def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
         pass
 
     @abc.abstractmethod

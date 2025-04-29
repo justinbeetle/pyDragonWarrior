@@ -21,9 +21,7 @@ class MonsterState(CombatCharacterState):
         else:
             self.monster_info = monster_info
             self.special_monster_info = None
-        super().__init__(
-            hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp)
-        )
+        super().__init__(hp=random.randint(self.monster_info.min_hp, self.monster_info.max_hp))
         self.gp = random.randint(self.monster_info.min_gp, self.monster_info.max_gp)
         self.xp = self.monster_info.xp  # TODO: Should this also come from a range?
         self.name = "the " + self.monster_info.name
@@ -59,17 +57,12 @@ class MonsterState(CombatCharacterState):
     def is_dodging_attack(self) -> bool:
         return not self.is_asleep and random.uniform(0, 1) < self.monster_info.dodge
 
-    def get_resistance(
-        self, action: DialogActionEnum, category: ActionCategoryTypeEnum
-    ) -> float:
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.SLEEP == action:
             return self.monster_info.sleep_resist
         if DialogActionEnum.STOPSPELL == action:
             return self.monster_info.stopspell_resist
-        if (
-            DialogActionEnum.DAMAGE_TARGET == action
-            and ActionCategoryTypeEnum.MAGICAL == category
-        ):
+        if DialogActionEnum.DAMAGE_TARGET == action and ActionCategoryTypeEnum.MAGICAL == category:
             return self.monster_info.hurt_resist
         return 0
 
@@ -90,18 +83,14 @@ class MonsterState(CombatCharacterState):
         else:
             min_damage = 0
             max_damage = (self.get_strength() + 4) // 6
-        damage = CombatCharacterState.calc_damage(
-            min_damage, max_damage, target, damage_type
-        )
+        damage = CombatCharacterState.calc_damage(min_damage, max_damage, target, damage_type)
 
         # For critical hits from monsters, perform a second damage calculation and use the higher of the two damage
         # values.
         if is_critical_hit:
             damage = max(
                 damage,
-                CombatCharacterState.calc_damage(
-                    min_damage, max_damage, target, damage_type
-                ),
+                CombatCharacterState.calc_damage(min_damage, max_damage, target, damage_type),
             )
 
         return damage, is_critical_hit
@@ -113,8 +102,7 @@ class MonsterState(CombatCharacterState):
         return (
             not self.monster_info.may_run_away
             and self.special_monster_info is None
-            and hero_state.get_agility() * random.uniform(0, 1)
-            < self.get_agility() * random.uniform(0, 1) * 0.25
+            and hero_state.get_agility() * random.uniform(0, 1) < self.get_agility() * random.uniform(0, 1) * 0.25
         )
 
     # Determine if the monster will attempt to run away.
@@ -194,9 +182,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

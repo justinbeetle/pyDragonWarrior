@@ -21,9 +21,7 @@ class HeroParty(CombatParty):
         self.gp = 0
         self.progress_markers: List[str] = []
 
-        self.light_diameter: Optional[float] = (
-            None  # None indicates the light diameter is unlimited
-        )
+        self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
         self.light_diameter_decay_steps: Optional[int] = None
         self.light_diameter_decay_steps_remaining: Optional[int] = None
 
@@ -153,18 +151,14 @@ class HeroParty(CombatParty):
         traversal_list.append(self.main_character)
         remaining_count = count
         for member in traversal_list:
-            member_lose_count = min(
-                member.get_item_count(item_name, unequipped_only=True), remaining_count
-            )
+            member_lose_count = min(member.get_item_count(item_name, unequipped_only=True), remaining_count)
             if 0 < member_lose_count:
                 member.lose_item(item_name, member_lose_count, unequipped_only=True)
                 remaining_count -= member_lose_count
             if 0 == remaining_count:
                 return
         for member in traversal_list:
-            member_lose_count = min(
-                member.get_item_count(item_name, unequipped_only=False), remaining_count
-            )
+            member_lose_count = min(member.get_item_count(item_name, unequipped_only=False), remaining_count)
             if 0 < member_lose_count:
                 member.lose_item(item_name, member_lose_count, unequipped_only=False)
                 remaining_count -= member_lose_count
@@ -233,9 +227,7 @@ class HeroParty(CombatParty):
             member.curr_pos_offset_img_px = Point(0, 0)
             member.direction = direction
 
-    def set_last_outside_pos(
-        self, map_name: str, pos: Point, direction: Direction
-    ) -> None:
+    def set_last_outside_pos(self, map_name: str, pos: Point, direction: Direction) -> None:
         self.last_outside_map_name = map_name
         self.last_outside_pos_dat_tile = pos
         self.last_outside_dir = direction
@@ -248,22 +240,14 @@ class HeroParty(CombatParty):
                 member.inc_step_counter()
 
         # Decay the light radius effect over time
-        if (
-            self.light_diameter is not None
-            and self.light_diameter_decay_steps_remaining is not None
-        ):
+        if self.light_diameter is not None and self.light_diameter_decay_steps_remaining is not None:
             self.light_diameter_decay_steps_remaining -= 1
             if 0 >= self.light_diameter_decay_steps_remaining:
                 self.light_diameter = max(0.5, self.light_diameter - 2)
-                self.light_diameter_decay_steps_remaining = (
-                    self.light_diameter_decay_steps
-                )
+                self.light_diameter_decay_steps_remaining = self.light_diameter_decay_steps
 
         # Decay the repel monsters effect over time
-        if (
-            self.repel_monsters
-            and self.repel_monsters_decay_steps_remaining is not None
-        ):
+        if self.repel_monsters and self.repel_monsters_decay_steps_remaining is not None:
             self.repel_monsters_decay_steps_remaining -= 1
             if 0 >= self.repel_monsters_decay_steps_remaining:
                 self.repel_monsters = False
@@ -275,18 +259,14 @@ class HeroParty(CombatParty):
         lowest_health_ratio = 1.0
         for member in self.members:
             if member.max_hp > 0:
-                lowest_health_ratio = min(
-                    lowest_health_ratio, member.hp / member.max_hp
-                )
+                lowest_health_ratio = min(lowest_health_ratio, member.hp / member.max_hp)
         return lowest_health_ratio
 
     def get_highest_defense_strength(self) -> int:
         highest_defense_strength = 0
         for member in self.members:
             if member.is_alive():
-                highest_defense_strength = max(
-                    highest_defense_strength, member.get_defense_strength()
-                )
+                highest_defense_strength = max(highest_defense_strength, member.get_defense_strength())
         return highest_defense_strength
 
     def has_low_health(self) -> bool:
@@ -298,9 +278,7 @@ class HeroParty(CombatParty):
     ) -> List[List[str]]:
         item_row_data: List[List[str]] = []
         for member in self.members:
-            member_item_row_data = member.get_item_row_data(
-                limit_to_droppable, True, filter_types
-            )
+            member_item_row_data = member.get_item_row_data(limit_to_droppable, True, filter_types)
             if 0 == len(item_row_data):
                 item_row_data = member_item_row_data
             else:
@@ -315,22 +293,16 @@ class HeroParty(CombatParty):
         item_row_data.sort(key=lambda x: x[0])
         return item_row_data
 
-    def is_monster_party_repelled(
-        self, monster_party: MonsterParty, is_outside: bool
-    ) -> bool:
+    def is_monster_party_repelled(self, monster_party: MonsterParty, is_outside: bool) -> bool:
         # Repel only works outside
         if not self.repel_monsters or not is_outside:
             return False
 
-        return (
-            self.get_highest_defense_strength() // 2
-            > monster_party.get_highest_attack_strength() // 2
-        )
+        return self.get_highest_defense_strength() // 2 > monster_party.get_highest_attack_strength() // 2
 
     def __str__(self) -> str:
         return (
-            f"{self.__class__.__name__}({self.main_character}, "
-            f"{self.members}, {self.gp}, {self.progress_markers})"
+            f"{self.__class__.__name__}({self.main_character}, " f"{self.members}, {self.gp}, {self.progress_markers})"
         )
 
     def __repr__(self) -> str:
@@ -362,9 +334,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

@@ -6,9 +6,7 @@ from pydw.game_types import CharacterType, Direction
 
 
 class MapCharacterState:
-    def __init__(
-        self, character_type: CharacterType, pos_dat_tile: Point, direction: Direction
-    ) -> None:
+    def __init__(self, character_type: CharacterType, pos_dat_tile: Point, direction: Direction) -> None:
         self.character_type = character_type
         self.curr_pos_dat_tile = Point(pos_dat_tile)
         self.dest_pos_dat_tile = Point(pos_dat_tile)
@@ -45,9 +43,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

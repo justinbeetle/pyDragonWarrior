@@ -45,13 +45,9 @@ class GameLoop:
 
         # Setup state needed for call to determine_tile_size, which also initializes the display
         self.tile_scaling_factor = self.desired_tile_scaling_factor
-        self.tile_size_pixels = (
-            self.unscaled_tile_size_pixels * self.tile_scaling_factor
-        )
+        self.tile_size_pixels = self.unscaled_tile_size_pixels * self.tile_scaling_factor
         self.initialize_display()
-        self.win_size_tiles = Point(
-            0, 0
-        )  # Gets set meaningfully in determine_window_sizing
+        self.win_size_tiles = Point(0, 0)  # Gets set meaningfully in determine_window_sizing
         self.determine_tile_size()
 
         # Load the minimum amount of game info to launch the loading screen
@@ -61,9 +57,7 @@ class GameLoop:
             self.win_size_tiles,
             self.tile_size_pixels,
         )
-        self.loading_screen: Optional[LoadingScreen] = LoadingScreen(
-            title_image, title_music
-        )
+        self.loading_screen: Optional[LoadingScreen] = LoadingScreen(title_image, title_music)
         self.loading_screen.render()
 
     def initialize_display(self) -> None:
@@ -71,9 +65,7 @@ class GameLoop:
         if self.desired_win_size_pixels is None:
             # Find index of largest display
             largest_display_index = largest_display_size = 0
-            for display_index, (display_x_size, display_y_size) in enumerate(
-                pygame.display.get_desktop_sizes()
-            ):
+            for display_index, (display_x_size, display_y_size) in enumerate(pygame.display.get_desktop_sizes()):
                 current_display_size = display_x_size * display_y_size
                 if current_display_size > largest_display_size:
                     largest_display_index = display_index
@@ -86,11 +78,7 @@ class GameLoop:
                 display=largest_display_index,
             )
         else:
-            win_size_pixels = (
-                self.desired_win_size_pixels
-                // self.tile_size_pixels
-                * self.tile_size_pixels
-            )
+            win_size_pixels = self.desired_win_size_pixels // self.tile_size_pixels * self.tile_size_pixels
             pygame.display.set_mode(
                 win_size_pixels.get_as_int_tuple(),
                 pygame.RESIZABLE | pygame.SRCALPHA,
@@ -103,27 +91,17 @@ class GameLoop:
 
         # Determine if the tile scaling factor should be reduced
         # Base this decision on the size of the message dialog
-        dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(
-            self.win_size_tiles
-        )
-        while self.tile_scaling_factor > 1 and (
-            dialog_size_tiles.x < 10 or dialog_size_tiles.y < 5
-        ):
+        dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(self.win_size_tiles)
+        while self.tile_scaling_factor > 1 and (dialog_size_tiles.x < 10 or dialog_size_tiles.y < 5):
             self.tile_scaling_factor -= 1
 
             # Recompute the sizes after reducing tile_scaling_factor
-            self.tile_size_pixels = (
-                self.unscaled_tile_size_pixels * self.tile_scaling_factor
-            )
+            self.tile_size_pixels = self.unscaled_tile_size_pixels * self.tile_scaling_factor
             self.win_size_tiles = win_size_pixels / self.tile_size_pixels
-            dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(
-                self.win_size_tiles
-            )
+            dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(self.win_size_tiles)
 
         if self.verbose and self.tile_scaling_factor < self.desired_tile_scaling_factor:
-            print(
-                f"Reduced tile scaling factor to {self.tile_scaling_factor}", flush=True
-            )
+            print(f"Reduced tile scaling factor to {self.tile_scaling_factor}", flush=True)
 
     def run(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Register the focus gain handler - needed so that we don't end up with an empty black screen after losing focus

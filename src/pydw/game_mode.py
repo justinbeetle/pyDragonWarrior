@@ -88,9 +88,7 @@ class GameMode(ABC):
             self.message_dialog = None
             self.render(flip_buffer)
 
-    def add_cascading_dialog(
-        self, dialog: GameDialog, flip_buffer: bool = True
-    ) -> None:
+    def add_cascading_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
         """Add a cascading dialog."""
         self.cascading_dialogs.append(dialog)
         screen = pygame.display.get_surface()

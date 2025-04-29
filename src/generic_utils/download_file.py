@@ -22,9 +22,7 @@ def download_file(url: str, filepath: str) -> bool:
     try:
         if url.startswith("https://"):
             ssl_context = ssl.create_default_context(cafile=certifi.where())
-            with urllib.request.urlopen(url, context=ssl_context) as resp, open(
-                filepath, "wb"
-            ) as file:
+            with urllib.request.urlopen(url, context=ssl_context) as resp, open(filepath, "wb") as file:
                 file.write(resp.read())
         else:
             urllib.request.urlretrieve(url, filepath)

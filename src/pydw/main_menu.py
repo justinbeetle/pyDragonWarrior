@@ -20,9 +20,7 @@ from pydw.loading_screen import LoadingScreen
 class MainMenu(GameMode):
     """Game mode for the game's main menu."""
 
-    def __init__(
-        self, game_state: GameState, pc_name_or_file_name: Optional[str] = None
-    ) -> None:
+    def __init__(self, game_state: GameState, pc_name_or_file_name: Optional[str] = None) -> None:
         super().__init__(game_state)
         self.pc_name_or_file_name = pc_name_or_file_name
         self.background_text = "Press any key"
@@ -30,10 +28,7 @@ class MainMenu(GameMode):
     def get_saved_games(self) -> List[str]:
         """Get a list of the saved games."""
         saved_game_files = glob.glob(os.path.join(self.game_state.saves_path, "*.xml"))
-        return [
-            os.path.basename(saved_game_file)[:-4]
-            for saved_game_file in saved_game_files
-        ]
+        return [os.path.basename(saved_game_file)[:-4] for saved_game_file in saved_game_files]
 
     def get_main_menu_options(self, saved_games: List[str]) -> List[str]:
         """Get a list of the main menu options."""
@@ -86,28 +81,19 @@ class MainMenu(GameMode):
                 new_main_menu_options = self.get_main_menu_options(saved_games)
                 if main_menu_options != new_main_menu_options:
                     main_menu_options = new_main_menu_options
-                    selected_menu_position = (
-                        main_menu_dialog.get_selected_menu_position()
-                    )
+                    selected_menu_position = main_menu_dialog.get_selected_menu_position()
                     main_menu_dialog.clear()
                     main_menu_dialog.add_menu_prompt(new_main_menu_options, 1)
-                    if (
-                        len(main_menu_options) == len(new_main_menu_options)
-                        and selected_menu_position is not None
-                    ):
+                    if len(main_menu_options) == len(new_main_menu_options) and selected_menu_position is not None:
                         selected_row, selected_col = selected_menu_position
-                        main_menu_dialog.set_selected_menu_position(
-                            selected_row, selected_col
-                        )
+                        main_menu_dialog.set_selected_menu_position(selected_row, selected_col)
                 main_menu_dialog.blit(self.game_state.screen, True)
 
                 menu_result = gde.get_menu_result(main_menu_dialog)
                 # print('menu_result =', menu_result, flush=True)
                 if menu_result == "Continue a Quest":
                     saved_games_dialog = GameDialog.create_message_dialog()
-                    saved_games_dialog.add_message(
-                        "Which quest dost thou want to continue?", fully_populate=True
-                    )
+                    saved_games_dialog.add_message("Which quest dost thou want to continue?", fully_populate=True)
                     saved_games_dialog.add_menu_prompt(saved_games, 1)
                     self.add_cascading_dialog(saved_games_dialog)
                     menu_result = gde.get_menu_result(saved_games_dialog)
@@ -117,9 +103,7 @@ class MainMenu(GameMode):
                     self.remove_cascading_dialog(False)
                 if menu_result == "Delete a Quest":
                     saved_games_dialog = GameDialog.create_message_dialog()
-                    saved_games_dialog.add_message(
-                        "Which quest dost thou want to delete?", fully_populate=True
-                    )
+                    saved_games_dialog.add_message("Which quest dost thou want to delete?", fully_populate=True)
                     saved_games_dialog.add_menu_prompt(saved_games, 1)
                     self.add_cascading_dialog(saved_games_dialog)
                     menu_result = gde.get_menu_result(saved_games_dialog)
@@ -129,18 +113,12 @@ class MainMenu(GameMode):
                         if gde.get_menu_result(saved_games_dialog) == "YES":
                             saved_games.remove(menu_result)
                             # Delete the save game by archiving it off
-                            saved_game_file = os.path.join(
-                                self.game_state.saves_path, menu_result + ".xml"
-                            )
-                            self.game_state.archive_saved_game_file(
-                                saved_game_file, "deleted"
-                            )
+                            saved_game_file = os.path.join(self.game_state.saves_path, menu_result + ".xml")
+                            self.game_state.archive_saved_game_file(saved_game_file, "deleted")
                     self.remove_cascading_dialog(False)
                 elif menu_result == "Begin a Quest":
                     begin_quest_dialog = GameDialog.create_message_dialog()
-                    pc_name_or_file_name = gde.wait_for_user_input(
-                        begin_quest_dialog, "What is your name?"
-                    )[0]
+                    pc_name_or_file_name = gde.wait_for_user_input(begin_quest_dialog, "What is your name?")[0]
 
                     if pc_name_or_file_name:
                         if pc_name_or_file_name in saved_games:
@@ -157,9 +135,7 @@ class MainMenu(GameMode):
                                     self.game_state.saves_path,
                                     pc_name_or_file_name + ".xml",
                                 )
-                                self.game_state.archive_saved_game_file(
-                                    saved_game_file, "deleted"
-                                )
+                                self.game_state.archive_saved_game_file(saved_game_file, "deleted")
                             elif menu_result != "NO":
                                 continue
                         break

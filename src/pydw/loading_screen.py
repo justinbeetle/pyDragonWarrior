@@ -46,10 +46,7 @@ class LoadingScreen:
                 0.9 * win_size_pixels.w / title_image_size_px.w,
                 0.4 * win_size_pixels.h / title_image_size_px.h,
             )
-            if (
-                title_image_size_px.w > win_size_pixels.w
-                or title_image_size_px.h > win_size_pixels.h
-            ):
+            if title_image_size_px.w > win_size_pixels.w or title_image_size_px.h > win_size_pixels.h:
                 # Scale down for small window sizes
                 title_image_size_px *= title_scaling_factor
             else:
@@ -58,9 +55,7 @@ class LoadingScreen:
                     1,
                     int(title_scaling_factor),
                 )
-            scaled_title_image = pygame.transform.scale(
-                self.title_image, title_image_size_px.get_as_int_tuple()
-            )
+            scaled_title_image = pygame.transform.scale(self.title_image, title_image_size_px.get_as_int_tuple())
             title_image_dest_px = Point(
                 (win_size_pixels.w - title_image_size_px.w) / 2,
                 win_size_pixels.h / 2 - title_image_size_px.h,

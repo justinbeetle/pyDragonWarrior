@@ -45,11 +45,7 @@ class MusicTrack(NamedTuple):
         # Try to download the track
         if not self.is_file1_present() and self.link1 is not None:
             download_file(self.link1, self.file_path1)
-        if (
-            not self.is_file2_present()
-            and self.link2 is not None
-            and self.file_path2 is not None
-        ):
+        if not self.is_file2_present() and self.link2 is not None and self.file_path2 is not None:
             download_file(self.link2, self.file_path2)
 
         if self.is_track_present():
@@ -158,28 +154,20 @@ class AudioPlayer:
         def set_music_path(self, music_path: str) -> None:
             self.music_path = music_path
 
-        def add_music_tracks(
-            self, name_to_track_mapping: Dict[str, MusicTrack]
-        ) -> None:
+        def add_music_tracks(self, name_to_track_mapping: Dict[str, MusicTrack]) -> None:
             for name in name_to_track_mapping:
                 if name not in self.name_to_music_track_mapping:
                     self.name_to_music_track_mapping[name] = []
-                self.name_to_music_track_mapping[name].append(
-                    name_to_track_mapping[name]
-                )
+                self.name_to_music_track_mapping[name].append(name_to_track_mapping[name])
 
         def set_sound_path(self, sound_path: str) -> None:
             self.sound_path = sound_path
 
-        def add_sound_tracks(
-            self, name_to_track_mapping: Dict[str, SoundTrack]
-        ) -> None:
+        def add_sound_tracks(self, name_to_track_mapping: Dict[str, SoundTrack]) -> None:
             for name in name_to_track_mapping:
                 if name not in self.name_to_sound_track_mapping:
                     self.name_to_sound_track_mapping[name] = []
-                self.name_to_sound_track_mapping[name].append(
-                    name_to_track_mapping[name]
-                )
+                self.name_to_sound_track_mapping[name].append(name_to_track_mapping[name])
 
         def stage_music_track(self, track_name: str) -> Optional[MusicTrack]:
             if track_name not in self.name_to_music_track_mapping:
@@ -265,19 +253,11 @@ class AudioPlayer:
                         self.music_rel_file_path2 = music_rel_file_path1
                         self.music_file_start2_sec = music_file_start1_sec
 
-                    if self.music_rel_file_path1 is not None and not os.path.exists(
-                        self.music_rel_file_path1
-                    ):
-                        self.music_rel_file_path1 = os.path.join(
-                            self.music_path, self.music_rel_file_path1
-                        )
+                    if self.music_rel_file_path1 is not None and not os.path.exists(self.music_rel_file_path1):
+                        self.music_rel_file_path1 = os.path.join(self.music_path, self.music_rel_file_path1)
 
-                    if self.music_rel_file_path2 is not None and not os.path.exists(
-                        self.music_rel_file_path2
-                    ):
-                        self.music_rel_file_path2 = os.path.join(
-                            self.music_path, self.music_rel_file_path2
-                        )
+                    if self.music_rel_file_path2 is not None and not os.path.exists(self.music_rel_file_path2):
+                        self.music_rel_file_path2 = os.path.join(self.music_path, self.music_rel_file_path2)
 
         def __music_thread(self) -> None:
             first_time = True
@@ -296,10 +276,7 @@ class AudioPlayer:
                         current_music_rel_file_path2 = self.music_rel_file_path2
                         first_time = True
 
-                    if (
-                        self.music_rel_file_path1 is not None
-                        and self.music_rel_file_path2 is not None
-                    ):
+                    if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
                         # load the music
                         if first_time:
                             first_time = False
@@ -317,10 +294,8 @@ class AudioPlayer:
                             while (
                                 self.running
                                 and pygame.mixer.music.get_busy()
-                                and current_music_rel_file_path1
-                                == self.music_rel_file_path1
-                                and current_music_rel_file_path2
-                                == self.music_rel_file_path2
+                                and current_music_rel_file_path1 == self.music_rel_file_path1
+                                and current_music_rel_file_path2 == self.music_rel_file_path2
                             ):
                                 # still playing and not changed
                                 self.music_thread_lock.release()
@@ -351,9 +326,7 @@ class AudioPlayer:
             sound_track = self.stage_sound_track(sound_rel_file_path)
             music_track = self.stage_music_track(sound_rel_file_path)
 
-            if (
-                from_music_tracks_first or sound_track is None
-            ) and music_track is not None:
+            if (from_music_tracks_first or sound_track is None) and music_track is not None:
                 sound_file_path = music_track.file_path1
             elif sound_track is not None:
                 sound_file_path = sound_track.file_path
@@ -365,14 +338,10 @@ class AudioPlayer:
             if is_blocking:
                 self.__sound_thread(sound_file_path, is_blocking)
             else:
-                sound_thread = threading.Thread(
-                    target=self.__sound_thread, args=[sound_file_path]
-                )
+                sound_thread = threading.Thread(target=self.__sound_thread, args=[sound_file_path])
                 sound_thread.start()
 
-        def __sound_thread(
-            self, sound_file_path: str, is_blocking: bool = False
-        ) -> None:
+        def __sound_thread(self, sound_file_path: str, is_blocking: bool = False) -> None:
             # Load the sound if not previously loaded
             if sound_file_path not in self.sounds:
                 try:
@@ -472,9 +441,7 @@ class AudioPlayer:
         is_blocking: bool = False,
     ) -> None:
         if self.instance is not None:
-            self.instance.play_sound(
-                sound_file_path, from_music_tracks_first, is_blocking
-            )
+            self.instance.play_sound(sound_file_path, from_music_tracks_first, is_blocking)
 
     def stop_music(self) -> None:
         if self.instance is not None:
@@ -526,9 +493,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )
