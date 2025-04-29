@@ -1,3 +1,93 @@
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel"]
+# Build a wheel as: pip install .
+requires = [
+  "setuptools >= 62.6.0",
+  "setuptools-scm >= 8.0",
+  "wheel",
+]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyDragonWarrior"
+version = "1.3.1"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+description = "A Python based Dragon Warrior clone."
+readme = "README.md"
+authors = [
+  {name = "justinbeetle"},
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Games/Entertainment",
+  "Topic :: Games/Entertainment :: Role-Playing",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[project.scripts]
+pyDragonWarrior = "pydw.game.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/justinbeetle/pyDragonWarrior"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pyDragonWarrior = ["data"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.black]
+# Run black as: black scripts src tests
+line-length = 120
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = "E203"
+
+[tool.mypy]
+# Run mypy as: mypy --config-file pyproject.toml src/pydw/game.py
+ignore_missing_imports = true
+strict = true
+
+[tool.pylint.BASIC]
+# Run pylint as: pylint src
+good-names = [
+  "gp",
+  "h",
+  "hp",
+  "mp",
+  "pc",
+  "i",
+  "j",
+  "k",
+  "w",
+  "x",
+  "x1",
+  "x2",
+  "xp",
+  "y",
+  "y1",
+  "y2",
+  "z",
+  "z1",
+  "z2",
+]
+
+[tool.pylint.CHECKER]
+fail-under = 8.7
+
+[tool.pylint.FORMAT]
+max-line-length = 120
+
+[tool.pylint.TYPECHECK]
+generated-members = "pygame.K*"
