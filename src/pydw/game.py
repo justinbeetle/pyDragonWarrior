@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+"""Entry point for launching pydw.  Uses subprocess commands to create a venv, if not already running in one, in order
+to install the required wheels.  Then re-runs this script in a subshell command using Python from the venv."""
+
 from typing import Optional, Tuple
 
 import argparse
@@ -13,6 +16,7 @@ import traceback
 
 
 def is_windows() -> bool:
+    """Returns True if running on the Windows operating system, else False."""
     return sys.platform in ("win32", "cygwin")
 
 
@@ -47,6 +51,8 @@ def get_writeable_application_path(application_path: str, application_name: str,
 
 
 def main() -> None:
+    """The entry point for launching pydw."""
+
     application_name = "pyDragonWarrior"
 
     parser = argparse.ArgumentParser()

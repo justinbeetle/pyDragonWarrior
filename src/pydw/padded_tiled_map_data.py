@@ -268,7 +268,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         :param alpha: preserve alpha channel or not
         :return: None
         """
-        images = list()
+        images = []
         for image in self.tmx.images:
             try:
                 if alpha:

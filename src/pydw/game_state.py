@@ -485,6 +485,7 @@ class GameState(GameStateInterface):
                 )
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
+        """Get the tile info for the specified position, or if not specified, the location of the player character."""
         return self.game_map.get_tile_info(tile)
 
     # Find point transitions for either the specified point or the current position of the player character.

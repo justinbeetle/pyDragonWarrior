@@ -163,7 +163,7 @@ class MapDecorationSprite(MapSprite):
 
     def remove_decoration(self) -> bool:
         """
-        :return: True if the map was successfully set to a removed image
+        :return: True if the image was successfully set to a removed image
         """
         if self.decoration.type is not None and self.decoration.type.removed_image is not None:
             self.image = self.decoration.type.removed_image
@@ -533,6 +533,9 @@ class GameMap(GameMapInterface):
         pygame.display.flip()
 
     def get_tile_info(self, tile: Optional[Point] = None, use_second: bool = False) -> Tile:
+        """Get the tile info for the specified position, or if not specified, the location of the player character.
+        If use_second is True, ignore the first tile type found.  This is used for gates where the terrain on which the
+        gate is located affects the encounter image."""
         if tile is None:
             tile = self.game_state.get_hero_party().main_character.curr_pos_dat_tile
 
@@ -838,10 +841,14 @@ class GameMap(GameMapInterface):
         if decoration in self.map_decorations and decoration.type is not None:
             self.map_decorations.remove(decoration)
 
+            # Remove all the sprites from the decoration layer then add back in the ones which should remain.
             for sprite in self.group.remove_sprites_of_layer(self.map_data.decoration_layer):
                 if sprite.decoration != decoration:
+                    # Restore the sprite as it wasn't for the decoration being removed
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
                 elif isinstance(sprite, MapDecorationSprite) and sprite.remove_decoration():
+                    # Restore the sprite as it was for the removed decoration but it has an image for its removed state
+                    # (ie an image of a closed chest was replaced by an image of an open chest).
                     self.removed_map_decorations.append(decoration)
                     self.group.add(sprite, layer=self.map_data.decoration_layer)
 

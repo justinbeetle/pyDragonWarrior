@@ -745,9 +745,11 @@ class GameDialog:
 
     def add_encounter_prompt(
         self,
-        options: List[str] = ["FIGHT", "RUN", "SPELL", "ITEM"],
+        options: Optional[List[str]] = None,
         prompt: str = "Command?",
     ) -> None:
+        if options is None:
+            options = ["FIGHT", "RUN", "SPELL", "ITEM"]
         self.add_menu_prompt(options, len(options), GameDialogSpacing.SPACERS, prompt)
 
     def add_yes_no_prompt(self, prompt: Optional[str] = None) -> None:

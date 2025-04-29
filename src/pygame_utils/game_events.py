@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """Module defining methods wrapping pygame.event and pygame.joystick"""
 
 from typing import Callable, Dict, List, Optional, Tuple
@@ -7,6 +8,8 @@ import pygame
 
 # Mapping from unique instance IDs to initialized joysticks/gamepads
 joysticks: Dict[int, pygame.joystick.JoystickType] = {}
+
+# Optional event handlers
 focus_gain_handler: Optional[Callable[[], None]] = None
 window_resize_handler: Optional[Callable[[], None]] = None
 
@@ -102,13 +105,13 @@ def get_events(
 
         # Optionally handle focus gained events
         if event.type == pygame.ACTIVEEVENT and "gain" in event.__dict__ and event.gain:
-            print("Detected gain focus event", flush=True)
+            # print("Detected gain focus event", flush=True)
             if focus_gain_handler:
                 focus_gain_handler()
 
         # Optionally window size changed events
         if event.type == pygame.WINDOWSIZECHANGED:
-            print("Detected window size changed event", flush=True)
+            # print("Detected window size changed event", flush=True)
             if window_resize_handler:
                 window_resize_handler()
 

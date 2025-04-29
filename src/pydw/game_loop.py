@@ -128,14 +128,21 @@ class GameLoop:
             self.current_game_mode.game_mode_loop()
 
     def focus_gain_handlder(self) -> None:
-        print("Rendering due to invocation of focus_gain_handlder", flush=True)
+        """Handler for focus gain events to render the latest content to the display surface.
+        Since pygame 2.5.2, the display surface is cleared when focus is lost and gained
+        (see https://github.com/pygame/pygame/issues/4133).
+        """
+        if self.verbose:
+            print("Rendering due to invocation of focus_gain_handlder", flush=True)
         if self.current_game_mode:
             self.current_game_mode.render()
         elif self.loading_screen:
             self.loading_screen.render()
 
     def window_resize_handlder(self) -> None:
-        print("Rendering due to invocation of window_resize_handlder", flush=True)
+        """Handler for window resize events needed to implement a resizeable window."""
+        if self.verbose:
+            print("Rendering due to invocation of window_resize_handlder", flush=True)
         # TODO: What needs to be done to resize things on the fly?
         # self.determine_tile_size()
         if self.current_game_mode:

@@ -935,6 +935,7 @@ class GameDialogEvaluator:
                                     AudioPlayer().play_sound("critical_hit_lvl_1")
 
                             # Ensure there is damage if the user was correct and no damage if the user was wrong
+                            allow_dodge = ActionCategoryTypeEnum.PHYSICAL == item.category
                             if item.problem is not None:
                                 if user_answer == item.problem.answer:
                                     damage = max(1, damage)
@@ -949,7 +950,6 @@ class GameDialogEvaluator:
                                 else:
                                     damage = 0
                             else:
-                                allow_dodge = ActionCategoryTypeEnum.PHYSICAL == item.category
                                 if is_critical_hit:
                                     add_message("Excellent move!")
 
