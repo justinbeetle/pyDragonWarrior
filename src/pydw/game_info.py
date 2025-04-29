@@ -89,6 +89,8 @@ from pydw.game_types import (
 
 class GameInfo:
     TRANSPARENT_COLOR = pygame.Color(0, 0, 0, 0)
+    title_image: Optional[pygame.Surface] = None
+    title_music: Optional[str] = None
 
     def __init__(
         self,
@@ -197,7 +199,7 @@ class GameInfo:
     @staticmethod
     def static_init(
         base_path: str, game_xml_path: str, win_size_tiles: Point, tile_size_pixels: int
-    ) -> Tuple[pygame.surface.Surface, str]:
+    ) -> Tuple[Optional[pygame.surface.Surface], Optional[str]]:
         xml_root = ET.parse(game_xml_path).getroot()
         ETI.include(xml_root)
 
@@ -339,16 +341,16 @@ class GameInfo:
     @staticmethod
     def parse_title_info(
         xml_root: ET.Element, image_path: str
-    ) -> Tuple[pygame.surface.Surface, str]:
+    ) -> Tuple[Optional[pygame.surface.Surface], Optional[str]]:
         title_element = xml_root.find("Title")
         if title_element is not None:
-            title_music = title_element.attrib["music"]
+            GameInfo.title_music = title_element.attrib["music"]
             title_image_file_name = os.path.join(
                 image_path, title_element.attrib["image"]
             )
-            title_image = pygame.image.load(title_image_file_name).convert()
+            GameInfo.title_image = pygame.image.load(title_image_file_name).convert()
 
-        return title_image, title_music
+        return GameInfo.title_image, GameInfo.title_music
 
     @staticmethod
     def parse_dialogs_info(
@@ -681,8 +683,7 @@ class GameInfo:
 
         for x in range(2, max_tile_variants + 1):
             w = numpy.arange(x, 0, -1)
-            w = w * numpy.transpose(w)
-            w = w * numpy.transpose(w)
+            w = w * w * w
             p = w / sum(w)
             tile_probabilities.append([float(x) for x in p])
 

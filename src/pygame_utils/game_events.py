@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-""" Module defining methods wrapping pygame.event and pygame.joystick """
+"""Module defining methods wrapping pygame.event and pygame.joystick"""
 
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import pygame
 
 # Mapping from unique instance IDs to initialized joysticks/gamepads
 joysticks: Dict[int, pygame.joystick.JoystickType] = {}
+focus_gain_handler: Optional[Callable[[], None]] = None
+window_resize_handler: Optional[Callable[[], None]] = None
 
 
 def setup_joystick() -> bool:
@@ -53,6 +55,16 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
+def set_focus_gain_handler(handler_method: Callable[[], None]) -> None:
+    global focus_gain_handler
+    focus_gain_handler = handler_method
+
+
+def set_window_resize_handler(handler_method: Callable[[], None]) -> None:
+    global window_resize_handler
+    window_resize_handler = handler_method
+
+
 def get_events(
     is_keyboard_repeat_enabled: bool = False,
     translate_wasd_to_uldr: bool = True,
@@ -75,9 +87,6 @@ def get_events(
 
     events: List[pygame.event.Event] = []
     for event in pygame.event.get():
-        # if event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
-        #     print('Detected gain focus event', flush=True)
-
         # Drop mouse events
         if event.type in [
             pygame.MOUSEMOTION,
@@ -90,6 +99,18 @@ def get_events(
         # Drop key up events
         if event.type in [pygame.KEYUP]:
             continue
+
+        # Optionally handle focus gained events
+        if event.type == pygame.ACTIVEEVENT and "gain" in event.__dict__ and event.gain:
+            print("Detected gain focus event", flush=True)
+            if focus_gain_handler:
+                focus_gain_handler()
+
+        # Optionally window size changed events
+        if event.type == pygame.WINDOWSIZECHANGED:
+            print("Detected window size changed event", flush=True)
+            if window_resize_handler:
+                window_resize_handler()
 
         # Remap keyboard events
         event = _remap_keyboard_event(
@@ -114,11 +135,7 @@ def get_events(
 
 def clear_events() -> None:
     """Clear the event queue"""
-
-    # Allow joysticks to be rediscovered if they get uninitialized.
-    setup_joystick()
-
-    pygame.event.clear()
+    get_events(False, False, False)
 
 
 def _remap_keyboard_event(
@@ -363,7 +380,7 @@ def _add_event_if_not_duplicate(
 
 
 def _get_event_for_joystick_hat_position(
-    hat_position: Tuple[float, float]
+    hat_position: Tuple[float, float],
 ) -> Optional[pygame.event.Event]:
     """Generate key down events from pressed joystick hat - doesn't support one event becoming multiple events"""
     event = None

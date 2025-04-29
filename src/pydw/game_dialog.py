@@ -1153,6 +1153,12 @@ class GameDialog:
             return self.menu_data[self.menu_row][self.menu_col]
         return None
 
+    def get_selected_menu_position(self) -> Optional[Tuple[int, int]]:
+        """Get the selected menu item, if any, by row and column index"""
+        if self.row_data is not None and self.menu_data is not None:
+            return self.menu_row, self.menu_col
+        return None
+
     def set_selected_menu_option(self, menu_item: str) -> None:
         if self.row_data is not None and self.menu_data is not None:
             for row in range(len(self.menu_data)):
@@ -1163,7 +1169,16 @@ class GameDialog:
                         self.menu_col = col
                         self.draw_menu_indicator()
                         break
-        return None
+
+    def set_selected_menu_position(self, row: int, col: int) -> None:
+        """Set the selected menu item by row and column index"""
+        if self.row_data is not None and self.menu_data is not None:
+            if row in range(len(self.menu_data)):
+                if col in range(len(self.menu_data[row])):
+                    self.erase_menu_indicator()
+                    self.menu_row = row
+                    self.menu_col = col
+                    self.draw_menu_indicator()
 
     def erase_menu_indicator(self) -> None:
         self.draw_menu_indicator(pygame.Color("black"))

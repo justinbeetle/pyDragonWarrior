@@ -388,7 +388,7 @@ class GameState(GameStateInterface):
         """
 
         # Initialize the default dialog font color based on the state of the hero party
-        gde = GameDialogEvaluator(self.game_info, self)
+        gde = GameDialogEvaluator(self)
         gde.update_default_dialog_font_color()
 
     def save(self, quick_save: bool = False) -> None:
@@ -942,17 +942,17 @@ class GameState(GameStateInterface):
         if not self.hero_party.has_surviving_members():
             # Player death
             self.hero_party.main_character.hp = 0
-            AudioPlayer().stop_music()
-            AudioPlayer().play_sound("player_died")
             GameDialog.create_encounter_status_dialog(self.hero_party).blit(
                 self.screen, False
             )
-            gde = GameDialogEvaluator(self.game_info, self)
+            gde = GameDialogEvaluator(self)
             if message_dialog is None:
                 message_dialog = GameDialog.create_message_dialog()
             else:
                 message_dialog.add_message("")
             gde.add_and_wait_for_message("Thou art dead.", message_dialog)
+            AudioPlayer().stop_music()
+            AudioPlayer().play_sound("player_died", is_blocking=True)
             gde.wait_for_acknowledgement(message_dialog)
             for hero in self.hero_party.members:
                 hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = (
@@ -979,7 +979,7 @@ class GameState(GameStateInterface):
             Point(1, 1), "Do you really want to quit?"
         )
         menu_dialog.blit(self.screen, flip_buffer=True)
-        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(
+        menu_result = GameDialogEvaluator(self).get_menu_result(
             menu_dialog, allow_quit=False
         )
         if menu_result is not None and menu_result == "YES":

@@ -1,4 +1,4 @@
-""" Module defining the Point class """
+"""Module defining the Point class"""
 
 # Imports to support type annotations
 from __future__ import annotations

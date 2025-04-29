@@ -1,4 +1,4 @@
-""" Module defining the download_file method """
+"""Module defining the download_file method"""
 
 import os
 import ssl

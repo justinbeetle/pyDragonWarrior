@@ -43,11 +43,10 @@ from pydw.monster_state import MonsterState
 class GameDialogEvaluator:
     def __init__(
         self,
-        game_info: GameInfo,
         game_state: GameStateInterface,
         combat_encounter: Optional[CombatEncounterInterface] = None,
     ) -> None:
-        self.game_info = game_info
+        self.game_info = game_state.get_game_info()
         self.game_state = game_state
         self.combat_encounter = combat_encounter
         self.wait_before_new_text = False

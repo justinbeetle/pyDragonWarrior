@@ -23,11 +23,11 @@ class CombatParty:
         return False
 
     def get_still_in_combat_members(self) -> List[CombatCharacterState]:
-        alive_members = []
+        still_in_combat_members = []
         for member in self.get_combat_members():
             if member.is_still_in_combat():
-                alive_members.append(member)
-        return alive_members
+                still_in_combat_members.append(member)
+        return still_in_combat_members
 
     def get_highest_attack_strength(self) -> int:
         highest_attack_strength = 0

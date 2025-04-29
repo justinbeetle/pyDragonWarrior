@@ -77,7 +77,7 @@ class CombatEncounter(CombatEncounterInterface):
             self.message_dialog.add_message("")
         else:
             self.message_dialog = GameDialog.create_message_dialog()
-        self.gde = GameDialogEvaluator(game_info, game_state, self)
+        self.gde = GameDialogEvaluator(game_state, self)
         self.gde.update_status_dialog(message_dialog=self.message_dialog)
 
         if encounter_music is not None:
@@ -518,7 +518,7 @@ class CombatEncounter(CombatEncounterInterface):
 
             elif menu_result == "RUN":
                 target = random.choice(self.monster_party.get_still_in_combat_members())
-                if target.is_blocking_escape(hero):
+                if isinstance(target, MonsterState) and target.is_blocking_escape(hero):
                     AudioPlayer().play_sound("attack_miss_lvl2")
                     self.add_message(
                         hero.get_name()

@@ -1,4 +1,4 @@
-""" Module defining tests for the Point class """
+"""Module defining tests for the Point class"""
 
 import math
 
