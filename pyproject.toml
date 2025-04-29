@@ -1,5 +1,4 @@
 [build-system]
-# Build a wheel as: pip install .
 requires = [
   "setuptools >= 62.6.0",
   "setuptools-scm >= 8.0",
@@ -29,7 +28,27 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 requires-python = ">=3.10"
-dynamic = ["dependencies"]
+# Install dependencies as: pip install .
+dependencies = [
+    "certifi==2025.4.26",
+    "numpy==2.2.5",
+    "pygame==2.6.1",
+    "pyscroll==2.31",
+    "pytmx==3.32",
+]
+
+[project.optional-dependencies]
+# Install dev dependencies as: pip install .[dev]
+dev = [
+    "black==25.1.0",
+    "coverage==7.8.0",
+    "mypy==1.15.0",
+    "opensimplex==0.4.5.1",
+    "pytest==8.3.5",
+    "pylint==3.3.6",
+    "pyinstaller==6.13.0",
+    "snakeviz==2.2.2",
+]
 
 [project.scripts]
 pyDragonWarrior = "pydw.game.__main__:main"
