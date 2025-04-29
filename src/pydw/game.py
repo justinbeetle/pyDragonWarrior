@@ -138,7 +138,7 @@ def main() -> None:
         #       logic is platform specific, it will report an error on Linux for ctypes.windll.  Applying a type ignore
         #       on that line also doesn't work, as it results in an unused ignore error in Windows.
         #       See https://github.com/python/mypy/issues/9242 for more info.
-        if sys.platform in ("win32", "cygwin"):
+        if sys.platform == "win32" or sys.platform == "cygwin":
             import ctypes
 
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
