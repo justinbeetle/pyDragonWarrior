@@ -11,7 +11,7 @@ import xml.dom.minidom
 from generic_utils.point import Point
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
+from pygame_utils import game_events
 
 from pydw.combat_encounter import CombatEncounter
 from pydw.game_dialog import GameDialog
@@ -936,7 +936,7 @@ class GameState(GameStateInterface):
         AudioPlayer().play_music(self.game_info.maps[self.get_map_name()].music)
 
         # Clear event queue
-        GameEvents.clear_events()
+        game_events.clear_events()
 
     def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
         if not self.hero_party.has_surviving_members():

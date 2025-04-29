@@ -138,7 +138,7 @@ def main() -> None:
         #       logic is platform specific, it will report an error on Linux for ctypes.windll.  Applying a type ignore
         #       on that line also doesn't work, as it results in an unused ignore error in Windows.
         #       See https://github.com/python/mypy/issues/9242 for more info.
-        if sys.platform == "win32" or sys.platform == "cygwin":
+        if sys.platform in ("win32", "cygwin"):
             import ctypes
 
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
@@ -212,7 +212,9 @@ def main() -> None:
             if venv_context.env_exe != sys.executable:
                 if args.verbose:
                     print("Running application in venv", flush=True)
-                exit(subprocess.check_call([venv_context.env_exe] + sys.argv + ["-s"]))
+                sys.exit(
+                    subprocess.check_call([venv_context.env_exe] + sys.argv + ["-s"])
+                )
         elif args.verbose:
             print("Not running in a venv", flush=True)
 

@@ -8,7 +8,7 @@ import pygame
 from generic_utils.point import Point
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
+from pygame_utils import game_events
 
 from pydw.game_map import GameMap
 from pydw.game_state_interface import GameStateInterface
@@ -97,7 +97,7 @@ class GameMapViewer:
         god_mode = False
 
         while self.is_running and not done_with_map:
-            for event in GameEvents.get_events(True):
+            for event in game_events.get_events(True):
                 move_direction: Optional[Direction] = None
 
                 if event.type == pygame.KEYDOWN:

@@ -4,12 +4,11 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import concurrent.futures
 import os
-import numpy
 import sys
 
 # xml.etree doesn't support nested xincludes prior to Python 3.9 (see https://github.com/python/cpython/issues/65127)
 # Prior to Python 3.9, use lxml.etree
-if sys.version_info[0] == 3 and sys.version_info[1] < 9:
+if sys.version_info < (3, 9):
     from typing import Callable
     import lxml.etree as ET
     import lxml.ElementInclude as ETI
@@ -31,6 +30,8 @@ if sys.version_info[0] == 3 and sys.version_info[1] < 9:
 else:
     import xml.etree.ElementTree as ET
     import xml.etree.ElementInclude as ETI
+
+import numpy
 
 import pygame
 

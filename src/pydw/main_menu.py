@@ -8,7 +8,7 @@ import os
 import pygame
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as game_events
+from pygame_utils import game_events
 
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo

@@ -10,8 +10,7 @@ import pygame
 from generic_utils.point import Point
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
-import pygame_utils.surface_effects as SurfaceEffects
+from pygame_utils import game_events, surface_effects
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
@@ -97,7 +96,7 @@ class GameDialogEvaluator:
         background_image = self.game_state.screen.copy()
 
         # Clear event queue
-        GameEvents.clear_events()
+        game_events.clear_events()
 
         # Create the status and message dialogs
         GameDialog.create_exploring_status_dialog(self.hero_party).blit(
@@ -148,7 +147,7 @@ class GameDialogEvaluator:
             return
 
         # Clear event queue
-        GameEvents.clear_events()
+        game_events.clear_events()
 
         # AudioPlayer().play_sound('prompt')
 
@@ -157,7 +156,7 @@ class GameDialogEvaluator:
         clock = pygame.time.Clock()
         while self.game_state.is_running and is_awaiting_acknowledgement:
             # Process events
-            events = GameEvents.get_events()
+            events = game_events.get_events()
             if 0 == len(events):
                 if message_dialog is not None:
                     if is_waiting_indicator_drawn:
@@ -204,7 +203,7 @@ class GameDialogEvaluator:
         start_time = time.time()
         while self.game_state.is_running and is_waiting_for_user_input:
             # Process events
-            events = GameEvents.get_events(
+            events = game_events.get_events(
                 True, translate_e_to_enter=GameDialog.use_menus_for_text_entry()
             )
             for event in events:
@@ -257,7 +256,7 @@ class GameDialogEvaluator:
 
         menu_result = None
         while self.game_state.is_running and menu_result is None:
-            events = GameEvents.get_events(True)
+            events = game_events.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -844,15 +843,15 @@ class GameDialogEvaluator:
 
                     # TODO: Can this be done via reflection?
                     if item.name == "fadeToBlackAndBack":
-                        SurfaceEffects.fade_to_black_and_back(self.game_state.screen)
+                        surface_effects.fade_to_black_and_back(self.game_state.screen)
                     elif item.name == "fadeOutToBlack":
-                        SurfaceEffects.fade_out_to_black(self.game_state.screen)
+                        surface_effects.fade_out_to_black(self.game_state.screen)
                     elif item.name == "fadeInFromBlack":
-                        SurfaceEffects.fade_in_from_black(self.game_state.screen)
+                        surface_effects.fade_in_from_black(self.game_state.screen)
                     elif item.name == "flickering":
-                        SurfaceEffects.flickering(self.game_state.screen)
+                        surface_effects.flickering(self.game_state.screen)
                     elif item.name == "rainbowEffect":
-                        SurfaceEffects.rainbow_effect(self.game_state, message_dialog)
+                        surface_effects.rainbow_effect(self.game_state, message_dialog)
 
                     elif item.name == "hideDialog":
                         # Before hiding the dialog first ensure the contents are acknowledged then clear them
@@ -860,7 +859,7 @@ class GameDialogEvaluator:
                         message_dialog.clear()
                         self.game_state.draw_map(flip_buffer=True)
                     elif item.name == "evilDeathLoop":
-                        SurfaceEffects.black_red_monochrome_effect(
+                        surface_effects.black_red_monochrome_effect(
                             self.game_state.screen, flip_buffer=False
                         )
                         self.game_state.draw_map(draw_only_character_sprites=True)
@@ -868,7 +867,7 @@ class GameDialogEvaluator:
                         # Endless loop where quiting is the only exit
                         while self.game_state.is_running:
                             # Process events
-                            events = GameEvents.get_events()
+                            events = game_events.get_events()
                             if 0 == len(events):
                                 pygame.time.wait(25)
                             for event in events:

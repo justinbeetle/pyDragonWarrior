@@ -11,7 +11,7 @@ import pygame
 
 from generic_utils.point import Point
 
-import pygame_utils.game_events as game_events
+from pygame_utils import game_events
 
 from pydw.exploring import Exploring
 from pydw.game_dialog import GameDialog

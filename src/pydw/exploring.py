@@ -9,7 +9,7 @@ import pygame
 from generic_utils.point import Point
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as game_events
+from pygame_utils import game_events
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_dialog import GameDialog, GameDialogSpacing
@@ -339,7 +339,7 @@ class Exploring(GameMode):
                                     else:
                                         dialog = []
                                     break
-                                elif decoration.type.remove_with_key:
+                                if decoration.type.remove_with_key:
                                     key_item = self.game_state.game_info.items["Key"]
                                     if (
                                         self.game_state.hero_party.has_item(

@@ -14,7 +14,7 @@ import pygame.time
 
 from generic_utils.download_file import download_file
 
-import pygame_utils.game_events as game_events
+from pygame_utils import game_events
 
 
 class MusicTrack(NamedTuple):
@@ -68,7 +68,7 @@ class MusicTrack(NamedTuple):
             else:
                 print(f"ERROR: Failed to stage {self.file_path1}", flush=True)
             return False
-        elif not self.is_file2_present():
+        if not self.is_file2_present():
             print(f"ERROR: Failed to stage {self.file_path2}", flush=True)
             return False
 

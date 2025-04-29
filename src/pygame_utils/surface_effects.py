@@ -23,38 +23,38 @@ def fade_to_color_and_back(
     screen: pygame.surface.Surface, fade_color: pygame.Color
 ) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(fade_color)
-    fade_out(screen, background_surface, fade_surface)
-    fade_out(screen, fade_surface, background_surface)
+    color_surface = pygame.surface.Surface(screen.get_size())
+    color_surface.fill(fade_color)
+    fade_out(screen, background_surface, color_surface)
+    fade_out(screen, color_surface, background_surface)
 
 
 def fade_out_to_color(screen: pygame.surface.Surface, fade_color: pygame.Color) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(fade_color)
-    fade_out(screen, background_surface, fade_surface)
+    color_surface = pygame.surface.Surface(screen.get_size())
+    color_surface.fill(fade_color)
+    fade_out(screen, background_surface, color_surface)
 
 
 def fade_in_from_color(
     screen: pygame.surface.Surface, fade_color: pygame.Color
 ) -> None:
     background_surface = screen.copy()
-    fade_surface = pygame.surface.Surface(screen.get_size())
-    fade_surface.fill(fade_color)
-    fade_out(screen, fade_surface, background_surface)
+    color_surface = pygame.surface.Surface(screen.get_size())
+    color_surface.fill(fade_color)
+    fade_out(screen, color_surface, background_surface)
 
 
 def fade_out(
     screen: pygame.surface.Surface,
-    background_surface: pygame.surface.Surface,
-    fade_surface: pygame.surface.Surface,
+    fade_out_from_image: pygame.surface.Surface,
+    fade_in_to_image: pygame.surface.Surface,
 ) -> None:
     clock = pygame.time.Clock()
     for i in range(15, 256, 16):
-        fade_surface.set_alpha(i)
-        screen.blit(background_surface, (0, 0))
-        screen.blit(fade_surface, (0, 0))
+        fade_in_to_image.set_alpha(i)
+        screen.blit(fade_out_from_image, (0, 0))
+        screen.blit(fade_in_to_image, (0, 0))
         clock.tick(20)
         pygame.display.flip()
 
@@ -150,12 +150,12 @@ def rainbow_effect_across_map(
 
     # Cycle through the rainbow colors
     clock = pygame.time.Clock()
+    fade_surface = pygame.surface.Surface(game_state.screen.get_size())
     for _ in range(2):
         for rainbow_color in rainbow_colors:
-            fade_surface = pygame.surface.Surface(game_state.screen.get_size())
             fade_surface.fill(rainbow_color)
 
-            def fade_step(alpha: int) -> None:
+            def fade_step(fade_surface: pygame.surface.Surface, alpha: int) -> None:
                 fade_surface.set_alpha(alpha)
                 game_state.screen.blit(background_surface, (0, 0))
                 game_state.screen.blit(fade_surface, (0, 0))
@@ -172,10 +172,10 @@ def rainbow_effect_across_map(
                 pygame.display.flip()
 
             for j in range(63, 196, 64):
-                fade_step(j)
+                fade_step(fade_surface, j)
 
             for j in range(63, 196, 64):
-                fade_step(196 - j)
+                fade_step(fade_surface, 196 - j)
 
 
 def rainbow_effect_on_water(

@@ -9,7 +9,7 @@ import pygame
 from generic_utils.point import Point
 
 from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
+from pygame_utils import game_events
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
@@ -114,7 +114,7 @@ class CombatEncounter(CombatEncounterInterface):
         self.render_encounter_background_phase_in()
 
         # Clear event queue
-        GameEvents.clear_events()
+        game_events.clear_events()
 
         # Add the approach dialog
         if self.approach_dialog is not None:
@@ -123,7 +123,7 @@ class CombatEncounter(CombatEncounterInterface):
             self.add_message(self.monster_party.get_default_approach_dialog())
 
         # Clear the event queue and wait for user acknowledgement
-        GameEvents.clear_events()
+        game_events.clear_events()
 
         # Check if monsters run away at the start of the encounter
         last_turn_was_monster_turn = False
@@ -491,7 +491,7 @@ class CombatEncounter(CombatEncounterInterface):
         use_dialog = None
         target_type = None
         prev_menu_result = None
-        GameEvents.clear_events()  # Clear event queue
+        game_events.clear_events()  # Clear event queue
         while self.game_state.is_running:
             # Get selected action for turn
             self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)

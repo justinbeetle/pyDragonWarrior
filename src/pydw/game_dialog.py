@@ -11,7 +11,7 @@ import pygame
 
 from generic_utils.point import Point
 
-import pygame_utils.game_events as GameEvents
+from pygame_utils import game_events
 
 from pydw.hero_party import HeroParty
 
@@ -347,7 +347,7 @@ class GameDialog:
     @staticmethod
     def use_menus_for_text_entry() -> bool:
         if GameDialog.force_use_menus_for_text_entry is None:
-            return GameEvents.setup_joystick()
+            return game_events.setup_joystick()
         return GameDialog.force_use_menus_for_text_entry
 
     def __init__(
@@ -1460,7 +1460,7 @@ def main() -> None:
         is_awaiting_selection = True
         dialog_with_menu.blit(screen, True)
         while is_awaiting_selection:
-            events = GameEvents.get_events(True)
+            events = game_events.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -1486,7 +1486,7 @@ def main() -> None:
         is_waiting_for_user_input = True
         wait_for_message_to_fully_display(dialog_with_user_input)
         while is_waiting_for_user_input:
-            events = GameEvents.get_events(True)
+            events = game_events.get_events(True)
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:

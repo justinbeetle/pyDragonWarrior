@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Define the GameMode base class."""
+
 from typing import List, Optional
 
 from abc import ABC, abstractmethod
@@ -34,13 +36,11 @@ class GameMode(ABC):
     @abstractmethod
     def game_mode_loop(self) -> None:
         """The game loop for the game mode."""
-        pass
 
     @abstractmethod
     def render_background(self, flip_buffer: bool = False) -> None:
         """Render the current state of the game mode's background to the display.
         The background is whatever is behind the dialogs."""
-        pass
 
     def render(self, flip_buffer: bool = True) -> None:
         """Render the current state of the game mode to the display."""
@@ -61,6 +61,7 @@ class GameMode(ABC):
         self.render()
 
     def add_status_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
+        """Add a status dialog."""
         self.status_dialog = dialog
         screen = pygame.display.get_surface()
         dialog.blit(screen)
@@ -68,11 +69,13 @@ class GameMode(ABC):
             pygame.display.flip()
 
     def remove_status_dialog(self, flip_buffer: bool = True) -> None:
+        """Remove the status dialog."""
         if self.status_dialog:
             self.status_dialog = None
             self.render(flip_buffer)
 
     def add_message_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
+        """Add a message dialog."""
         self.message_dialog = dialog
         screen = pygame.display.get_surface()
         dialog.blit(screen)
@@ -80,6 +83,7 @@ class GameMode(ABC):
             pygame.display.flip()
 
     def remove_message_dialog(self, flip_buffer: bool = True) -> None:
+        """Remove the message dialog."""
         if self.message_dialog:
             self.message_dialog = None
             self.render(flip_buffer)
@@ -87,6 +91,7 @@ class GameMode(ABC):
     def add_cascading_dialog(
         self, dialog: GameDialog, flip_buffer: bool = True
     ) -> None:
+        """Add a cascading dialog."""
         self.cascading_dialogs.append(dialog)
         screen = pygame.display.get_surface()
         dialog.blit(screen)
@@ -94,10 +99,12 @@ class GameMode(ABC):
             pygame.display.flip()
 
     def remove_cascading_dialog(self, flip_buffer: bool = True) -> None:
+        """Remove a cascading dialog."""
         if 0 < len(self.cascading_dialogs):
             self.cascading_dialogs.pop()
             self.render(flip_buffer)
 
     def clear_cascading_dialogs(self, flip_buffer: bool = True) -> None:
+        """Remove all cascading dialogs."""
         self.cascading_dialogs.clear()
         self.render(flip_buffer)
