@@ -1,14 +1,14 @@
 [build-system]
+# Build a wheel as: pip install build; python -m build
 requires = [
   "setuptools >= 62.6.0",
   "setuptools-scm >= 8.0",
-  "wheel",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyDragonWarrior"
-version = "1.3.1"
+dynamic = ["version"]
 license = "MIT"
 license-files = ["LICEN[CS]E.*"]
 description = "A Python based Dragon Warrior clone."
@@ -51,7 +51,7 @@ dev = [
 ]
 
 [project.scripts]
-pyDragonWarrior = "pydw.game.__main__:main"
+pyDragonWarrior = "pydw.game:main"
 
 [project.urls]
 Repository = "https://github.com/justinbeetle/pyDragonWarrior"
@@ -62,11 +62,11 @@ where = ["src"]
 [tool.setuptools.package-data]
 pyDragonWarrior = ["data"]
 
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+[tool.setuptools_scm]
+# Needed to dynamically obtain the version number based on the git tags
 
 [tool.black]
-# Run black as: black scripts src tests
+# Run black as: pip install .[dev]; black scripts src tests
 line-length = 120
 
 [tool.flake8]
@@ -74,12 +74,12 @@ max-line-length = 120
 extend-ignore = "E203"
 
 [tool.mypy]
-# Run mypy as: mypy --config-file pyproject.toml src/pydw/game.py
+# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/game.py
 ignore_missing_imports = true
 strict = true
 
 [tool.pylint.BASIC]
-# Run pylint as: pylint src
+# Run pylint as: pip install .[dev]; pylint src
 good-names = [
   "gp",
   "h",

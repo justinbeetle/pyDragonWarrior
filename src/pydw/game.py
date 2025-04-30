@@ -9,7 +9,7 @@ packages, then run the application via a subprocess using Python from the venv.
 The Game class is specific to pyDragonWarrior.  It conforms to the LaunchableApplication protocol and can be launched
 via Launcher.  The main method does this to start pyDragonWarrior."""
 
-from typing import Optional, Protocol, Tuple
+from typing import Optional, List, Protocol, Tuple
 
 from argparse import ArgumentParser, Namespace
 from multiprocessing import freeze_support
@@ -32,12 +32,6 @@ class LaunchableApplication(Protocol):
         options.  A LaunchableApplication needs to reserve these options for the Launcher, though the verbose option
         is generic and can also be used by the application."""
 
-    def get_file_path(self) -> str:
-        """Get the __file__ value from the application."""
-
-    def get_num_directories_from_base_path_to_file_path(self) -> int:
-        """Get the number of directories between the base_path and the file_path."""
-
     def main(self, args: Namespace, base_path: str, saves_path: str) -> int:
         """Method to run the application returning an exit code for the application."""
 
@@ -54,12 +48,18 @@ class Launcher:
         """Returns True if running on the Windows operating system, else False."""
         return sys.platform in ("win32", "cygwin")
 
-    def get_application_base_path(self) -> str:
-        """Get the application base path (path of the root directory of the repo)."""
-        path = os.path.dirname(self.app.get_file_path())
-        for _ in range(self.app.get_num_directories_from_base_path_to_file_path()):
-            path = os.path.dirname(path)
-        return path
+    @staticmethod
+    def get_application_base_path() -> str:
+        """Get the repo base path (path of the root directory of the repo) or the file path if not found."""
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        current_dir = file_dir
+        parent_dir = ""
+        while current_dir != parent_dir:
+            if os.path.exists(os.path.join(current_dir, "pyproject.toml")):
+                return current_dir
+            parent_dir = current_dir
+            current_dir = os.path.dirname(current_dir)
+        return file_dir
 
     def get_writeable_application_path(self, app_path: str, directory: str) -> Tuple[bool, str]:
         """Get a writeable directory path for this application.
@@ -92,8 +92,11 @@ class Launcher:
 
         return is_path_writeable(), writeable_application_path
 
-    def launch(self) -> int:
+    def launch(self, argv: Optional[List[str]] = None) -> int:
         """Launch the application and call its main method returning an exit code for the application."""
+
+        # Allows pyinstaller Windows executables to support the use of concurrent.futures
+        freeze_support()
 
         # Get the application arg parsers and add launcher specific args
         parser = self.app.get_arg_parser()
@@ -112,7 +115,7 @@ class Launcher:
             default=False,
             help="Enable verbose logging",
         )
-        args = parser.parse_args()
+        args = parser.parse_args(argv)
         # print('args =', args, flush=True)
 
         # Determine if application is a script file or frozen exe
@@ -150,7 +153,7 @@ class Launcher:
         os.chdir(base_path)
 
         # Load required Python libraries
-        if not is_frozen and args.perform_pip_install:
+        if not is_frozen and args.perform_pip_install and os.path.exists("pyproject.toml"):
             # If not in a virtual environment, create one first
             venv_path: Optional[str] = None
             if "VIRTUAL_ENV" not in os.environ:
@@ -236,14 +239,6 @@ class Game:
     def get_application_name(self) -> str:
         """Get the name of the application"""
         return self.application_name
-
-    def get_file_path(self) -> str:
-        """Get the __file__ value from the application."""
-        return __file__
-
-    def get_num_directories_from_base_path_to_file_path(self) -> int:
-        """Get the number of directories between the base_path and the file_path."""
-        return 2
 
     def get_arg_parser(self) -> ArgumentParser:
         parser = ArgumentParser()
@@ -386,14 +381,14 @@ class Game:
         return 0
 
 
-def main() -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     """Run via Launcher"""
-    return Launcher(Game()).launch()
+    try:
+        return Launcher(Game()).launch(argv)
+    except:
+        traceback.print_exc()
+    return 1
 
 
 if __name__ == "__main__":
-    freeze_support()  # This allows pyinstaller Windows executables to support the use of concurrent.futures
-    try:
-        main()
-    except Exception:
-        traceback.print_exc()
+    main()
