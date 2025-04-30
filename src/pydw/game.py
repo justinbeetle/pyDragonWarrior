@@ -314,7 +314,7 @@ class Game:
 
         def create_game_loop(game_xml_path: str, error_msg: Optional[str] = None) -> Optional[GameLoop]:
             try:
-                return GameLoop(
+                game_loop = GameLoop(
                     saves_path,
                     base_path,
                     game_xml_path,
@@ -323,6 +323,8 @@ class Game:
                     tile_scaling_factor,
                     verbose=args.verbose,
                 )
+                game_loop.load()
+                return game_loop
             except Exception:
                 if args.verbose:
                     if error_msg is None:
@@ -351,9 +353,10 @@ class Game:
                                 print("Extracting assets...", flush=True)
                             for asset_file in asset_pack_file:
                                 if not os.path.exists(os.path.join(base_path, asset_file.name)):
-                                    asset_pack_file.extract(asset_file)
+                                    asset_pack_file.extract(asset_file, filter='data')
                                     if args.verbose:
                                         print(f"   {asset_file.name}", flush=True)
+
                         game_loop = create_game_loop(
                             game_xml_path,
                             "Failed to load licensed assets after extracting from asset pack",
@@ -365,8 +368,9 @@ class Game:
                 game_loop = create_game_loop(game_xml_path, "ERROR: Failed to load unlicensed assets")
 
         # Run the game
+        exit_code = 1
         if game_loop is not None:
-            game_loop.run(args.save)
+            exit_code = game_loop.run(args.save)
         elif not args.verbose:
             print(
                 "ERROR: Failed to load the game.  Run with the -v option for more info.",
@@ -378,7 +382,7 @@ class Game:
         pygame.joystick.quit()
         pygame.quit()
 
-        return 0
+        return exit_code
 
 
 def main(argv: Optional[List[str]] = None) -> int:

@@ -60,6 +60,8 @@ class GameLoop:
         self.loading_screen: Optional[LoadingScreen] = LoadingScreen(title_image, title_music)
         self.loading_screen.render()
 
+        self.game_state: Optional[GameState] = None
+
     def initialize_display(self) -> None:
         """Initialize the pygame display"""
         if self.desired_win_size_pixels is None:
@@ -103,29 +105,46 @@ class GameLoop:
         if self.verbose and self.tile_scaling_factor < self.desired_tile_scaling_factor:
             print(f"Reduced tile scaling factor to {self.tile_scaling_factor}", flush=True)
 
-    def run(self, pc_name_or_file_name: Optional[str] = None) -> None:
+    def load(self) -> None:
+        """Attempt to load the game state and throw an exception if it fails."""
+
         # Register the focus gain handler - needed so that we don't end up with an empty black screen after losing focus
         game_events.set_focus_gain_handler(self.focus_gain_handlder)
         game_events.set_window_resize_handler(self.window_resize_handlder)
 
         # Load the full game state
-        game_state = GameState(
-            self.saves_path,
-            self.base_path,
-            self.game_xml_path,
-            self.win_size_tiles,
-            self.tile_size_pixels,
-        )
+        try:
+            self.game_state = GameState(
+                self.saves_path,
+                self.base_path,
+                self.game_xml_path,
+                self.win_size_tiles,
+                self.tile_size_pixels,
+            )
+        except:
+            # Unregister the handles if loading fails
+            game_events.set_focus_gain_handler(None)
+            game_events.set_window_resize_handler(None)
+            raise
+
+    def run(self, pc_name_or_file_name: Optional[str] = None) -> int:
+        """Run the game loop.  The game state needs to be loaded as a prerequisite."""
+
+        if self.game_state is None:
+            print(f"ERROR: Game state has not been loaded", flush=True)
+            return 1
 
         # Transition from the loading screen to the main menu
         self.loading_screen = None
-        self.current_game_mode = MainMenu(game_state, pc_name_or_file_name)
+        self.current_game_mode = MainMenu(self.game_state, pc_name_or_file_name)
         self.current_game_mode.game_mode_loop()
 
         # Transition from the main menu to exploring
-        if game_state.is_running:
-            self.current_game_mode = Exploring(game_state, self.verbose)
+        if self.game_state and self.game_state.is_running:
+            self.current_game_mode = Exploring(self.game_state, self.verbose)
             self.current_game_mode.game_mode_loop()
+
+        return 0
 
     def focus_gain_handlder(self) -> None:
         """Handler for focus gain events to render the latest content to the display surface.
