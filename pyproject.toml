@@ -71,7 +71,6 @@ line-length = 120
 
 [tool.flake8]
 max-line-length = 120
-extend-ignore = "E203"
 
 [tool.mypy]
 # Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/game.py

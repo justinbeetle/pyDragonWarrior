@@ -353,7 +353,7 @@ class Game:
                                 print("Extracting assets...", flush=True)
                             for asset_file in asset_pack_file:
                                 if not os.path.exists(os.path.join(base_path, asset_file.name)):
-                                    asset_pack_file.extract(asset_file, filter='data')
+                                    asset_pack_file.extract(asset_file, filter="data")
                                     if args.verbose:
                                         print(f"   {asset_file.name}", flush=True)
 

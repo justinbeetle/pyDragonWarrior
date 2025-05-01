@@ -58,12 +58,14 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
-def set_focus_gain_handler(handler_method: Callable[[], None]) -> None:
+def set_focus_gain_handler(handler_method: Optional[Callable[[], None]]) -> None:
+    """Set (or unset) the optional focus gain handler."""
     global focus_gain_handler
     focus_gain_handler = handler_method
 
 
-def set_window_resize_handler(handler_method: Callable[[], None]) -> None:
+def set_window_resize_handler(handler_method: Optional[Callable[[], None]]) -> None:
+    """Set (or unset) the optional window resize handler."""
     global window_resize_handler
     window_resize_handler = handler_method
 
