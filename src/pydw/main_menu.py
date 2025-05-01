@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Module defining MainMenu class."""
+
 from typing import List, Optional
 
 import glob
@@ -18,7 +20,8 @@ from pydw.loading_screen import LoadingScreen
 
 
 class MainMenu(GameMode):
-    """Game mode for the game's main menu."""
+    """Game mode for the game's main menu supporting user selections for creating, loading, and deleting saved game
+    files and selecting game settings."""
 
     def __init__(self, game_state: GameState, pc_name_or_file_name: Optional[str] = None) -> None:
         super().__init__(game_state)
@@ -46,14 +49,15 @@ class MainMenu(GameMode):
 
     def game_mode_loop(self) -> None:
         """The game loop for the main menu."""
-        self.render()
+        self.draw()
 
         # Wait for user input - any key press
         while self.game_state.is_running:
             waiting_for_user_input = True
             for event in game_events.get_events():
                 if event.type == pygame.QUIT:
-                    self.game_state.handle_quit(force=True)
+                    self.handle_quit(force=True)
+                    return
                 elif event.type == pygame.KEYDOWN:
                     AudioPlayer().play_sound("select")
                     waiting_for_user_input = False
@@ -147,8 +151,8 @@ class MainMenu(GameMode):
         if self.game_state.is_running:
             self.game_state.load(pc_name_or_file_name)
 
-    def render_background(self, flip_buffer: bool = False) -> None:
-        """Render the background for the main menu, which is the same as the background for the loading screen."""
+    def draw_background(self, flip_buffer: bool = False) -> None:
+        """Draw the background for the main menu, which is the same as the background for the loading screen."""
         loading_screen = LoadingScreen(GameInfo.title_image, GameInfo.title_music)
         loading_screen.set_background_text(self.background_text)
-        loading_screen.render(flip_buffer)
+        loading_screen.draw(flip_buffer)

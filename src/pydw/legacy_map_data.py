@@ -44,6 +44,10 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             self.overlay_images = self.get_map_images_from_game_info(overlay_dat)
         self.layers_to_render = self.all_tile_layers
 
+    def reload_data(self) -> None:
+        """Reload the tiles"""
+        pass
+
     def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.surface.Surface]]]:
         def pad_row(row_to_pad: str) -> str:
             pad_width = int(self.image_pad_tiles.w)

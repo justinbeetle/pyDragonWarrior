@@ -111,19 +111,19 @@ Generate sample GIFs using https://github.com/lightlike/Tiled-Gif-Export:
 Generate PyInstaller single file package:
    Run the game, to ensure the venv is fully populated: src/pydw/game.py
    Activate the venv: source venv/Scripts/activate
-   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/game.py
+   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --onefile --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" --splash data/images/title.png src/pydw/launcher.py
 
 Generate PyInstaller tarball package:
    Run the game, to ensure the venv is fully populated: src/pydw/game.py
    Activate the venv: source venv/Scripts/activate
-   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/game.py
+   /c/Users/justi/AppData/Local/Programs/Python/Python310/Scripts/pyinstaller.exe --name pyDragonWarrior --icon icon.ico --add-data "game.xml;./" --add-data "game_licensed_assets.xml;./" --add-data "data;data" --add-data "icon.png;./" src/pydw/launcher.py
    cd dist
    tar cfz pyDragonWarrior.tgz pyDragonWarrior
 
 Create asset pack: tar cfz licensed_assets.tgz $(git ls-files --others data/licensed_assets -x *.xcf)
 
 Run black:  python -m black src scripts tests
-Run mypy:   python -m mypy src/pydw/game.py --strict --ignore-missing-imports
+Run mypy:   python -m mypy src/pydw/launcher.py --strict --ignore-missing-imports
 Run pylint: python -m pylint $(git ls-files '*.py')
 Run tests:  python -m pytest
 

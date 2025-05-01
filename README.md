@@ -22,9 +22,9 @@ out-and-out clone or reimagining.
  
 ## Running
 
-Execute pyDragonWarrior/src/pydw/game.py
+Execute pyDragonWarrior/src/pydw/launcher.py
 
-Note: Running game.py runs a subshell command to install the required Python libraries in a venv using pip.
+Note: Running launcher.py runs a subshell command to install the required Python libraries in a venv using pip.
 
 ## Controls
 
@@ -78,7 +78,7 @@ of problems in the add_problem_to_use_dialog method.
 3. pip install .
 4. pip install pyinstaller
 5. pyinstaller --onefile --name pyDragonWarrior --add-data "data;data" --icon data/images/icon.ico --splash
-data/images/title.png src/pydw/game.py
+data/images/title.png src/pydw/launcher.py
 
 ### Using Docker
 

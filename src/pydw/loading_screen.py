@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Module defining LoadingScreen class."""
+
 from typing import Optional
 
 import pygame
@@ -28,8 +30,8 @@ class LoadingScreen:
         """Set the text for the bottom of the loading screen."""
         self.background_text = background_text
 
-    def render(self, flip_buffer: bool = True) -> None:
-        """Render the title image and text message while playing the title music."""
+    def draw(self, flip_buffer: bool = True) -> None:
+        """Draw the title image and text message while playing the title music."""
 
         # Play title music
         if self.title_music:

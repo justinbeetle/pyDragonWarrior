@@ -27,10 +27,11 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 # Install dependencies as: pip install .
 dependencies = [
     "certifi==2025.4.26",
+    "lxml;python_version<'3.9'",
     "numpy==2.2.5",
     "pygame==2.6.1",
     "pyscroll==2.31",
@@ -51,7 +52,7 @@ dev = [
 ]
 
 [project.scripts]
-pyDragonWarrior = "pydw.game:main"
+pyDragonWarrior = "pydw.launcher:main"
 
 [project.urls]
 Repository = "https://github.com/justinbeetle/pyDragonWarrior"
@@ -73,7 +74,7 @@ line-length = 120
 max-line-length = 120
 
 [tool.mypy]
-# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/game.py
+# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/launcher.py
 ignore_missing_imports = true
 strict = true
 

@@ -474,6 +474,6 @@ class Exploring(GameMode):
             for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.game_state.advance_tick()
 
-    def render_background(self, flip_buffer: bool = False) -> None:
-        """Render the background for the main menu, which is the same as the background for the loading screen."""
-        self.game_state.draw_map()
+    def draw_background(self, flip_buffer: bool = False) -> None:
+        """Draw the background for the main menu, which is the same as the background for the loading screen."""
+        self.game_state.draw_map(flip_buffer)

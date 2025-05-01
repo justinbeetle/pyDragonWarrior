@@ -40,10 +40,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             xml_root.remove(image_layer_element)
 
         # load data from pytmx
-        # Would use the following if not for the imagelayer issue: pytmx.util_pygame.load_pygame(tmx_filename)
-        self.tmx = pytmx.TiledMap(image_loader=pytmx.util_pygame.pygame_image_loader)
-        self.tmx.filename = tmx_filename
-        self.tmx.parse_xml(xml_root)
+        self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
 
         # Determine desired amount of pre-zoom
         self.pre_zoom = 1.0
@@ -115,6 +112,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             print('overlay_tile_layers: layer', idx, '=', l, flush=True)
         print('decoration layer', self.decoration_layer, flush=True)
         print('character layer', self.character_layer, flush=True)"""
+
+    def reload_data(self) -> None:
+        """Reload the tiles"""
+        self.tmx = pytmx.util_pygame.load_pygame(self.tmx.filename)
 
     def set_pc_character_tile(self, pos_dat_tile: Point) -> bool:
         """
