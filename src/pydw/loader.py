@@ -19,7 +19,6 @@ from pygame_utils import game_events
 from pydw.exploring import Exploring
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
-from pydw.game_mode import GameMode
 from pydw.game_state import GameState
 from pydw.launcher import Launcher
 from pydw.loading_screen import LoadingScreen
@@ -48,8 +47,6 @@ class Loader:
         self.win_size_tiles = Point(0, 0)
 
         self.loading_screen: Optional[LoadingScreen] = None
-        self.current_game_mode: Optional[GameMode] = None  # TODO: Move the current game mode into GameState
-        self.game_state: Optional[GameState] = None
 
     def run(self) -> int:
         """Attempt to initialize pygame, load the game assets, and run the game.  Returns an exit code."""
@@ -61,47 +58,9 @@ class Loader:
         try:
             self.initialize_pygame()
             self.determine_tile_size()
-
-            successfully_loaded = False
-            if self.args.config:
-                successfully_loaded = self.load_from_game_xml(self.args.config)
-            else:
-                # Attempt to load game using the licensed assets
-                if not self.args.force_use_unlicensed_assets:
-                    game_xml_path = os.path.join(self.base_path, "data", "game_licensed_assets.xml")
-                    successfully_loaded = self.load_from_game_xml(game_xml_path, "Failed to load using licensed assets")
-
-                    # If failed to load, retry after extracting asset pack (if present)
-                    asset_pack_path = os.path.join(self.base_path, "licensed_assets.tgz")
-                    if not successfully_loaded and os.path.exists(asset_pack_path):
-                        self.extract_asset_pack(asset_pack_path)
-
-                        # Retry loading using the licensed assets
-                        successfully_loaded = self.load_from_game_xml(
-                            game_xml_path, "Failed to load licensed assets after extracting from asset pack"
-                        )
-
-                # Fallback to using unlicensed assets if the licensed weren't present or didn't work
-                if not successfully_loaded:
-                    game_xml_path = os.path.join(self.base_path, "data", "game.xml")
-                    successfully_loaded = self.load_from_game_xml(
-                        game_xml_path, "ERROR: Failed to load unlicensed assets"
-                    )
-
-            if successfully_loaded and self.game_state is not None:
-                self.loading_screen = None
-
-                # Transition from the loading screen to the main menu
-                self.loading_screen = None
-                self.current_game_mode = MainMenu(self.game_state, self.args.save)
-                self.current_game_mode.game_mode_loop()
-
-                # Transition from the main menu to exploring
-                if self.game_state.is_running:
-                    self.current_game_mode = Exploring(self.game_state, self.verbose)
-                    self.current_game_mode.game_mode_loop()
-
-                return 0
+            game_state = self.load_game_assets()
+            if game_state:
+                return game_state.run(self.args.save)
         finally:
             self.terminate_pygame()
 
@@ -165,13 +124,36 @@ class Loader:
         if self.verbose and tile_scaling_factor < self.desired_tile_scaling_factor:
             print(f"Reduced tile scaling factor to {tile_scaling_factor}", flush=True)
 
-    def terminate_pygame(self) -> None:
-        """Terminate pygame"""
-        AudioPlayer().terminate()
-        pygame.joystick.quit()
-        pygame.quit()
+    def load_game_assets(self) -> Optional[GameState]:
+        """Attempt to load the game assets, returning a GameState on success."""
 
-    def load_from_game_xml(self, game_xml_path: str, error_msg: Optional[str] = None) -> bool:
+        if self.args.config:
+            return self.load_from_game_xml(self.args.config)
+
+        # Attempt to load game using the licensed assets
+        if not self.args.force_use_unlicensed_assets:
+            game_xml_path = os.path.join(self.base_path, "data", "game_licensed_assets.xml")
+            game_state = self.load_from_game_xml(game_xml_path, "Failed to load using licensed assets")
+            if game_state:
+                return game_state
+
+            # If failed to load, retry after extracting asset pack (if present)
+            asset_pack_path = os.path.join(self.base_path, "licensed_assets.tgz")
+            if os.path.exists(asset_pack_path):
+                self.extract_asset_pack(asset_pack_path)
+
+                # Retry loading using the licensed assets
+                game_state = self.load_from_game_xml(
+                    game_xml_path, "Failed to load licensed assets after extracting from asset pack"
+                )
+            if game_state:
+                return game_state
+
+        # Fallback to using unlicensed assets if the licensed weren't present or didn't work
+        game_xml_path = os.path.join(self.base_path, "data", "game.xml")
+        return self.load_from_game_xml(game_xml_path, "ERROR: Failed to load unlicensed assets")
+
+    def load_from_game_xml(self, game_xml_path: str, error_msg: Optional[str] = None) -> Optional[GameState]:
         """Load the game resources based on the specified xml file."""
         try:
             # Load the minimum amount of game info to launch the loading screen
@@ -185,12 +167,8 @@ class Loader:
             self.loading_screen.draw()
 
             # Load the full game state
-            self.game_state = GameState(
-                self.saves_path,
-                self.base_path,
-                game_xml_path,
-                self.win_size_tiles,
-                self.tile_size_pixels,
+            return GameState(
+                self.saves_path, self.base_path, game_xml_path, self.win_size_tiles, self.tile_size_pixels, self.verbose
             )
         except Exception:
             if self.verbose:
@@ -198,9 +176,8 @@ class Loader:
                     error_msg = f"Failed to load game using {game_xml_path}"
                 print(f"ERROR: {error_msg}", flush=True)
                 traceback.print_exc()
-            return False
 
-        return True
+        return None
 
     def extract_asset_pack(self, asset_pack_path: str) -> None:
         """Extract asset pack without overwriting existing files."""
@@ -218,19 +195,20 @@ class Loader:
         Since pygame 2.5.2, the display surface is cleared when focus is lost and gained
         (see https://github.com/pygame/pygame/issues/4133).
         """
-        if self.verbose:
-            print("Re-drawing to the display due to invocation of focus_gain_handlder", flush=True)
-        if self.current_game_mode:
-            self.current_game_mode.draw()
-        elif self.loading_screen:
+        if self.loading_screen:
+            if self.verbose:
+                print("Re-drawing to the display due to invocation of focus_gain_handlder", flush=True)
             self.loading_screen.draw()
 
     def window_resize_handlder(self) -> None:
         """Handler for window resize events needed to implement a resizeable window."""
-        if self.verbose:
-            print("Re-drawing to the display due to invocation of window_resize_handlder", flush=True)
-        # TODO: What needs to be done to resize things on the fly?
-        if self.current_game_mode:
-            self.current_game_mode.resize()
-        elif self.loading_screen:
+        if self.loading_screen:
+            if self.verbose:
+                print("Re-drawing to the display due to invocation of window_resize_handlder", flush=True)
             self.loading_screen.draw()
+
+    def terminate_pygame(self) -> None:
+        """Terminate pygame"""
+        AudioPlayer().terminate()
+        pygame.joystick.quit()
+        pygame.quit()

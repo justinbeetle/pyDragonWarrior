@@ -14,6 +14,7 @@ from pygame_utils.audio_player import AudioPlayer
 from pygame_utils import game_events
 
 from pydw.combat_encounter import CombatEncounter
+from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_types import (
@@ -29,6 +30,7 @@ from pydw.game_types import (
 )
 from pydw.game_info import GameInfo
 from pydw.game_map import GameMap
+from pydw.game_mode import GameMode
 from pydw.game_state_interface import GameStateInterface
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
@@ -38,7 +40,7 @@ from pydw.monster_state import MonsterState
 from pydw.npc_state import NpcState
 
 
-class GameState(GameStateInterface):
+class GameState(GameStateInterface, DialogManagerMediator):
     game_map: GameMap
 
     def __init__(
@@ -48,15 +50,17 @@ class GameState(GameStateInterface):
         game_xml_path: str,
         win_size_tiles: Point,
         tile_size_pixels: int,
+        verbose: bool = False,
     ) -> None:
+        super().__init__(pygame.display.get_surface())
+
         self.saves_path = saves_path
         self.win_size_tiles = win_size_tiles
+        self.verbose = verbose
+
         self.image_pad_tiles = self.win_size_tiles // 2
         self.win_size_pixels = self.win_size_tiles * tile_size_pixels
         self.__should_add_math_problems_in_combat = True
-
-        super().__init__(pygame.display.get_surface())
-
         self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
@@ -66,9 +70,31 @@ class GameState(GameStateInterface):
         self.clock = pygame.time.Clock()
         self.tick_count = 0
 
-        # TODO: Migrate these to here
-        # self.message_dialog: Optional[GameDialog] = None
+        self.dialog_manager = DialogManager(self)
+        self.current_game_mode: Optional[GameMode] = None
         self.combat_encounter: Optional[CombatEncounter] = None
+
+    def run(self, pc_name_or_file_name: Optional[str] = None) -> int:
+        """Run the game loop."""
+
+        # Register the focus gain handler - needed so that we don't end up with an empty black screen after losing focus
+        game_events.set_focus_gain_handler(self.focus_gain_handlder)
+        game_events.set_window_resize_handler(self.window_resize_handlder)
+
+        # Transition from the loading screen to the main menu
+        from pydw.main_menu import MainMenu
+
+        self.current_game_mode = MainMenu(self, pc_name_or_file_name)
+        self.current_game_mode.game_mode_loop()
+
+        # Transition from the main menu to exploring
+        if self.is_running:
+            from pydw.exploring import Exploring
+
+            self.current_game_mode = Exploring(self, self.verbose)
+            self.current_game_mode.game_mode_loop()
+
+        return 0
 
     def set_map(
         self,
@@ -851,24 +877,56 @@ class GameState(GameStateInterface):
             self.set_map(self.game_info.death_map, respawn_decorations=True)
 
     def handle_quit(self, force: bool = False) -> None:
-        AudioPlayer().play_sound("select")
         if force:
             self.is_running = False
 
-        # Save off initial background image
-        background_surface = self.screen.copy()
-
+        AudioPlayer().play_sound("select")
         menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), "Do you really want to quit?")
-        menu_dialog.blit(self.screen, flip_buffer=True)
+        self.dialog_manager.add_cascading_dialog(menu_dialog)
         menu_result = GameDialogEvaluator(self).get_menu_result(menu_dialog, allow_quit=False)
         if menu_result is not None and menu_result == "YES":
             self.is_running = False
-
-        # Restore initial background image
-        menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
+            return
+        self.dialog_manager.remove_cascading_dialog()
 
     def should_add_math_problems_in_combat(self) -> bool:
         return self.__should_add_math_problems_in_combat
 
     def toggle_should_add_math_problems_in_combat(self) -> None:
         self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat
+
+    def get_dialog_manager(self) -> DialogManager:
+        """Get the dialog manager."""
+        return self.dialog_manager
+
+    def draw(self, flip_buffer: bool = True) -> None:
+        """Draw the current state of the game mode to the display."""
+        if self.current_game_mode:
+            self.current_game_mode.draw_background()
+        self.dialog_manager.draw_dialogs(flip_buffer)
+
+    def get_foreground_dialog_font_color(self) -> pygame.Color:
+        if self.hero_party and self.hero_party.has_low_health():
+            return GameDialog.LOW_HEALTH_FONT_COLOR
+        return GameDialog.NOMINAL_HEALTH_FONT_COLOR
+
+    def resize(self) -> None:
+        """Handle a resize of the display, including drawing to the display."""
+        # TODO: Need to resize and replace the dialogs!!!
+        self.draw()
+
+    def focus_gain_handlder(self) -> None:
+        """Handler for focus gain events to render the latest content to the display surface.
+        Since pygame 2.5.2, the display surface is cleared when focus is lost and gained
+        (see https://github.com/pygame/pygame/issues/4133).
+        """
+        if self.verbose:
+            print("Re-drawing to the display due to invocation of focus_gain_handlder", flush=True)
+        self.draw()
+
+    def window_resize_handlder(self) -> None:
+        """Handler for window resize events needed to implement a resizeable window."""
+        # TODO: What needs to be done to resize things on the fly?
+        if self.verbose:
+            print("Re-drawing to the display due to invocation of window_resize_handlder", flush=True)
+        self.draw()

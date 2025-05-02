@@ -8,6 +8,7 @@ import pygame
 
 from generic_utils.point import Point
 
+from pydw.dialog_manager import DialogManager
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
 from pydw.game_types import (
@@ -152,3 +153,11 @@ class GameStateInterface(ABC, GenericGameState):
     @abstractmethod
     def should_add_math_problems_in_combat(self) -> bool:
         pass
+
+    @abstractmethod
+    def get_dialog_manager(self) -> DialogManager:
+        """Get the dialog manager."""
+
+    @abstractmethod
+    def draw(self, flip_buffer: bool = True) -> None:
+        """Draw the current state of the game mode to the display."""

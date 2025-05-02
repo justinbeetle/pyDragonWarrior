@@ -13,6 +13,7 @@ from pygame_utils.audio_player import AudioPlayer
 from pygame_utils import game_events
 
 from pydw.game_dialog import GameDialog
+from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_info import GameInfo
 from pydw.game_mode import GameMode
 from pydw.game_state import GameState
@@ -24,13 +25,17 @@ class MainMenu(GameMode):
     files and selecting game settings."""
 
     def __init__(self, game_state: GameState, pc_name_or_file_name: Optional[str] = None) -> None:
-        super().__init__(game_state)
+        super().__init__(game_state.get_dialog_manager())
+        self.game_state = game_state
         self.pc_name_or_file_name = pc_name_or_file_name
+
+        self.saves_path = self.game_state.saves_path
+
         self.background_text = "Press any key"
 
     def get_saved_games(self) -> List[str]:
         """Get a list of the saved games."""
-        saved_game_files = glob.glob(os.path.join(self.game_state.saves_path, "*.xml"))
+        saved_game_files = glob.glob(os.path.join(self.saves_path, "*.xml"))
         return [os.path.basename(saved_game_file)[:-4] for saved_game_file in saved_game_files]
 
     def get_main_menu_options(self, saved_games: List[str]) -> List[str]:
@@ -49,14 +54,14 @@ class MainMenu(GameMode):
 
     def game_mode_loop(self) -> None:
         """The game loop for the main menu."""
-        self.draw()
+        self.game_state.draw()
 
         # Wait for user input - any key press
         while self.game_state.is_running:
             waiting_for_user_input = True
             for event in game_events.get_events():
                 if event.type == pygame.QUIT:
-                    self.handle_quit(force=True)
+                    self.game_state.handle_quit(force=True)
                     return
                 elif event.type == pygame.KEYDOWN:
                     AudioPlayer().play_sound("select")
@@ -71,14 +76,15 @@ class MainMenu(GameMode):
         self.background_text = ""
 
         # Prompt user for new game or to load a saved game
-        gde = self.gde
+        gde = GameDialogEvaluator(self.game_state)
+        dm = self.game_state.get_dialog_manager()
         pc_name_or_file_name = self.pc_name_or_file_name
         if pc_name_or_file_name is None:
             saved_games = self.get_saved_games()
             main_menu_options = self.get_main_menu_options(saved_games)
             main_menu_dialog = GameDialog.create_message_dialog()
             main_menu_dialog.add_menu_prompt(main_menu_options, 1)
-            self.add_cascading_dialog(main_menu_dialog)
+            dm.add_cascading_dialog(main_menu_dialog)
 
             while self.game_state.is_running:
                 # Update the main menu options if they have changed
@@ -99,17 +105,17 @@ class MainMenu(GameMode):
                     saved_games_dialog = GameDialog.create_message_dialog()
                     saved_games_dialog.add_message("Which quest dost thou want to continue?", fully_populate=True)
                     saved_games_dialog.add_menu_prompt(saved_games, 1)
-                    self.add_cascading_dialog(saved_games_dialog)
+                    dm.add_cascading_dialog(saved_games_dialog)
                     menu_result = gde.get_menu_result(saved_games_dialog)
                     if menu_result is not None:
                         pc_name_or_file_name = menu_result
                         break
-                    self.remove_cascading_dialog(False)
+                    dm.remove_cascading_dialog(False)
                 if menu_result == "Delete a Quest":
                     saved_games_dialog = GameDialog.create_message_dialog()
                     saved_games_dialog.add_message("Which quest dost thou want to delete?", fully_populate=True)
                     saved_games_dialog.add_menu_prompt(saved_games, 1)
-                    self.add_cascading_dialog(saved_games_dialog)
+                    dm.add_cascading_dialog(saved_games_dialog)
                     menu_result = gde.get_menu_result(saved_games_dialog)
                     if menu_result is not None:
                         saved_games_dialog.add_yes_no_prompt("Are you sure?")
@@ -117,9 +123,9 @@ class MainMenu(GameMode):
                         if gde.get_menu_result(saved_games_dialog) == "YES":
                             saved_games.remove(menu_result)
                             # Delete the save game by archiving it off
-                            saved_game_file = os.path.join(self.game_state.saves_path, menu_result + ".xml")
+                            saved_game_file = os.path.join(self.saves_path, menu_result + ".xml")
                             self.game_state.archive_saved_game_file(saved_game_file, "deleted")
-                    self.remove_cascading_dialog(False)
+                    dm.remove_cascading_dialog(False)
                 elif menu_result == "Begin a Quest":
                     begin_quest_dialog = GameDialog.create_message_dialog()
                     pc_name_or_file_name = gde.wait_for_user_input(begin_quest_dialog, "What is your name?")[0]
@@ -136,14 +142,14 @@ class MainMenu(GameMode):
                             if menu_result == "YES":
                                 # Delete the existing save game by archiving it off
                                 saved_game_file = os.path.join(
-                                    self.game_state.saves_path,
+                                    self.saves_path,
                                     pc_name_or_file_name + ".xml",
                                 )
                                 self.game_state.archive_saved_game_file(saved_game_file, "deleted")
                             elif menu_result != "NO":
                                 continue
                         break
-                    self.remove_cascading_dialog(False)
+                    dm.remove_cascading_dialog(False)
                 elif menu_result is not None and menu_result.startswith("Combat Mode:"):
                     self.game_state.toggle_should_add_math_problems_in_combat()
 

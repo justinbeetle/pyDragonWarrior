@@ -13,6 +13,7 @@ from pygame_utils import game_events
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_dialog import GameDialog, GameDialogSpacing
+from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_map import CharacterSprite
 from pydw.game_mode import GameMode
 from pydw.game_state import GameState
@@ -23,8 +24,12 @@ class Exploring(GameMode):
     """Game mode for exploring, which is the main game loop."""
 
     def __init__(self, game_state: GameState, verbose: bool) -> None:
-        super().__init__(game_state)
+        super().__init__(game_state.get_dialog_manager())
+        self.game_state = game_state
         self.verbose = verbose
+
+        self.gde = GameDialogEvaluator(game_state)
+
         self.first_block_occurred = False
 
     def game_mode_loop(self) -> None:
