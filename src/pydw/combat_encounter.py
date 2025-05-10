@@ -13,6 +13,7 @@ from pygame_utils import game_events
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
+from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog, GameDialogSpacing
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_info import GameInfo
@@ -51,7 +52,6 @@ class CombatEncounter(CombatEncounterInterface):
         game_state: GameStateInterface,
         monster_party: MonsterParty,
         encounter_background: EncounterBackground,
-        message_dialog: Optional[GameDialog] = None,
         approach_dialog: Optional[DialogType] = None,
         victory_dialog: Optional[DialogType] = None,
         run_away_dialog: Optional[DialogType] = None,
@@ -72,11 +72,12 @@ class CombatEncounter(CombatEncounterInterface):
             self.game_state.draw_map(flip_buffer=False, draw_status=False)
         self.background_image = game_state.screen.copy()
 
-        if message_dialog is not None:
-            self.message_dialog = message_dialog
+        dm = self.game_state.get_dialog_manager()
+        if dm.message_dialog is not None:
+            self.message_dialog = dm.message_dialog
             self.message_dialog.add_message("")
         else:
-            self.message_dialog = GameDialog.create_message_dialog()
+            self.message_dialog = dm.message_dialog = GameDialog.create_message_dialog()
         self.gde = GameDialogEvaluator(game_state, self)
         self.gde.update_status_dialog(message_dialog=self.message_dialog)
 
@@ -161,7 +162,7 @@ class CombatEncounter(CombatEncounterInterface):
             elif self.run_away_dialog is not None:
                 self.gde.traverse_dialog(self.message_dialog, self.run_away_dialog)
         else:
-            self.game_state.handle_death(self.message_dialog)
+            self.game_state.handle_death()
 
         # Clear combat status effects now that combat is over
         self.hero_party.clear_combat_status_affects()
@@ -755,11 +756,12 @@ def main() -> None:
     import os
 
     base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
-    game_xml_path = os.path.join(base_path, "game.xml")
+    game_xml_path = os.path.join(base_path, "data", "game.xml")
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
 
     # Find an encounter image to use
+    encounter_background: Optional[EncounterBackground] = None
     for game_map in game_info.maps.values():
         if game_map.encounter_background is not None:
             encounter_background = game_map.encounter_background
@@ -784,6 +786,9 @@ def main() -> None:
     mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
     mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
     mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
+    mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
+    dialog_manager = DialogManager(mock_dialog_manager_mediator)
+    mock_game_state.get_dialog_manager = MagicMock(return_value=dialog_manager)
 
     def handle_quit_side_effect(force: bool = False) -> None:
         _ = force  # appease pylint - force is needed to conform to the interface
@@ -839,9 +844,10 @@ def main() -> None:
     for hero_party, monster_party in combat_parties:
         if not mock_game_state.is_running:
             break
-
         mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
         combat_encounter = CombatEncounter(game_info, mock_game_state, monster_party, encounter_background)
+        mock_dialog_manager_mediator.draw_background = combat_encounter.render_monsters
+        mock_dialog_manager_mediator.get_foreground_dialog_font_color = GameDialog.get_default_font_color
         combat_encounter.encounter_loop()
         pygame.time.wait(200)
 

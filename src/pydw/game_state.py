@@ -708,7 +708,8 @@ class GameState(GameStateInterface, DialogManagerMediator):
             self.combat_encounter.background_image = self.screen.copy()
             self.combat_encounter.render_monsters()
         elif draw_status:
-            GameDialog.create_persistent_status_dialog(self.hero_party).blit(self.screen, False)
+            self.dialog_manager.status_dialog = GameDialog.create_persistent_status_dialog(self.hero_party)
+            self.dialog_manager.status_dialog.blit(self.screen, False)
 
         # Flip the screen buffer
         if flip_buffer:
@@ -786,7 +787,6 @@ class GameState(GameStateInterface, DialogManagerMediator):
         victory_dialog: Optional[DialogType] = None,
         run_away_dialog: Optional[DialogType] = None,
         encounter_music: Optional[str] = None,
-        message_dialog: Optional[GameDialog] = None,
     ) -> None:
         # TODO: Make the conditions for no monsters configurable
         if self.hero_party.has_item("Ball of Light"):
@@ -836,7 +836,6 @@ class GameState(GameStateInterface, DialogManagerMediator):
             game_state=self,
             monster_party=monster_party,
             encounter_background=encounter_background,
-            message_dialog=message_dialog,
             approach_dialog=approach_dialog,
             victory_dialog=victory_dialog,
             run_away_dialog=run_away_dialog,
@@ -851,20 +850,20 @@ class GameState(GameStateInterface, DialogManagerMediator):
         # Clear event queue
         game_events.clear_events()
 
-    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
+    def handle_death(self) -> None:
         if not self.hero_party.has_surviving_members():
             # Player death
             self.hero_party.main_character.hp = 0
             GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.screen, False)
             gde = GameDialogEvaluator(self)
-            if message_dialog is None:
-                message_dialog = GameDialog.create_message_dialog()
+            if self.dialog_manager.message_dialog is None:
+                self.dialog_manager.message_dialog = GameDialog.create_message_dialog()
             else:
-                message_dialog.add_message("")
-            gde.add_and_wait_for_message("Thou art dead.", message_dialog)
+                self.dialog_manager.message_dialog.add_message("")
+            gde.add_and_wait_for_message("Thou art dead.", self.dialog_manager.message_dialog)
             AudioPlayer().stop_music()
             AudioPlayer().play_sound("player_died", is_blocking=True)
-            gde.wait_for_acknowledgement(message_dialog)
+            gde.wait_for_acknowledgement(self.dialog_manager.message_dialog)
             for hero in self.hero_party.members:
                 hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_info.death_hero_pos_dat_tile
                 hero.curr_pos_offset_img_px = Point(0, 0)
@@ -901,9 +900,15 @@ class GameState(GameStateInterface, DialogManagerMediator):
 
     def draw(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode to the display."""
-        if self.current_game_mode:
+        self.dialog_manager.draw(flip_buffer)
+
+    def draw_background(self, flip_buffer: bool = True) -> None:
+        """Draw the current state of the game mode's background to the display.
+        The background is whatever is behind the dialogs."""
+        if self.combat_encounter is not None:
+            self.combat_encounter.render_monsters(render_dialogs=False)
+        elif self.current_game_mode:
             self.current_game_mode.draw_background()
-        self.dialog_manager.draw_dialogs(flip_buffer)
 
     def get_foreground_dialog_font_color(self) -> pygame.Color:
         if self.hero_party and self.hero_party.has_low_health():

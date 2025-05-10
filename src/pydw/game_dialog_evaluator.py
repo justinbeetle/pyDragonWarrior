@@ -91,12 +91,17 @@ class GameDialogEvaluator:
         game_events.clear_events()
 
         # Create the status and message dialogs
-        GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, False)
-        message_dialog = GameDialog.create_message_dialog()
+        dm = self.game_state.get_dialog_manager()
+        dm.status_dialog = GameDialog.create_exploring_status_dialog(self.hero_party)
+        dm.status_dialog.blit(self.game_state.screen, False)
+        dm.message_dialog = GameDialog.create_message_dialog()
 
-        self.traverse_dialog(message_dialog, dialog, npc=npc)
+        self.traverse_dialog(dm.message_dialog, dialog, npc=npc)
 
         if self.game_state.is_running:
+            dm.status_dialog = None
+            dm.message_dialog = None
+
             # Restore initial background image
             self.game_state.screen.blit(background_image, (0, 0))
 
@@ -275,16 +280,17 @@ class GameDialogEvaluator:
         old_default = GameDialog.get_default_font_color()
         self.update_default_dialog_font_color()
         new_default = GameDialog.get_default_font_color()
-        if old_default != new_default:
-            self.game_state.draw_map(flip_buffer=False)
-            if message_dialog is not None:
-                message_dialog.set_font_color(new_default)
-                message_dialog.blit(self.game_state.screen, flip_buffer=False)
 
+        dm = self.game_state.get_dialog_manager()
         if self.game_state.is_in_combat():
-            GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen, flip_buffer)
+            dm.status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
         else:
-            GameDialog.create_exploring_status_dialog(self.hero_party).blit(self.game_state.screen, flip_buffer)
+            dm.status_dialog = GameDialog.create_exploring_status_dialog(self.hero_party)
+
+        if old_default != new_default:
+            self.game_state.draw(flip_buffer)
+        else:
+            dm.status_dialog.blit(self.game_state.screen, flip_buffer)
 
     def traverse_dialog(
         self,
@@ -802,7 +808,6 @@ class GameDialogEvaluator:
                             victory_dialog=item.victory_dialog,
                             run_away_dialog=item.run_away_dialog,
                             encounter_music=item.encounter_music,
-                            message_dialog=message_dialog,
                         )
 
                 elif item.type == DialogActionEnum.OPEN_LOCKED_ITEM:

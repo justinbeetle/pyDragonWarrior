@@ -138,12 +138,11 @@ class GameStateInterface(ABC, GenericGameState):
         victory_dialog: Optional[DialogType] = None,
         run_away_dialog: Optional[DialogType] = None,
         encounter_music: Optional[str] = None,
-        message_dialog: Optional[GameDialog] = None,
     ) -> None:
         pass
 
     @abstractmethod
-    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
+    def handle_death(self) -> None:
         pass
 
     @abstractmethod

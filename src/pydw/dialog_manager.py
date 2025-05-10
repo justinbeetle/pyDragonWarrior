@@ -15,8 +15,9 @@ class DialogManagerMediator(ABC):
     """DialogManager's outgoing interface."""
 
     @abstractmethod
-    def draw(self, flip_buffer: bool = True) -> None:
-        """Draw the full display (background and dialogs.  Should invoke DialogManager's draw_dialogs method."""
+    def draw_background(self, flip_buffer: bool = False) -> None:
+        """Draw the current state of the game mode's background to the display.
+        The background is whatever is behind the dialogs."""
 
     @abstractmethod
     def get_foreground_dialog_font_color(self) -> pygame.Color:
@@ -40,46 +41,67 @@ class DialogManager:
         # Potentially cascading dialogs that may eclipse other dialogs
         self.cascading_dialogs: List[GameDialog] = []
 
-    def add_status_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
-        """Add a status dialog."""
+    def add_status_dialog(self, dialog: GameDialog, flip_buffer: bool = True, draw_display: bool = False) -> None:
+        """Add a status dialog and optionally redraw the display."""
         self.status_dialog = dialog
 
         # Need to draw the whole screen as the status dialog type may change and be smaller than the previous one
-        self.mediator.draw(flip_buffer)
+        if draw_display:
+            self.draw(flip_buffer)
 
-    def remove_status_dialog(self, flip_buffer: bool = True) -> None:
-        """Remove the status dialog."""
+    def remove_status_dialog(self, flip_buffer: bool = True, draw_display: bool = False) -> None:
+        """Remove the status dialog and redraw the display."""
         if self.status_dialog:
             self.status_dialog = None
-            self.mediator.draw(flip_buffer)
 
-    def add_message_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
-        """Add a message dialog."""
+            if draw_display:
+                self.draw(flip_buffer)
+
+    def add_message_dialog(self, dialog: GameDialog, flip_buffer: bool = True, draw_display: bool = False) -> None:
+        """Add a message dialog and redraw the display."""
         self.message_dialog = dialog
-        self.draw_dialogs(flip_buffer)
 
-    def remove_message_dialog(self, flip_buffer: bool = True) -> None:
-        """Remove the message dialog."""
+        if draw_display:
+            self.draw_dialogs(flip_buffer)
+
+    def remove_message_dialog(self, flip_buffer: bool = True, draw_display: bool = False) -> None:
+        """Remove the message dialog and redraw the display."""
         if self.message_dialog:
             self.message_dialog = None
-            self.mediator.draw(flip_buffer)
+
+            if draw_display:
+                self.draw(flip_buffer)
 
     def add_cascading_dialog(self, dialog: GameDialog, flip_buffer: bool = True) -> None:
-        """Add a cascading dialog."""
+        """Add a cascading dialog and redraw the display."""
         self.cascading_dialogs.append(dialog)
         self.draw_dialogs(flip_buffer)
 
     def remove_cascading_dialog(self, flip_buffer: bool = True) -> None:
-        """Remove a cascading dialog."""
+        """Remove a cascading dialog and redraw the display."""
         if 0 < len(self.cascading_dialogs):
             self.cascading_dialogs.pop()
-            self.mediator.draw(flip_buffer)
+            self.draw(flip_buffer)
 
     def clear_cascading_dialogs(self, flip_buffer: bool = True) -> None:
-        """Remove all cascading dialogs."""
+        """Remove all cascading dialogs and redraw the display."""
         if 0 < len(self.cascading_dialogs):
             self.cascading_dialogs.clear()
-            self.mediator.draw(flip_buffer)
+            self.draw(flip_buffer)
+
+    """
+    def draw_status_dialog(self, flip_buffer: bool = False) -> None:
+        DialogManager.draw_dialog(self.status_dialog, flip_buffer)
+
+    def draw_message_dialog(self, flip_buffer: bool = False) -> None:
+        DialogManager.draw_dialog(self.message_dialog, flip_buffer)
+
+    @staticmethod
+    def draw_dialog(dialog: Optional[GameDialog], flip_buffer: bool = False) -> None:
+        if dialog is not None:
+            screen = pygame.display.get_surface()
+            dialog.blit(screen, flip_buffer)
+    """
 
     def draw_dialogs(self, flip_buffer: bool = True) -> None:
         """Draw the current set of dialogs to the display."""
@@ -108,3 +130,8 @@ class DialogManager:
             self.cascading_dialogs[-1].blit(screen)
         if flip_buffer:
             pygame.display.flip()
+
+    def draw(self, flip_buffer: bool = True) -> None:
+        """Draw the current state of the game (background and dialogs) to the display."""
+        self.mediator.draw_background(False)
+        self.draw_dialogs(flip_buffer)

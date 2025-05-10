@@ -34,6 +34,7 @@ class Exploring(GameMode):
 
     def game_mode_loop(self) -> None:
         map_name = ""
+        dm = self.game_state.get_dialog_manager()
 
         while self.game_state.is_running:
             # Generate the map state a mode or map change
@@ -115,27 +116,32 @@ class Exploring(GameMode):
 
                 if menu:
                     AudioPlayer().play_sound("select")
-                    GameDialog.create_exploring_status_dialog(self.game_state.hero_party).blit(
-                        self.game_state.screen, False
-                    )
+                    dm.status_dialog = GameDialog.create_exploring_status_dialog(self.game_state.hero_party)
+                    dm.add_cascading_dialog(GameDialog.create_exploring_menu())
                     menu_dialog = GameDialog.create_exploring_menu()
+                    dm.add_cascading_dialog(menu_dialog)
                     menu_dialog.blit(self.game_state.screen, True)
                     menu_result = self.gde.get_menu_result(menu_dialog)
                     # print('menu_result =', menu_result, flush=True)
                     if menu_result == "TALK":
+                        dm.cascading_dialogs = []
                         talking = True
                     elif menu_result == "SEARCH":
+                        dm.cascading_dialogs = []
                         searching = True
                     elif menu_result == "OPEN":
+                        dm.cascading_dialogs = []
                         opening = True
                     elif menu_result == "STAIRS":
+                        dm.cascading_dialogs = []
                         if not self.game_state.make_map_transition(self.game_state.get_point_transition()):
                             self.gde.dialog_loop("There are no stairs here.")
                     elif menu_result == "STATUS":
-                        GameDialog.create_full_status_dialog(self.game_state.hero_party).blit(
-                            self.game_state.screen, True
-                        )
+                        full_status_dialog = GameDialog.create_full_status_dialog(self.game_state.hero_party)
+
+                        dm.add_cascading_dialog(full_status_dialog)
                         self.gde.wait_for_acknowledgement()
+                        dm.clear_cascading_dialogs()
                     elif menu_result == "SPELL":
                         # TODO: Need to choose the actor (spellcaster)
                         actor = self.game_state.hero_party.main_character
