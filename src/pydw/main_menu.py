@@ -155,6 +155,7 @@ class MainMenu(GameMode):
 
         # Load the saved game
         if self.game_state.is_running:
+            dm.clear_cascading_dialogs()
             self.game_state.load(pc_name_or_file_name)
 
     def draw_background(self, flip_buffer: bool = False) -> None:
