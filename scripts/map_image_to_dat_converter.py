@@ -52,9 +52,7 @@ def main():
             map_dat_file.write(border_symbol)
             for map_x in range(map_image.get_width() // tile_size_pixels):
                 map_x_px = map_x * tile_size_pixels
-                current_tile = map_image.subsurface(
-                    pygame.Rect(map_x_px, map_y_px, tile_size_pixels, tile_size_pixels)
-                )
+                current_tile = map_image.subsurface(pygame.Rect(map_x_px, map_y_px, tile_size_pixels, tile_size_pixels))
                 screen.blit(current_tile, (0, 0))
 
                 # Determine if the tile has previously been seen
@@ -63,9 +61,7 @@ def main():
                     is_tile_match = True
                     for tile_x in range(tile_size_pixels):
                         for tile_y in range(tile_size_pixels):
-                            if tile.get_at((tile_x, tile_y)) != current_tile.get_at(
-                                (tile_x, tile_y)
-                            ):
+                            if tile.get_at((tile_x, tile_y)) != current_tile.get_at((tile_x, tile_y)):
                                 is_tile_match = False
                                 break
                         if not is_tile_match:
@@ -82,11 +78,7 @@ def main():
                     clock.tick(5)
                     # Prompt user for tile symbol
                     print(
-                        "Enter symbol for this tile "
-                        + str(map_x)
-                        + ","
-                        + str(map_y)
-                        + ":",
+                        "Enter symbol for this tile " + str(map_x) + "," + str(map_y) + ":",
                         flush=True,
                     )
                     symbol = "\n"
@@ -111,9 +103,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

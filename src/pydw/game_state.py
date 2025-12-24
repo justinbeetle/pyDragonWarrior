@@ -55,11 +55,12 @@ class GameState(GameStateInterface):
         self.win_size_pixels = self.win_size_tiles * tile_size_pixels
         self.__should_add_math_problems_in_combat = True
 
-        super().__init__(pygame.display.get_surface())
+        screen = pygame.display.get_surface()
+        if screen is None:
+            raise ValueError("No screen")
+        super().__init__(screen)
 
-        self.game_info = GameInfo(
-            base_path, game_xml_path, tile_size_pixels, self.win_size_pixels
-        )
+        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
         self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None
@@ -94,8 +95,7 @@ class GameState(GameStateInterface):
             not old_map_name
             or new_map_light_diameter is None
             or (
-                new_map_light_diameter
-                != self.game_info.maps[old_map_name].light_diameter
+                new_map_light_diameter != self.game_info.maps[old_map_name].light_diameter
                 and (
                     self.game_info.maps[old_map_name].light_diameter is None
                     or (
@@ -117,19 +117,14 @@ class GameState(GameStateInterface):
             map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
         for decoration in map_decorations[:]:
-            if not self.check_progress_markers(
-                decoration.progress_marker, decoration.inverse_progress_marker
-            ):
+            if not self.check_progress_markers(decoration.progress_marker, decoration.inverse_progress_marker):
                 map_decorations.remove(decoration)
         # Prune out previously removed decorations
         if new_map_name in self.removed_decorations_by_map:
             for decoration in self.removed_decorations_by_map[new_map_name]:
                 if decoration in map_decorations:
                     map_decorations.remove(decoration)
-                    if (
-                        decoration.type is not None
-                        and decoration.type.removed_image is not None
-                    ):
+                    if decoration.type is not None and decoration.type.removed_image is not None:
                         removed_map_decorations.append(decoration)
 
         if old_map_name == new_map_name:
@@ -146,9 +141,7 @@ class GameState(GameStateInterface):
 
             # Add missing NPCs
             for npc in self.game_info.maps[new_map_name].npcs:
-                if not self.check_progress_markers(
-                    npc.progress_marker, npc.inverse_progress_marker
-                ):
+                if not self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     continue
                 is_missing = True
                 for npc_char in npcs:
@@ -161,14 +154,10 @@ class GameState(GameStateInterface):
             # On a map change load NPCs from scratch
             npcs = []
             for npc in self.game_info.maps[new_map_name].npcs:
-                if self.check_progress_markers(
-                    npc.progress_marker, npc.inverse_progress_marker
-                ):
+                if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     npcs.append(NpcState(npc))
 
-        self.game_map = GameMap(
-            self, new_map_name, map_decorations, removed_map_decorations, npcs
-        )
+        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game
@@ -177,9 +166,7 @@ class GameState(GameStateInterface):
             if os.path.isfile(pc_name_or_file_name):
                 save_game_file_path = pc_name_or_file_name
             else:
-                save_game_file_path = os.path.join(
-                    self.saves_path, pc_name_or_file_name + ".xml"
-                )
+                save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + ".xml")
 
         if save_game_file_path is None or not os.path.isfile(save_game_file_path):
             self.game_info.parse_initial_game_state(pc_name_or_file_name)
@@ -220,15 +207,11 @@ class GameState(GameStateInterface):
             def parse_party_member(member_element: ET.Element) -> None:
                 member_type = self.game_info.character_types["hero"]
                 if "type" in member_element.attrib:
-                    member_type = self.game_info.character_types[
-                        member_element.attrib["type"]
-                    ]
+                    member_type = self.game_info.character_types[member_element.attrib["type"]]
 
                 member_is_combat_character = True
                 if "is_combat_character" in member_element.attrib:
-                    member_is_combat_character = (
-                        member_element.attrib["is_combat_character"] == "yes"
-                    )
+                    member_is_combat_character = member_element.attrib["is_combat_character"] == "yes"
 
                 member = HeroState(
                     member_type,
@@ -252,9 +235,7 @@ class GameState(GameStateInterface):
                     elif item_name in self.game_info.shields:
                         member.shield = self.game_info.shields[item_name]
                     elif item_name in self.game_info.tools:
-                        member.other_equipped_items.append(
-                            self.game_info.tools[item_name]
-                        )
+                        member.other_equipped_items.append(self.game_info.tools[item_name])
                     else:
                         print("ERROR: Unsupported item", item_name, flush=True)
 
@@ -264,9 +245,7 @@ class GameState(GameStateInterface):
                     if "count" in item_element.attrib:
                         item_count = int(item_element.attrib["count"])
                     if item_name in self.game_info.items:
-                        member.unequipped_items[self.game_info.items[item_name]] = (
-                            item_count
-                        )
+                        member.unequipped_items[self.game_info.items[item_name]] = item_count
                     else:
                         print("ERROR: Unsupported item", item_name, flush=True)
 
@@ -290,35 +269,25 @@ class GameState(GameStateInterface):
 
             # Load state related to repel monsters
             if "repel_monsters" in xml_root.attrib:
-                self.hero_party.repel_monsters = (
-                    xml_root.attrib["repel_monsters"] == "yes"
-                )
+                self.hero_party.repel_monsters = xml_root.attrib["repel_monsters"] == "yes"
             if "repel_monsters_decay_steps_remaining" in xml_root.attrib:
                 self.hero_party.repel_monsters_decay_steps_remaining = int(
                     xml_root.attrib["repel_monsters_decay_steps_remaining"]
                 )
             if "repel_monster_fade_dialog" in xml_root.attrib:
-                self.hero_party.repel_monster_fade_dialog = [
-                    xml_root.attrib["repel_monster_fade_dialog"]
-                ]
+                self.hero_party.repel_monster_fade_dialog = [xml_root.attrib["repel_monster_fade_dialog"]]
 
             # Load state related to last outside position
             if "last_outside_map" in xml_root.attrib:
-                self.hero_party.last_outside_map_name = xml_root.attrib[
-                    "last_outside_map"
-                ]
+                self.hero_party.last_outside_map_name = xml_root.attrib["last_outside_map"]
                 self.hero_party.last_outside_pos_dat_tile = Point(
                     int(xml_root.attrib["last_outside_x"]),
                     int(xml_root.attrib["last_outside_y"]),
                 )
-                self.hero_party.last_outside_dir = Direction[
-                    xml_root.attrib["last_outside_dir"]
-                ]
+                self.hero_party.last_outside_dir = Direction[xml_root.attrib["last_outside_dir"]]
 
             # Load state related to removed decorations
-            for removed_decoration_element in xml_root.findall(
-                "./RemovedDecorations/RemovedDecoration"
-            ):
+            for removed_decoration_element in xml_root.findall("./RemovedDecorations/RemovedDecoration"):
                 removed_decoration_map_name = removed_decoration_element.attrib["map"]
                 removed_decoration_x = int(removed_decoration_element.attrib["x"])
                 removed_decoration_y = int(removed_decoration_element.attrib["y"])
@@ -329,36 +298,21 @@ class GameState(GameStateInterface):
                 )
 
                 # Find the removed map decoration and insert it into self.removed_decorations_by_map
-                for decoration in self.game_info.maps[
-                    removed_decoration_map_name
-                ].map_decorations:
-                    decoration_type_name = (
-                        None if decoration.type is None else decoration.type.name
-                    )
+                for decoration in self.game_info.maps[removed_decoration_map_name].map_decorations:
+                    decoration_type_name = None if decoration.type is None else decoration.type.name
                     if (
                         decoration_type_name == removed_decoration_type_name
                         and decoration.point.x == removed_decoration_x
                         and decoration.point.y == removed_decoration_y
                     ):
-                        if (
-                            removed_decoration_map_name
-                            not in self.removed_decorations_by_map
-                        ):
-                            self.removed_decorations_by_map[
-                                removed_decoration_map_name
-                            ] = []
-                        self.removed_decorations_by_map[
-                            removed_decoration_map_name
-                        ].append(decoration)
+                        if removed_decoration_map_name not in self.removed_decorations_by_map:
+                            self.removed_decorations_by_map[removed_decoration_map_name] = []
+                        self.removed_decorations_by_map[removed_decoration_map_name].append(decoration)
                         break
 
             # Parse the progress markers
-            for progress_marker_element in xml_root.findall(
-                "./ProgressMarkers/ProgressMarker"
-            ):
-                self.hero_party.progress_markers.append(
-                    progress_marker_element.attrib["name"]
-                )
+            for progress_marker_element in xml_root.findall("./ProgressMarkers/ProgressMarker"):
+                self.hero_party.progress_markers.append(progress_marker_element.attrib["name"])
                 # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
 
             self.set_map(map, init=True)
@@ -367,9 +321,7 @@ class GameState(GameStateInterface):
             if "light_diameter" in xml_root.attrib:
                 self.hero_party.light_diameter = int(xml_root.attrib["light_diameter"])
             if "light_diameter_decay_steps" in xml_root.attrib:
-                self.hero_party.light_diameter_decay_steps = int(
-                    xml_root.attrib["light_diameter_decay_steps"]
-                )
+                self.hero_party.light_diameter_decay_steps = int(xml_root.attrib["light_diameter_decay_steps"])
             if "light_diameter_decay_steps_remaining" in xml_root.attrib:
                 self.hero_party.light_diameter_decay_steps_remaining = int(
                     xml_root.attrib["light_diameter_decay_steps_remaining"]
@@ -402,18 +354,14 @@ class GameState(GameStateInterface):
         if self.hero_party.light_diameter is not None:
             xml_root.attrib["light_diameter"] = str(self.hero_party.light_diameter)
         if self.hero_party.light_diameter_decay_steps is not None:
-            xml_root.attrib["light_diameter_decay_steps"] = str(
-                self.hero_party.light_diameter_decay_steps
-            )
+            xml_root.attrib["light_diameter_decay_steps"] = str(self.hero_party.light_diameter_decay_steps)
         if self.hero_party.light_diameter_decay_steps_remaining is not None:
             xml_root.attrib["light_diameter_decay_steps_remaining"] = str(
                 self.hero_party.light_diameter_decay_steps_remaining
             )
 
         # Save state related to repel monsters
-        xml_root.attrib["repel_monsters"] = (
-            "yes" if self.hero_party.repel_monsters else "no"
-        )
+        xml_root.attrib["repel_monsters"] = "yes" if self.hero_party.repel_monsters else "no"
         if self.hero_party.repel_monsters_decay_steps_remaining is not None:
             xml_root.attrib["repel_monsters_decay_steps_remaining"] = str(
                 self.hero_party.repel_monsters_decay_steps_remaining
@@ -421,28 +369,20 @@ class GameState(GameStateInterface):
         if self.hero_party.repel_monster_fade_dialog is not None and isinstance(
             self.hero_party.repel_monster_fade_dialog, str
         ):
-            xml_root.attrib["repel_monster_fade_dialog"] = str(
-                self.hero_party.repel_monster_fade_dialog
-            )
+            xml_root.attrib["repel_monster_fade_dialog"] = str(self.hero_party.repel_monster_fade_dialog)
 
         # Save state related to last outside position
         if "" != self.hero_party.last_outside_map_name:
             xml_root.attrib["last_outside_map"] = self.hero_party.last_outside_map_name
-            xml_root.attrib["last_outside_x"] = str(
-                self.hero_party.last_outside_pos_dat_tile.x
-            )
-            xml_root.attrib["last_outside_y"] = str(
-                self.hero_party.last_outside_pos_dat_tile.y
-            )
+            xml_root.attrib["last_outside_x"] = str(self.hero_party.last_outside_pos_dat_tile.x)
+            xml_root.attrib["last_outside_y"] = str(self.hero_party.last_outside_pos_dat_tile.y)
             xml_root.attrib["last_outside_dir"] = self.hero_party.last_outside_dir.name
 
         # Save state related to removed decorations
         removed_decorations_element = ET.SubElement(xml_root, "RemovedDecorations")
         for map_name, removed_decorations in self.removed_decorations_by_map.items():
             for decoration in removed_decorations:
-                removed_decoration_element = ET.SubElement(
-                    removed_decorations_element, "RemovedDecoration"
-                )
+                removed_decoration_element = ET.SubElement(removed_decorations_element, "RemovedDecoration")
                 removed_decoration_element.attrib["map"] = map_name
                 removed_decoration_element.attrib["x"] = str(decoration.point.x)
                 removed_decoration_element.attrib["y"] = str(decoration.point.y)
@@ -460,9 +400,7 @@ class GameState(GameStateInterface):
             member_element.attrib["xp"] = str(member.xp)
             member_element.attrib["hp"] = str(member.hp)
             member_element.attrib["mp"] = str(member.mp)
-            member_element.attrib["is_combat_character"] = (
-                "yes" if member.is_combat_character else "no"
-            )
+            member_element.attrib["is_combat_character"] = "yes" if member.is_combat_character else "no"
 
             items_element = ET.SubElement(member_element, "EquippedItems")
             if member.weapon is not None:
@@ -487,34 +425,24 @@ class GameState(GameStateInterface):
 
         progress_markers_element = ET.SubElement(xml_root, "ProgressMarkers")
         for progress_marker in self.hero_party.progress_markers:
-            progress_marker_element = ET.SubElement(
-                progress_markers_element, "ProgressMarker"
-            )
+            progress_marker_element = ET.SubElement(progress_markers_element, "ProgressMarker")
             progress_marker_element.attrib["name"] = progress_marker
 
         # TODO: This should all be captured in game.xml
         if not quick_save:
             dialog_element = ET.SubElement(xml_root, "Dialog")
-            dialog_element.text = (
-                '"I am glad thou hast returned.  All our hopes are riding on thee."'
-            )
+            dialog_element.text = '"I am glad thou hast returned.  All our hopes are riding on thee."'
             dialog_element = ET.SubElement(xml_root, "Dialog")
             dialog_element.text = (
                 '"Before reaching thy next level of experience thou must gain [NEXT_LEVEL_XP] '
                 'experience points.  See me again when thy level has increased."'
             )
             dialog_element = ET.SubElement(xml_root, "Dialog")
-            dialog_element.text = (
-                '"Goodbye now, [NAME].  Take care and tempt not the Fates."'
-            )
+            dialog_element.text = '"Goodbye now, [NAME].  Take care and tempt not the Fates."'
 
-        xml_string = xml.dom.minidom.parseString(ET.tostring(xml_root)).toprettyxml(
-            indent="   "
-        )
+        xml_string = xml.dom.minidom.parseString(ET.tostring(xml_root)).toprettyxml(indent="   ")
 
-        save_game_file_path = os.path.join(
-            self.saves_path, self.hero_party.main_character.name + ".xml"
-        )
+        save_game_file_path = os.path.join(self.saves_path, self.hero_party.main_character.name + ".xml")
 
         # Archive off the old save, if one is present
         self.archive_saved_game_file(save_game_file_path)
@@ -534,17 +462,13 @@ class GameState(GameStateInterface):
                 flush=True,
             )
 
-    def archive_saved_game_file(
-        self, save_game_file_path: str, archive_dir_name: str = "archive"
-    ) -> None:
+    def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str = "archive") -> None:
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
             archive_dir = os.path.join(self.saves_path, archive_dir_name)
             from datetime import datetime
 
-            timestamp = datetime.fromtimestamp(
-                os.path.getmtime(save_game_file_path)
-            ).strftime("%Y%m%d%H%M%S")
+            timestamp = datetime.fromtimestamp(os.path.getmtime(save_game_file_path)).strftime("%Y%m%d%H%M%S")
             rename_file_path = os.path.join(
                 archive_dir,
                 self.hero_party.main_character.name + "_" + timestamp + ".xml",
@@ -575,18 +499,13 @@ class GameState(GameStateInterface):
     ) -> Optional[OutgoingTransition]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for point_transition in self.game_info.maps[
-            self.get_map_name()
-        ].point_transitions:
+        for point_transition in self.game_info.maps[self.get_map_name()].point_transitions:
             if point_transition.point == tile and self.check_progress_markers(
                 point_transition.progress_marker,
                 point_transition.inverse_progress_marker,
             ):
                 if filter_to_automatic_transitions:
-                    if (
-                        point_transition.is_automatic is None
-                        and not self.is_light_restricted()
-                    ):
+                    if point_transition.is_automatic is None and not self.is_light_restricted():
                         # By default, make transitions manual in dark places
                         return point_transition
                     elif point_transition.is_automatic:
@@ -595,9 +514,7 @@ class GameState(GameStateInterface):
                     return point_transition
         return None
 
-    def get_encounter_background(
-        self, tile: Optional[Point] = None
-    ) -> Optional[EncounterBackground]:
+    def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
         return self.game_map.get_encounter_background(tile)
 
     def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
@@ -609,14 +526,10 @@ class GameState(GameStateInterface):
     def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
         return self.game_map.get_npc_by_name(name)
 
-    def get_special_monster(
-        self, tile: Optional[Point] = None
-    ) -> Optional[SpecialMonster]:
+    def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
-        for special_monster in self.game_info.maps[
-            self.get_map_name()
-        ].special_monsters:
+        for special_monster in self.game_info.maps[self.get_map_name()].special_monsters:
             if special_monster.point == tile and self.check_progress_markers(
                 special_monster.progress_marker, special_monster.inverse_progress_marker
             ):
@@ -625,9 +538,7 @@ class GameState(GameStateInterface):
         return None
 
     # Return True if progress_markers satisfied, else False
-    def check_progress_markers(
-        self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]
-    ) -> bool:
+    def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
         if progress_marker is None:
             progress_marker_eval = True
         else:
@@ -636,9 +547,7 @@ class GameState(GameStateInterface):
         if inverse_progress_marker is None:
             inverse_progress_marker_eval = False
         else:
-            inverse_progress_marker_eval = self.evaluate_progress_marker_string(
-                inverse_progress_marker
-            )
+            inverse_progress_marker_eval = self.evaluate_progress_marker_string(inverse_progress_marker)
 
         return progress_marker_eval and not inverse_progress_marker_eval
 
@@ -646,16 +555,12 @@ class GameState(GameStateInterface):
         progress_marker_term_string = progress_marker_string
         logical_tokens = ["(", ")", " and ", " or ", " not ", "&", "|", "!"]
         for strip_term in logical_tokens:
-            progress_marker_term_string = progress_marker_term_string.replace(
-                strip_term, " "
-            )
+            progress_marker_term_string = progress_marker_term_string.replace(strip_term, " ")
         stripped_logical_tokens = [x.strip() for x in logical_tokens]
         for term in filter(None, progress_marker_term_string.split(" ")):
             if term in stripped_logical_tokens:
                 continue
-            progress_marker_string = progress_marker_string.replace(
-                term, str(term in self.hero_party.progress_markers)
-            )
+            progress_marker_string = progress_marker_string.replace(term, str(term in self.hero_party.progress_markers))
         if eval(progress_marker_string):
             return True
         return False
@@ -710,16 +615,12 @@ class GameState(GameStateInterface):
                 return False
         else:
             try:
-                dest_transition = dest_map.transitions_by_map_and_name[
-                    self.get_map_name()
-                ][transition.dest_name]
+                dest_transition = dest_map.transitions_by_map_and_name[self.get_map_name()][transition.dest_name]
             except KeyError:
                 try:
                     dest_transition = dest_map.transitions_by_name[transition.dest_name]
                 except KeyError:
-                    print(
-                        "Failed to find destination transition by dest_name", flush=True
-                    )
+                    print("Failed to find destination transition by dest_name", flush=True)
                     return False
 
         # If transitioning from outside to inside, save off last outside position
@@ -733,9 +634,7 @@ class GameState(GameStateInterface):
         # Make the transition and draw the map
         AudioPlayer().play_sound("walk_away")
         self.hero_party.set_pos(dest_transition.point, dest_transition.dir)
-        self.set_map(
-            transition.dest_map, respawn_decorations=transition.respawn_decorations
-        )
+        self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
         self.draw_map(True)
 
         # Slight pause on a map transition
@@ -754,9 +653,7 @@ class GameState(GameStateInterface):
         if removed_decoration:
             if self.get_map_name() not in self.removed_decorations_by_map:
                 self.removed_decorations_by_map[self.get_map_name()] = []
-            self.removed_decorations_by_map[self.get_map_name()].append(
-                removed_decoration
-            )
+            self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
         return removed_decoration
 
     def remove_decoration(self, decoration: MapDecoration) -> None:
@@ -764,9 +661,7 @@ class GameState(GameStateInterface):
         if removed_decoration:
             if self.get_map_name() not in self.removed_decorations_by_map:
                 self.removed_decorations_by_map[self.get_map_name()] = []
-            self.removed_decorations_by_map[self.get_map_name()].append(
-                removed_decoration
-            )
+            self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
 
     def draw_map(
         self,
@@ -789,9 +684,7 @@ class GameState(GameStateInterface):
             self.combat_encounter.background_image = self.screen.copy()
             self.combat_encounter.render_monsters()
         elif draw_status:
-            GameDialog.create_persistent_status_dialog(self.hero_party).blit(
-                self.screen, False
-            )
+            GameDialog.create_persistent_status_dialog(self.hero_party).blit(self.screen, False)
 
         # Flip the screen buffer
         if flip_buffer:
@@ -834,9 +727,7 @@ class GameState(GameStateInterface):
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
         variables = DialogReplacementVariables()
         variables.generic["[NAME]"] = self.hero_party.main_character.get_name()
-        variables.generic["[NEXT_LEVEL_XP]"] = str(
-            self.hero_party.main_character.calc_xp_to_next_level()
-        )
+        variables.generic["[NEXT_LEVEL_XP]"] = str(self.hero_party.main_character.calc_xp_to_next_level())
         map_origin = self.game_info.maps[self.get_map_name()].origin
         if map_origin is not None:
             map_coord = self.hero_party.get_curr_pos_dat_tile() - map_origin
@@ -903,9 +794,7 @@ class GameState(GameStateInterface):
             return
 
         # A combat encounter requires an encounter background
-        encounter_background = self.game_info.maps[
-            self.get_map_name()
-        ].encounter_background
+        encounter_background = self.game_info.maps[self.get_map_name()].encounter_background
         if encounter_background is None:
             encounter_background = self.get_encounter_background()
             if encounter_background is None:
@@ -944,9 +833,7 @@ class GameState(GameStateInterface):
             self.hero_party.main_character.hp = 0
             AudioPlayer().stop_music()
             AudioPlayer().play_sound("player_died")
-            GameDialog.create_encounter_status_dialog(self.hero_party).blit(
-                self.screen, False
-            )
+            GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.screen, False)
             gde = GameDialogEvaluator(self.game_info, self)
             if message_dialog is None:
                 message_dialog = GameDialog.create_message_dialog()
@@ -955,9 +842,7 @@ class GameState(GameStateInterface):
             gde.add_and_wait_for_message("Thou art dead.", message_dialog)
             gde.wait_for_acknowledgement(message_dialog)
             for hero in self.hero_party.members:
-                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = (
-                    self.game_info.death_hero_pos_dat_tile
-                )
+                hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_info.death_hero_pos_dat_tile
                 hero.curr_pos_offset_img_px = Point(0, 0)
                 hero.direction = self.game_info.death_hero_pos_dir
                 hero.hp = hero.level.hp
@@ -975,13 +860,9 @@ class GameState(GameStateInterface):
         # Save off initial background image
         background_surface = self.screen.copy()
 
-        menu_dialog = GameDialog.create_yes_no_menu(
-            Point(1, 1), "Do you really want to quit?"
-        )
+        menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), "Do you really want to quit?")
         menu_dialog.blit(self.screen, flip_buffer=True)
-        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(
-            menu_dialog, allow_quit=False
-        )
+        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(menu_dialog, allow_quit=False)
         if menu_result is not None and menu_result == "YES":
             self.is_running = False
 
@@ -992,6 +873,4 @@ class GameState(GameStateInterface):
         return self.__should_add_math_problems_in_combat
 
     def toggle_should_add_math_problems_in_combat(self) -> None:
-        self.__should_add_math_problems_in_combat = (
-            not self.__should_add_math_problems_in_combat
-        )
+        self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat

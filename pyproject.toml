@@ -1,3 +1,114 @@
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel"]
+# Build a wheel as: pip install build; python -m build
+requires = [
+  "setuptools >= 77.0.3",
+  "setuptools-scm >= 8.0",
+]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyDragonWarrior"
+dynamic = ["version"]
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+description = "A Python based Dragon Warrior clone."
+readme = "README.md"
+authors = [
+  {name = "justinbeetle"},
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Games/Entertainment",
+  "Topic :: Games/Entertainment :: Role-Playing",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+requires-python = ">=3.9"
+# Install dependencies as: pip install .
+dependencies = [
+    "certifi==2025.4.26",
+    "numpy==2.0.2; python_version <= '3.9'",
+    "numpy==2.2.5; python_version > '3.9'",
+    "pygame-ce==2.5.6",
+    "pyscroll==2.31",
+    "pytmx==3.32",
+]
+
+[project.optional-dependencies]
+# Install dev dependencies as: pip install .[dev]
+dev = [
+    "black==25.12.0",
+    "coverage==7.8.0",
+    "mypy==1.19.1",
+    "opensimplex==0.4.5.1",
+    "pytest==8.3.5",
+    "pylint==4.0.4",
+    "pyinstaller==6.13.0",
+    "snakeviz==2.2.2",
+]
+
+[project.scripts]
+pyDragonWarrior = "pydw.game:main"
+
+[project.urls]
+Repository = "https://github.com/justinbeetle/pyDragonWarrior"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pyDragonWarrior = ["data"]
+
+[tool.setuptools_scm]
+# Needed to dynamically obtain the version number based on the git tags
+
+[tool.black]
+# Run black as: pip install .[dev]; black scripts src tests
+line-length = 120
+
+[tool.flake8]
+max-line-length = 120
+
+[tool.mypy]
+# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/game.py
+ignore_missing_imports = true
+strict = true
+
+[tool.pylint.BASIC]
+# Run pylint as: pip install .[dev]; pylint src
+good-names = [
+  "gp",
+  "h",
+  "hp",
+  "mp",
+  "pc",
+  "i",
+  "j",
+  "k",
+  "w",
+  "x",
+  "x1",
+  "x2",
+  "xp",
+  "y",
+  "y1",
+  "y2",
+  "z",
+  "z1",
+  "z2",
+]
+
+[tool.pylint.CHECKER]
+fail-under = 8.7
+
+[tool.pylint.FORMAT]
+max-line-length = 120
+
+[tool.pylint.TYPECHECK]
+generated-members = "pygame.K*"

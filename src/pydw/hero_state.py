@@ -53,9 +53,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.armor: Optional[Armor] = None
         self.shield: Optional[Shield] = None
         self.other_equipped_items: List[Tool] = []
-        self.unequipped_items: Dict[ItemType, int] = (
-            {}
-        )  # Dict where keys are items and values are the item counts
+        self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
 
         self.hp_regen_tiles_remaining: Optional[int] = None
 
@@ -72,34 +70,18 @@ class HeroState(MapCharacterState, CombatCharacterState):
         item_row_data: List[List[str]] = []
         if not limit_to_unequipped:
             if self.weapon is not None:
-                HeroState.add_item_to_item_row_data(
-                    self.weapon, "E", limit_to_droppable, filter_types, item_row_data
-                )
+                HeroState.add_item_to_item_row_data(self.weapon, "E", limit_to_droppable, filter_types, item_row_data)
             if self.helm is not None:
-                HeroState.add_item_to_item_row_data(
-                    self.helm, "E", limit_to_droppable, filter_types, item_row_data
-                )
+                HeroState.add_item_to_item_row_data(self.helm, "E", limit_to_droppable, filter_types, item_row_data)
             if self.armor is not None:
-                HeroState.add_item_to_item_row_data(
-                    self.armor, "E", limit_to_droppable, filter_types, item_row_data
-                )
+                HeroState.add_item_to_item_row_data(self.armor, "E", limit_to_droppable, filter_types, item_row_data)
             if self.shield is not None:
-                HeroState.add_item_to_item_row_data(
-                    self.shield, "E", limit_to_droppable, filter_types, item_row_data
-                )
-            for tool in sorted(
-                self.other_equipped_items, key=lambda inner_item: inner_item.name
-            ):
-                HeroState.add_item_to_item_row_data(
-                    tool, "E", limit_to_droppable, filter_types, item_row_data
-                )
-        for item in sorted(
-            self.unequipped_items, key=lambda inner_item: inner_item.name
-        ):
+                HeroState.add_item_to_item_row_data(self.shield, "E", limit_to_droppable, filter_types, item_row_data)
+            for tool in sorted(self.other_equipped_items, key=lambda inner_item: inner_item.name):
+                HeroState.add_item_to_item_row_data(tool, "E", limit_to_droppable, filter_types, item_row_data)
+        for item in sorted(self.unequipped_items, key=lambda inner_item: inner_item.name):
             item_count_str = str(self.unequipped_items[item])
-            HeroState.add_item_to_item_row_data(
-                item, item_count_str, limit_to_droppable, filter_types, item_row_data
-            )
+            HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
 
         # Flip the data
         flipped_item_row_data: List[List[str]] = []
@@ -138,9 +120,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 if filter_type == "Tool" and isinstance(item, Tool):
                     item_passed_type_filter = True
                     break
-        if item_passed_type_filter and (
-            not limit_to_droppable or not isinstance(item, Tool) or item.droppable
-        ):
+        if item_passed_type_filter and (not limit_to_droppable or not isinstance(item, Tool) or item.droppable):
             item_row_data.append([item.name, col_value])
 
     def is_item_equipped(self, item_name: str) -> bool:
@@ -173,9 +153,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
             ret_val += 1
         return ret_val
 
-    def get_item(
-        self, item_name: str, unequipped_only: bool = False
-    ) -> Optional[ItemType]:
+    def get_item(self, item_name: str, unequipped_only: bool = False) -> Optional[ItemType]:
         for item in self.unequipped_items:
             if item_name == item.name:
                 return item
@@ -199,9 +177,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         is_equipped = False
         if self.is_item_equipped(item_name):
             item_options.append("UNEQUIP")
-            item_options.append(
-                "DROP"
-            )  # At present all equipable items are also droppable
+            item_options.append("DROP")  # At present all equipable items are also droppable
             is_equipped = True
         for item in self.unequipped_items:
             if item_name == item.name:
@@ -281,9 +257,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         else:
             self.unequipped_items[item] = count
 
-    def lose_item(
-        self, item_name: str, count: int = 1, unequipped_only: bool = False
-    ) -> None:
+    def lose_item(self, item_name: str, count: int = 1, unequipped_only: bool = False) -> None:
         # Lost items are taken from unequippedItems where possible, else equipped items
         remaining_items_to_lose = count
         for item in self.unequipped_items:
@@ -352,9 +326,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
     def is_dodging_attack(self) -> bool:
         return False
 
-    def get_resistance(
-        self, action: DialogActionEnum, category: ActionCategoryTypeEnum
-    ) -> float:
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         if DialogActionEnum.STOPSPELL == action and self.armor is not None:
             return self.armor.stopspell_resistance
         return 0
@@ -375,27 +347,21 @@ class HeroState(MapCharacterState, CombatCharacterState):
         is_critical_hit: Optional[bool] = None,
     ) -> Tuple[int, bool]:
         if is_critical_hit is None:
-            is_critical_hit = (
-                target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
-            )
+            is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
         if is_critical_hit and target.allows_critical_hits():
             min_damage = self.get_attack_strength() // 2
             max_damage = self.get_attack_strength()
         else:
             min_damage = (self.get_attack_strength() - target.get_agility() // 2) // 4
             max_damage = (self.get_attack_strength() - target.get_agility() // 2) // 2
-        damage = CombatCharacterState.calc_damage(
-            min_damage, max_damage, target, damage_type
-        )
+        damage = CombatCharacterState.calc_damage(min_damage, max_damage, target, damage_type)
 
         # For critical hits to targets which don't allow them, perform a second damage calculation and use the higher
         # of the two damage values.
         if is_critical_hit and not target.allows_critical_hits():
             damage = max(
                 damage,
-                CombatCharacterState.calc_damage(
-                    min_damage, max_damage, target, damage_type
-                ),
+                CombatCharacterState.calc_damage(min_damage, max_damage, target, damage_type),
             )
 
         return damage, is_critical_hit
@@ -425,12 +391,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 available_spells.append(level.spell)
         return available_spells
 
-    def get_castable_spell_names(
-        self, is_in_combat: bool, is_inside: bool
-    ) -> List[str]:
-        return HeroState.get_spell_names(
-            self.get_castable_spells(is_in_combat, is_inside)
-        )
+    def get_castable_spell_names(self, is_in_combat: bool, is_inside: bool) -> List[str]:
+        return HeroState.get_spell_names(self.get_castable_spells(is_in_combat, is_inside))
 
     def get_available_spell_names(self) -> List[str]:
         return HeroState.get_spell_names(self.get_available_spells())
@@ -527,9 +489,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

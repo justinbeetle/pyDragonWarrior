@@ -108,11 +108,8 @@ class GameInfo:
         self.image_px_step_size = 1
         for possible_step_size in range(2, self.tile_size_pixels):
             if self.tile_size_pixels % possible_step_size == 0:
-                if abs(
-                    self.tile_size_pixels / possible_step_size - desired_tile_move_steps
-                ) < abs(
-                    self.tile_size_pixels / self.image_px_step_size
-                    - desired_tile_move_steps
+                if abs(self.tile_size_pixels / possible_step_size - desired_tile_move_steps) < abs(
+                    self.tile_size_pixels / self.image_px_step_size - desired_tile_move_steps
                 ):
                     self.image_px_step_size = possible_step_size
                 else:
@@ -127,9 +124,7 @@ class GameInfo:
         GameInfo.init_audio_player(xml_root, data_path)
 
         # Parse the encounter background images
-        self.encounter_backgrounds = GameInfo.parse_encounter_backgrounds(
-            xml_root, image_path
-        )
+        self.encounter_backgrounds = GameInfo.parse_encounter_backgrounds(xml_root, image_path)
 
         # Parse map locations - self.locations is a dictionary of Map name -> Location name -> NamedLocation
         self.locations = GameInfo.parse_map_locations(xml_root)
@@ -149,30 +144,22 @@ class GameInfo:
         )
 
         # Parse decorations
-        self.decorations = GameInfo.parse_decoration(
-            xml_root, image_path, self.tile_size_pixels
-        )
+        self.decorations = GameInfo.parse_decoration(xml_root, image_path, self.tile_size_pixels)
 
         # Parse spells
         self.spells = self.parse_spells(xml_root)
 
         # Parse characters
-        self.character_types = GameInfo.parse_character_types(
-            xml_root, image_path, self.spells, self.tile_size_pixels
-        )
+        self.character_types = GameInfo.parse_character_types(xml_root, image_path, self.spells, self.tile_size_pixels)
 
         # Parse monsters
-        self.monsters = self.parse_monsters(
-            xml_root, image_path, int(win_size_pixels.y)
-        )
+        self.monsters = self.parse_monsters(xml_root, image_path, int(win_size_pixels.y))
 
         # Parse monster sets
         self.monster_sets = GameInfo.parse_monster_sets(xml_root)
 
         # Parse maps
-        self.maps = self.parse_maps(
-            xml_root, os.path.join(data_path, xml_root.attrib["mapsPath"])
-        )
+        self.maps = self.parse_maps(xml_root, os.path.join(data_path, xml_root.attrib["mapsPath"]))
 
         # Parse dialog scripts
         for element in xml_root.findall("./DialogScripts/DialogScript"):
@@ -186,12 +173,8 @@ class GameInfo:
             print("ERROR: DeathState element is missing", flush=True)
             raise Exception("Missing required DeathState element")
         self.death_map = death_state_element.attrib["map"]
-        self.death_hero_pos_dat_tile = self.get_location(
-            self.death_map, death_state_element
-        )
-        self.death_hero_pos_dir = self.get_direction(
-            self.death_map, death_state_element
-        )
+        self.death_hero_pos_dat_tile = self.get_location(self.death_map, death_state_element)
+        self.death_hero_pos_dir = self.get_direction(self.death_map, death_state_element)
         self.death_dialog = self.parse_dialog(death_state_element)
 
     @staticmethod
@@ -205,12 +188,8 @@ class GameInfo:
         GameInfo.init_audio_player(xml_root, data_path)
 
         image_path = os.path.join(data_path, xml_root.attrib["imagePath"])
-        font_names, dialog_border_image_filename = GameInfo.parse_dialogs_info(
-            xml_root, image_path
-        )
-        GameDialog.static_init(
-            win_size_tiles, tile_size_pixels, font_names, dialog_border_image_filename
-        )
+        font_names, dialog_border_image_filename = GameInfo.parse_dialogs_info(xml_root, image_path)
+        GameDialog.static_init(win_size_tiles, tile_size_pixels, font_names, dialog_border_image_filename)
 
         image_path = os.path.join(data_path, xml_root.attrib["imagePath"])
         return GameInfo.parse_title_info(xml_root, image_path)
@@ -218,9 +197,7 @@ class GameInfo:
     @staticmethod
     def init_audio_player(xml_root: ET.Element, data_path: str) -> None:
         audio_player = AudioPlayer()
-        if 0 == len(audio_player.get_music_tracks()) and 0 == len(
-            audio_player.get_sound_tracks()
-        ):
+        if 0 == len(audio_player.get_music_tracks()) and 0 == len(audio_player.get_sound_tracks()):
             # On the first initialization pass, just add the tracks
             GameInfo.init_audio_player_music(xml_root, data_path)
             GameInfo.init_audio_player_sounds(xml_root, data_path)
@@ -337,23 +314,17 @@ class GameInfo:
             audio_player.add_sound_tracks(name_to_sound_track_mapping)
 
     @staticmethod
-    def parse_title_info(
-        xml_root: ET.Element, image_path: str
-    ) -> Tuple[pygame.surface.Surface, str]:
+    def parse_title_info(xml_root: ET.Element, image_path: str) -> Tuple[pygame.surface.Surface, str]:
         title_element = xml_root.find("Title")
         if title_element is not None:
             title_music = title_element.attrib["music"]
-            title_image_file_name = os.path.join(
-                image_path, title_element.attrib["image"]
-            )
+            title_image_file_name = os.path.join(image_path, title_element.attrib["image"])
             title_image = pygame.image.load(title_image_file_name).convert()
 
         return title_image, title_music
 
     @staticmethod
-    def parse_dialogs_info(
-        xml_root: ET.Element, image_path: str
-    ) -> Tuple[List[str], Optional[str]]:
+    def parse_dialogs_info(xml_root: ET.Element, image_path: str) -> Tuple[List[str], Optional[str]]:
         font_names: List[str] = []
         dialogs_element = xml_root.find("Dialogs")
         if dialogs_element is not None:
@@ -361,68 +332,42 @@ class GameInfo:
                 font_names.append(element.attrib["name"])
             dialog_border_image_filename = None
             if "image" in dialogs_element.attrib:
-                dialog_border_image_filename = os.path.join(
-                    image_path, dialogs_element.attrib["image"]
-                )
+                dialog_border_image_filename = os.path.join(image_path, dialogs_element.attrib["image"])
         return font_names, dialog_border_image_filename
 
     @staticmethod
-    def parse_encounter_backgrounds(
-        xml_root: ET.Element, image_path: str
-    ) -> Dict[str, EncounterBackground]:
+    def parse_encounter_backgrounds(xml_root: ET.Element, image_path: str) -> Dict[str, EncounterBackground]:
         encounter_path = os.path.join(image_path, xml_root.attrib["encounterPath"])
         encounter_backgrounds: Dict[str, EncounterBackground] = {}
         for mappings_element in xml_root.findall("./EncounterBackgroundMappings"):
-            element_encounter_path = os.path.join(
-                encounter_path, mappings_element.attrib["path"]
-            )
+            element_encounter_path = os.path.join(encounter_path, mappings_element.attrib["path"])
             for image_element in mappings_element.findall("./Image"):
                 encounter_background_name = image_element.attrib["name"]
                 if encounter_background_name in encounter_backgrounds:
                     # Favor the first image added
                     continue
-                image_path = os.path.join(
-                    element_encounter_path, image_element.attrib["source"]
-                )
+                image_path = os.path.join(element_encounter_path, image_element.attrib["source"])
 
                 # print('Loading', encounter_background_name, flush=True)
                 try:
                     encounter_background_image = pygame.image.load(image_path)
-                    encounter_backgrounds[encounter_background_name] = (
-                        EncounterBackground(
-                            encounter_background_name,
-                            encounter_background_image,
-                            image_path,
-                            (
-                                image_element.attrib["artist"]
-                                if "artist" in image_element.attrib
-                                else "Uncredited"
-                            ),
-                            (
-                                image_element.attrib["artist_url"]
-                                if "artist_url" in image_element.attrib
-                                else None
-                            ),
-                            (
-                                image_element.attrib["url"]
-                                if "url" in image_element.attrib
-                                else None
-                            ),
-                        )
+                    encounter_backgrounds[encounter_background_name] = EncounterBackground(
+                        encounter_background_name,
+                        encounter_background_image,
+                        image_path,
+                        (image_element.attrib["artist"] if "artist" in image_element.attrib else "Uncredited"),
+                        (image_element.attrib["artist_url"] if "artist_url" in image_element.attrib else None),
+                        (image_element.attrib["url"] if "url" in image_element.attrib else None),
                     )
                 except Exception:
-                    print(
-                        "ERROR: Failed to load", encounter_background_name, flush=True
-                    )
+                    print("ERROR: Failed to load", encounter_background_name, flush=True)
         return encounter_backgrounds
 
     @staticmethod
     def parse_map_locations(
         xml_root: ET.Element,
     ) -> Dict[str, Dict[str, NamedLocation]]:
-        locations: Dict[str, Dict[str, NamedLocation]] = (
-            {}
-        )  # Map name -> Location name -> NamedLocation
+        locations: Dict[str, Dict[str, NamedLocation]] = {}  # Map name -> Location name -> NamedLocation
         for element in xml_root.findall("./Maps//Map"):
             map_name = element.attrib["name"]
             map_locations: Dict[str, NamedLocation] = {}
@@ -475,18 +420,13 @@ class GameInfo:
         return weapons, default_weapon
 
     @staticmethod
-    def parse_armors(
-        xml_root: ET.Element, items: Dict[str, ItemType]
-    ) -> Dict[str, Armor]:
+    def parse_armors(xml_root: ET.Element, items: Dict[str, ItemType]) -> Dict[str, Armor]:
         armors: Dict[str, Armor] = {}
         for element in xml_root.findall("./Items/Armors/Armor"):
             item_name = element.attrib["name"]
 
             hp_regen_tiles = None
-            if (
-                "hpRegenTiles" in element.attrib
-                and "none" != element.attrib["hpRegenTiles"]
-            ):
+            if "hpRegenTiles" in element.attrib and "none" != element.attrib["hpRegenTiles"]:
                 hp_regen_tiles = int(element.attrib["hpRegenTiles"])
 
             armors[item_name] = Armor(
@@ -503,9 +443,7 @@ class GameInfo:
         return armors
 
     @staticmethod
-    def parse_shields(
-        xml_root: ET.Element, items: Dict[str, ItemType]
-    ) -> Dict[str, Shield]:
+    def parse_shields(xml_root: ET.Element, items: Dict[str, ItemType]) -> Dict[str, Shield]:
         shields: Dict[str, Shield] = {}
         for element in xml_root.findall("./Items/Shields/Shield"):
             item_name = element.attrib["name"]
@@ -613,22 +551,16 @@ class GameInfo:
                     for x in range(16):
                         tile_images_scaled.append([])
                     unscaled_size = tile_image_unscaled.get_height() / 4
-                    tile_variants = (
-                        tile_image_unscaled.get_width()
-                        // tile_image_unscaled.get_height()
-                    )
+                    tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
                     max_tile_variants = max(max_tile_variants, tile_variants)
                     for y in range(4):
                         for x in range(4):
                             for z in range(tile_variants):
-                                temp_surface = pygame.surface.Surface(
-                                    (tile_size_pixels, tile_size_pixels)
-                                )
+                                temp_surface = pygame.surface.Surface((tile_size_pixels, tile_size_pixels))
                                 pygame.transform.scale(
                                     tile_image_unscaled.subsurface(
                                         pygame.Rect(
-                                            x * unscaled_size
-                                            + z * tile_image_unscaled.get_height(),
+                                            x * unscaled_size + z * tile_image_unscaled.get_height(),
                                             y * unscaled_size,
                                             unscaled_size,
                                             unscaled_size,
@@ -637,20 +569,13 @@ class GameInfo:
                                     (tile_size_pixels, tile_size_pixels),
                                     temp_surface,
                                 )
-                                tile_images_scaled[
-                                    image_index_translation[y][x]
-                                ].append(temp_surface)
+                                tile_images_scaled[image_index_translation[y][x]].append(temp_surface)
                 elif tile_type == "simple":
-                    tile_variants = (
-                        tile_image_unscaled.get_width()
-                        // tile_image_unscaled.get_height()
-                    )
+                    tile_variants = tile_image_unscaled.get_width() // tile_image_unscaled.get_height()
                     max_tile_variants = max(max_tile_variants, tile_variants)
                     temp_surface_list: List[pygame.surface.Surface] = []
                     for z in range(tile_variants):
-                        temp_surface_list.append(
-                            pygame.surface.Surface((tile_size_pixels, tile_size_pixels))
-                        )
+                        temp_surface_list.append(pygame.surface.Surface((tile_size_pixels, tile_size_pixels)))
                         pygame.transform.scale(
                             tile_image_unscaled.subsurface(
                                 pygame.Rect(
@@ -681,17 +606,14 @@ class GameInfo:
 
         for x in range(2, max_tile_variants + 1):
             w = numpy.arange(x, 0, -1)
-            w = w * numpy.transpose(w)
-            w = w * numpy.transpose(w)
+            w = w * w * w
             p = w / sum(w)
             tile_probabilities.append([float(x) for x in p])
 
         return tiles, tile_symbols, tile_probabilities
 
     @staticmethod
-    def parse_decoration(
-        xml_root: ET.Element, image_path: str, tile_size_pixels: int
-    ) -> Dict[str, Decoration]:
+    def parse_decoration(xml_root: ET.Element, image_path: str, tile_size_pixels: int) -> Dict[str, Decoration]:
         decorations: Dict[str, Decoration] = {}
 
         element = xml_root.find("Decorations")
@@ -706,20 +628,14 @@ class GameInfo:
         def load_decoration_image(image_filename: str) -> pygame.surface.Surface:
             decoration_image_filename = os.path.join(decoration_path, image_filename)
             # print('Loading image', decoration_image_filename, flush=True)
-            image_unscaled = pygame.image.load(
-                decoration_image_filename
-            ).convert_alpha()
+            image_unscaled = pygame.image.load(decoration_image_filename).convert_alpha()
             unscaled_size_pixels = Point(image_unscaled.get_size())
             max_scaled_size_pixels = Point(width_tiles, height_tiles) * tile_size_pixels
             scale_factor_point = max_scaled_size_pixels / unscaled_size_pixels
             scale_factor = max(scale_factor_point.w, scale_factor_point.h)
             scaled_size_pixels = (unscaled_size_pixels * scale_factor).floor()
-            image_scaled = pygame.surface.Surface(
-                scaled_size_pixels, flags=pygame.SRCALPHA
-            )
-            pygame.transform.scale(
-                image_unscaled, scaled_size_pixels.get_as_int_tuple(), image_scaled
-            )
+            image_scaled = pygame.surface.Surface(scaled_size_pixels, flags=pygame.SRCALPHA)
+            pygame.transform.scale(image_unscaled, scaled_size_pixels.get_as_int_tuple(), image_scaled)
             return image_scaled
 
         for element in xml_root.findall("./Decorations//Decoration"):
@@ -757,9 +673,7 @@ class GameInfo:
             decoration_image_scaled = load_decoration_image(element.attrib["image"])
             decoration_removed_image_scaled: Optional[pygame.surface.Surface] = None
             if "removed_image" in element.attrib:
-                decoration_removed_image_scaled = load_decoration_image(
-                    element.attrib["removed_image"]
-                )
+                decoration_removed_image_scaled = load_decoration_image(element.attrib["removed_image"])
 
             decorations[decoration_name] = Decoration(
                 decoration_name,
@@ -788,9 +702,7 @@ class GameInfo:
             if "availableInCombat" in element.attrib:
                 available_in_combat = element.attrib["availableInCombat"] == "yes"
             if "availableOutsideCombat" in element.attrib:
-                available_outside_combat = (
-                    element.attrib["availableOutsideCombat"] == "yes"
-                )
+                available_outside_combat = element.attrib["availableOutsideCombat"] == "yes"
             if "availableInside" in element.attrib:
                 available_inside = element.attrib["availableInside"] == "yes"
             if "availableOutside" in element.attrib:
@@ -815,9 +727,7 @@ class GameInfo:
         return spells
 
     @staticmethod
-    def parse_levels(
-        xml_root: ET.Element, spells: Dict[str, Spell]
-    ) -> Dict[str, List[Level]]:
+    def parse_levels(xml_root: ET.Element, spells: Dict[str, Spell]) -> Dict[str, List[Level]]:
         levels: Dict[str, List[Level]] = {}
         for element in xml_root.findall("./Levels//CharacterLevels"):
             character_type = element.attrib["type"]
@@ -826,10 +736,7 @@ class GameInfo:
                 level_name = level_element.attrib["name"]
                 level_number = len(levels[character_type])
                 level_spell = None
-                if (
-                    "spell" in level_element.attrib
-                    and level_element.attrib["spell"] in spells
-                ):
+                if "spell" in level_element.attrib and level_element.attrib["spell"] in spells:
                     level_spell = spells[level_element.attrib["spell"]]
                 level = Level(
                     level_number,
@@ -871,22 +778,15 @@ class GameInfo:
             ticks_between_npc_moves = 60
             if "frames_between_moves" in element.attrib:
                 ticks_between_npc_moves = int(element.attrib["frames_between_moves"])
-            character_type_filename = os.path.join(
-                character_path, element.attrib["image"]
-            )
+            character_type_filename = os.path.join(character_path, element.attrib["image"])
             # print('Loading image', character_type_filename, flush=True)
             try:
-                character_type_image = pygame.image.load(
-                    character_type_filename
-                ).convert_alpha()
+                character_type_image = pygame.image.load(character_type_filename).convert_alpha()
             except FileNotFoundError:
                 print("ERROR: Failed to load file", character_type_filename, flush=True)
                 continue
             character_type_images = {}
-            if (
-                character_type_image.get_width()
-                == character_type_image.get_height() * 8 + 7
-            ):
+            if character_type_image.get_width() == character_type_image.get_height() * 8 + 7:
                 # Support for old style character images
                 x_px = 0
                 for direction in [
@@ -897,9 +797,7 @@ class GameInfo:
                 ]:
                     direction_character_type_images = {}
                     for phase in range(num_phases):
-                        image = pygame.surface.Surface(
-                            (tile_size_pixels, tile_size_pixels), flags=pygame.SRCALPHA
-                        )
+                        image = pygame.surface.Surface((tile_size_pixels, tile_size_pixels), flags=pygame.SRCALPHA)
                         pygame.transform.scale(
                             character_type_image.subsurface(
                                 x_px,
@@ -918,9 +816,7 @@ class GameInfo:
                     character_type_image.get_width() // num_phases,
                     character_type_image.get_height() // 4,
                 )
-                scale_factor = tile_size_pixels / max(
-                    phase_image_size.w, phase_image_size.h
-                )
+                scale_factor = tile_size_pixels / max(phase_image_size.w, phase_image_size.h)
                 phase_image_scaled_size = Point(
                     int(scale_factor * phase_image_size.w),
                     int(scale_factor * phase_image_size.h),
@@ -931,20 +827,14 @@ class GameInfo:
                     phase_image_scaled_size.w,
                     phase_image_scaled_size.h,
                 )
-                for idx, direction in enumerate(
-                    [Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.NORTH]
-                ):
+                for idx, direction in enumerate([Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.NORTH]):
                     y_px = idx * phase_image_size.h
                     direction_character_type_images = {}
                     for phase in range(num_phases):
                         x_px = phase * int(phase_image_size.w)
-                        image = pygame.surface.Surface(
-                            (tile_size_pixels, tile_size_pixels), flags=pygame.SRCALPHA
-                        )
+                        image = pygame.surface.Surface((tile_size_pixels, tile_size_pixels), flags=pygame.SRCALPHA)
                         pygame.transform.scale(
-                            character_type_image.subsurface(
-                                x_px, y_px, phase_image_size.w, phase_image_size.h
-                            ),
+                            character_type_image.subsurface(x_px, y_px, phase_image_size.w, phase_image_size.h),
                             phase_image_scaled_size.get_as_int_tuple(),
                             image.subsurface(dest_image_rect),
                         )
@@ -964,9 +854,7 @@ class GameInfo:
             character_types[character_type] = new_char
         return character_types
 
-    def parse_monster_actions(
-        self, xml_root: ET.Element
-    ) -> Tuple[Dict[str, MonsterAction], MonsterAction]:
+    def parse_monster_actions(self, xml_root: ET.Element) -> Tuple[Dict[str, MonsterAction], MonsterAction]:
         # Parse monster actions
         monster_actions: Dict[str, MonsterAction] = {}
         for element in xml_root.findall("./MonsterActions/MonsterAction"):
@@ -982,36 +870,23 @@ class GameInfo:
                     target_type = TargetTypeEnum[element.attrib["target"]]
                 use_dialog = self.parse_dialog(element)
             if target_type is None:
-                print(
-                    "ERROR: No target type for monster action", action_name, flush=True
-                )
+                print("ERROR: No target type for monster action", action_name, flush=True)
                 continue
             if use_dialog is None:
-                print(
-                    "ERROR: No use dialog for monster action", action_name, flush=True
-                )
+                print("ERROR: No use dialog for monster action", action_name, flush=True)
                 continue
-            monster_actions[action_name] = MonsterAction(
-                action_name, spell, target_type, use_dialog
-            )
+            monster_actions[action_name] = MonsterAction(action_name, spell, target_type, use_dialog)
 
         # Get default monster action
         monster_actions_element = xml_root.find("MonsterActions")
-        if (
-            monster_actions_element is not None
-            and "default" in monster_actions_element.attrib
-        ):
-            default_monster_action = monster_actions[
-                monster_actions_element.attrib["default"]
-            ]
+        if monster_actions_element is not None and "default" in monster_actions_element.attrib:
+            default_monster_action = monster_actions[monster_actions_element.attrib["default"]]
         else:
             default_monster_action = next(iter(monster_actions.values()))
 
         return monster_actions, default_monster_action
 
-    def parse_monsters(
-        self, xml_root: ET.Element, image_path: str, window_height: int
-    ) -> Dict[str, MonsterInfo]:
+    def parse_monsters(self, xml_root: ET.Element, image_path: str, window_height: int) -> Dict[str, MonsterInfo]:
         monster_path = os.path.join(image_path, xml_root.attrib["monsterPath"])
 
         # Parse monster actions
@@ -1090,18 +965,12 @@ class GameInfo:
             monster_image.fill(pygame.Color(0, 0, 0, 0))
             monster_image.blit(scaled_monster_image, (0, black_border_pixels))
             monster_image.blit(scaled_monster_image, (black_border_pixels, 0))
-            monster_image.blit(
-                scaled_monster_image, (black_border_pixels, 2 * black_border_pixels)
-            )
-            monster_image.blit(
-                scaled_monster_image, (2 * black_border_pixels, black_border_pixels)
-            )
+            monster_image.blit(scaled_monster_image, (black_border_pixels, 2 * black_border_pixels))
+            monster_image.blit(scaled_monster_image, (2 * black_border_pixels, black_border_pixels))
             monster_image.fill("black", special_flags=pygame.BLEND_RGB_MULT)
 
             # Blit the main image into the center
-            monster_image.blit(
-                scaled_monster_image, (black_border_pixels, black_border_pixels)
-            )
+            monster_image.blit(scaled_monster_image, (black_border_pixels, black_border_pixels))
 
         (min_hp, max_hp) = GameTypes.parse_int_range(element.attrib["hp"])
         (min_gp, max_gp) = GameTypes.parse_int_range(element.attrib["gp"])
@@ -1110,9 +979,7 @@ class GameInfo:
         for monster_action_rules_element in element.findall("./MonsterActionRule"):
             health_ratio_threshold = 1.0
             if "healthRatioThreshold" in monster_action_rules_element.attrib:
-                health_ratio_threshold = float(
-                    monster_action_rules_element.attrib["healthRatioThreshold"]
-                )
+                health_ratio_threshold = float(monster_action_rules_element.attrib["healthRatioThreshold"])
             monster_action_rules.append(
                 MonsterActionRule(
                     monster_actions[monster_action_rules_element.attrib["type"]],
@@ -1168,19 +1035,14 @@ class GameInfo:
             # print( 'mapName =', map_name, flush=True )
             music = element.attrib["music"]
             light_diameter = None
-            if (
-                "lightDiameter" in element.attrib
-                and element.attrib["lightDiameter"] != "unlimited"
-            ):
+            if "lightDiameter" in element.attrib and element.attrib["lightDiameter"] != "unlimited":
                 light_diameter = int(element.attrib["lightDiameter"])
             is_outside = True
             if "isOutside" in element.attrib:
                 is_outside = element.attrib["isOutside"] == "yes"
             origin = None
             if "originX" in element.attrib and "originY" in element.attrib:
-                origin = Point(
-                    int(element.attrib["originX"]), int(element.attrib["originY"])
-                )
+                origin = Point(int(element.attrib["originX"]), int(element.attrib["originY"]))
 
             # Parse transitions
             # print('Parse transitions', flush=True)
@@ -1198,9 +1060,7 @@ class GameInfo:
                     if transition.name is not None:
                         if transition.dest_map not in transitions_by_map_and_name:
                             transitions_by_map_and_name[transition.dest_map] = {}
-                        transitions_by_map_and_name[transition.dest_map][
-                            transition.name
-                        ] = transition
+                        transitions_by_map_and_name[transition.dest_map][transition.name] = transition
                         transitions_by_name[transition.name] = transition
 
             def parse_incoming_transition(
@@ -1214,9 +1074,7 @@ class GameInfo:
                     progress_marker = trans_element.attrib["progressMarker"]
                 inverse_progress_marker = None
                 if "inverseProgressMarker" in trans_element.attrib:
-                    inverse_progress_marker = trans_element.attrib[
-                        "inverseProgressMarker"
-                    ]
+                    inverse_progress_marker = trans_element.attrib["inverseProgressMarker"]
                 transition = IncomingTransition(
                     self.get_location(map_name, trans_element),
                     self.get_direction(map_name, trans_element),
@@ -1234,10 +1092,7 @@ class GameInfo:
                     inverse_progress_marker,
                 )
                 update_transitions_by_map(transition)
-                if (
-                    "decoration" in trans_element.attrib
-                    and trans_element.attrib["decoration"] in self.decorations
-                ):
+                if "decoration" in trans_element.attrib and trans_element.attrib["decoration"] in self.decorations:
                     map_decorations.append(
                         MapDecoration.create(
                             self.decorations[trans_element.attrib["decoration"]],
@@ -1260,17 +1115,13 @@ class GameInfo:
                     dest_name = trans_element.attrib["toName"]
                 respawn_decorations = False
                 if "respawnDecorations" in trans_element.attrib:
-                    respawn_decorations = (
-                        trans_element.attrib["respawnDecorations"] == "yes"
-                    )
+                    respawn_decorations = trans_element.attrib["respawnDecorations"] == "yes"
                 progress_marker = None
                 if "progressMarker" in trans_element.attrib:
                     progress_marker = trans_element.attrib["progressMarker"]
                 inverse_progress_marker = None
                 if "inverseProgressMarker" in trans_element.attrib:
-                    inverse_progress_marker = trans_element.attrib[
-                        "inverseProgressMarker"
-                    ]
+                    inverse_progress_marker = trans_element.attrib["inverseProgressMarker"]
                 bounding_box = None
                 if (
                     "leftX" in trans_element.attrib
@@ -1282,9 +1133,7 @@ class GameInfo:
                     right_x = int(trans_element.attrib["rightX"])
                     top_y = int(trans_element.attrib["topY"])
                     bottom_y = int(trans_element.attrib["bottomY"])
-                    bounding_box = pygame.Rect(
-                        left_x, top_y, right_x - left_x, bottom_y - top_y
-                    )
+                    bounding_box = pygame.Rect(left_x, top_y, right_x - left_x, bottom_y - top_y)
                 transition = OutgoingTransition(
                     self.get_location(map_name, trans_element),
                     self.get_direction(map_name, trans_element),
@@ -1297,10 +1146,7 @@ class GameInfo:
                     bounding_box,
                 )
                 update_transitions_by_map(transition)
-                if (
-                    "decoration" in trans_element.attrib
-                    and trans_element.attrib["decoration"] in self.decorations
-                ):
+                if "decoration" in trans_element.attrib and trans_element.attrib["decoration"] in self.decorations:
                     map_decorations.append(
                         MapDecoration.create(
                             self.decorations[trans_element.attrib["decoration"]],
@@ -1324,19 +1170,14 @@ class GameInfo:
             # print( 'Parse standalone decorations', flush=True )
             for decoration_element in element.findall(".//MapDecoration"):
                 decoration = None
-                if (
-                    "type" in decoration_element.attrib
-                    and decoration_element.attrib["type"] in self.decorations
-                ):
+                if "type" in decoration_element.attrib and decoration_element.attrib["type"] in self.decorations:
                     decoration = self.decorations[decoration_element.attrib["type"]]
                 progress_marker = None
                 if "progressMarker" in decoration_element.attrib:
                     progress_marker = decoration_element.attrib["progressMarker"]
                 inverse_progress_marker = None
                 if "inverseProgressMarker" in decoration_element.attrib:
-                    inverse_progress_marker = decoration_element.attrib[
-                        "inverseProgressMarker"
-                    ]
+                    inverse_progress_marker = decoration_element.attrib["inverseProgressMarker"]
                 map_decorations.append(
                     MapDecoration.create(
                         decoration,
@@ -1359,9 +1200,7 @@ class GameInfo:
                     progress_marker = npc_element.attrib["progressMarker"]
                 inverse_progress_marker = None
                 if "inverseProgressMarker" in npc_element.attrib:
-                    inverse_progress_marker = npc_element.attrib[
-                        "inverseProgressMarker"
-                    ]
+                    inverse_progress_marker = npc_element.attrib["inverseProgressMarker"]
                 npcs.append(
                     NpcInfo(
                         self.character_types[npc_element.attrib["type"]],
@@ -1399,9 +1238,7 @@ class GameInfo:
                     progress_marker = monster_element.attrib["progressMarker"]
                 inverse_progress_marker = None
                 if "inverseProgressMarker" in monster_element.attrib:
-                    inverse_progress_marker = monster_element.attrib[
-                        "inverseProgressMarker"
-                    ]
+                    inverse_progress_marker = monster_element.attrib["inverseProgressMarker"]
                 if monster_element.attrib["name"] not in self.monsters:
                     print(
                         f'ERROR: Skipping special monster of unknown type {monster_element.attrib["name"]}',
@@ -1441,18 +1278,14 @@ class GameInfo:
                 if "overlayTiles" in element.attrib:
                     # print('Load map overlay dat file', flush=True)
                     map_overlay_dat = []
-                    map_overlay_dat_file_name = os.path.join(
-                        maps_path, element.attrib["overlayTiles"]
-                    )
+                    map_overlay_dat_file_name = os.path.join(maps_path, element.attrib["overlayTiles"])
                     with open(map_overlay_dat_file_name, "r") as map_overlay_dat_file:
                         # Future: Could corner turn data from row,col (y,x) into col,row (x,y)
                         for line in map_overlay_dat_file:
                             line = line.strip("\n")
                             map_overlay_dat.append(line)
                             # TODO: Validate the map is rectangular and all tiles are defined
-                    map_overlay_dat_size = Point(
-                        len(map_overlay_dat[0]), len(map_overlay_dat)
-                    )
+                    map_overlay_dat_size = Point(len(map_overlay_dat[0]), len(map_overlay_dat))
                     if map_dat_size != map_overlay_dat_size:
                         print(
                             "ERROR: Size mismatch between the map and map overlaps.  Map size =",
@@ -1466,15 +1299,9 @@ class GameInfo:
             # print('Parse map monster info', flush=True)
             monster_zones = []
             if "monsterSet" in element.attrib:
-                monster_zones.append(
-                    MonsterZone(
-                        0, 0, 999999999, 999999999, element.attrib["monsterSet"]
-                    )
-                )
+                monster_zones.append(MonsterZone(0, 0, 999999999, 999999999, element.attrib["monsterSet"]))
             else:
-                for monster_zone_element in element.findall(
-                    ".//MonsterZones/MonsterZone"
-                ):
+                for monster_zone_element in element.findall(".//MonsterZones/MonsterZone"):
                     monster_zones.append(
                         MonsterZone(
                             int(monster_zone_element.attrib["x"]),
@@ -1493,9 +1320,7 @@ class GameInfo:
                 and "encounterBackground" in element.attrib
                 and element.attrib["encounterBackground"] in self.encounter_backgrounds
             ):
-                encounter_background = self.encounter_backgrounds[
-                    element.attrib["encounterBackground"]
-                ]
+                encounter_background = self.encounter_backgrounds[element.attrib["encounterBackground"]]
 
             # Save the map information
             # print('Save the map information', flush=True)
@@ -1534,9 +1359,7 @@ class GameInfo:
             direction = Direction.NORTH
         return direction
 
-    def get_optional_direction(
-        self, map_name: Optional[str], element: ET.Element
-    ) -> Optional[Direction]:
+    def get_optional_direction(self, map_name: Optional[str], element: ET.Element) -> Optional[Direction]:
         if map_name and "location" in element.attrib:
             location = self.locations[map_name][element.attrib["location"]]
             if location.dir:
@@ -1562,12 +1385,8 @@ class GameInfo:
             raise Exception("Missing required InitialState element")
 
         self.initial_map = initial_state_element.attrib["map"]
-        self.initial_hero_pos_dat_tile = self.get_location(
-            self.initial_map, initial_state_element
-        )
-        self.initial_hero_pos_dir = self.get_direction(
-            self.initial_map, initial_state_element
-        )
+        self.initial_hero_pos_dat_tile = self.get_location(self.initial_map, initial_state_element)
+        self.initial_hero_pos_dir = self.get_direction(self.initial_map, initial_state_element)
         self.initial_state_dialog = self.parse_dialog(initial_state_element)
 
         if not self.pc_name:
@@ -1609,19 +1428,14 @@ class GameInfo:
                 print("ERROR: Unsupported item", item_name, flush=True)
 
         self.pc_progress_markers: List[str] = []
-        for progress_marker_element in initial_state_element.findall(
-            "./ProgressMarkers/ProgressMarker"
-        ):
+        for progress_marker_element in initial_state_element.findall("./ProgressMarkers/ProgressMarker"):
             self.pc_progress_markers.append(progress_marker_element.attrib["name"])
             # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
 
         self.initial_map_decorations: List[MapDecoration] = []
         for decoration_element in initial_state_element.findall("./MapDecoration"):
             decoration = None
-            if (
-                "type" in decoration_element.attrib
-                and decoration_element.attrib["type"] in self.decorations
-            ):
+            if "type" in decoration_element.attrib and decoration_element.attrib["type"] in self.decorations:
                 decoration = self.decorations[decoration_element.attrib["type"]]
             self.initial_map_decorations.append(
                 MapDecoration.create(
@@ -1633,9 +1447,7 @@ class GameInfo:
                 )
             )
 
-    def parse_dialog(
-        self, dialog_root_element: Optional[ET.Element]
-    ) -> Optional[DialogType]:
+    def parse_dialog(self, dialog_root_element: Optional[ET.Element]) -> Optional[DialogType]:
         if dialog_root_element is None:
             return None
         dialog: DialogType = []
@@ -1653,8 +1465,7 @@ class GameInfo:
             count: Union[int, str] = 1
             if "count" in element.attrib:
                 if "unlimited" == element.attrib["count"] or (
-                    "[" == element.attrib["count"][0]
-                    and "]" == element.attrib["count"][-1]
+                    "[" == element.attrib["count"][0] and "]" == element.attrib["count"][-1]
                 ):
                     count = element.attrib["count"]
                 else:
@@ -1698,13 +1509,8 @@ class GameInfo:
                         dialog_option = []
                     if dialog_option is not None:
                         dialog_options[option_element.attrib["name"]] = dialog_option
-                        if (
-                            "label" in option_element.attrib
-                            and option_element.attrib["label"] is not None
-                        ):
-                            self.dialog_sequences[option_element.attrib["label"]] = (
-                                dialog_option
-                            )
+                        if "label" in option_element.attrib and option_element.attrib["label"] is not None:
+                            self.dialog_sequences[option_element.attrib["label"]] = dialog_option
                 if len(dialog_options) > 0:
                     dialog.append(dialog_options)
                     if label is not None:
@@ -1712,9 +1518,7 @@ class GameInfo:
 
             elif element.tag == "DialogVendorBuyOptions":
                 if "values" in element.attrib:
-                    dialog_vendor_buy_options: DialogVendorBuyOptionsParamType = (
-                        element.attrib["values"]
-                    )
+                    dialog_vendor_buy_options: DialogVendorBuyOptionsParamType = element.attrib["values"]
                 else:
                     dialog_vendor_buy_options = []
                     for option_element in element.findall("./DialogVendorBuyOption"):
@@ -1727,9 +1531,7 @@ class GameInfo:
 
             elif element.tag == "DialogVendorSellOptions":
                 if "values" in element.attrib:
-                    dialog_vendor_sell_options: DialogVendorSellOptionsParamType = (
-                        element.attrib["values"]
-                    )
+                    dialog_vendor_sell_options: DialogVendorSellOptionsParamType = element.attrib["values"]
                 else:
                     dialog_vendor_sell_options = []
                     for option_element in element.findall("./DialogVendorSellOption"):
@@ -1791,8 +1593,7 @@ class GameInfo:
 
                 # For DAMAGE_TARGET count should NOT default to 1
                 if (
-                    DialogActionEnum[element.attrib["type"]]
-                    == DialogActionEnum.DAMAGE_TARGET
+                    DialogActionEnum[element.attrib["type"]] == DialogActionEnum.DAMAGE_TARGET
                     and "count" not in element.attrib
                 ):
                     count = "default"
@@ -1820,33 +1621,19 @@ class GameInfo:
                 name = element.attrib["name"]
                 value = element.attrib["value"]
                 if value == "ITEM_LIST":
-                    value_for_dialog_vendor_buy_options: (
-                        DialogVendorBuyOptionsParamWithoutReplacementType
-                    ) = []
+                    value_for_dialog_vendor_buy_options: DialogVendorBuyOptionsParamWithoutReplacementType = []
                     for item_element in element.findall("./Item"):
                         item_name = item_element.attrib["name"]
                         item_gp = str(self.items[item_name].gp)
                         if "gp" in item_element.attrib:
                             item_gp = item_element.attrib["gp"]
                         value_for_dialog_vendor_buy_options.append([item_name, item_gp])
-                    dialog.append(
-                        DialogVendorBuyOptionsVariable(
-                            name, value_for_dialog_vendor_buy_options
-                        )
-                    )
+                    dialog.append(DialogVendorBuyOptionsVariable(name, value_for_dialog_vendor_buy_options))
                 elif value == "INVENTORY_ITEM_TYPE_LIST":
-                    value_for_dialog_vendor_sell_options: (
-                        DialogVendorSellOptionsParamWithoutReplacementType
-                    ) = []
+                    value_for_dialog_vendor_sell_options: DialogVendorSellOptionsParamWithoutReplacementType = []
                     for item_type_element in element.findall("./InventoryItemType"):
-                        value_for_dialog_vendor_sell_options.append(
-                            item_type_element.attrib["type"]
-                        )
-                    dialog.append(
-                        DialogVendorSellOptionsVariable(
-                            name, value_for_dialog_vendor_sell_options
-                        )
-                    )
+                        value_for_dialog_vendor_sell_options.append(item_type_element.attrib["type"])
+                    dialog.append(DialogVendorSellOptionsVariable(name, value_for_dialog_vendor_sell_options))
                 else:
                     dialog.append(DialogVariable(name, value))
 
@@ -1855,9 +1642,7 @@ class GameInfo:
 
         return None
 
-    def parse_waypoints(
-        self, map_name: Optional[str], waypoints_root_element: ET.Element
-    ) -> List[Point]:
+    def parse_waypoints(self, map_name: Optional[str], waypoints_root_element: ET.Element) -> List[Point]:
         waypoints = []
         for waypoint_element in waypoints_root_element.findall("./Waypoint"):
             waypoints.append(self.get_location(map_name, waypoint_element))
@@ -1874,7 +1659,5 @@ class GameInfo:
         if 1 == num_images:
             random_index = 0
         else:
-            random_index = numpy.random.choice(
-                list(range(num_images)), p=self.tile_probabilities[num_images - 1]
-            )
+            random_index = numpy.random.choice(list(range(num_images)), p=self.tile_probabilities[num_images - 1])
         return images[random_index]

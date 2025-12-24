@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" Module defining methods wrapping pygame.event and pygame.joystick """
+"""Module defining methods wrapping pygame.event and pygame.joystick"""
 
 from typing import Dict, List, Optional, Tuple
 
@@ -92,9 +92,7 @@ def get_events(
             continue
 
         # Remap keyboard events
-        event = _remap_keyboard_event(
-            translate_wasd_to_uldr, translate_e_to_enter, event
-        )
+        event = _remap_keyboard_event(translate_wasd_to_uldr, translate_e_to_enter, event)
 
         # Remap joystick/gamepad events
         remapped_event = _remap_joystick_event(event)
@@ -234,15 +232,11 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
     remapped_event: Optional[pygame.event.Event] = event
     if pygame.JOYBUTTONDOWN == event.type:
         if event.button == 0:
-            remapped_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": pygame.K_RETURN}
-            )
+            remapped_event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_RETURN})
         elif event.button == 1:
             remapped_event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_SPACE})
         elif event.button == 6:
-            remapped_event = pygame.event.Event(
-                pygame.KEYDOWN, {"key": pygame.K_ESCAPE}
-            )
+            remapped_event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_ESCAPE})
         elif event.button == 7:
             remapped_event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_F1})
         else:
@@ -255,9 +249,7 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
     return remapped_event
 
 
-def _add_keyboard_keydown_events(
-    translate_wasd_to_uldr: bool, events: List[pygame.event.Event]
-) -> None:
+def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
     """Generate key down events from pressed keys
 
     The translation of TEXTINPUT events to KEYDOWN events takes care of this for letters (while handling capitalization)
@@ -272,37 +264,27 @@ def _add_keyboard_keydown_events(
         or (translate_wasd_to_uldr and pressed[pygame.K_w])
         or (not_num_lock and pressed[pygame.K_KP8])
     ):
-        _add_event_if_not_duplicate(
-            events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP})
-        )
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP}))
     elif (
         pressed[pygame.K_DOWN]
         or (translate_wasd_to_uldr and pressed[pygame.K_s])
         or (not_num_lock and pressed[pygame.K_KP2])
     ):
-        _add_event_if_not_duplicate(
-            events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_DOWN})
-        )
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_DOWN}))
     if (
         pressed[pygame.K_LEFT]
         or (translate_wasd_to_uldr and pressed[pygame.K_a])
         or (not_num_lock and pressed[pygame.K_KP4])
     ):
-        _add_event_if_not_duplicate(
-            events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_LEFT})
-        )
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_LEFT}))
     elif (
         pressed[pygame.K_RIGHT]
         or (translate_wasd_to_uldr and pressed[pygame.K_d])
         or (not_num_lock and pressed[pygame.K_KP6])
     ):
-        _add_event_if_not_duplicate(
-            events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_RIGHT})
-        )
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_RIGHT}))
     elif pressed[pygame.K_BACKSPACE]:
-        _add_event_if_not_duplicate(
-            events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_BACKSPACE})
-        )
+        _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_BACKSPACE}))
 
 
 def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
@@ -314,39 +296,25 @@ def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
         for hat_id in range(joystick.get_numhats()):
             hat_position = joystick.get_hat(hat_id)
             if -1 == hat_position[0]:
-                _add_event_if_not_duplicate(
-                    events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_LEFT})
-                )
+                _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_LEFT}))
             elif 1 == hat_position[0]:
-                _add_event_if_not_duplicate(
-                    events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_RIGHT})
-                )
+                _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_RIGHT}))
 
             if -1 == hat_position[1]:
-                _add_event_if_not_duplicate(
-                    events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_DOWN})
-                )
+                _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_DOWN}))
             elif 1 == hat_position[1]:
-                _add_event_if_not_duplicate(
-                    events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP})
-                )
+                _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP}))
 
 
-def _add_event_if_not_duplicate(
-    events: List[pygame.event.Event], event: pygame.event.Event
-) -> None:
+def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.event.Event) -> None:
     """Append event to events unless doing so would result in multiple KEYDOWN events for a single key"""
     if pygame.KEYDOWN == event.type:
         for existing_event in events:
-            if (
-                pygame.KEYDOWN == existing_event.type
-                and existing_event.key == event.key
-            ):
+            if pygame.KEYDOWN == existing_event.type and existing_event.key == event.key:
                 # A KEYDOWN event of this type is already in events
-                if (
-                    "unicode" not in existing_event.__dict__
-                    or "" == existing_event.__dict__["unicode"]
-                ) and ("unicode" in event.__dict__ and "" != event.__dict__["unicode"]):
+                if ("unicode" not in existing_event.__dict__ or "" == existing_event.__dict__["unicode"]) and (
+                    "unicode" in event.__dict__ and "" != event.__dict__["unicode"]
+                ):
                     # Sometimes the unicode field of the KEYDOWN (and KEYUP) events is incorrectly set to ''.  If this
                     # event has it where the existing event was missing it, then populate it in the existing event.
                     # The TEXTINPUT events don't seem to have this glitch, but this implementation is all in on the
@@ -362,9 +330,7 @@ def _add_event_if_not_duplicate(
     events.append(event)
 
 
-def _get_event_for_joystick_hat_position(
-    hat_position: Tuple[float, float]
-) -> Optional[pygame.event.Event]:
+def _get_event_for_joystick_hat_position(hat_position: Tuple[float, float]) -> Optional[pygame.event.Event]:
     """Generate key down events from pressed joystick hat - doesn't support one event becoming multiple events"""
     event = None
     if hat_position == (0, -1):
@@ -405,9 +371,7 @@ def main() -> None:
 
         for event in events:
             print("   event =", event, flush=True)
-            if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
-            ):
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 is_running = False
 
         pygame.time.wait(200)
@@ -425,9 +389,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

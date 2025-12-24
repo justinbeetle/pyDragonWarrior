@@ -12,9 +12,7 @@ from pydw.game_types import Map
 
 class MapGenNoise:
     @staticmethod
-    def gen_map_dat(
-        width: int, height: int, elevation_seed: int, moisture_seed: int
-    ) -> List[str]:
+    def gen_map_dat(width: int, height: int, elevation_seed: int, moisture_seed: int) -> List[str]:
         elevation_simplex = OpenSimplex(elevation_seed)
         moisture_simplex = OpenSimplex(moisture_seed)
 
@@ -34,16 +32,10 @@ class MapGenNoise:
                 moisture_factor_x = 1.0
 
                 elevation_noise = (
-                    (elevation_simplex.noise2(x / 8.0, y / 8.0) + 1)
-                    / 2.0
-                    * elevation_factor_x
-                    * elevation_factor_y
+                    (elevation_simplex.noise2(x / 8.0, y / 8.0) + 1) / 2.0 * elevation_factor_x * elevation_factor_y
                 )
                 moisture_noise = (
-                    (moisture_simplex.noise2(x / 20.0, y / 20.0) + 1)
-                    / 2.0
-                    * moisture_factor_x
-                    * moisture_factor_y
+                    (moisture_simplex.noise2(x / 20.0, y / 20.0) + 1) / 2.0 * moisture_factor_x * moisture_factor_y
                 )
                 # print('x=', x, "; y=", y, "; elevation_noise=", elevation_noise)
                 if elevation_noise > 0.725:  # mountain elevation
@@ -72,9 +64,7 @@ class MapGenNoise:
                     else:
                         row += "-"  # desert
                 else:  # ocean elevation
-                    if (
-                        edge_dist_x > 20 and edge_dist_y > 20
-                    ):  # ocean elevation away from the edge of the map
+                    if edge_dist_x > 20 and edge_dist_y > 20:  # ocean elevation away from the edge of the map
                         if moisture_noise > 0.25:
                             row += "w"  # water
                         else:
@@ -109,9 +99,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

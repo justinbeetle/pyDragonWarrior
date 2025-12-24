@@ -16,18 +16,14 @@ def is_windows() -> bool:
     return sys.platform in ("win32", "cygwin")
 
 
-def get_writeable_application_path(
-    application_path: str, application_name: str, directory: str
-) -> Tuple[bool, str]:
+def get_writeable_application_path(application_path: str, application_name: str, directory: str) -> Tuple[bool, str]:
     """Get a writeable directory path for this application
 
     First try to use the path of the application.  Then try APPDATA on Windows.  Finally try the home directory.
     Return a tuple of a bool indicating success and the path identified
     """
     writeable_application_base_path = application_path
-    writeable_application_path = os.path.join(
-        writeable_application_base_path, directory
-    )
+    writeable_application_path = os.path.join(writeable_application_base_path, directory)
 
     def is_path_writeable() -> bool:
         return (
@@ -45,9 +41,7 @@ def get_writeable_application_path(
             # Default to a base path in the user's home directory
             writeable_application_base_path = str(pathlib.Path.home())
 
-        writeable_application_path = os.path.join(
-            writeable_application_base_path, f".{application_name}", directory
-        )
+        writeable_application_path = os.path.join(writeable_application_base_path, f".{application_name}", directory)
 
     return is_path_writeable(), writeable_application_path
 
@@ -129,9 +123,7 @@ def main() -> None:
         # Normal execution
         if args.verbose:
             print("Running as a Python script", flush=True)
-        application_path = base_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        application_path = base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
         # On Windows, change the app user model so that Windows doesn't use the Python icon in the taskbar.
         # NOTE: No longer using is_windows() here because it confuses mypy.  If mypy can't successfully determine this
@@ -154,14 +146,10 @@ def main() -> None:
         venv_path: Optional[str] = None
         if "VIRTUAL_ENV" not in os.environ:
             # Identify path for venv
-            venv_path_found, venv_path = get_writeable_application_path(
-                application_path, application_name, "venv"
-            )
+            venv_path_found, venv_path = get_writeable_application_path(application_path, application_name, "venv")
             if venv_path_found:
                 if args.verbose:
-                    print(
-                        f"Not running in a venv, will switch to {venv_path}", flush=True
-                    )
+                    print(f"Not running in a venv, will switch to {venv_path}", flush=True)
             else:
                 venv_path = None
                 print(
@@ -217,9 +205,7 @@ def main() -> None:
             print("Not running in a venv", flush=True)
 
     # Identify the path for saved gamed files
-    saves_path_found, saves_path = get_writeable_application_path(
-        application_path, application_name, "saves"
-    )
+    saves_path_found, saves_path = get_writeable_application_path(application_path, application_name, "saves")
     if not saves_path_found:
         print(
             "ERROR: Failed to identify a saves path to which the current user has write access",
@@ -228,9 +214,7 @@ def main() -> None:
     elif args.verbose:
         print("Running with a save path of", saves_path, flush=True)
 
-    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = (
-        "1"  # Silence pygame outputs to standard out
-    )
+    os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"  # Silence pygame outputs to standard out
     import pygame
     from generic_utils.point import Point
     from pygame_utils.audio_player import AudioPlayer
@@ -257,9 +241,7 @@ def main() -> None:
     tile_size_pixels = 16
     tile_scaling_factor = 3
 
-    def create_game_loop(
-        game_xml_path: str, error_msg: Optional[str] = None
-    ) -> Optional[GameLoop]:
+    def create_game_loop(game_xml_path: str, error_msg: Optional[str] = None) -> Optional[GameLoop]:
         try:
             return GameLoop(
                 saves_path,
@@ -287,9 +269,7 @@ def main() -> None:
         if not args.force_use_unlicensed_assets:
             # Attempt to load game using the licensed assets
             game_xml_path = os.path.join(base_path, "data", "game_licensed_assets.xml")
-            game_loop = create_game_loop(
-                game_xml_path, "Failed to load using licensed assets"
-            )
+            game_loop = create_game_loop(game_xml_path, "Failed to load using licensed assets")
 
             if not game_loop:
                 # Attempt to load game using the licensed assets after extracting missing assets from the asset pack
@@ -299,9 +279,7 @@ def main() -> None:
                         if args.verbose:
                             print("Extracting assets...", flush=True)
                         for asset_file in asset_pack_file:
-                            if not os.path.exists(
-                                os.path.join(base_path, asset_file.name)
-                            ):
+                            if not os.path.exists(os.path.join(base_path, asset_file.name)):
                                 asset_pack_file.extract(asset_file)
                                 if args.verbose:
                                     print(f"   {asset_file.name}", flush=True)
@@ -313,9 +291,7 @@ def main() -> None:
         if game_loop is None:
             # Fallback to using unlicensed assets
             game_xml_path = os.path.join(base_path, "data", "game.xml")
-            game_loop = create_game_loop(
-                game_xml_path, "ERROR: Failed to load unlicensed assets"
-            )
+            game_loop = create_game_loop(game_xml_path, "ERROR: Failed to load unlicensed assets")
 
     # Run the game
     if game_loop is not None:

@@ -35,9 +35,7 @@ class MonsterParty(CombatParty):
         "tenth",
     ]
 
-    def __init__(
-        self, monsters: List[Union[MonsterInfo, SpecialMonster, MonsterState]] = []
-    ) -> None:
+    def __init__(self, monsters: List[Union[MonsterInfo, SpecialMonster, MonsterState]] = []) -> None:
         super().__init__()
         self.members: List[MonsterState] = []
         for monster in monsters:
@@ -46,9 +44,7 @@ class MonsterParty(CombatParty):
     def get_combat_members(self) -> List[CombatCharacterState]:
         return cast(List[CombatCharacterState], self.members)
 
-    def add_monster(
-        self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]
-    ) -> None:
+    def add_monster(self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]) -> None:
         if isinstance(monster, MonsterState):
             self.members.append(monster)
         else:
@@ -77,9 +73,7 @@ class MonsterParty(CombatParty):
                 current_monster_type_to_count_map[monster.monster_info.name] = 0
             monster.set_name(
                 "the "
-                + MonsterParty.ORDINAL_NUMBERS[
-                    current_monster_type_to_count_map[monster.monster_info.name]
-                ]
+                + MonsterParty.ORDINAL_NUMBERS[current_monster_type_to_count_map[monster.monster_info.name]]
                 + " "
                 + monster.monster_info.name
             )
@@ -114,11 +108,7 @@ class MonsterParty(CombatParty):
         # Now make a second pass and generate a term for each monster type
         terms = []
         for type_name in type_names:
-            term = (
-                MonsterParty.NUMBERS[monster_type_counts[type_name] - 1]
-                + " "
-                + type_name
-            )
+            term = MonsterParty.NUMBERS[monster_type_counts[type_name] - 1] + " " + type_name
             if 1 != monster_type_counts[type_name]:
                 term += "s"
             terms.append(term)

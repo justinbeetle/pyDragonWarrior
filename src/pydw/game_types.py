@@ -38,9 +38,7 @@ class GameTypes:
         return GameTypes.get_dialog_action(dialog, action) is not None
 
     @staticmethod
-    def get_dialog_action(
-        dialog: DialogType, action: DialogActionEnum
-    ) -> Optional[DialogAction]:
+    def get_dialog_action(dialog: DialogType, action: DialogActionEnum) -> Optional[DialogAction]:
         # Not checking sub-trees and the like.  The use dialog for spells and monster action should always be linear.
         for element in dialog:
             if isinstance(element, DialogAction):
@@ -49,9 +47,7 @@ class GameTypes:
         return None
 
     @staticmethod
-    def dialog_contains_action_category(
-        dialog: DialogType, category: ActionCategoryTypeEnum
-    ) -> bool:
+    def dialog_contains_action_category(dialog: DialogType, category: ActionCategoryTypeEnum) -> bool:
         # Not checking sub-trees and the like.  The use dialog for spells and monster action should always be linear.
         for element in dialog:
             if isinstance(element, DialogAction):
@@ -146,9 +142,7 @@ class DialogCheckEnum(Enum):
     IS_TARGET_HERO = 12  # attributes: <none>
     IS_TARGET_MONSTER = 13  # attributes: name - optional monster type
     IS_DEFINED = 14  # attributes: name - returns true if the name is a defined variable
-    IS_NOT_DEFINED = (
-        15  # attributes: name - returns true if the name is NOT a defined variable
-    )
+    IS_NOT_DEFINED = 15  # attributes: name - returns true if the name is NOT a defined variable
 
 
 # Actions that can be triggered from dialog
@@ -167,22 +161,14 @@ class DialogActionEnum(Enum):
     GOTO_COORDINATES = 8  # attributes: map, x, y, dir
     GOTO_LAST_OUTSIDE_COORDINATES = 9  # attributes: <none>
     PLAY_SOUND = 10  # attributes: name
-    PLAY_MUSIC = (
-        11  # attributes: name (play it once and return to looping on the prior music)
-    )
-    VISUAL_EFFECT = (
-        12  # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
-    )
-    START_ENCOUNTER = (
-        13  # attributes: name, approach_dialog, victory_dialog, run_away_dialog,
-    )
+    PLAY_MUSIC = 11  # attributes: name (play it once and return to looping on the prior music)
+    VISUAL_EFFECT = 12  # attributes: name (fadeToBlackAndBack, flickering, rainbowEffect, darkness)
+    START_ENCOUNTER = 13  # attributes: name, approach_dialog, victory_dialog, run_away_dialog,
     #                                                encounterMusic
     OPEN_LOCKED_ITEM = 14  # attributes: <none>
     SLEEP = 15  # attributes: bypass (to bypass resistances), category
     STOPSPELL = 16  # attributes: bypass (to bypass resistances), category
-    DAMAGE_TARGET = (
-        17  # attributes: count (number, range, unlimited, or default), category
-    )
+    DAMAGE_TARGET = 17  # attributes: count (number, range, unlimited, or default), category
     #                                                bypass (to bypass resistances and damage modifiers)
     WAIT = 18  # attributes: count (number of milliseconds to wait)
     SET_LEVEL = 19  # attributes: name, bypass (to bypass updating the screen)
@@ -250,9 +236,7 @@ class DialogGoTo:
 # consisting of item name and gold cost (as str)
 # Optionally could also be a string for replacement by a DialogVariable
 DialogVendorBuyOptionsParamWithoutReplacementType = List[List[str]]
-DialogVendorBuyOptionsParamType = Union[
-    DialogVendorBuyOptionsParamWithoutReplacementType, str
-]
+DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
 
 
 # Dialog for a list of vendor buy options
@@ -264,9 +248,7 @@ class DialogVendorBuyOptions:
 # List of the classes of items that can be sold to the vendor
 # Optionally could also be a string for replacement by a DialogVariable
 DialogVendorSellOptionsParamWithoutReplacementType = List[str]
-DialogVendorSellOptionsParamType = Union[
-    DialogVendorSellOptionsParamWithoutReplacementType, str
-]
+DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacementType, str]
 
 
 @dataclass
@@ -315,9 +297,7 @@ class DialogAction:
     victory_dialog: Optional[DialogType] = None
     run_away_dialog: Optional[DialogType] = None
     encounter_music: Optional[str] = None
-    category: ActionCategoryTypeEnum = (
-        ActionCategoryTypeEnum.PHYSICAL
-    )  # TODO: Change to list of categories?
+    category: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL  # TODO: Change to list of categories?
     target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ALLY
     problem: Optional[Problem] = None
 
@@ -326,12 +306,8 @@ class DialogAction:
 class DialogReplacementVariables:
     def __init__(self) -> None:
         self.generic: Dict[str, str] = {}
-        self.vendor_buy_options: Dict[
-            str, DialogVendorBuyOptionsParamWithoutReplacementType
-        ] = {}
-        self.vendor_sell_options: Dict[
-            str, DialogVendorSellOptionsParamWithoutReplacementType
-        ] = {}
+        self.vendor_buy_options: Dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = {}
+        self.vendor_sell_options: Dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = {}
 
 
 class Tile(NamedTuple):
@@ -382,9 +358,7 @@ class CharacterType(NamedTuple):
 class IncomingTransition(NamedTuple):
     point: Point  # Location of PC on incoming transit; trigger point for outgoing point transit
     dir: Direction  # Direction of the PC on incoming transit
-    name: Optional[
-        str
-    ]  # Name of transition (where needed due to keep transits unambiguous)
+    name: Optional[str]  # Name of transition (where needed due to keep transits unambiguous)
     dest_map: Optional[str] = None  # Name of map to which the transition connects
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
@@ -393,16 +367,10 @@ class IncomingTransition(NamedTuple):
 class OutgoingTransition(NamedTuple):
     point: Point  # Location of PC on incoming transit; trigger point for outgoing point transit
     dir: Direction  # Direction of the PC on incoming transit
-    name: Optional[
-        str
-    ]  # Name of transition (where needed to keep transits unambiguous)
+    name: Optional[str]  # Name of transition (where needed to keep transits unambiguous)
     dest_map: str  # Name of map to which the transition connects
-    dest_name: Optional[str] = (
-        None  # Name of destination transition in the destination map
-    )
-    respawn_decorations: bool = (
-        False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
-    )
+    dest_name: Optional[str] = None  # Name of destination transition in the destination map
+    respawn_decorations: bool = False  # Do removable decorations (ie doors, chests) get respawned when transit occurs
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
 
@@ -536,37 +504,25 @@ class MonsterAction(NamedTuple):
     use_dialog: DialogType
 
     def is_spell(self) -> bool:
-        return GameTypes.dialog_contains_action_category(
-            self.use_dialog, ActionCategoryTypeEnum.MAGICAL
-        )
+        return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.MAGICAL)
 
     def is_damage_action(self) -> bool:
-        return GameTypes.dialog_contains_action(
-            self.use_dialog, DialogActionEnum.DAMAGE_TARGET
-        )
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET)
 
     def is_heal_action(self) -> bool:
-        return GameTypes.dialog_contains_action(
-            self.use_dialog, DialogActionEnum.HEALTH_RESTORE
-        )
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.HEALTH_RESTORE)
 
     def is_sleep_action(self) -> bool:
         return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.SLEEP)
 
     def is_stopspell_action(self) -> bool:
-        return GameTypes.dialog_contains_action(
-            self.use_dialog, DialogActionEnum.STOPSPELL
-        )
+        return GameTypes.dialog_contains_action(self.use_dialog, DialogActionEnum.STOPSPELL)
 
     def is_fire_attack(self) -> bool:
-        return GameTypes.dialog_contains_action_category(
-            self.use_dialog, ActionCategoryTypeEnum.FIRE
-        )
+        return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.FIRE)
 
     def get_damage_range(self) -> Tuple[int, int]:
-        dialog_action = GameTypes.get_dialog_action(
-            self.use_dialog, DialogActionEnum.DAMAGE_TARGET
-        )
+        dialog_action = GameTypes.get_dialog_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET)
         if dialog_action is not None:
             return GameTypes.parse_int_range(dialog_action.count)
         return 0, 0
@@ -598,9 +554,7 @@ class MonsterInfo(NamedTuple):
     may_run_away: bool
 
 
-PygameSurfaceFormatType = Union[
-    Literal["P"], Literal["RGB"], Literal["RGBX"], Literal["RGBA"], Literal["ARGB"]
-]
+PygameSurfaceFormatType = Union[Literal["P"], Literal["RGB"], Literal["RGBX"], Literal["RGBA"], Literal["ARGB"]]
 
 
 class SurfacePickable(NamedTuple):
@@ -609,12 +563,8 @@ class SurfacePickable(NamedTuple):
     format: PygameSurfaceFormatType
 
     @staticmethod
-    def from_surface(
-        surface: pygame.surface.Surface, format: PygameSurfaceFormatType = "RGBA"
-    ) -> SurfacePickable:
-        return SurfacePickable(
-            pygame.image.tobytes(surface, format), surface.get_size(), format
-        )
+    def from_surface(surface: pygame.surface.Surface, format: PygameSurfaceFormatType = "RGBA") -> SurfacePickable:
+        return SurfacePickable(pygame.image.tobytes(surface, format), surface.get_size(), format)
 
     def to_surface(self) -> pygame.surface.Surface:
         return pygame.image.frombytes(self.pixels, self.size, self.format)

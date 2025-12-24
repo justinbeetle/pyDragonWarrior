@@ -35,9 +35,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

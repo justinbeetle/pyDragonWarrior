@@ -1,13 +1,11 @@
-""" Module defining tests for the Point class """
+"""Module defining tests for the Point class"""
 
 import math
 
 from generic_utils.point import Point, PointTypeElemType
 
 
-def validate_point_values(
-    point: Point, expected_x: PointTypeElemType, expected_y: PointTypeElemType
-) -> None:
+def validate_point_values(point: Point, expected_x: PointTypeElemType, expected_y: PointTypeElemType) -> None:
     """Validate that the Point has the expected coordinates and magnitude"""
     assert point == (expected_x, expected_y)
     assert point == Point(expected_x, expected_y)
@@ -55,17 +53,13 @@ def point_binary_operations(
     validate_point_values(point1 + point2, x1 + x2, y1 + y2)
     validate_point_values((x1, y1) + point2, x1 + x2, y1 + y2)
     validate_point_values(point1 + (x2, y2), x1 + x2, y1 + y2)
-    assert len((x1, y1) + (x2, y2)) != len(
-        (x1 + x2, y1 + y2)
-    )  # Normal tuples instead concatenate!
+    assert len((x1, y1) + (x2, y2)) != len((x1 + x2, y1 + y2))  # Normal tuples instead concatenate!
 
     # point2+point1
     validate_point_values(point2 + point1, x1 + x2, y1 + y2)
     validate_point_values((x2, y2) + point1, x1 + x2, y1 + y2)
     validate_point_values(point2 + (x1, y1), x1 + x2, y1 + y2)
-    assert len((x2, y2) + (x1, y1)) != len(
-        (x1 + x2, y1 + y2)
-    )  # Normal tuples instead concatenate!
+    assert len((x2, y2) + (x1, y1)) != len((x1 + x2, y1 + y2))  # Normal tuples instead concatenate!
 
     # point1-point2
     validate_point_values(point1 - point2, x1 - x2, y1 - y2)

@@ -72,9 +72,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
             return False
         if DialogActionEnum.STOPSPELL == action and target.are_spells_blocked:
             return False
-        if not bypass_resistance and target.get_resistance(
-            action, category
-        ) > random.uniform(0, 1):
+        if not bypass_resistance and target.get_resistance(action, category) > random.uniform(0, 1):
             return False
         if isinstance(self, type(target)) and action in (
             DialogActionEnum.SLEEP,
@@ -95,9 +93,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
 
     # Determine if character should remain asleep.  Maintain turns_asleep.
     def is_still_asleep(self) -> bool:
-        ret_val = self.is_asleep and (
-            self.turns_asleep == 0 or random.uniform(0, 1) > self.get_wake_probability()
-        )
+        ret_val = self.is_asleep and (self.turns_asleep == 0 or random.uniform(0, 1) > self.get_wake_probability())
         if ret_val:
             self.turns_asleep += 1
         else:
@@ -134,9 +130,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_resistance(
-        self, action: DialogActionEnum, category: ActionCategoryTypeEnum
-    ) -> float:
+    def get_resistance(self, action: DialogActionEnum, category: ActionCategoryTypeEnum) -> float:
         pass
 
     @abc.abstractmethod
@@ -164,9 +158,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         # print('min_damage =', min_damage, flush=True)
         # print('max_damage =', max_damage, flush=True)
         modifier = target.get_damage_modifier(damage_type)
-        damage = math.floor(
-            (min_damage + random.uniform(0, 1) * (max_damage - min_damage)) * modifier
-        )
+        damage = math.floor((min_damage + random.uniform(0, 1) * (max_damage - min_damage)) * modifier)
         if damage < 1:
             damage = random.randint(0, 1)
         return damage

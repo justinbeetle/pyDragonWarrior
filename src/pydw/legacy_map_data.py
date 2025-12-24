@@ -22,9 +22,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     CHARACTER_LAYER = 2
     OVERLAY_MAP_LAYER = 3
 
-    def __init__(
-        self, game_info: GameInfo, map_name: str, image_pad_tiles: Point = Point(0, 0)
-    ):
+    def __init__(self, game_info: GameInfo, map_name: str, image_pad_tiles: Point = Point(0, 0)):
         super().__init__()
         self.game_info = game_info
         self.map_name = map_name
@@ -39,18 +37,14 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         )
 
         # Load up the images for the base map and overlay
-        self.base_map_images = self.get_map_images_from_game_info(
-            self.game_info.maps[map_name].dat
-        )
+        self.base_map_images = self.get_map_images_from_game_info(self.game_info.maps[map_name].dat)
         self.overlay_images = None
         overlay_dat = self.game_info.maps[map_name].overlay_dat
         if overlay_dat is not None:
             self.overlay_images = self.get_map_images_from_game_info(overlay_dat)
         self.layers_to_render = self.all_tile_layers
 
-    def get_map_images_from_game_info(
-        self, dat: List[str]
-    ) -> List[List[Optional[pygame.surface.Surface]]]:
+    def get_map_images_from_game_info(self, dat: List[str]) -> List[List[Optional[pygame.surface.Surface]]]:
         def pad_row(row_to_pad: str) -> str:
             pad_width = int(self.image_pad_tiles.w)
             return row_to_pad[0] * pad_width + row_to_pad + row_to_pad[-1] * pad_width
@@ -83,29 +77,15 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 # Determine which image to use
                 image_idx = 0
                 # TODO: Fix hardcoded exception for the bridge tile_symbol of 'b'
-                if (
-                    y > 0
-                    and padded_dat[y - 1][x] != tile_symbol
-                    and padded_dat[y - 1][x] != "b"
-                ):
+                if y > 0 and padded_dat[y - 1][x] != tile_symbol and padded_dat[y - 1][x] != "b":
                     image_idx += 8
-                if (
-                    y < len(padded_dat) - 1
-                    and padded_dat[y + 1][x] != tile_symbol
-                    and padded_dat[y + 1][x] != "b"
-                ):
+                if y < len(padded_dat) - 1 and padded_dat[y + 1][x] != tile_symbol and padded_dat[y + 1][x] != "b":
                     image_idx += 2
                 if x > 0 and row_data[x - 1] != tile_symbol and row_data[x - 1] != "b":
                     image_idx += 1
-                if (
-                    x < len(row_data) - 1
-                    and row_data[x + 1] != tile_symbol
-                    and row_data[x + 1] != "b"
-                ):
+                if x < len(row_data) - 1 and row_data[x + 1] != tile_symbol and row_data[x + 1] != "b":
                     image_idx += 4
-                map_images_row.append(
-                    self.game_info.random_tile_image(tile_symbol, image_idx)
-                )
+                map_images_row.append(self.game_info.random_tile_image(tile_symbol, image_idx))
             map_images.append(map_images_row)
 
         return map_images
@@ -180,9 +160,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     def get_animations(self) -> None:
         return
 
-    def convert_surfaces(
-        self, parent: pygame.surface.Surface, alpha: bool = False
-    ) -> None:
+    def convert_surfaces(self, parent: pygame.surface.Surface, alpha: bool = False) -> None:
         """Convert all images in the data to match the parent
 
         :param parent: pygame.surface.Surface
@@ -192,8 +170,6 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         def convert_surfaces_helper(
             map_images: List[List[Optional[pygame.surface.Surface]]],
-            parent: pygame.surface.Surface,
-            alpha: bool = False,
         ) -> List[List[Optional[pygame.surface.Surface]]]:
             converted_map_images: List[List[Optional[pygame.surface.Surface]]] = []
             for map_images_row in map_images:
@@ -202,19 +178,15 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                     if image is None:
                         converted_images_row.append(None)
                     elif alpha:
-                        converted_images_row.append(image.convert_alpha(parent))
+                        converted_images_row.append(image.convert_alpha())
                     else:
                         converted_images_row.append(image.convert(parent))
                 converted_map_images.append(converted_images_row)
             return converted_map_images
 
-        self.base_map_images = convert_surfaces_helper(
-            self.base_map_images, parent, alpha
-        )
+        self.base_map_images = convert_surfaces_helper(self.base_map_images)
         if self.overlay_images is not None:
-            self.overlay_images = convert_surfaces_helper(
-                self.overlay_images, parent, alpha
-            )
+            self.overlay_images = convert_surfaces_helper(self.overlay_images)
 
     @property
     def tile_size(self) -> Tuple[int, int]:
@@ -249,9 +221,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         image_indexing: bool = True,
         limit_to_visible: bool = True,
     ) -> Optional[pygame.surface.Surface]:
-        if layer_idx not in self.all_tile_layers or (
-            limit_to_visible and layer_idx not in self.layers_to_render
-        ):
+        if layer_idx not in self.all_tile_layers or (limit_to_visible and layer_idx not in self.layers_to_render):
             return None
 
         if not image_indexing:
@@ -262,10 +232,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         if layer_idx == LegacyMapData.BASE_MAP_LAYER:
             return self.base_map_images[y][x]
-        elif (
-            layer_idx == LegacyMapData.OVERLAY_MAP_LAYER
-            and self.overlay_images is not None
-        ):
+        elif layer_idx == LegacyMapData.OVERLAY_MAP_LAYER and self.overlay_images is not None:
             return self.overlay_images[y][x]
 
         return None
@@ -280,9 +247,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """
         return None
 
-    def get_tile_images_by_rect(
-        self, rect: pygame.Rect
-    ) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
+    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
         x1, y1, x2, y2 = pyscroll.common.rect_to_bb(rect)
         tiles_w, tiles_h = self.map_size_tiles.get_as_int_tuple()
         x1 = min(max(x1, 0), tiles_w - 1)
@@ -307,18 +272,14 @@ class ScrollTest:
 
     """
 
-    def __init__(
-        self, screen: pygame.surface.Surface, game_info: GameInfo, map_name: str
-    ):
+    def __init__(self, screen: pygame.surface.Surface, game_info: GameInfo, map_name: str):
         self.screen = screen
 
         # create new data source
         map_data = LegacyMapData(game_info, map_name, Point(100, 100))
 
         # create new renderer
-        self.map_layer = pyscroll.orthographic.BufferedRenderer(
-            map_data, self.screen.get_size()
-        )
+        self.map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
         # create a font and pre-render some text to be displayed over the map
         f = pygame.font.Font(pygame.font.get_default_font(), 20)
@@ -379,9 +340,7 @@ class ScrollTest:
 
             # this will be handled if the window is resized
             elif event.type == pygame.VIDEORESIZE:
-                self.screen = pygame.display.set_mode(
-                    (event.w, event.h), pygame.RESIZABLE
-                )
+                self.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
                 self.map_layer.set_size((event.w, event.h))
 
         # these keys will change the camera vector
@@ -489,20 +448,12 @@ class MapViewer:
         if desired_win_size_pixels is None:
             self.screen: pygame.surface.Surface = pygame.display.set_mode(
                 (0, 0),
-                pygame.FULLSCREEN
-                | pygame.NOFRAME
-                | pygame.SRCALPHA
-                | pygame.DOUBLEBUF
-                | pygame.HWSURFACE,
+                pygame.FULLSCREEN | pygame.NOFRAME | pygame.SRCALPHA | pygame.DOUBLEBUF | pygame.HWSURFACE,
             )
             self.win_size_pixels: Point = Point(self.screen.get_size())
-            self.win_size_tiles: Point = (
-                self.win_size_pixels / self.tile_size_pixels
-            ).floor()
+            self.win_size_tiles: Point = (self.win_size_pixels / self.tile_size_pixels).floor()
         else:
-            self.win_size_tiles = (
-                desired_win_size_pixels / self.tile_size_pixels
-            ).floor()
+            self.win_size_tiles = (desired_win_size_pixels / self.tile_size_pixels).floor()
             self.win_size_pixels = self.win_size_tiles * self.tile_size_pixels
             self.screen = pygame.display.set_mode(
                 self.win_size_pixels.get_as_int_tuple(),
@@ -513,13 +464,9 @@ class MapViewer:
         # Initialize GameInfo
         import os
 
-        base_path = os.path.join(
-            os.path.dirname(__file__), os.path.pardir, os.path.pardir
-        )
+        base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
         game_xml_path = os.path.join(base_path, "game.xml")
-        self.game_info = GameInfo(
-            base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels
-        )
+        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
 
         self.is_running = True
 
@@ -555,9 +502,7 @@ if __name__ == "__main__":
         import traceback
 
         print(
-            traceback.format_exception(
-                None, e, e.__traceback__  # <- type(e) by docs, but ignored
-            ),
+            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
             file=sys.stderr,
             flush=True,
         )

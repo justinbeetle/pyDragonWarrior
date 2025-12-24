@@ -116,7 +116,7 @@ Potential polearm grips names: https://grauenwolf.wordpress.com/2015/03/15/propo
 FUTURE: Could add additional wrinkles and complexity to track distance of combatants and make footwork selections for the
 attack.
 
-Measure and distance: A figher's measure is their attack range.  You want to be safely outside the measure of your
+Measure and distance: A fighter's measure is their attack range.  You want to be safely outside the measure of your
 opponent but need your opponent to be within your measure, or "in measure", to land an attack.
   * Stand ground: No forward movement, must already be in measure.
   * Advancing (retreating) step: Short, quick step pushing off with rear leg and take one step forward.  In reverse,
@@ -245,7 +245,7 @@ Special Properties:
 
 Shields:
 * Round Shield: Large round wooden shield.
-* Kite Shield: Large tear-drop shaped shield tall enough to extend coverage to the legs.
+* Kite Shield: Large teardrop shaped shield tall enough to extend coverage to the legs.
 * Heater Shield: Medium sized heater-shaped shield made with layers of wooden and leather reinforced with steel.  Has
 a slight curvature to partially deflect blows.
 * Buckler: Small and light metal shield with a curved surface to partially deflect blows.
