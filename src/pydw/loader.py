@@ -16,13 +16,11 @@ from generic_utils.point import Point
 from pygame_utils.audio_player import AudioPlayer
 from pygame_utils import game_events
 
-from pydw.exploring import Exploring
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
 from pydw.game_state import GameState
 from pydw.launcher import Launcher
 from pydw.loading_screen import LoadingScreen
-from pydw.main_menu import MainMenu
 
 
 class Loader:

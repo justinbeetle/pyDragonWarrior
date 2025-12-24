@@ -22,7 +22,7 @@ class BootstrappableApplication(Protocol):
     def get_arg_parser(self) -> ArgumentParser:
         """Get an ArgumentParser populated for the application.
 
-        Bootstrapper adds -v/--verbose and -s/--skip-pip-install options.  A LaunchableApplication needs to reserve
+        Bootstrapper adds -v/--verbose and -s/--skip-pip-install options.  A BootstrappableApplication needs to reserve
         these options for the Launcher, though the verbose option is generic and can also be used by the application."""
 
     def run(self, args: Namespace, base_path: str, saves_path: str) -> int:
