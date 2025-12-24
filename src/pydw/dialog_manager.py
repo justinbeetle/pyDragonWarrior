@@ -100,6 +100,8 @@ class DialogManager:
 
         # Render each of the dialogs using the appropriate color
         screen = pygame.display.get_surface()
+        if screen is None:
+            raise ValueError("No screen")
         if self.status_dialog:
             dialog_color = background_font_color if has_cascading_dialogs else foreground_font_color
             self.status_dialog.set_font_color(dialog_color)

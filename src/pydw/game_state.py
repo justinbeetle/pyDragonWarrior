@@ -52,7 +52,10 @@ class GameState(GameStateInterface, DialogManagerMediator):
         tile_size_pixels: int,
         verbose: bool = False,
     ) -> None:
-        super().__init__(pygame.display.get_surface())
+        screen = pygame.display.get_surface()
+        if screen is None:
+            raise ValueError("No screen")
+        super().__init__(screen)
 
         self.saves_path = saves_path
         self.win_size_tiles = win_size_tiles

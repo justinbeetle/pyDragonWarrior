@@ -104,8 +104,11 @@ class Loader:
     def determine_tile_size(self) -> None:
         """Determine the tile size and window size in tiles.  Sets self.tile_size_pixels and self.win_size_tiles."""
 
+        screen = pygame.display.get_surface()
+        if screen is None:
+            raise ValueError("No screen")
         tile_scaling_factor = Loader.desired_tile_scaling_factor
-        win_size_pixels = Point(pygame.display.get_surface().get_size())
+        win_size_pixels = Point(screen.get_size())
         self.win_size_tiles = win_size_pixels / self.tile_size_pixels
 
         # Determine if the tile scaling factor should be reduced

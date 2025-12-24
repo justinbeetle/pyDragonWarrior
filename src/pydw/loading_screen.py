@@ -39,6 +39,8 @@ class LoadingScreen:
 
         # Display the title image
         screen = pygame.display.get_surface()
+        if screen is None:
+            raise ValueError("No screen")
         win_size_pixels = Point(screen.get_size())
         screen.fill("black")
         if self.title_image:

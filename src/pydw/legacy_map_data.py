@@ -174,8 +174,6 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         def convert_surfaces_helper(
             map_images: List[List[Optional[pygame.surface.Surface]]],
-            parent: pygame.surface.Surface,
-            alpha: bool = False,
         ) -> List[List[Optional[pygame.surface.Surface]]]:
             converted_map_images: List[List[Optional[pygame.surface.Surface]]] = []
             for map_images_row in map_images:
@@ -184,15 +182,15 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                     if image is None:
                         converted_images_row.append(None)
                     elif alpha:
-                        converted_images_row.append(image.convert_alpha(parent))
+                        converted_images_row.append(image.convert_alpha())
                     else:
                         converted_images_row.append(image.convert(parent))
                 converted_map_images.append(converted_images_row)
             return converted_map_images
 
-        self.base_map_images = convert_surfaces_helper(self.base_map_images, parent, alpha)
+        self.base_map_images = convert_surfaces_helper(self.base_map_images)
         if self.overlay_images is not None:
-            self.overlay_images = convert_surfaces_helper(self.overlay_images, parent, alpha)
+            self.overlay_images = convert_surfaces_helper(self.overlay_images)
 
     @property
     def tile_size(self) -> Tuple[int, int]:
