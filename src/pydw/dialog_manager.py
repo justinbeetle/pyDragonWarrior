@@ -89,20 +89,6 @@ class DialogManager:
             self.cascading_dialogs.clear()
             self.draw(flip_buffer)
 
-    """
-    def draw_status_dialog(self, flip_buffer: bool = False) -> None:
-        DialogManager.draw_dialog(self.status_dialog, flip_buffer)
-
-    def draw_message_dialog(self, flip_buffer: bool = False) -> None:
-        DialogManager.draw_dialog(self.message_dialog, flip_buffer)
-
-    @staticmethod
-    def draw_dialog(dialog: Optional[GameDialog], flip_buffer: bool = False) -> None:
-        if dialog is not None:
-            screen = pygame.display.get_surface()
-            dialog.blit(screen, flip_buffer)
-    """
-
     def draw_dialogs(self, flip_buffer: bool = True) -> None:
         """Draw the current set of dialogs to the display."""
         # Determine the font (and border) color for the dialogs
