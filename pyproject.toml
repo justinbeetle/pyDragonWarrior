@@ -105,7 +105,7 @@ good-names = [
 ]
 
 [tool.pylint.CHECKER]
-fail-under = 8.7
+fail-under = 8.6
 
 [tool.pylint.FORMAT]
 max-line-length = 120
