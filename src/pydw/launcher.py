@@ -147,11 +147,11 @@ class Bootstrapper:
             application_path = base_path = self.get_application_base_path()
 
             # On Windows, change the app user model so that Windows doesn't use the Python icon in the taskbar.
-            # NOTE: No longer using is_os_windows() here because it confuses mypy.  If mypy can't successfully determine
-            #       this logic is platform specific, it will report an error on Linux for ctypes.windll.  Applying a
-            #       type ignore on that line also doesn't work, as it results in an unused ignore error in Windows.
-            #       See https://github.com/python/mypy/issues/9242 for more info.
-            if sys.platform in ("win32", "cygwin"):
+            # NOTE: No longer using is_os_windows() here (or even the in syntax from the method) because it confuses
+            #       mypy.  If mypy can't successfully determine this logic is platform specific, it will report an error
+            #       on Linux for ctypes.windll.  Applying a type ignore on that line also doesn't work, as it results in
+            #       an unused ignore error in Windows.  See https://github.com/python/mypy/issues/9242 for more info.
+            if sys.platform == "win32" or sys.platform == "cygwin":
                 import ctypes
 
                 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
