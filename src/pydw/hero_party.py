@@ -14,6 +14,8 @@ from pydw.monster_party import MonsterParty
 
 
 class HeroParty(CombatParty):
+    """Data structure for the state of the party of heroes."""
+
     def __init__(self, main_character: HeroState) -> None:
         super().__init__()
         self.main_character = main_character
@@ -32,6 +34,8 @@ class HeroParty(CombatParty):
         self.last_outside_map_name = ""
         self.last_outside_pos_dat_tile = Point()
         self.last_outside_dir = Direction.SOUTH
+
+        self.last_direction: Optional[Direction] = None
 
     @property
     def combat_members(self) -> List[HeroState]:
@@ -208,6 +212,20 @@ class HeroParty(CombatParty):
             if not member.is_ignoring_tile_penalties():
                 return False
         return True
+
+    def is_moving(self) -> bool:
+        """Return true if the hero party is moving, else false."""
+        return self.members[0].is_moving()
+
+    def has_turned(self) -> bool:
+        """Return true if the hero party has turned since this method was last called, else false."""
+        return_value = self.last_direction != self.members[0].direction
+        self.last_direction = self.members[0].direction
+        return return_value
+
+    def move(self, direction: Direction) -> None:
+        """Move the first member in the party.  ."""
+        self.members[0].move(direction)
 
     def get_curr_pos_dat_tile(self) -> Point:
         return self.members[0].curr_pos_dat_tile

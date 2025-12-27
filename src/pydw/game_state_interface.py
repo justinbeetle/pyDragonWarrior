@@ -158,5 +158,5 @@ class GameStateInterface(ABC, GenericGameState):
         """Get the dialog manager."""
 
     @abstractmethod
-    def draw(self, flip_buffer: bool = True) -> None:
+    def draw(self, flip_buffer: bool = True, advance_tick: bool = False) -> None:
         """Draw the current state of the game mode to the display."""

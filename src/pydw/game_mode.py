@@ -22,7 +22,13 @@ class GameMode(ABC):
         """Draw the current state of the game mode's background to the display.
         The background is whatever is behind the dialogs."""
 
-    def draw(self, flip_buffer: bool = True) -> None:
+    def advance_tick(self) -> None:
+        """Advance the state of the game mode by one tick."""
+        raise NotImplementedError()
+
+    def draw(self, flip_buffer: bool = True, advance_tick: bool = False) -> None:
         """Draw the current state of the game mode to the display."""
+        if advance_tick:
+            self.advance_tick()
         self.draw_background()
         self.dialog_manager.draw_dialogs(flip_buffer)

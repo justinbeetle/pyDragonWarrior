@@ -221,10 +221,11 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self,
         x: int,
         y: int,
-        layer_idx: int,
+        l: int,
         image_indexing: bool = True,
         limit_to_visible: bool = True,
     ) -> Optional[pygame.surface.Surface]:
+        layer_idx = l
         if layer_idx not in self.all_tile_layers or (limit_to_visible and layer_idx not in self.layers_to_render):
             return None
 

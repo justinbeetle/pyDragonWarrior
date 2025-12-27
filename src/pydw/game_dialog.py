@@ -1012,6 +1012,9 @@ class GameDialog:
         # Refresh image
         self.refresh_image()
 
+    def get_screen_rect(self) -> pygame.Rect:
+        return pygame.Rect(self.pos_tile * GameDialog.tile_size_pixels, self.image.get_size())
+
     def blit(
         self,
         surface: pygame.surface.Surface,
@@ -1052,8 +1055,8 @@ class GameDialog:
             return self.menu_row, self.menu_col
         return None
 
-    def set_selected_menu_option(self, menu_item: str) -> None:
-        if self.row_data is not None and self.menu_data is not None:
+    def set_selected_menu_option(self, menu_item: Optional[str]) -> None:
+        if menu_item is not None and self.row_data is not None and self.menu_data is not None:
             for row in range(len(self.menu_data)):
                 for col in range(len(self.menu_data[row])):
                     if menu_item == self.menu_data[row][col]:

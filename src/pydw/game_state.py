@@ -70,9 +70,6 @@ class GameState(GameStateInterface, DialogManagerMediator):
         self.pending_dialog: Optional[DialogType] = None
         self.load()
 
-        self.clock = pygame.time.Clock()
-        self.tick_count = 0
-
         self.dialog_manager = DialogManager(self)
         self.current_game_mode: Optional[GameMode] = None
         self.combat_encounter: Optional[CombatEncounter] = None
@@ -94,7 +91,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         if self.is_running:
             from pydw.exploring import Exploring
 
-            self.current_game_mode = Exploring(self, self.verbose)
+            self.current_game_mode = Exploring(self)
             self.current_game_mode.game_mode_loop()
 
         return 0
@@ -698,6 +695,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         draw_status: bool = True,
         draw_only_character_sprites: bool = False,
     ) -> None:
+        # TODO: This method should move into Exploring, and maybe the game_map should move with it...
         if draw_only_character_sprites:
             self.game_map.draw_character_sprites()
             return
@@ -712,34 +710,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
             self.combat_encounter.render_monsters()
         elif draw_status:
             self.dialog_manager.status_dialog = GameDialog.create_persistent_status_dialog(self.hero_party)
-            self.dialog_manager.status_dialog.blit(self.screen, False)
+            self.dialog_manager.draw_dialogs()
 
         # Flip the screen buffer
-        if flip_buffer:
-            pygame.display.flip()
-
-    def advance_tick(
-        self,
-        update_map: bool = True,
-        draw_map: bool = True,
-        advance_time: bool = True,
-        flip_buffer: bool = True,
-    ) -> None:
-        if update_map:
-            self.game_map.update()
-
-        if draw_map:
-            self.draw_map(flip_buffer=False)
-
-        if advance_time:
-            # Allow pygame to process internal events for interacting with the OS every frame
-            pygame.event.pump()
-
-            self.clock.tick(30)
-            # self.tick_count += 1
-            # if 10 == self.tick_count % 100:
-            #     print(f'FPS = {self.clock.get_fps()}', flush=True)
-
         if flip_buffer:
             pygame.display.flip()
 
@@ -857,7 +830,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
         if not self.hero_party.has_surviving_members():
             # Player death
             self.hero_party.main_character.hp = 0
-            GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.screen, False)
+            self.dialog_manager.add_status_dialog(
+                GameDialog.create_encounter_status_dialog(self.hero_party), flip_buffer=False
+            )
             gde = GameDialogEvaluator(self)
             if self.dialog_manager.message_dialog is None:
                 self.dialog_manager.message_dialog = GameDialog.create_message_dialog()
@@ -883,8 +858,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
             self.is_running = False
 
         AudioPlayer().play_sound("select")
-        menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), "Do you really want to quit?")
-        self.dialog_manager.add_cascading_dialog(menu_dialog)
+        menu_dialog = self.dialog_manager.add_high_priority_cascading_dialog(
+            GameDialog.create_yes_no_menu(Point(0.5, 0.5), "Do you really want to quit?")
+        )
         menu_result = GameDialogEvaluator(self).get_menu_result(menu_dialog, allow_quit=False)
         if menu_result is not None and menu_result == "YES":
             self.is_running = False
@@ -901,9 +877,10 @@ class GameState(GameStateInterface, DialogManagerMediator):
         """Get the dialog manager."""
         return self.dialog_manager
 
-    def draw(self, flip_buffer: bool = True) -> None:
+    def draw(self, flip_buffer: bool = True, advance_tick: bool = False) -> None:
         """Draw the current state of the game mode to the display."""
-        self.dialog_manager.draw(flip_buffer)
+        if self.current_game_mode:
+            self.current_game_mode.draw(flip_buffer, advance_tick)
 
     def draw_background(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode's background to the display.

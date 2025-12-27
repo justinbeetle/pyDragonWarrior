@@ -5,6 +5,7 @@
 from typing import Optional, List, Protocol, Tuple
 
 from argparse import ArgumentParser, Namespace
+import logging
 from multiprocessing import freeze_support
 import os
 import pathlib
@@ -22,8 +23,9 @@ class BootstrappableApplication(Protocol):
     def get_arg_parser(self) -> ArgumentParser:
         """Get an ArgumentParser populated for the application.
 
-        Bootstrapper adds -v/--verbose and -s/--skip-pip-install options.  A BootstrappableApplication needs to reserve
-        these options for the Launcher, though the verbose option is generic and can also be used by the application."""
+        Bootstrapper adds -v/--verbose, -vv/--very-verbose, and -s/--skip-pip-install options.  A
+        BootstrappableApplication needs to reserve  these options for the Launcher, though the verbose option is generic
+        and can also be used by the application."""
 
     def run(self, args: Namespace, base_path: str, saves_path: str) -> int:
         """Method to run the application returning an exit code for the application."""
@@ -112,8 +114,18 @@ class Bootstrapper:
             default=False,
             help="Enable verbose logging",
         )
+        parser.add_argument(
+            "-vv",
+            "--very-verbose",
+            action="store_true",
+            default=False,
+            help="Enable very verbose",
+        )
         args = parser.parse_args(argv)
         # print('args =', args, flush=True)
+
+        # Setup logging
+        self.setup_logging(args)
 
         # Determine if application is a script file or frozen exe
         is_frozen = getattr(sys, "frozen", False)
@@ -139,7 +151,7 @@ class Bootstrapper:
             #       this logic is platform specific, it will report an error on Linux for ctypes.windll.  Applying a
             #       type ignore on that line also doesn't work, as it results in an unused ignore error in Windows.
             #       See https://github.com/python/mypy/issues/9242 for more info.
-            if sys.platform == "win32" or sys.platform == "cygwin":
+            if sys.platform in ("win32", "cygwin"):
                 import ctypes
 
                 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("pydw")
@@ -231,6 +243,25 @@ class Bootstrapper:
             print("Not running in a venv", flush=True)
 
         return None
+
+    @staticmethod
+    def setup_logging(args: Namespace) -> None:
+        logging_level = logging.WARNING
+        if args.very_verbose:
+            logging_level = logging.DEBUG
+            args.verbose = True
+        elif args.verbose:
+            logging_level = logging.INFO
+        logging.basicConfig(
+            stream=sys.stdout,
+            level=logging_level,
+            format="%(asctime)s.%(msecs)d %(levelname)s %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",  # ISO-8601
+        )
+        # logging.debug("debug log message")
+        # logging.info("info log message")
+        # logging.warning("warning log message")
+        # logging.error("error log message")
 
 
 class Launcher:

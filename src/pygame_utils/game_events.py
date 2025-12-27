@@ -14,6 +14,11 @@ focus_gain_handler: Optional[Callable[[], None]] = None
 window_resize_handler: Optional[Callable[[], None]] = None
 
 
+def is_pygame_ce() -> bool:
+    """Return true if running in pygame-ce, else false if running in pygame."""
+    return getattr(pygame, "IS_CE", False)
+
+
 def setup_joystick() -> bool:
     """Detect joysticks/gamepads as they become available and configure them for use
 
@@ -60,14 +65,18 @@ def setup_joystick() -> bool:
 
 def set_focus_gain_handler(handler_method: Optional[Callable[[], None]]) -> None:
     """Set (or unset) the optional focus gain handler."""
-    global focus_gain_handler
-    focus_gain_handler = handler_method
+    # pygame-ce appears to have fixed this issue, so disabling this handler for the time being
+    if not is_pygame_ce():
+        global focus_gain_handler
+        focus_gain_handler = handler_method
 
 
 def set_window_resize_handler(handler_method: Optional[Callable[[], None]]) -> None:
     """Set (or unset) the optional window resize handler."""
-    global window_resize_handler
-    window_resize_handler = handler_method
+    # pygame-ce appears to have fixed this issue, so disabling this handler for the time being
+    if not is_pygame_ce():
+        global window_resize_handler
+        window_resize_handler = handler_method
 
 
 def get_events(
@@ -117,11 +126,16 @@ def get_events(
             if window_resize_handler:
                 window_resize_handler()
 
+        # print(f"event before remapping: {event}", flush=True)
+
         # Remap keyboard events
-        event = _remap_keyboard_event(translate_wasd_to_uldr, translate_e_to_enter, event)
+        remapped_event = _remap_keyboard_event(translate_wasd_to_uldr, translate_e_to_enter, event)
 
         # Remap joystick/gamepad events
-        remapped_event = _remap_joystick_event(event)
+        if remapped_event is not None:
+            remapped_event = _remap_joystick_event(remapped_event)
+
+        # print(f"event after remapping: {remapped_event}", flush=True)
 
         if remapped_event is not None:
             _add_event_if_not_duplicate(events, remapped_event)
@@ -143,15 +157,17 @@ def clear_events() -> None:
 
 def _remap_keyboard_event(
     translate_wasd_to_uldr: bool, translate_e_to_enter: bool, event: pygame.event.Event
-) -> pygame.event.Event:
+) -> Optional[pygame.event.Event]:
     """Perform remapping of keydown events to change which key is pressed to support multiple keys for the same actions
 
     FUTURE: Potentially implement keybinding support here
     """
 
     # Sometimes the KEYDOWN events seems to stop while TEXTINPUT events continue.  Translate TEXTINPUT event to KEYDOWN
-    # events where possible to better handle instances of missing KEYDOWN events.
-    if pygame.TEXTINPUT == event.type:
+    # events where possible to better handle instances of missing KEYDOWN events.  Disabling this hack for pygame-ce for
+    # the time being to assess whether this "feature" from pygame has been fixed in pygame-ce.
+    drop_keydown_in_favor_of_textinput = not is_pygame_ce()
+    if drop_keydown_in_favor_of_textinput and pygame.TEXTINPUT == event.type:
         try:
             # orig_event = event
             event = pygame.event.Event(
@@ -159,10 +175,20 @@ def _remap_keyboard_event(
                 {"key": pygame.key.key_code(event.text), "unicode": event.text},
             )
             # print(f'Translated {orig_event} to {event}', flush=True)
+
+            # After remapping a TEXTINPUT to a KEYDOWN, unset the drop_keydown_in_favor_of_textinput flag so we don't
+            # subsequently drop the remapped event.
+            drop_keydown_in_favor_of_textinput = False
         except (ValueError, NotImplementedError):
             print(f"Failed to translate {event} to a KEYDOWN event", flush=True)
 
     if pygame.KEYDOWN == event.type:
+        if drop_keydown_in_favor_of_textinput:
+            # When converting TEXTINPUT events to KEYDOWN events, drop the KEYDOWN events for the letter keys to avoid
+            # duplicate events.
+            event_unicode = str(event.__dict__.get("unicode", ""))
+            if event_unicode.isalpha():
+                return None
         if event.key in [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]:
             # Optionally convert WASD events to arrow key events
             if translate_wasd_to_uldr:
@@ -333,21 +359,6 @@ def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.
     if pygame.KEYDOWN == event.type:
         for existing_event in events:
             if pygame.KEYDOWN == existing_event.type and existing_event.key == event.key:
-                # A KEYDOWN event of this type is already in events
-                if ("unicode" not in existing_event.__dict__ or "" == existing_event.__dict__["unicode"]) and (
-                    "unicode" in event.__dict__ and "" != event.__dict__["unicode"]
-                ):
-                    # Sometimes the unicode field of the KEYDOWN (and KEYUP) events is incorrectly set to ''.  If this
-                    # event has it where the existing event was missing it, then populate it in the existing event.
-                    # The TEXTINPUT events don't seem to have this glitch, but this implementation is all in on the
-                    # KEYDOWN events and translates TEXTINPUT events to KEYDOWN events.  This if statement will repair
-                    # offending KEYDOWN events using the TEXTINPUT event we have translated to a KEYDOWN event.
-                    #
-                    # TODO: Get a better handle on this issue and submit an issue against pygame.  It looks to be
-                    #       related to https://github.com/pygame/pygame/issues/3229.
-                    # print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
-                    existing_event.__dict__["unicode"] = event.__dict__["unicode"]
-                # print('Not adding event as a duplicate is already present:', event, flush=True)
                 return
     events.append(event)
 

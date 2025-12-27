@@ -105,8 +105,8 @@ class GameDialogEvaluator:
             # Restore initial background image
             self.game_state.screen.blit(background_image, (0, 0))
 
-            # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
-            self.game_state.draw_map(False)
+            # Call game_state.draw but manually flip the buffer for the case where this method is a mock
+            self.game_state.draw(flip_buffer=False)
             pygame.display.flip()
 
     def add_and_wait_for_message(self, message: str, message_dialog: GameDialog) -> None:
@@ -125,15 +125,21 @@ class GameDialogEvaluator:
                 AudioPlayer().play_sound("talking")
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
-            message_dialog.blit(self.game_state.screen)
-            clock.tick(30)
-            pygame.display.flip()
+            try:
+                self.game_state.draw(advance_tick=True)
+            except NotImplementedError:
+                message_dialog.blit(self.game_state.screen)
+                clock.tick(30)
+                pygame.display.flip()
 
-    def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> None:
+    def wait_for_acknowledgement(self, message_dialog: Optional[GameDialog] = None) -> bool:
         # Skip waiting for acknowledgement of message dialog if the content
-        # was already acknowledged.
+        # was already acknowledged.  Return a bool where true indicates the
+        # acknowledgement took the form of acceptance (RETURN) and false
+        # indicates it took the form of cancellation (SPACE).
+        is_acceptance = True
         if not self.game_state.is_running or (message_dialog is not None and message_dialog.is_acknowledged()):
-            return
+            return is_acceptance
 
         # Clear event queue
         game_events.clear_events()
@@ -142,26 +148,36 @@ class GameDialogEvaluator:
 
         is_awaiting_acknowledgement = True
         is_waiting_indicator_drawn = False
+        frame_count = 0
+        frames_to_hold_indicator = 4
         clock = pygame.time.Clock()
         while self.game_state.is_running and is_awaiting_acknowledgement:
             # Process events
             events = game_events.get_events()
             if 0 == len(events):
                 if message_dialog is not None:
-                    if is_waiting_indicator_drawn:
-                        message_dialog.erase_waiting_indicator()
+                    if frame_count < frames_to_hold_indicator:
+                        frame_count += 1
                     else:
-                        message_dialog.draw_waiting_indicator()
-                    is_waiting_indicator_drawn = not is_waiting_indicator_drawn
-                    message_dialog.blit(self.game_state.screen)
-                clock.tick(8)
-                pygame.display.flip()
+                        frame_count = 0
+                        if is_waiting_indicator_drawn:
+                            message_dialog.erase_waiting_indicator()
+                        else:
+                            message_dialog.draw_waiting_indicator()
+                        is_waiting_indicator_drawn = not is_waiting_indicator_drawn
+                        message_dialog.blit(self.game_state.screen)
+                try:
+                    self.game_state.draw(advance_tick=True)
+                except NotImplementedError:
+                    clock.tick(30)
+                    pygame.display.flip()
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
                     elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
                         is_awaiting_acknowledgement = False
+                        is_acceptance = event.key == pygame.K_RETURN
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
 
@@ -176,6 +192,8 @@ class GameDialogEvaluator:
 
         # Since we just waited, clean wait_before_new_text
         self.wait_before_new_text = False
+
+        return is_acceptance
 
     def wait_for_user_input(
         self,
@@ -696,7 +714,7 @@ class GameDialogEvaluator:
                         self.hero_party.light_diameter_decay_steps_remaining = item.decay_steps
                     else:
                         self.hero_party.light_diameter = None
-                    self.game_state.draw_map()
+                    self.game_state.draw()
 
                 elif item.type == DialogActionEnum.REPEL_MONSTERS:
                     self.hero_party.repel_monsters = True
@@ -714,7 +732,7 @@ class GameDialogEvaluator:
                         self.game_state.set_map(item.map_name)
                     else:
                         self.game_state.set_map(self.game_state.get_map_name())
-                    self.game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_combat=False)
+                    self.game_state.draw(flip_buffer=message_dialog.is_empty())
                     if not message_dialog.is_empty():
                         message_dialog.blit(self.game_state.screen, True)
 
@@ -725,7 +743,7 @@ class GameDialogEvaluator:
                             Direction.get_opposite(self.hero_party.last_outside_dir),
                         )
                         self.game_state.set_map(self.hero_party.last_outside_map_name)
-                        self.game_state.draw_map(flip_buffer=message_dialog.is_empty(), draw_combat=False)
+                        self.game_state.draw(flip_buffer=message_dialog.is_empty())
                     else:
                         add_message("But it did not work.")
 
@@ -741,7 +759,7 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.VISUAL_EFFECT:
                     # Update the screen but don't flip the buffers
-                    self.game_state.draw_map(flip_buffer=False)
+                    self.game_state.draw(flip_buffer=False)
                     if self.combat_encounter is not None:
                         self.combat_encounter.render_monsters()
                     message_dialog.blit(self.game_state.screen, flip_buffer=False)
@@ -763,8 +781,9 @@ class GameDialogEvaluator:
                         # Before hiding the dialog first ensure the contents are acknowledged then clear them
                         self.wait_for_acknowledgement(message_dialog)
                         message_dialog.clear()
-                        self.game_state.draw_map(flip_buffer=True)
+                        self.game_state.draw(flip_buffer=True)
                     elif item.name == "evilDeathLoop":
+                        # TODO: Change this to a game mode
                         surface_effects.black_red_monochrome_effect(self.game_state.screen, flip_buffer=False)
                         self.game_state.draw_map(draw_only_character_sprites=True)
 
@@ -812,7 +831,7 @@ class GameDialogEvaluator:
 
                 elif item.type == DialogActionEnum.OPEN_LOCKED_ITEM:
                     removed_map_decoration = self.game_state.open_locked_item()
-                    self.game_state.draw_map(flip_buffer=message_dialog.is_empty())
+                    self.game_state.draw(flip_buffer=message_dialog.is_empty())
                     if not message_dialog.is_empty():
                         message_dialog.blit(self.game_state.screen, True)
                     if removed_map_decoration is not None and removed_map_decoration.dialog is not None:

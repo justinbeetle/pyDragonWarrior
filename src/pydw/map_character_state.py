@@ -6,12 +6,28 @@ from pydw.game_types import CharacterType, Direction
 
 
 class MapCharacterState:
+    """Data structure for the state of a character rendered to the map."""
+
     def __init__(self, character_type: CharacterType, pos_dat_tile: Point, direction: Direction) -> None:
         self.character_type = character_type
         self.curr_pos_dat_tile = Point(pos_dat_tile)
         self.dest_pos_dat_tile = Point(pos_dat_tile)
         self.curr_pos_offset_img_px = Point(0, 0)
         self.direction = direction
+
+    def is_moving(self) -> bool:
+        """Return true is the character is moving, else false."""
+        return self.curr_pos_dat_tile != self.dest_pos_dat_tile
+
+    def move(self, direction: Direction) -> None:
+        """Update the state for movement in the specified direction.  Treated as a no-op when already moving."""
+        if not self.is_moving():
+            if self.direction != direction:
+                self.direction = direction
+            else:
+                self.dest_pos_dat_tile = self.curr_pos_dat_tile + direction.get_vector()
+        # else:
+        #     print('Ignoring move as another move is already in progress', flush=True)
 
     def __str__(self) -> str:
         return (

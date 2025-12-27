@@ -40,7 +40,7 @@ The interact control does the following in order of precedence:
 1. Talks to an NPC if the player character is facing one
 2. Opens a chest or door if the player character is on or facing one
 3. Takes the stairs if the player character is on a staircase
-4. Searches in all other cases
+4. Enters the menu in all other cases
 
 Note: Gamepad support is based on an XBox One controller.  Other controllers have not been tested and may have different
 button naming schemes.
