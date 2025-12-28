@@ -126,7 +126,7 @@ class Exploring(GameMode):
             self.first_block_occurred = False
 
             change_of_direction_ticks = max(2, CharacterSprite.get_tile_movement_steps() // 3)
-            # logger.debug("Advancing %s ticks in exploring_loop", change_of_direction_ticks)
+            # logger.debug("Advancing %s ticks", change_of_direction_ticks)
             for _ in range(change_of_direction_ticks):
                 self.advance_tick()
         else:
@@ -134,12 +134,12 @@ class Exploring(GameMode):
             # if not self.first_block_occurred: logger.debug("Setting first_block_occurred on stopping")
             self.first_block_occurred = True
 
-            # logger.debug("Advancing one tick in exploring_loop")
+            # logger.debug("Advancing one tick")
             self.advance_tick()
 
     def advance_tick(
         self, update_map: bool = True, draw_map: bool = True, advance_time: bool = True, flip_buffer: bool = True
-    ) -> None:
+    ) -> bool:
         """Advance one tick."""
         if update_map:
             self.game_state.game_map.update()
@@ -158,6 +158,8 @@ class Exploring(GameMode):
 
         if flip_buffer:
             pygame.display.flip()
+
+        return True
 
     def handle_talking(self) -> None:
         """Handle a user command to talk"""
@@ -296,7 +298,7 @@ class Exploring(GameMode):
             self.gde.dialog_loop("Thou dost not have any items.")
         else:
             item_result: Optional[str] = None
-            while True:
+            while 0 < len(dm.cascading_dialogs):
                 item_row_data = actor.get_item_row_data()
                 if "ITEMS" == dm.cascading_dialogs[-1].title:
                     dm.remove_cascading_dialog(flip_buffer=False)
@@ -395,7 +397,7 @@ class Exploring(GameMode):
                     1,
                 )
             )
-            while True:
+            while 0 < len(dm.cascading_dialogs):
                 menu_result = self.gde.get_menu_result(dm.cascading_dialogs[-1])
                 logger.debug("menu_result = %s", menu_result)
                 if menu_result is None:
@@ -511,7 +513,7 @@ class Exploring(GameMode):
         first_frame = True
         while self.game_state.hero_party.is_moving():
             # Redraws the characters when movement_allowed is True
-            # logger.debug("Advancing one tick in scroll_tile")
+            # logger.debug("Advancing one tick")
             if movement_allowed and movement_hp_penalty > 0 and first_frame:
                 flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
                 flicker_surface.fill("red")
@@ -551,6 +553,7 @@ class Exploring(GameMode):
                     self.game_state.initiate_encounter()
                     game_events.clear_events()
         else:
+            # logger.debug("Advancing %s ticks", CharacterSprite.get_tile_movement_steps())
             for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.advance_tick()
 

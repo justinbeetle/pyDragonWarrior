@@ -125,9 +125,10 @@ class GameDialogEvaluator:
                 AudioPlayer().play_sound("talking")
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
-            try:
-                self.game_state.draw(advance_tick=True)
-            except NotImplementedError:
+
+            if self.game_state.advance_tick():
+                self.game_state.draw()
+            else:
                 message_dialog.blit(self.game_state.screen)
                 clock.tick(30)
                 pygame.display.flip()
@@ -166,9 +167,10 @@ class GameDialogEvaluator:
                             message_dialog.draw_waiting_indicator()
                         is_waiting_indicator_drawn = not is_waiting_indicator_drawn
                         message_dialog.blit(self.game_state.screen)
-                try:
-                    self.game_state.draw(advance_tick=True)
-                except NotImplementedError:
+
+                if self.game_state.advance_tick():
+                    self.game_state.draw()
+                else:
                     clock.tick(30)
                     pygame.display.flip()
             for event in events:

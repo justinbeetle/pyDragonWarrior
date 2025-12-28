@@ -806,6 +806,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
                 return
 
         # Perform the combat encounter
+        # TODO: Convert CombatEncounter into a GameMode
         CombatEncounter.static_init("combat")
         self.combat_encounter = CombatEncounter(
             game_info=self.game_info,
@@ -877,10 +878,17 @@ class GameState(GameStateInterface, DialogManagerMediator):
         """Get the dialog manager."""
         return self.dialog_manager
 
-    def draw(self, flip_buffer: bool = True, advance_tick: bool = False) -> None:
+    def advance_tick(self) -> bool:
+        """Advance the game state by one tick (frame).  Return a bool indicating if the state was advanced,
+        which would then require re-drawing the game mode to the display."""
+        if self.current_game_mode and self.combat_encounter is None:
+            return self.current_game_mode.advance_tick()
+        return False
+
+    def draw(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode to the display."""
         if self.current_game_mode:
-            self.current_game_mode.draw(flip_buffer, advance_tick)
+            self.current_game_mode.draw(flip_buffer)
 
     def draw_background(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode's background to the display.

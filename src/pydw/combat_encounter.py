@@ -2,6 +2,7 @@
 
 from typing import cast, List, Optional, Tuple, Union
 
+import logging
 import random
 
 import pygame
@@ -35,6 +36,8 @@ from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
+
+logger = logging.getLogger(__name__)
 
 
 class CombatEncounter(CombatEncounterInterface):
@@ -72,12 +75,13 @@ class CombatEncounter(CombatEncounterInterface):
             self.game_state.draw_map(flip_buffer=False, draw_status=False)
         self.background_image = game_state.screen.copy()
 
-        dm = self.game_state.get_dialog_manager()
-        if dm.message_dialog is not None:
-            self.message_dialog = dm.message_dialog
+        self.dialog_manager = self.game_state.get_dialog_manager()
+        self.dialog_manager.clear_cascading_dialogs(flip_buffer=False)
+        if self.dialog_manager.message_dialog is not None:
+            self.message_dialog = self.dialog_manager.message_dialog
             self.message_dialog.add_message("")
         else:
-            self.message_dialog = dm.message_dialog = GameDialog.create_message_dialog()
+            self.message_dialog = self.dialog_manager.message_dialog = GameDialog.create_message_dialog()
         self.gde = GameDialogEvaluator(game_state, self)
         self.gde.update_status_dialog(message_dialog=self.message_dialog)
 
@@ -169,6 +173,8 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Wait for final acknowledgement
         self.wait_for_acknowledgement()
+        self.dialog_manager.message_dialog = None
+        self.dialog_manager.status_dialog = None
 
         # Restore initial background image
         self.game_state.screen.blit(self.background_image, (0, 0))
@@ -265,8 +271,8 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Render the dialogs
         if render_dialogs:
-            self.message_dialog.blit(self.game_state.screen)
-            self.gde.update_status_dialog()
+            self.gde.update_status_dialog(flip_buffer=False)
+            self.dialog_manager.draw_dialogs(flip_buffer=False)
 
     def render_damage_to_targets(self, targets: List[CombatCharacterState]) -> None:
         # Determine if rendering damage to the hero party or monster party.
@@ -401,7 +407,7 @@ class CombatEncounter(CombatEncounterInterface):
                 break
 
         if chosen_monster_action is None:
-            print("ERROR: Failed to select action for monster ", monster, flush=True)
+            logger.error("ERROR: Failed to select action for monster %s", monster)
             self.add_message(monster.get_name() + " stares at " + target.get_name() + " with evil eyes.")
             return
 
@@ -450,8 +456,7 @@ class CombatEncounter(CombatEncounterInterface):
         while self.game_state.is_running:
             # Get selected action for turn
             self.message_dialog.add_encounter_prompt(options=options, prompt=prompt)
-            if prev_menu_result is not None:
-                self.message_dialog.set_selected_menu_option(prev_menu_result)
+            self.message_dialog.set_selected_menu_option(prev_menu_result)
             self.message_dialog.blit(self.game_state.screen, True)
             menu_result = None
             while self.game_state.is_running and menu_result is None:
@@ -489,11 +494,13 @@ class CombatEncounter(CombatEncounterInterface):
                     continue
 
                 menu_dialog = GameDialog.create_menu_dialog(Point(-1, 1), None, "SPELLS", available_spell_names, 1)
-                menu_dialog.blit(self.game_state.screen, True)
+                self.dialog_manager.message_dialog_has_focus = False
+                self.dialog_manager.add_cascading_dialog(menu_dialog)
                 menu_result = self.gde.get_menu_result(menu_dialog)
-                menu_dialog.erase(self.game_state.screen, self.background_image)
+                self.dialog_manager.message_dialog_has_focus = True
+                self.dialog_manager.clear_cascading_dialogs()
 
-                # print('menu_result =', menu_result, flush=True)
+                logger.debug("menu_result = %s", menu_result)
                 if menu_result is None:
                     continue
                 spell = hero.get_spell(menu_result)
@@ -521,11 +528,13 @@ class CombatEncounter(CombatEncounterInterface):
                     item_cols,
                     GameDialogSpacing.OUTSIDE_JUSTIFIED,
                 )
-                menu_dialog.blit(self.game_state.screen, True)
+                self.dialog_manager.message_dialog_has_focus = False
+                self.dialog_manager.add_cascading_dialog(menu_dialog)
                 item_result = self.gde.get_menu_result(menu_dialog)
-                menu_dialog.erase(self.game_state.screen, self.background_image)
+                self.dialog_manager.message_dialog_has_focus = True
+                self.dialog_manager.clear_cascading_dialogs()
 
-                # print( 'item_result =', item_result, flush=True )
+                logger.debug("item_result = %s", item_result)
                 if item_result is None:
                     continue
                 item = hero.get_item(item_result)
@@ -570,7 +579,7 @@ class CombatEncounter(CombatEncounterInterface):
         elif TargetTypeEnum.ALL_ENEMIES:
             self.gde.set_targets(self.monster_party.get_still_in_combat_members())
         else:
-            print("ERROR: Unsupported target type", target_type, flush=True)
+            logger.error("ERROR: Unsupported target type %s", target_type)
 
         # Perform the action
         self.gde.traverse_dialog(self.message_dialog, use_dialog, depth=1)
@@ -612,8 +621,8 @@ class CombatEncounter(CombatEncounterInterface):
                             self.add_message(f"Thy maximum hit points increase by {hp_increase}.")
                         if mp_increase > 0:
                             self.add_message(f"Thy maximum magic points increase by {mp_increase}.")
-                        # print('old_spells =', len(old_spells), flush=True)
-                        # print('new_spells =', len(hero.get_available_spells()), flush=True)
+                        # logger.debug("old_spells = %s", len(old_spells))
+                        # logger.debug("new_spells =%s", len(hero.get_available_spells()))
                         if len(hero.get_available_spells()) > len(old_spells):
                             self.add_message("Thou hast learned a new spell.")
 
@@ -754,8 +763,9 @@ def main() -> None:
 
     # Initialize GameInfo
     import os
+    from pydw.launcher import Bootstrapper
 
-    base_path = os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir)
+    base_path = Bootstrapper.get_application_base_path()
     game_xml_path = os.path.join(base_path, "data", "game.xml")
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
     game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
@@ -769,7 +779,7 @@ def main() -> None:
 
     # Verify an encounter image was found
     if encounter_background is None:
-        print("Failed to find an encounter image", flush=True)
+        logger.error("Failed to find an encounter image")
         AudioPlayer().terminate()
         pygame.quit()
         return
@@ -782,19 +792,25 @@ def main() -> None:
     mock_game_state = mock.create_autospec(spec=GameStateInterface)
     mock_game_state.screen = screen
     mock_game_state.is_running = True
-    mock_game_state.is_light_restricted = MagicMock(return_value=False)
-    mock_game_state.get_win_size_pixels = MagicMock(return_value=win_size_pixels)
-    mock_game_state.get_dialog_replacement_variables = MagicMock(return_value=DialogReplacementVariables())
-    mock_game_state.should_add_math_problems_in_combat = MagicMock(return_value=False)
+    mock_game_state.is_light_restricted.return_value = False
+    mock_game_state.get_win_size_pixels.return_value = win_size_pixels
+    mock_game_state.get_dialog_replacement_variables.return_value = DialogReplacementVariables()
+    mock_game_state.should_add_math_problems_in_combat.return_value = False
+    mock_game_state.advance_tick.return_value = False
     mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
     dialog_manager = DialogManager(mock_dialog_manager_mediator)
-    mock_game_state.get_dialog_manager = MagicMock(return_value=dialog_manager)
+    mock_game_state.get_dialog_manager.return_value = dialog_manager
+
+    def draw_side_effect(flip_buffer: bool = True) -> None:
+        dialog_manager.draw_dialogs(flip_buffer)
+
+    mock_game_state.draw = draw_side_effect
 
     def handle_quit_side_effect(force: bool = False) -> None:
         _ = force  # appease pylint - force is needed to conform to the interface
         mock_game_state.is_running = False
 
-    mock_game_state.handle_quit = MagicMock(side_effect=handle_quit_side_effect)
+    mock_game_state.handle_quit = handle_quit_side_effect
 
     # Create a series of hero party and monster party tuples for encounters
     from pydw.game_types import Direction
@@ -846,7 +862,11 @@ def main() -> None:
             break
         mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
         combat_encounter = CombatEncounter(game_info, mock_game_state, monster_party, encounter_background)
-        mock_dialog_manager_mediator.draw_background = combat_encounter.render_monsters
+
+        def draw_background_side_effect(flip_buffer: bool = False) -> None:
+            combat_encounter.render_monsters(render_dialogs=False)
+
+        mock_dialog_manager_mediator.draw_background = draw_background_side_effect
         mock_dialog_manager_mediator.get_foreground_dialog_font_color = GameDialog.get_default_font_color
         combat_encounter.encounter_loop()
         pygame.time.wait(200)
@@ -859,13 +879,7 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        import sys
+    except Exception:
         import traceback
 
-        print(
-            traceback.format_exception(None, e, e.__traceback__),  # <- type(e) by docs, but ignored
-            file=sys.stderr,
-            flush=True,
-        )
         traceback.print_exc()

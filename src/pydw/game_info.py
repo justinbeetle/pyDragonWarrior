@@ -4,32 +4,8 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import concurrent.futures
 import os
-import sys
-
-# xml.etree doesn't support nested xincludes prior to Python 3.9 (see https://github.com/python/cpython/issues/65127)
-# Prior to Python 3.9, use lxml.etree
-if sys.version_info < (3, 9):
-    from typing import Callable
-    import lxml.etree as ET
-    import lxml.ElementInclude as ETI
-
-    # lxml.etree._Element is not natively pickleable
-    # See https://stackoverflow.com/questions/25991860/unable-to-pass-an-lxml-etree-object-to-a-separate-process/25994232#25994232
-    def element_unpickler(data: str) -> ET._Element:
-        return ET.fromstring(data)
-
-    def element_pickler(
-        element: ET._Element,
-    ) -> Tuple[Callable[[str], ET._Element], Tuple[str]]:
-        data = ET.tostring(element)
-        return element_unpickler, (data,)
-
-    import copyreg
-
-    copyreg.pickle(ET._Element, element_pickler)
-else:
-    import xml.etree.ElementTree as ET
-    import xml.etree.ElementInclude as ETI
+import xml.etree.ElementTree as ET
+import xml.etree.ElementInclude as ETI
 
 import numpy
 
@@ -119,8 +95,7 @@ class GameInfo:
                     break
 
         # Parse XML
-        xml_root = ET.parse(game_xml_path).getroot()
-        ETI.include(xml_root)
+        xml_root = GameInfo.parse_xml_file(base_path, game_xml_path)
         data_path = os.path.join(base_path, xml_root.attrib["dataPath"])
         image_path = os.path.join(data_path, xml_root.attrib["imagePath"])
 
@@ -181,18 +156,29 @@ class GameInfo:
         self.death_dialog = self.parse_dialog(death_state_element)
 
     @staticmethod
+    def parse_xml_file(base_path: str, game_xml_path: str) -> ET.Element:
+        xml_root = ET.parse(game_xml_path).getroot()
+
+        # For evaluating the XML xincludes, set the current working directory to the base path.
+        # The base_url argument to ETI.include doesn't seem to handle this.
+        orig_working_dir = os.getcwd()
+        os.chdir(base_path)
+        ETI.include(xml_root)
+        os.chdir(orig_working_dir)
+        return xml_root
+
+    @staticmethod
     def static_init(
         base_path: str, game_xml_path: str, win_size_tiles: Point, tile_size_pixels: int
     ) -> Tuple[Optional[pygame.surface.Surface], Optional[str]]:
-        xml_root = ET.parse(game_xml_path).getroot()
-        ETI.include(xml_root)
+        xml_root = GameInfo.parse_xml_file(base_path, game_xml_path)
 
         data_path = os.path.join(base_path, xml_root.attrib["dataPath"])
         GameInfo.init_audio_player(xml_root, data_path)
 
         image_path = os.path.join(data_path, xml_root.attrib["imagePath"])
         font_names, dialog_border_image_filename = GameInfo.parse_dialogs_info(xml_root, image_path)
-        GameDialog.static_init(win_size_tiles, tile_size_pixels, font_names, dialog_border_image_filename)
+        GameDialog.static_init(base_path, win_size_tiles, tile_size_pixels, font_names, dialog_border_image_filename)
 
         image_path = os.path.join(data_path, xml_root.attrib["imagePath"])
         return GameInfo.parse_title_info(xml_root, image_path)

@@ -55,6 +55,7 @@ class GameDialog:
 
     @staticmethod
     def static_init(
+        base_path: str,
         win_size_tiles: Point,
         tile_size_pixels: int,
         font_names: Optional[List[str]] = None,
@@ -96,9 +97,10 @@ class GameDialog:
                     if name in pygame.font.get_fonts():
                         # print('Found system font', name, flush=True)
                         return name
-                    if os.path.exists(name):
+                    font_path = os.path.join(base_path, name)
+                    if os.path.exists(font_path):
                         # print('Found font', name, flush=True)
-                        return name
+                        return font_path
                     print("WARN: Failed to load font", name, flush=True)
             return default_font_name
 
@@ -1298,7 +1300,7 @@ def main() -> None:
     screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA | pygame.HWSURFACE)
 
     # Test out game dialog
-    GameDialog.static_init(win_size_tiles, tile_size_pixels, ["lucidasans", "arialms"])
+    GameDialog.static_init(".", win_size_tiles, tile_size_pixels, ["lucidasans", "arialms"])
     from pydw.hero_state import HeroState
 
     hero_party = HeroParty(HeroState.create_null())
