@@ -24,6 +24,7 @@ class MonsterState(CombatCharacterState):
         self.gp = random.randint(self.monster_info.min_gp, self.monster_info.max_gp)
         self.xp = self.monster_info.xp  # TODO: Should this also come from a range?
         self.name = "the " + self.monster_info.name
+        self.has_death_been_rendered = False
 
     def get_name(self) -> str:
         return self.name
@@ -121,6 +122,15 @@ class MonsterState(CombatCharacterState):
             and hero_state.get_agility() * random.uniform(0, 1)
             < self.get_agility() * random.uniform(0, 1) * self.monster_info.block_factor
         )
+
+    def should_be_rendered(self) -> bool:
+        """Return a bool indicating if the monster should still be rendered."""
+        return not self.has_death_been_rendered and not self.has_run_away
+
+    def done_rendering_damage(self) -> None:
+        """Set has_death_been_rendered to halt rendering a dead monster."""
+        if self.is_dead():
+            self.has_death_been_rendered = True
 
     def __str__(self) -> str:
         return (

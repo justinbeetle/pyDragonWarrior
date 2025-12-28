@@ -8,8 +8,8 @@ import pygame
 
 from generic_utils.point import Point
 from pydw.dialog_manager import DialogManager
-from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
+from pydw.game_mode import GameMode
 from pydw.game_types import (
     DialogReplacementVariables,
     DialogType,
@@ -157,10 +157,5 @@ class GameStateInterface(ABC, GenericGameState):
         """Get the dialog manager."""
 
     @abstractmethod
-    def advance_tick(self) -> bool:
-        """Advance the game state by one tick (frame).  Return a bool indicating if the state was advanced,
-        which would then require re-drawing the game mode to the display."""
-
-    @abstractmethod
-    def draw(self, flip_buffer: bool = True) -> None:
-        """Draw the current state of the game mode to the display."""
+    def get_game_mode(self) -> GameMode:
+        """Get the game mode."""

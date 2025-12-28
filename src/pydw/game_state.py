@@ -876,21 +876,21 @@ class GameState(GameStateInterface, DialogManagerMediator):
         """Get the dialog manager."""
         return self.dialog_manager
 
-    def advance_tick(self) -> bool:
-        """Advance the game state by one tick (frame).  Return a bool indicating if the state was advanced,
-        which would then require re-drawing the game mode to the display."""
-        if self.current_game_mode and self.combat_encounter is None:
-            return self.current_game_mode.advance_tick()
-        return False
+    def get_game_mode(self) -> GameMode:
+        """Get the game mode."""
+        if self.current_game_mode is None:
+            raise ValueError("No game mode")
+        return self.current_game_mode
 
     def draw(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode to the display."""
         if self.current_game_mode:
-            self.current_game_mode.draw(flip_buffer)
+            self.current_game_mode.draw(flip_buffer=flip_buffer)
 
     def draw_background(self, flip_buffer: bool = True) -> None:
         """Draw the current state of the game mode's background to the display.
         The background is whatever is behind the dialogs."""
+        # TODO: Should just call self.current_game_mode.
         if self.combat_encounter is not None:
             self.combat_encounter.render_monsters(render_dialogs=False)
         elif self.current_game_mode:

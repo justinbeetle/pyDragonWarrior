@@ -30,10 +30,6 @@ class Exploring(GameMode):
         self.game_state = game_state
         self.gde = GameDialogEvaluator(game_state)
 
-        # State to maintain and monitor frame rate
-        self.clock = pygame.time.Clock()
-        self.tick_count = 0
-
         # Flag to throttle how often the block sound is played
         self.first_block_occurred = False
 
@@ -50,7 +46,7 @@ class Exploring(GameMode):
                 AudioPlayer().play_music(self.game_state.game_info.maps[self.game_state.get_map_name()].music)
 
                 # Draw the map to the screen
-                self.game_state.draw_map()
+                self.draw(flip_buffer=True)
 
                 # Clear the event queue for a clean start on the new map
                 game_events.clear_events()
@@ -61,6 +57,17 @@ class Exploring(GameMode):
 
             self.process_events()
             self.advance_until_ready_for_more_user_input()
+
+    def advance_state(self) -> bool:
+        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
+        Return a boolean indicating if the state was updated, as state updates need to be followed by
+        drawing the updated state to the display."""
+        self.game_state.game_map.update()
+        return True
+
+    def draw_background(self, flip_buffer: bool = False) -> None:
+        """Draw the background, which is the map in this game mode."""
+        self.game_state.draw_map(flip_buffer=flip_buffer, draw_status=False)
 
     def process_events(self) -> None:
         """Process user input via events off the pygame event queue."""
@@ -134,37 +141,13 @@ class Exploring(GameMode):
             # logger.debug("Advancing one tick")
             self.advance_tick()
 
-    def advance_tick(
-        self, update_map: bool = True, draw_map: bool = True, advance_time: bool = True, flip_buffer: bool = True
-    ) -> bool:
-        """Advance one tick."""
-        if update_map:
-            self.game_state.game_map.update()
-
-        if draw_map:
-            self.game_state.draw_map(flip_buffer=False)
-
-        if advance_time:
-            # Allow pygame to process internal events for interacting with the OS every frame
-            pygame.event.pump()
-
-            self.clock.tick(30)
-            self.tick_count += 1
-            if 299 == self.tick_count % 300:
-                logger.debug("%.2f FPS", self.clock.get_fps())
-
-        if flip_buffer:
-            pygame.display.flip()
-
-        return True
-
     def handle_talking(self) -> None:
         """Handle a user command to talk"""
         npc = self.game_state.get_npc_to_talk_to()
         if npc:
             if npc.npc_info.dialog is not None:
                 dialog = npc.npc_info.dialog
-                self.game_state.draw_map()
+                self.draw()
             else:
                 dialog = ["They pay you no mind."]
         else:
@@ -210,7 +193,7 @@ class Exploring(GameMode):
                         if decoration.type.remove_sound is not None:
                             AudioPlayer().play_sound(decoration.type.remove_sound)
                         self.game_state.remove_decoration(decoration)
-                        self.game_state.draw_map()
+                        self.draw()
 
                         if decoration.dialog is not None:
                             dialog = decoration.dialog
@@ -485,7 +468,7 @@ class Exploring(GameMode):
                 self.gde.update_default_dialog_font_color()
 
                 # Redraw the map
-                self.game_state.draw_map(True)
+                self.draw()
             if dialog_from_inc_step_count is not None:
                 self.gde.dialog_loop(dialog_from_inc_step_count)
 
@@ -515,19 +498,10 @@ class Exploring(GameMode):
                 flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
                 flicker_surface.fill("red")
                 flicker_surface.set_alpha(128)
-                self.advance_tick(
-                    update_map=True,
-                    draw_map=True,
-                    advance_time=False,
-                    flip_buffer=False,
-                )
+                self.advance_state()
+                self.draw(flip_buffer=False)
                 self.game_state.screen.blit(flicker_surface, (0, 0))
-                self.advance_tick(
-                    update_map=False,
-                    draw_map=False,
-                    advance_time=True,
-                    flip_buffer=True,
-                )
+                self.advance_time(flip_buffer=True)
                 first_frame = False
             else:
                 self.advance_tick()
@@ -553,7 +527,3 @@ class Exploring(GameMode):
             # logger.debug("Advancing %s ticks", CharacterSprite.get_tile_movement_steps())
             for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.advance_tick()
-
-    def draw_background(self, flip_buffer: bool = False) -> None:
-        """Draw the background, which is the map in this game mode."""
-        self.game_state.draw_map(flip_buffer)

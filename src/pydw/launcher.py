@@ -257,10 +257,6 @@ class Bootstrapper:
             format="%(asctime)s.%(msecs)d %(levelname)s %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
             datefmt="%Y-%m-%dT%H:%M:%S",  # ISO-8601
         )
-        # logging.debug("debug log message")
-        # logging.info("info log message")
-        # logging.warning("warning log message")
-        # logging.error("error log message")
 
 
 class Launcher:

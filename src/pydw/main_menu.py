@@ -161,3 +161,9 @@ class MainMenu(GameMode):
         loading_screen = LoadingScreen(GameInfo.title_image, GameInfo.title_music)
         loading_screen.set_background_text(self.background_text)
         loading_screen.draw(flip_buffer)
+
+    def advance_state(self) -> bool:
+        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
+        Return a boolean indicating if the state was updated, as state updates need to be followed by
+        drawing the updated state to the display."""
+        return False

@@ -226,15 +226,12 @@ class CombatEncounter(CombatEncounterInterface):
     def render_monsters(
         self,
         flicker_image_monsters: Optional[List[CombatCharacterState]] = None,
-        force_display_monsters: Optional[List[CombatCharacterState]] = None,
         render_background: bool = True,
         render_dialogs: bool = True,
         flicker_color: pygame.Color = pygame.Color("red"),
     ) -> None:
         if flicker_image_monsters is None:
             flicker_image_monsters = []
-        if force_display_monsters is None:
-            force_display_monsters = []
 
         # Render the encounter background
         (
@@ -248,7 +245,7 @@ class CombatEncounter(CombatEncounterInterface):
             monster_width_px += monster.monster_info.image.get_width()
         monster_pos_x = (self.game_state.get_win_size_pixels().x - monster_width_px) / 2
         for monster in self.monster_party.members:
-            if monster.is_still_in_combat() or monster in force_display_monsters:
+            if monster.should_be_rendered():
                 if monster in flicker_image_monsters:
                     monster_image = monster.monster_info.image.copy()
                     monster_image.fill("black", special_flags=pygame.BLEND_RGB_MULT)
@@ -286,22 +283,27 @@ class CombatEncounter(CombatEncounterInterface):
     def render_damage_to_monster_party(self, targets: List[CombatCharacterState]) -> None:
         self.render_flickering_monsters(targets, pygame.Color("red"))
 
+        # Call done_rendering_damage on the monsters to stop rendering dead monsters.
+        for target in targets:
+            if isinstance(target, MonsterState):
+                target.done_rendering_damage()
+
+        # Perform a final render to drop any of the targets which were killed.
+        self.render_monsters()
+
     def render_monster_casting(self, casting_monster: CombatCharacterState) -> None:
         self.render_flickering_monsters([casting_monster], pygame.Color("white"))
 
     def render_flickering_monsters(self, monsters: List[CombatCharacterState], flicker_color: pygame.Color) -> None:
         clock = pygame.time.Clock()
         for _ in range(10):
-            self.render_monsters(monsters, monsters, flicker_color=flicker_color)
+            self.render_monsters(monsters, flicker_color=flicker_color)
             clock.tick(30)
             pygame.display.flip()
 
-            self.render_monsters([], monsters)
+            self.render_monsters()
             clock.tick(30)
             pygame.display.flip()
-
-        # Final render to drop any of the targets which were killed
-        self.render_monsters()
 
     def render_damage_to_hero_party(self) -> None:
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
@@ -795,15 +797,9 @@ def main() -> None:
     mock_game_state.get_win_size_pixels.return_value = win_size_pixels
     mock_game_state.get_dialog_replacement_variables.return_value = DialogReplacementVariables()
     mock_game_state.should_add_math_problems_in_combat.return_value = False
-    mock_game_state.advance_tick.return_value = False
     mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
     dialog_manager = DialogManager(mock_dialog_manager_mediator)
     mock_game_state.get_dialog_manager.return_value = dialog_manager
-
-    def draw_side_effect(flip_buffer: bool = True) -> None:
-        dialog_manager.draw_dialogs(flip_buffer)
-
-    mock_game_state.draw = draw_side_effect
 
     def handle_quit_side_effect(force: bool = False) -> None:
         _ = force  # appease pylint - force is needed to conform to the interface
