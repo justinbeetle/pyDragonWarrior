@@ -34,7 +34,7 @@ requires-python = ">=3.9"
 dependencies = [
     "certifi==2025.11.12",
     "numpy==2.0.2; python_version == '3.9'",
-    "numpy==2.2.6; python_version < '3.11'",
+    "numpy==2.2.6; python_version == '3.10'",
     "numpy==2.4.0; python_version >= '3.11'",
     "pygame-ce==2.5.6",
     "pyscroll==2.31",
