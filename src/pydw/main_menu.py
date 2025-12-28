@@ -2,15 +2,11 @@
 
 """Module defining MainMenu class."""
 
-from typing import List, Optional
-
 import glob
 import os
+from typing import List, Optional
 
 import pygame
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
 
 from pydw.game_dialog import GameDialog
 from pydw.game_dialog_evaluator import GameDialogEvaluator
@@ -18,6 +14,8 @@ from pydw.game_info import GameInfo
 from pydw.game_mode import GameMode
 from pydw.game_state import GameState
 from pydw.loading_screen import LoadingScreen
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
 class MainMenu(GameMode):

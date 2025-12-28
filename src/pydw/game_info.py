@@ -1,20 +1,15 @@
 #!/usr/bin/env python
 
-from typing import Dict, List, Optional, Tuple, Union
-
 import concurrent.futures
 import os
-import xml.etree.ElementTree as ET
 import xml.etree.ElementInclude as ETI
+import xml.etree.ElementTree as ET
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy
-
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer, MusicTrack, SoundTrack
-
 from pydw.game_dialog import GameDialog
 from pydw.game_types import (
     ActionCategoryTypeEnum,
@@ -30,12 +25,12 @@ from pydw.game_types import (
     DialogType,
     DialogVariable,
     DialogVendorBuyOptions,
-    DialogVendorBuyOptionsParamWithoutReplacementType,
     DialogVendorBuyOptionsParamType,
+    DialogVendorBuyOptionsParamWithoutReplacementType,
     DialogVendorBuyOptionsVariable,
     DialogVendorSellOptions,
-    DialogVendorSellOptionsParamWithoutReplacementType,
     DialogVendorSellOptionsParamType,
+    DialogVendorSellOptionsParamWithoutReplacementType,
     DialogVendorSellOptionsVariable,
     Direction,
     EncounterBackground,
@@ -62,6 +57,7 @@ from pydw.game_types import (
     Tool,
     Weapon,
 )
+from pygame_utils.audio_player import AudioPlayer, MusicTrack, SoundTrack
 
 
 class GameInfo:

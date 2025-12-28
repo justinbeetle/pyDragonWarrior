@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 
-from typing import cast, List, Optional, Tuple, Union
-
 import logging
 import random
+from typing import List, Optional, Tuple, Union, cast
 
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
 from pydw.dialog_manager import DialogManager, DialogManagerMediator
@@ -36,6 +31,8 @@ from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 logger = logging.getLogger(__name__)
 
@@ -763,6 +760,7 @@ def main() -> None:
 
     # Initialize GameInfo
     import os
+
     from pydw.launcher import Bootstrapper
 
     base_path = Bootstrapper.get_application_base_path()
@@ -787,6 +785,7 @@ def main() -> None:
     # Setup a mock game state
     from unittest import mock
     from unittest.mock import MagicMock
+
     from pydw.game_types import DialogReplacementVariables
 
     mock_game_state = mock.create_autospec(spec=GameStateInterface)

@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 
+import os
+import random
+import xml.dom.minidom
+import xml.etree.ElementTree as ET
 from typing import Dict, List, Optional
 
-import os
 import pygame
-import random
-import xml.etree.ElementTree as ET
-import xml.dom.minidom
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
-
 from pydw.combat_encounter import CombatEncounter
 from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog
 from pydw.game_dialog_evaluator import GameDialogEvaluator
+from pydw.game_info import GameInfo
+from pydw.game_map import GameMap
+from pydw.game_mode import GameMode
+from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     DialogReplacementVariables,
     DialogType,
@@ -28,16 +28,14 @@ from pydw.game_types import (
     SpecialMonster,
     Tile,
 )
-from pydw.game_info import GameInfo
-from pydw.game_map import GameMap
-from pydw.game_mode import GameMode
-from pydw.game_state_interface import GameStateInterface
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.map_character_state import MapCharacterState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
 from pydw.npc_state import NpcState
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
 class GameState(GameStateInterface, DialogManagerMediator):

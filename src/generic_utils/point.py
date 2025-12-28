@@ -2,10 +2,9 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Tuple, Union
 
 import math
-
+from typing import Tuple, Union
 
 PointTypeElemType = Union[float, int]
 

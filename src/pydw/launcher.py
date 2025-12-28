@@ -2,16 +2,15 @@
 
 """This module serves as the entry point for running pyDragonWarrior."""
 
-from typing import Optional, List, Protocol, Tuple
-
-from argparse import ArgumentParser, Namespace
 import logging
-from multiprocessing import freeze_support
 import os
 import pathlib
 import subprocess
 import sys
 import traceback
+from argparse import ArgumentParser, Namespace
+from multiprocessing import freeze_support
+from typing import List, Optional, Protocol, Tuple
 
 
 class BootstrappableApplication(Protocol):

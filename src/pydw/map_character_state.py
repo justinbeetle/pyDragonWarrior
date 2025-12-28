@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from generic_utils.point import Point
-
 from pydw.game_types import CharacterType, Direction
 
 

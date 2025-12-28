@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from typing import Optional, Tuple, Union
-
 import random
+from typing import Optional, Tuple, Union
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import (

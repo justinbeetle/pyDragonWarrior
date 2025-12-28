@@ -7,10 +7,8 @@ from typing import Optional
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-
 from pydw.game_dialog import GameDialog
+from pygame_utils.audio_player import AudioPlayer
 
 
 class LoadingScreen:

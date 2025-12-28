@@ -2,18 +2,17 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import List, Optional, Tuple, Union
 
-from enum import Enum
 import math
 import os
+from enum import Enum
+from typing import List, Optional, Tuple, Union
+
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils import game_events
-
 from pydw.hero_party import HeroParty
+from pygame_utils import game_events
 
 
 class GameDialogSpacing(Enum):

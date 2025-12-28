@@ -6,9 +6,8 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import Any, Callable, cast, Deque, Dict, Iterator, List, Optional, Tuple
-
 import xml.etree.ElementTree as ET
+from typing import Any, Callable, Deque, Dict, Iterator, List, Optional, Tuple, cast
 
 import pygame
 import pyscroll

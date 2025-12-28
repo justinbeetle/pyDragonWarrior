@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 
+import os
 from typing import Optional
 
-import os
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
-
 from pydw.game_map import GameMap
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import Direction
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
 class GameMapViewer:

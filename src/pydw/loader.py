@@ -2,25 +2,22 @@
 
 """Module defining the Loader class."""
 
-from typing import Optional
-
-from argparse import Namespace
 import os
 import tarfile
 import traceback
+from argparse import Namespace
+from typing import Optional
 
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
-
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
 from pydw.game_state import GameState
 from pydw.launcher import Launcher
 from pydw.loading_screen import LoadingScreen
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
 class Loader:

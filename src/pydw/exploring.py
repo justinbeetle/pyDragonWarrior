@@ -2,18 +2,13 @@
 
 """Module defining the Exploring game mode."""
 
-from typing import cast, List, Optional
-
 import logging
 import random
+from typing import List, Optional, cast
 
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_dialog import GameDialog, GameDialogSpacing
 from pydw.game_dialog_evaluator import GameDialogEvaluator
@@ -21,6 +16,8 @@ from pydw.game_map import CharacterSprite
 from pydw.game_mode import GameMode
 from pydw.game_state import GameState
 from pydw.game_types import DialogType, Direction, OutgoingTransition, Tool
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 logger = logging.getLogger(__name__)
 

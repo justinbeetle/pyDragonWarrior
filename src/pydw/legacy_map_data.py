@@ -12,7 +12,6 @@ import pygame
 import pyscroll
 
 from generic_utils.point import Point
-
 from pydw.game_info import GameInfo
 
 

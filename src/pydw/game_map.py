@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
-
 import abc
-from heapq import heappush, heappop
 import math
 import random
+from heapq import heappop, heappush
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import pygame
 import pyscroll
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     CharacterType,
@@ -25,9 +21,10 @@ from pydw.game_types import (
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.legacy_map_data import LegacyMapData
-from pydw.padded_tiled_map_data import PaddedTiledMapData
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
+from pydw.padded_tiled_map_data import PaddedTiledMapData
+from pygame_utils.audio_player import AudioPlayer
 
 
 class GameMapInterface(metaclass=abc.ABCMeta):

@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import List
-
 import abc
+from typing import List
 
 from pydw.combat_character_state import CombatCharacterState
 

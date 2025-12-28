@@ -1,20 +1,17 @@
 #!/usr/bin/env python
 
-from typing import cast, Optional, List, Tuple, Union
-
 import random
 import time
+from typing import List, Optional, Tuple, Union, cast
 
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-from pygame_utils import game_events, surface_effects
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
 from pydw.game_dialog import GameDialog, GameDialogSpacing
+from pydw.game_info import GameInfo
+from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     ActionCategoryTypeEnum,
     DialogAction,
@@ -32,11 +29,11 @@ from pydw.game_types import (
     GameTypes,
     Level,
 )
-from pydw.game_info import GameInfo
-from pydw.game_state_interface import GameStateInterface
 from pydw.hero_state import HeroState
 from pydw.map_character_state import MapCharacterState
 from pydw.monster_state import MonsterState
+from pygame_utils import game_events, surface_effects
+from pygame_utils.audio_player import AudioPlayer
 
 
 class GameDialogEvaluator:

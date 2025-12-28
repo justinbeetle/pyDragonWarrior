@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from pydw.map_character_state import MapCharacterState
 from pydw.game_types import NpcInfo
+from pydw.map_character_state import MapCharacterState
 
 
 class NpcState(MapCharacterState):

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
+from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from abc import ABC, abstractmethod
 import pygame
 
 from generic_utils.point import Point
-
 from pydw.dialog_manager import DialogManager
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo

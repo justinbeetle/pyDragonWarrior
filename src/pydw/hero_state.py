@@ -2,13 +2,12 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple
 
 import math
 import random
+from typing import Dict, List, Optional, Tuple
 
 from generic_utils.point import Point
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import (
     ActionCategoryTypeEnum,

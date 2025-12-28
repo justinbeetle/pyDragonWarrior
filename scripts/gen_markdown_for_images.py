@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from typing import List
-
 import os.path
+from typing import List
 
 from pydw.game_map_viewer import GameMapViewer
 

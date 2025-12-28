@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import cast, List, Optional, Union
+from typing import List, Optional, Union, cast
 
 from generic_utils.point import Point
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_party import CombatParty
 from pydw.game_types import DialogType, Direction, ItemType

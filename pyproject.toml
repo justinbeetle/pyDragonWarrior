@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 name = "pyDragonWarrior"
 dynamic = ["version"]
 license = "MIT"
-license-files = ["LICEN[CS]E.*"]
+license-files = ["LICEN[CS]E.*", "data/licensed_assets/**/License.txt"]
 description = "A Python based Dragon Warrior clone."
 readme = "README.md"
 authors = [
@@ -32,9 +32,10 @@ classifiers = [
 requires-python = ">=3.9"
 # Install dependencies as: pip install .
 dependencies = [
-    "certifi==2025.4.26",
-    "numpy==2.0.2; python_version <= '3.9'",
-    "numpy==2.2.5; python_version > '3.9'",
+    "certifi==2025.11.12",
+    "numpy==2.0.2; python_version == '3.9'",
+    "numpy==2.2.6; python_version < '3.11'",
+    "numpy==2.4.0; python_version >= '3.11'",
     "pygame-ce==2.5.6",
     "pyscroll==2.31",
     "pytmx==3.32",
@@ -44,16 +45,20 @@ dependencies = [
 # Install dev dependencies as: pip install .[dev]
 dev = [
     "black==25.12.0",
-    "coverage==7.8.0",
+    "coverage==7.10.7; python_version == '3.9'",
+    "coverage==7.13.0; python_version >= '3.10'",
+    "isort==7.0.0",
     "mypy==1.19.1",
     "opensimplex==0.4.5.1",
-    "pytest==8.3.5",
-    "pylint==4.0.4",
-    "pyinstaller==6.13.0",
+    "pytest==8.4.2; python_version == '3.9'",
+    "pytest==9.0.2; python_version >= '3.10'",
+    "pylint==3.3.9; python_version == '3.9'",
+    "pylint==4.0.4; python_version >= '3.10'",
+    "pyinstaller==6.17.0",
     "snakeviz==2.2.2",
 ]
 
-[project.scripts]
+[project.gui-scripts]
 pyDragonWarrior = "pydw.launcher:main"
 
 [project.urls]
@@ -74,6 +79,10 @@ line-length = 120
 
 [tool.flake8]
 max-line-length = 120
+
+[tool.isort]
+# Run isort as: pip install .[dev]; isort scripts src tests
+profile = "black"
 
 [tool.mypy]
 # Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/launcher.py

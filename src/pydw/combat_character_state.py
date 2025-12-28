@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import annotations
-from typing import Optional, Tuple
 
 import abc
 import math
 import random
+from typing import Optional, Tuple
 
 from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum
 

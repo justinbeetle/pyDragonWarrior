@@ -2,18 +2,17 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 
 import atexit
 import concurrent.futures
 import os.path
 import threading
+from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 
 import pygame.mixer
 import pygame.time
 
 from generic_utils.download_file import download_file
-
 from pygame_utils import game_events
 
 

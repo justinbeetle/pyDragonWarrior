@@ -2,12 +2,13 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Any, Dict, List, Literal, NamedTuple, Optional, Tuple, Union
 
+import random
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Literal, NamedTuple, Optional, Tuple, Union
+
 import pygame
-import random
 
 from generic_utils.point import Point
 

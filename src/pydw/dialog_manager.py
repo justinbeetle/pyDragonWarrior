@@ -2,10 +2,9 @@
 
 """Module defining DialogManager class and its outgoing DialogManagerMediator interface."""
 
-from typing import List, Optional, Union
-
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
+from typing import List, Optional, Union
 
 import pygame
 

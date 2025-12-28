@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import cast, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_party import CombatParty
