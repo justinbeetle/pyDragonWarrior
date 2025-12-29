@@ -2,12 +2,12 @@
 
 """Module defining methods wrapping pygame.event and pygame.joystick"""
 
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 import pygame
 
 # Mapping from unique instance IDs to initialized joysticks/gamepads
-joysticks: Dict[int, pygame.joystick.JoystickType] = {}
+joysticks: dict[int, pygame.joystick.JoystickType] = {}
 
 # Optional event handlers
 focus_gain_handler: Optional[Callable[[], None]] = None
@@ -83,7 +83,7 @@ def get_events(
     is_keyboard_repeat_enabled: bool = False,
     translate_wasd_to_uldr: bool = True,
     translate_e_to_enter: bool = True,
-) -> List[pygame.event.Event]:
+) -> list[pygame.event.Event]:
     """Wrapper for pygame.event.get() translating keyboard and joystick/gamepad events into a reduced set of events.
 
     :param is_keyboard_repeat_enabled: Allow a held key to continue generating events, defaults to False
@@ -93,13 +93,13 @@ def get_events(
 
     :param translate_e_to_enter: translate events on the E key to events on the ENTER key, defaults to True
 
-    :return: List of events
+    :return: list of events
     """
 
     # Allow joysticks to be rediscovered if they get uninitialized.
     setup_joystick()
 
-    events: List[pygame.event.Event] = []
+    events: list[pygame.event.Event] = []
     for event in pygame.event.get():
         # Drop mouse events
         if event.type in [
@@ -297,7 +297,7 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
     return remapped_event
 
 
-def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
+def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: list[pygame.event.Event]) -> None:
     """Generate key down events from pressed keys
 
     The translation of TEXTINPUT events to KEYDOWN events takes care of this for letters (while handling capitalization)
@@ -335,7 +335,7 @@ def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pyga
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_BACKSPACE}))
 
 
-def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
+def _add_joystick_keydown_events(events: list[pygame.event.Event]) -> None:
     """Generate key down events from pressed joystick hat"""
     for joystick_id in range(pygame.joystick.get_count()):
         joystick = pygame.joystick.Joystick(joystick_id)
@@ -354,7 +354,7 @@ def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
                 _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP}))
 
 
-def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.event.Event) -> None:
+def _add_event_if_not_duplicate(events: list[pygame.event.Event], event: pygame.event.Event) -> None:
     """Append event to events unless doing so would result in multiple KEYDOWN events for a single key"""
     if pygame.KEYDOWN == event.type:
         for existing_event in events:
@@ -364,7 +364,7 @@ def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.
 
 
 def _get_event_for_joystick_hat_position(
-    hat_position: Tuple[float, float],
+    hat_position: tuple[float, float],
 ) -> Optional[pygame.event.Event]:
     """Generate key down events from pressed joystick hat - doesn't support one event becoming multiple events"""
     event = None

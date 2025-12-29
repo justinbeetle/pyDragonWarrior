@@ -7,7 +7,7 @@ import atexit
 import concurrent.futures
 import os.path
 import threading
-from typing import Dict, List, NamedTuple, Optional, Set, Tuple
+from typing import NamedTuple, Optional
 
 import pygame.mixer
 import pygame.time
@@ -69,7 +69,7 @@ class MusicTrack(NamedTuple):
 
         return True
 
-    def get_required_download_info(self) -> Set[Tuple[str, str]]:
+    def get_required_download_info(self) -> set[tuple[str, str]]:
         required_download_info = set()
         if not self.is_file1_present():
             if self.link1 is not None:
@@ -115,7 +115,7 @@ class SoundTrack(NamedTuple):
 
         return True
 
-    def get_required_download_info(self) -> Set[Tuple[str, str]]:
+    def get_required_download_info(self) -> set[tuple[str, str]]:
         required_download_info = set()
         if not self.is_track_present():
             if self.link is not None:
@@ -133,15 +133,15 @@ class AudioPlayer:
             pygame.mixer.set_num_channels(32)
 
             self.music_path = "./"
-            self.name_to_music_track_mapping: Dict[str, List[MusicTrack]] = {}
+            self.name_to_music_track_mapping: dict[str, list[MusicTrack]] = {}
             self.sound_path = "./"
-            self.name_to_sound_track_mapping: Dict[str, List[SoundTrack]] = {}
+            self.name_to_sound_track_mapping: dict[str, list[SoundTrack]] = {}
             self.music_rel_file_path1: Optional[str] = None
             self.music_rel_file_path2: Optional[str] = None
             self.music_file_start1_sec = 0.0
             self.music_file_start2_sec = 0.0
             self.running = True
-            self.sounds: Dict[str, Optional[pygame.mixer.Sound]] = {}
+            self.sounds: dict[str, Optional[pygame.mixer.Sound]] = {}
             self.music_thread_lock = threading.RLock()
             self.music_thread = threading.Thread(target=self.__music_thread)
             self.music_thread.start()
@@ -153,7 +153,7 @@ class AudioPlayer:
         def set_music_path(self, music_path: str) -> None:
             self.music_path = music_path
 
-        def add_music_tracks(self, name_to_track_mapping: Dict[str, MusicTrack]) -> None:
+        def add_music_tracks(self, name_to_track_mapping: dict[str, MusicTrack]) -> None:
             for name in name_to_track_mapping:
                 if name not in self.name_to_music_track_mapping:
                     self.name_to_music_track_mapping[name] = []
@@ -162,7 +162,7 @@ class AudioPlayer:
         def set_sound_path(self, sound_path: str) -> None:
             self.sound_path = sound_path
 
-        def add_sound_tracks(self, name_to_track_mapping: Dict[str, SoundTrack]) -> None:
+        def add_sound_tracks(self, name_to_track_mapping: dict[str, SoundTrack]) -> None:
             for name in name_to_track_mapping:
                 if name not in self.name_to_sound_track_mapping:
                     self.name_to_sound_track_mapping[name] = []
@@ -388,11 +388,11 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.set_music_path(music_path)
 
-    def add_music_tracks(self, name_to_track_mapping: Dict[str, MusicTrack]) -> None:
+    def add_music_tracks(self, name_to_track_mapping: dict[str, MusicTrack]) -> None:
         if self.instance is not None:
             self.instance.add_music_tracks(name_to_track_mapping)
 
-    def get_music_tracks(self) -> Dict[str, List[MusicTrack]]:
+    def get_music_tracks(self) -> dict[str, list[MusicTrack]]:
         if self.instance is not None:
             return self.instance.name_to_music_track_mapping
         return {}
@@ -401,11 +401,11 @@ class AudioPlayer:
         if self.instance is not None:
             self.instance.set_sound_path(sound_path)
 
-    def add_sound_tracks(self, name_to_track_mapping: Dict[str, SoundTrack]) -> None:
+    def add_sound_tracks(self, name_to_track_mapping: dict[str, SoundTrack]) -> None:
         if self.instance is not None:
             self.instance.add_sound_tracks(name_to_track_mapping)
 
-    def get_sound_tracks(self) -> Dict[str, List[SoundTrack]]:
+    def get_sound_tracks(self) -> dict[str, list[SoundTrack]]:
         if self.instance is not None:
             return self.instance.name_to_sound_track_mapping
         return {}

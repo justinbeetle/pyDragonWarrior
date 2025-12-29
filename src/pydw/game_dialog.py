@@ -6,7 +6,7 @@ from __future__ import annotations
 import math
 import os
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import pygame
 
@@ -57,7 +57,7 @@ class GameDialog:
         base_path: str,
         win_size_tiles: Point,
         tile_size_pixels: int,
-        font_names: Optional[List[str]] = None,
+        font_names: Optional[list[str]] = None,
         border_image_filename: Optional[str] = None,
     ) -> None:
         GameDialog.win_size_tiles = win_size_tiles
@@ -89,7 +89,7 @@ class GameDialog:
 
         # Determine fonts
         def find_font_by_name(
-            font_names: Optional[List[str]], default_font_name: Optional[str] = None
+            font_names: Optional[list[str]], default_font_name: Optional[str] = None
         ) -> Optional[str]:
             if font_names is not None:
                 for name in font_names:
@@ -166,7 +166,7 @@ class GameDialog:
         )
 
     @staticmethod
-    def get_size_for_menu(options: Union[List[str], List[List[str]]], num_cols: int, title: Optional[str]) -> Point:
+    def get_size_for_menu(options: Union[list[str], list[list[str]]], num_cols: int, title: Optional[str]) -> Point:
         row_data = GameDialog.convert_options_to_row_data(options, num_cols)
         num_rows = len(row_data)
 
@@ -338,21 +338,21 @@ class GameDialog:
         self.image = pygame.surface.Surface((0, 0))
         self.initialize_image()
 
-        self.displayed_message_lines: List[str] = []
+        self.displayed_message_lines: list[str] = []
         self.remainder_of_current_line: str = ""
-        self.remaining_message_lines: List[str] = []
+        self.remaining_message_lines: list[str] = []
         self.acknowledged = True
         self.lines_since_last_acknowledgement = 0
         self.is_in_quotation = False
 
-        self.row_data: Optional[List[List[Optional[str]]]] = None
+        self.row_data: Optional[list[list[Optional[str]]]] = None
         self.row_data_prompt: Optional[str] = None
         self.row_data_spacing: Optional[GameDialogSpacing] = None
-        self.row_data_trailing_message_lines: List[str] = []
+        self.row_data_trailing_message_lines: list[str] = []
         self.is_menu = False
         self.menu_row = 0
         self.menu_col = 0
-        self.menu_data: Optional[List[List[Optional[str]]]] = None
+        self.menu_data: Optional[list[list[Optional[str]]]] = None
 
         self.allow_user_typing = False
         self.user_text_prompt = ""
@@ -485,7 +485,7 @@ class GameDialog:
         pos_tile: Point,
         size_tiles: Optional[Point],
         title: Optional[str],
-        options: Union[List[str], List[List[str]]],
+        options: Union[list[str], list[list[str]]],
         num_cols: int = 2,
         spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
     ) -> GameDialog:
@@ -508,7 +508,7 @@ class GameDialog:
     @staticmethod
     def create_encounter_menu() -> GameDialog:
         title: Optional[str] = "COMMANDS"
-        options: List[str] = ["FIGHT", "SPELL", "RUN", "ITEM"]
+        options: list[str] = ["FIGHT", "SPELL", "RUN", "ITEM"]
         num_cols: int = len(options)
         return GameDialog.create_menu_dialog(
             Point(-1, 1),
@@ -540,7 +540,7 @@ class GameDialog:
         pos_tile: Point,
         size_tiles: Optional[Point],
         title: Optional[str],
-        row_data: List[List[Optional[str]]],
+        row_data: list[list[Optional[str]]],
         spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
         trailing_message: Optional[str] = None,
     ) -> GameDialog:
@@ -567,7 +567,7 @@ class GameDialog:
         if 1 == len(party.combat_members):
             title = party.main_character.name
             spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
-            status_data: List[List[Optional[str]]] = [
+            status_data: list[list[Optional[str]]] = [
                 ["Level", party.main_character.level.name],
                 ["Health", str(party.main_character.hp)],
                 ["Magic", str(party.main_character.mp)],
@@ -594,7 +594,7 @@ class GameDialog:
         if 1 == len(party.combat_members):
             title = party.main_character.name
             spacing_type = GameDialogSpacing.OUTSIDE_JUSTIFIED
-            status_data: List[List[Optional[str]]] = [
+            status_data: list[list[Optional[str]]] = [
                 ["Level", party.main_character.level.name],
                 ["Health", str(party.main_character.hp)],
                 ["Magic", str(party.main_character.mp)],
@@ -638,7 +638,7 @@ class GameDialog:
             armor_name = pc.armor.name
         if pc.shield is not None:
             shield_name = pc.shield.name
-        row_data: List[List[Optional[str]]] = [
+        row_data: list[list[Optional[str]]] = [
             ["Level", pc.level.name],
             ["Max Hit Points", str(pc.level.hp)],
             ["Hit Points", str(pc.hp)],
@@ -663,8 +663,8 @@ class GameDialog:
         )
 
     @staticmethod
-    def convert_message_to_lines(message: Optional[str], width_px: int) -> List[str]:
-        lines: List[str] = []
+    def convert_message_to_lines(message: Optional[str], width_px: int) -> list[str]:
+        lines: list[str] = []
         if message is None:
             return lines
         for line in message.split("\n"):
@@ -746,7 +746,7 @@ class GameDialog:
 
     def add_encounter_prompt(
         self,
-        options: Optional[List[str]] = None,
+        options: Optional[list[str]] = None,
         prompt: str = "Command?",
     ) -> None:
         if options is None:
@@ -793,7 +793,7 @@ class GameDialog:
     def has_more_content(self) -> bool:
         return len(self.remainder_of_current_line) + len(self.remaining_message_lines) != 0
 
-    def advance_content(self) -> Tuple[bool, bool]:
+    def advance_content(self) -> tuple[bool, bool]:
         """
         :return (should_wait_for_acknowledgement, is_new_content_part_of_quotation):
         should_wait_for_acknowledgement = Whether an acknowledged is required before rolling to the next line of text
@@ -934,7 +934,7 @@ class GameDialog:
 
     def add_menu_prompt(
         self,
-        options: Union[List[str], List[List[str]]],
+        options: Union[list[str], list[list[str]]],
         num_cols: int,
         spacing_type: GameDialogSpacing = GameDialogSpacing.EQUAL_COLUMNS,
         prompt: Optional[str] = None,
@@ -948,15 +948,15 @@ class GameDialog:
 
     @staticmethod
     def convert_options_to_row_data(
-        options: Union[List[str], List[List[str]]], num_cols: int
-    ) -> List[List[Optional[str]]]:
+        options: Union[list[str], list[list[str]]], num_cols: int
+    ) -> list[list[Optional[str]]]:
         num_rows = math.ceil(len(options) / num_cols)
         row_data = []
         cols_per_option = 1
         if len(options) > 0 and isinstance(options[0], list):
             cols_per_option = len(options[0])
         for row in range(num_rows):
-            temp: List[Optional[str]] = []
+            temp: list[Optional[str]] = []
             for col in range(num_cols):
                 index_in_options = row * num_cols + col
                 if index_in_options < len(options):
@@ -974,7 +974,7 @@ class GameDialog:
 
     def add_row_data(
         self,
-        row_data: List[List[Optional[str]]],
+        row_data: list[list[Optional[str]]],
         spacing_type: GameDialogSpacing = GameDialogSpacing.OUTSIDE_JUSTIFIED,
         is_menu: bool = False,
         prompt: Optional[str] = None,
@@ -1050,7 +1050,7 @@ class GameDialog:
             return self.menu_data[self.menu_row][self.menu_col]
         return None
 
-    def get_selected_menu_position(self) -> Optional[Tuple[int, int]]:
+    def get_selected_menu_position(self) -> Optional[tuple[int, int]]:
         """Get the selected menu item, if any, by row and column index"""
         if self.row_data is not None and self.menu_data is not None:
             return self.menu_row, self.menu_col

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import Dict, List, Optional, Union, cast
+from typing import Optional, Union, cast
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_party import CombatParty
@@ -35,15 +35,15 @@ class MonsterParty(CombatParty):
         "tenth",
     ]
 
-    def __init__(self, monsters: Optional[List[Union[MonsterInfo, SpecialMonster, MonsterState]]] = None) -> None:
+    def __init__(self, monsters: Optional[list[Union[MonsterInfo, SpecialMonster, MonsterState]]] = None) -> None:
         super().__init__()
-        self.members: List[MonsterState] = []
+        self.members: list[MonsterState] = []
         if monsters is not None:
             for monster in monsters:
                 self.add_monster(monster)
 
-    def get_combat_members(self) -> List[CombatCharacterState]:
-        return cast(List[CombatCharacterState], self.members)
+    def get_combat_members(self) -> list[CombatCharacterState]:
+        return cast(list[CombatCharacterState], self.members)
 
     def add_monster(self, monster: Union[MonsterInfo, SpecialMonster, MonsterState]) -> None:
         if isinstance(monster, MonsterState):
@@ -55,14 +55,14 @@ class MonsterParty(CombatParty):
     # Set each monster to have a unique name in the party
     def set_unique_monster_names(self) -> None:
         # First count the number of monsters of each type
-        overall_monster_type_to_count_map: Dict[str, int] = {}
+        overall_monster_type_to_count_map: dict[str, int] = {}
         for monster in self.members:
             if monster.monster_info.name not in overall_monster_type_to_count_map:
                 overall_monster_type_to_count_map[monster.monster_info.name] = 0
             overall_monster_type_to_count_map[monster.monster_info.name] += 1
 
         # Now make a second pass and give instances of any repeated monster types unique names
-        current_monster_type_to_count_map: Dict[str, int] = {}
+        current_monster_type_to_count_map: dict[str, int] = {}
         for monster in self.members:
             # Use the default name if we have only 1 instance of the monster type in the party
             if 1 == overall_monster_type_to_count_map[monster.monster_info.name]:
@@ -93,13 +93,13 @@ class MonsterParty(CombatParty):
         return MonsterParty.concatenate_string_list(terms)
 
     @staticmethod
-    def get_monster_summary(monsters: List[MonsterState]) -> str:
+    def get_monster_summary(monsters: list[MonsterState]) -> str:
         if 1 == len(monsters):
             return monsters[0].get_name()
 
         # First count the number of killed monsters of each type
         type_names = []
-        monster_type_counts: Dict[str, int] = {}
+        monster_type_counts: dict[str, int] = {}
         for monster in monsters:
             if monster.monster_info.name not in monster_type_counts:
                 type_names.append(monster.monster_info.name)
@@ -118,7 +118,7 @@ class MonsterParty(CombatParty):
         return MonsterParty.concatenate_string_list(terms)
 
     @staticmethod
-    def concatenate_string_list(terms: List[str]) -> str:
+    def concatenate_string_list(terms: list[str]) -> str:
         if 0 == len(terms):
             raise ValueError
         if 1 == len(terms):

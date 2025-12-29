@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 import math
 import random
-from typing import Optional, Tuple
+from typing import Optional
 
 from pydw.game_types import ActionCategoryTypeEnum, DialogActionEnum
 
@@ -145,7 +145,7 @@ class CombatCharacterState(metaclass=abc.ABCMeta):
         target: CombatCharacterState,
         damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
         is_critical_hit: Optional[bool] = None,
-    ) -> Tuple[int, bool]:
+    ) -> tuple[int, bool]:
         pass
 
     @staticmethod

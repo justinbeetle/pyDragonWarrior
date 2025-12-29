@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import random
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import (
@@ -74,7 +74,7 @@ class MonsterState(CombatCharacterState):
         target: CombatCharacterState,
         damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
         is_critical_hit: Optional[bool] = None,
-    ) -> Tuple[int, bool]:
+    ) -> tuple[int, bool]:
         if is_critical_hit is None:
             is_critical_hit = False
         if target.get_defense_strength() < self.get_strength():

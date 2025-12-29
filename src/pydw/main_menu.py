@@ -4,7 +4,7 @@
 
 import glob
 import os
-from typing import List, Optional
+from typing import Optional
 
 import pygame
 
@@ -31,14 +31,14 @@ class MainMenu(GameMode):
 
         self.background_text = "Press any key"
 
-    def get_saved_games(self) -> List[str]:
+    def get_saved_games(self) -> list[str]:
         """Get a list of the saved games."""
         saved_game_files = glob.glob(os.path.join(self.saves_path, "*.xml"))
         return [os.path.basename(saved_game_file)[:-4] for saved_game_file in saved_game_files]
 
-    def get_main_menu_options(self, saved_games: List[str]) -> List[str]:
+    def get_main_menu_options(self, saved_games: list[str]) -> list[str]:
         """Get a list of the main menu options."""
-        main_menu_options: List[str] = []
+        main_menu_options: list[str] = []
         if 0 < len(saved_games):
             main_menu_options.append("Continue a Quest")
         main_menu_options.append("Begin a Quest")
@@ -52,7 +52,7 @@ class MainMenu(GameMode):
 
     def game_mode_loop(self) -> None:
         """The game loop for the main menu."""
-        self.game_state.draw()
+        self.draw()
 
         # Wait for user input - any key press
         while self.game_state.is_running:
@@ -167,3 +167,7 @@ class MainMenu(GameMode):
         Return a boolean indicating if the state was updated, as state updates need to be followed by
         drawing the updated state to the display."""
         return False
+
+    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+        """Implementation of GameMode.get_music for this game mode."""
+        return self.game_state.game_info.title_music, None, None, None, None

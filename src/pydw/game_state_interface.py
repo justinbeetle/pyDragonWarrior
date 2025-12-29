@@ -2,19 +2,21 @@
 
 # Imports to support type annotations
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Optional
 
 import pygame
 
 from generic_utils.point import Point
 from pydw.dialog_manager import DialogManager
 from pydw.game_info import GameInfo
+from pydw.game_map_interface import GameMapInterface
 from pydw.game_mode import GameMode
 from pydw.game_types import (
     DialogReplacementVariables,
     DialogType,
     MapDecoration,
     MonsterInfo,
+    SpecialMonster,
     Tile,
 )
 from pydw.generic_game_state import GenericGameState
@@ -29,6 +31,28 @@ class GameStateInterface(ABC, GenericGameState):
     @abstractmethod
     def get_game_info(self) -> GameInfo:
         """Get the static game info"""
+
+    @abstractmethod
+    def get_game_map(self) -> GameMapInterface:
+        """Get the game map"""
+
+    @abstractmethod
+    def get_pending_dialog(self) -> Optional[DialogType]:
+        """Get pending dialog"""
+
+    @abstractmethod
+    def clear_pending_dialog(self) -> None:
+        """Clear pending dialog"""
+
+    @abstractmethod
+    def get_tile_monsters(self, tile: Optional[Point] = None) -> list[str]:
+        """Get the list of monster names which may spawn at the specified position, or if not specified, the location
+        of the player character."""
+
+    @abstractmethod
+    def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
+        """Get the special monster at the specified position, or if not specified, the location of the player
+        character."""
 
     @abstractmethod
     def get_tile_info(self, tile: Optional[Point]) -> Tile:
@@ -83,7 +107,7 @@ class GameStateInterface(ABC, GenericGameState):
     def set_map(
         self,
         new_map_name: str,
-        one_time_decorations: Optional[List[MapDecoration]] = None,
+        one_time_decorations: Optional[list[MapDecoration]] = None,
         respawn_decorations: bool = False,
     ) -> None:
         """Set to a new map."""
@@ -111,19 +135,9 @@ class GameStateInterface(ABC, GenericGameState):
         pass
 
     @abstractmethod
-    def draw_map(
-        self,
-        flip_buffer: bool = True,
-        draw_background: bool = True,
-        draw_combat: bool = True,
-        draw_status: bool = True,
-        draw_only_character_sprites: bool = False,
-    ) -> None:
-        pass
-
-    @abstractmethod
-    def save(self) -> None:
-        pass
+    def save(self, quick_save: bool = False) -> None:
+        """Save the state of the game to the filesystem.  If the save not associated dialog on load,
+        set quick_save to true."""
 
     @abstractmethod
     def get_win_size_pixels(self) -> Point:
@@ -159,3 +173,7 @@ class GameStateInterface(ABC, GenericGameState):
     @abstractmethod
     def get_game_mode(self) -> GameMode:
         """Get the game mode."""
+
+    @abstractmethod
+    def set_game_mode(self, game_mode: GameMode) -> None:
+        """Set the game mode."""

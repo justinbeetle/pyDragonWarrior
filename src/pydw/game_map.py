@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-import abc
 import math
 import random
 from heapq import heappop, heappush
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Optional
 
 import pygame
 import pyscroll
 
 from generic_utils.point import Point
+from pydw.game_map_interface import GameMapInterface
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     CharacterType,
@@ -25,101 +25,6 @@ from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
 from pydw.padded_tiled_map_data import PaddedTiledMapData
 from pygame_utils.audio_player import AudioPlayer
-
-
-class GameMapInterface(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
-        pass
-
-    @abc.abstractmethod
-    def can_move_to_tile(
-        self,
-        tile: Point,
-        enforce_npc_hp_penalty_limit: bool = False,
-        enforce_npc_dof_limit: bool = False,
-        is_npc: bool = False,
-        prev_tile: Optional[Point] = None,
-    ) -> bool:
-        pass
-
-    def can_npc_move_to_tile(
-        self,
-        tile: Point,
-        enforce_npc_hp_penalty_limit: bool = True,
-        enforce_npc_dof_limit: bool = True,
-        prev_tile: Optional[Point] = None,
-    ) -> bool:
-        return self.can_move_to_tile(tile, enforce_npc_hp_penalty_limit, enforce_npc_dof_limit, True, prev_tile)
-
-    def compute_npc_path(self, start: Point, goal: Point, verbose: bool = False) -> Optional[List[Point]]:
-        """Compute a path from start to goal for an NPC using A* search"""
-        if verbose:
-            print(f"in compute_npc_path; start={start}; goal={goal}", flush=True)
-
-        def h(n: Point) -> float:
-            return abs(goal.x - n.x) + abs(goal.y - n.y)
-
-        open_set: List[Tuple[float, Point]] = []
-        heappush(open_set, (h(start), start))
-        came_from: Dict[Point, Point] = {}
-        g_score: Dict[Point, float] = {start: 0.0}
-        f_score: Dict[Point, float] = {start: h(start)}
-        while 0 < len(open_set):
-            queued_f_score, current = heappop(open_set)
-            if queued_f_score != f_score[current]:
-                if verbose:
-                    print(
-                        f"\tin compute_npc_path; ignoring current={current}; open_set={open_set}",
-                        flush=True,
-                    )
-                continue
-            if verbose:
-                print(
-                    f"\tin compute_npc_path; current={current}; open_set={open_set}",
-                    flush=True,
-                )
-            if current == goal:
-                break
-
-            for direction in Direction:
-                neighbor = current + direction.get_vector()
-                if verbose:
-                    print(f"\t\tin compute_npc_path; neighbor={neighbor}", flush=True)
-                if not self.can_npc_move_to_tile(neighbor, enforce_npc_dof_limit=False, prev_tile=current):
-                    if verbose:
-                        print(
-                            f"\t\t\tin compute_npc_path; cannot move to tile",
-                            flush=True,
-                        )
-                    continue
-                neighbor_tile = self.get_tile_info(neighbor)
-                tile_score = (1.0 if neighbor_tile.name == "path" else 3.0) / neighbor_tile.movement_speed_factor
-                tentative_g_score = g_score[current] + tile_score
-                if verbose:
-                    print(
-                        f"\t\t\tin compute_npc_path; tentative_g_score={tentative_g_score}",
-                        flush=True,
-                    )
-                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                    tentative_f_score = tentative_g_score + h(neighbor)
-                    came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = tentative_f_score
-                    heappush(open_set, (tentative_f_score, neighbor))
-
-        if goal in came_from:
-            # Reconstruct the path
-            reverse_path = []
-            while goal != start:
-                reverse_path.append(goal)
-                goal = came_from[goal]
-            return list(reversed(reverse_path))
-        elif verbose:
-            print(f"in compute_npc_path; goal is not in came_from={came_from}", flush=True)
-
-        # No path exists
-        return None
 
 
 class MapSprite(pygame.sprite.Sprite):
@@ -259,7 +164,7 @@ class CharacterSprite(MapSprite):
 
 class HeroSprite(CharacterSprite):
     character: HeroState
-    character_types: Dict[str, CharacterType] = {}
+    character_types: dict[str, CharacterType] = {}
 
     def __init__(self, hero: HeroState, hero_party: HeroParty, game_map: GameMapInterface) -> None:
         self.hero_party = hero_party
@@ -370,9 +275,9 @@ class GameMap(GameMapInterface):
         self,
         game_state: GameStateInterface,
         map_name: str,
-        map_decorations: Optional[List[MapDecoration]] = None,
-        removed_map_decorations: Optional[List[MapDecoration]] = None,
-        npcs: Optional[List[NpcState]] = None,
+        map_decorations: Optional[list[MapDecoration]] = None,
+        removed_map_decorations: Optional[list[MapDecoration]] = None,
+        npcs: Optional[list[NpcState]] = None,
     ) -> None:
         self.game_state = game_state
         self.map = self.game_state.get_game_info().maps[map_name]
@@ -382,7 +287,7 @@ class GameMap(GameMapInterface):
             self.map_decorations = self.map.map_decorations
         else:
             self.map_decorations = map_decorations
-        self.removed_map_decorations: List[MapDecoration] = []
+        self.removed_map_decorations: list[MapDecoration] = []
         if removed_map_decorations is not None:
             self.removed_map_decorations = removed_map_decorations
 
@@ -569,7 +474,7 @@ class GameMap(GameMapInterface):
         tile: Optional[Point] = None,
         decoration_filter: Optional[Callable[[MapDecoration], bool]] = None,
         stop_after_first: bool = False,
-    ) -> List[MapDecoration]:
+    ) -> list[MapDecoration]:
         decorations = []
         if tile is None:
             tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
@@ -799,7 +704,7 @@ class GameMap(GameMapInterface):
     def is_exterior(self, pos_dat_tile: Optional[Point] = None) -> bool:
         return not self.is_interior(pos_dat_tile)
 
-    def get_tile_monsters(self, pos_dat_tile: Point) -> List[str]:
+    def get_tile_monsters(self, pos_dat_tile: Point) -> list[str]:
         monster_set_name = self.map_data.get_monster_set_name(pos_dat_tile)
         if monster_set_name in self.game_state.get_game_info().monster_sets:
             return self.game_state.get_game_info().monster_sets[monster_set_name]
@@ -853,7 +758,7 @@ class GameMap(GameMapInterface):
         return None
 
     @staticmethod
-    def get_surrounding_points(point: Point, distance: int, include_point: bool = True) -> List[Point]:
+    def get_surrounding_points(point: Point, distance: int, include_point: bool = True) -> list[Point]:
         points = []
         point_x, point_y = point.get_as_int_tuple()
         for x in range(point_x - distance, point_x + distance + 1):
@@ -864,7 +769,7 @@ class GameMap(GameMapInterface):
         return points
 
     @staticmethod
-    def get_adjacent_points(point: Point, include_point: bool = True) -> List[Point]:
+    def get_adjacent_points(point: Point, include_point: bool = True) -> list[Point]:
         points = [
             Point(point.x - 1, point.y),
             Point(point.x + 1, point.y),
@@ -875,14 +780,14 @@ class GameMap(GameMapInterface):
             points.append(point)
         return points
 
-    def get_tile_type_count(self, tiles: List[Point], tile_types: List[str]) -> int:
+    def get_tile_type_count(self, tiles: list[Point], tile_types: list[str]) -> int:
         tile_count = 0
         for tile in tiles:
             if self.get_tile_info(tile).name in tile_types:
                 tile_count += 1
         return tile_count
 
-    def get_tile_type_counts(self, tiles: List[Point], tile_types: List[str]) -> Dict[str, int]:
+    def get_tile_type_counts(self, tiles: list[Point], tile_types: list[str]) -> dict[str, int]:
         tile_counts = {tile_type: 0 for tile_type in tile_types}
         for tile in tiles:
             tile_info = self.get_tile_info(tile)
@@ -890,20 +795,20 @@ class GameMap(GameMapInterface):
                 tile_counts[tile_info.name] += 1
         return tile_counts
 
-    def get_surrounding_tile_type_count(self, tile: Point, distance: int, tile_types: List[str]) -> int:
+    def get_surrounding_tile_type_count(self, tile: Point, distance: int, tile_types: list[str]) -> int:
         return self.get_tile_type_count(self.get_surrounding_points(tile, distance), tile_types)
 
-    def get_surrounding_tile_type_counts(self, tile: Point, distance: int, tile_types: List[str]) -> Dict[str, int]:
+    def get_surrounding_tile_type_counts(self, tile: Point, distance: int, tile_types: list[str]) -> dict[str, int]:
         return self.get_tile_type_counts(self.get_surrounding_points(tile, distance), tile_types)
 
-    def get_adjacent_tile_type_count(self, tile: Point, tile_types: List[str]) -> int:
+    def get_adjacent_tile_type_count(self, tile: Point, tile_types: list[str]) -> int:
         return self.get_tile_type_count(self.get_adjacent_points(tile), tile_types)
 
-    def get_adjacent_tile_type_counts(self, tile: Point, tile_types: List[str]) -> Dict[str, int]:
+    def get_adjacent_tile_type_counts(self, tile: Point, tile_types: list[str]) -> dict[str, int]:
         return self.get_tile_type_counts(self.get_adjacent_points(tile), tile_types)
 
     def get_encounter_background_name(
-        self, tile: Optional[Point] = None, backgrounds: Optional[List[str]] = None
+        self, tile: Optional[Point] = None, backgrounds: Optional[list[str]] = None
     ) -> str:
         # Handle the background for dark maps
         if self.game_state.get_hero_party().light_diameter is not None:

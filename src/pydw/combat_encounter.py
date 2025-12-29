@@ -2,7 +2,7 @@
 
 import logging
 import random
-from typing import List, Optional, Tuple, Union, cast
+from typing import Optional, Union, cast
 
 import pygame
 
@@ -13,6 +13,7 @@ from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog, GameDialogSpacing
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_info import GameInfo
+from pydw.game_mode import GameMode
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     DialogAction,
@@ -37,7 +38,7 @@ from pygame_utils.audio_player import AudioPlayer
 logger = logging.getLogger(__name__)
 
 
-class CombatEncounter(CombatEncounterInterface):
+class CombatEncounter(GameMode, CombatEncounterInterface):
     MONSTER_SPACING_PIXELS = -5
     DAMAGE_FLICKER_PIXELS = 4
     default_encounter_music = ""
@@ -57,6 +58,8 @@ class CombatEncounter(CombatEncounterInterface):
         run_away_dialog: Optional[DialogType] = None,
         encounter_music: Optional[str] = None,
     ) -> None:
+        super().__init__(game_state.get_dialog_manager())
+        self.background_game_mode = game_state.get_game_mode()
         self.is_first_turn = True
         self.game_info = game_info
         self.game_state = game_state
@@ -66,13 +69,6 @@ class CombatEncounter(CombatEncounterInterface):
         self.victory_dialog = victory_dialog
         self.run_away_dialog = run_away_dialog
 
-        if self.game_state.is_light_restricted():
-            self.game_state.screen.fill("black")
-        else:
-            self.game_state.draw_map(flip_buffer=False, draw_status=False)
-        self.background_image = game_state.screen.copy()
-
-        self.dialog_manager = self.game_state.get_dialog_manager()
         self.dialog_manager.clear_cascading_dialogs(flip_buffer=False)
         if self.dialog_manager.message_dialog is not None:
             self.message_dialog = self.dialog_manager.message_dialog
@@ -106,7 +102,7 @@ class CombatEncounter(CombatEncounterInterface):
             encounter_image_size_px.get_as_int_tuple(),
         )
 
-    def encounter_loop(self) -> None:
+    def game_mode_loop(self) -> None:
         # Start encounter music
         AudioPlayer().play_music(self.encounter_music, self.encounter_music)
 
@@ -173,25 +169,46 @@ class CombatEncounter(CombatEncounterInterface):
         self.dialog_manager.message_dialog = None
         self.dialog_manager.status_dialog = None
 
-        # Restore initial background image
-        self.game_state.screen.blit(self.background_image, (0, 0))
+        # Draw the background mode
+        self.background_game_mode.draw(flip_buffer=True)
 
-        # Call game_state.draw_map but manually flip the buffer for the case where this method is a mock
-        self.game_state.draw_map(False, draw_combat=False)
-        pygame.display.flip()
+    def draw_combat_encounter_background(self) -> None:
+        """Draw background of the combat encounter, either darkess in caves or the map in the overworld."""
+        if self.game_state.is_light_restricted():
+            self.game_state.screen.fill("black")
+        else:
+            self.background_game_mode.draw_background(flip_buffer=False)
+
+    def draw_background(self, flip_buffer: bool = False) -> None:
+        """Draw the current state of the game mode's background to the display.
+        The background is whatever is behind the dialogs."""
+        self.render_monsters()
+
+        if flip_buffer:
+            pygame.display.flip()
+
+    def advance_state(self) -> bool:
+        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
+        Return a boolean indicating if the state was updated, as state updates need to be followed by
+        drawing the updated state to the display."""
+        if isinstance(self.background_game_mode, GameMode):
+            return self.background_game_mode.advance_state()
+        return False
+
+    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+        """Implementation of GameMode.get_music for this game mode."""
+        return self.encounter_music, self.encounter_music, None, None, None
 
     def render_encounter_background_phase_in(self) -> None:
-        clock = pygame.time.Clock()
         for percent in range(5, 100, 5):
             self.render_encounter_background(True, percent)
             GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen)
-            clock.tick(40)
-            pygame.display.flip()
+            self.advance_time(frame_rate_hz=40)
 
         # Final render to drop to complete the background and drop in the monsters
         self.render_monsters()
 
-    def render_encounter_background(self, render_background: bool = True, percent: int = 100) -> Tuple[Point, Point]:
+    def render_encounter_background(self, render_background: bool = True, percent: int = 100) -> tuple[Point, Point]:
         # Determine the size and screen position for the full background image
         encounter_image_size_px = Point(self.encounter_image.get_size())
         encounter_image_dest_px = Point(
@@ -211,8 +228,8 @@ class CombatEncounter(CombatEncounterInterface):
 
         # Draw the background image, then the border, then the encounter image
         if render_background:
-            self.game_state.screen.blit(self.background_image, (0, 0))
-        outside_border_width = 4
+            self.draw_combat_encounter_background()
+        outside_border_width = 10
         pygame.draw.rect(
             self.game_state.screen,
             "black",
@@ -225,7 +242,7 @@ class CombatEncounter(CombatEncounterInterface):
 
     def render_monsters(
         self,
-        flicker_image_monsters: Optional[List[CombatCharacterState]] = None,
+        flicker_image_monsters: Optional[list[CombatCharacterState]] = None,
         render_background: bool = True,
         render_dialogs: bool = True,
         flicker_color: pygame.Color = pygame.Color("red"),
@@ -268,7 +285,7 @@ class CombatEncounter(CombatEncounterInterface):
             self.gde.update_status_dialog(flip_buffer=False)
             self.dialog_manager.draw_dialogs(flip_buffer=False)
 
-    def render_damage_to_targets(self, targets: List[CombatCharacterState]) -> None:
+    def render_damage_to_targets(self, targets: list[CombatCharacterState]) -> None:
         # Determine if rendering damage to the hero party or monster party.
         # NOTE: At present not supporting concurrent damage to members of both parties
         if 0 == len(targets):
@@ -280,7 +297,7 @@ class CombatEncounter(CombatEncounterInterface):
         else:
             self.render_damage_to_hero_party()
 
-    def render_damage_to_monster_party(self, targets: List[CombatCharacterState]) -> None:
+    def render_damage_to_monster_party(self, targets: list[CombatCharacterState]) -> None:
         self.render_flickering_monsters(targets, pygame.Color("red"))
 
         # Call done_rendering_damage on the monsters to stop rendering dead monsters.
@@ -294,46 +311,39 @@ class CombatEncounter(CombatEncounterInterface):
     def render_monster_casting(self, casting_monster: CombatCharacterState) -> None:
         self.render_flickering_monsters([casting_monster], pygame.Color("white"))
 
-    def render_flickering_monsters(self, monsters: List[CombatCharacterState], flicker_color: pygame.Color) -> None:
-        clock = pygame.time.Clock()
+    def render_flickering_monsters(self, monsters: list[CombatCharacterState], flicker_color: pygame.Color) -> None:
         for _ in range(10):
             self.render_monsters(monsters, flicker_color=flicker_color)
-            clock.tick(30)
-            pygame.display.flip()
+            self.advance_time()
 
             self.render_monsters()
-            clock.tick(30)
-            pygame.display.flip()
+            self.advance_time()
 
     def render_damage_to_hero_party(self) -> None:
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
-        clock = pygame.time.Clock()
         offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
         for _ in range(10):
             if not self.hero_party.is_still_in_combat():
                 # On a death blow, the background flickers red
                 self.game_state.screen.fill("red")
             else:
-                self.game_state.screen.blit(self.background_image, (0, 0))
+                self.draw_combat_encounter_background()
             self.render_monsters(render_background=False, render_dialogs=False)
             status_dialog.blit(self.game_state.screen, offset_pixels=offset_pixels)
             self.message_dialog.blit(self.game_state.screen, offset_pixels=offset_pixels)
-            clock.tick(30)
-            pygame.display.flip()
+            self.advance_time()
 
-            self.game_state.screen.blit(self.background_image, (0, 0))
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen)
             self.message_dialog.blit(self.game_state.screen)
-            clock.tick(30)
-            pygame.display.flip()
+            self.advance_time()
 
-    def get_monsters_still_in_combat(self) -> List[CombatCharacterState]:
+    def get_monsters_still_in_combat(self) -> list[CombatCharacterState]:
         return self.monster_party.get_still_in_combat_members()
 
-    def get_turn_order(self) -> List[Union[HeroState, MonsterState]]:
+    def get_turn_order(self) -> list[Union[HeroState, MonsterState]]:
         # TODO: In the future rework this method to better support parties with multiple members
-        turn_order: List[Union[HeroState, MonsterState]] = []
+        turn_order: list[Union[HeroState, MonsterState]] = []
         skip_hero_party = False
         if self.is_first_turn:
             self.is_first_turn = False
@@ -510,7 +520,6 @@ class CombatEncounter(CombatEncounterInterface):
                 else:
                     self.add_message("Thou dost not have enough magic to cast the spell.")
                     continue
-                menu_dialog.erase(self.game_state.screen, self.background_image, True)
 
             elif menu_result == "ITEM":
                 item_cols = 2
@@ -672,8 +681,8 @@ class CombatEncounter(CombatEncounterInterface):
     def gen_multiplication_problem(
         min_term: int = 0,
         max_term: int = 12,
-        multiplicand_1_range: Optional[List[int]] = None,
-        multiplicand_2_range: Optional[List[int]] = None,
+        multiplicand_1_range: Optional[list[int]] = None,
+        multiplicand_2_range: Optional[list[int]] = None,
     ) -> Problem:
         if multiplicand_1_range is None:
             multiplicand_1 = random.randrange(min_term, max_term)
@@ -700,8 +709,8 @@ class CombatEncounter(CombatEncounterInterface):
     def gen_division_problem(
         min_term: int = 0,
         max_term: int = 12,
-        multiplicand_1_range: Optional[List[int]] = None,
-        multiplicand_2_range: Optional[List[int]] = None,
+        multiplicand_1_range: Optional[list[int]] = None,
+        multiplicand_2_range: Optional[list[int]] = None,
     ) -> Problem:
         if multiplicand_1_range is None:
             multiplicand_1 = random.randrange(min_term, max_term)
@@ -758,7 +767,6 @@ def main() -> None:
     win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
     win_size_pixels = win_size_tiles * tile_size_pixels
     screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA | pygame.HWSURFACE)
-    screen.fill("pink")
 
     # Initialize GameInfo
     import os
@@ -790,15 +798,15 @@ def main() -> None:
 
     from pydw.game_types import DialogReplacementVariables
 
+    mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
+    dialog_manager = DialogManager(mock_dialog_manager_mediator)
     mock_game_state = mock.create_autospec(spec=GameStateInterface)
     mock_game_state.screen = screen
     mock_game_state.is_running = True
-    mock_game_state.is_light_restricted.return_value = False
+    mock_game_state.is_light_restricted.return_value = True
     mock_game_state.get_win_size_pixels.return_value = win_size_pixels
     mock_game_state.get_dialog_replacement_variables.return_value = DialogReplacementVariables()
     mock_game_state.should_add_math_problems_in_combat.return_value = False
-    mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
-    dialog_manager = DialogManager(mock_dialog_manager_mediator)
     mock_game_state.get_dialog_manager.return_value = dialog_manager
 
     def handle_quit_side_effect(force: bool = False) -> None:
@@ -806,6 +814,15 @@ def main() -> None:
         mock_game_state.is_running = False
 
     mock_game_state.handle_quit = handle_quit_side_effect
+
+    mock_background_game_mode = mock.create_autospec(spec=GameMode)
+
+    def background_game_mode_draw_background(flip_buffer: bool = False) -> None:
+        screen.fill("pink")
+        if flip_buffer:
+            pygame.display.flip()
+
+    mock_background_game_mode.draw_background = background_game_mode_draw_background
 
     # Create a series of hero party and monster party tuples for encounters
     from pydw.game_types import Direction
@@ -823,7 +840,7 @@ def main() -> None:
         )
         monster_party = MonsterParty(
             cast(
-                List[Union[MonsterInfo, SpecialMonster, MonsterState]],
+                list[Union[MonsterInfo, SpecialMonster, MonsterState]],
                 list(game_info.monsters.values())[0:i],
             )
         )
@@ -856,14 +873,12 @@ def main() -> None:
         if not mock_game_state.is_running:
             break
         mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
+        mock_game_state.get_game_mode.return_value = mock_background_game_mode
         combat_encounter = CombatEncounter(game_info, mock_game_state, monster_party, encounter_background)
-
-        def draw_background_side_effect(flip_buffer: bool = False) -> None:
-            combat_encounter.render_monsters(render_dialogs=False)
-
-        mock_dialog_manager_mediator.draw_background = draw_background_side_effect
+        mock_game_state.get_game_mode.return_value = combat_encounter
+        mock_dialog_manager_mediator.draw_background = combat_encounter.draw_background
         mock_dialog_manager_mediator.get_foreground_dialog_font_color = GameDialog.get_default_font_color
-        combat_encounter.encounter_loop()
+        combat_encounter.game_mode_loop()
         pygame.time.wait(200)
 
     # Terminate pygame

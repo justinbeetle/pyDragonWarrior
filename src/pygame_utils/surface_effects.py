@@ -129,11 +129,12 @@ def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -
         rainbow_effect_on_water(game_state.screen, game_info.tiles["water"].images[0][0])
     else:
         # On a tiled map, use the new effect
-        rainbow_effect_across_map(game_state, message_dialog)
+        rainbow_effect_across_background(game_state, message_dialog)
 
 
-def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
-    game_state.draw_map(flip_buffer=False, draw_status=False)
+def rainbow_effect_across_background(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
+    game_mode = game_state.get_game_mode()
+    game_mode.draw_background(flip_buffer=False)
     background_surface = game_state.screen.copy()
 
     # Cycle through the rainbow colors
@@ -149,13 +150,10 @@ def rainbow_effect_across_map(game_state: GameStateInterface, message_dialog: Ga
                 game_state.screen.blit(fade_surface, (0, 0))
 
                 # Overlay the dialogs
-                game_state.draw_map(flip_buffer=False, draw_background=False, draw_status=True)
-                if not message_dialog.is_empty():
-                    message_dialog.blit(game_state.screen)
+                game_mode.draw_dialogs(flip_buffer=False)
 
                 # Advance a tick
-                clock.tick(15)
-                pygame.display.flip()
+                game_mode.advance_time(flip_buffer=True, frame_rate_hz=15)
 
             for j in range(63, 196, 64):
                 fade_step(fade_surface, j)

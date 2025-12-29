@@ -10,7 +10,7 @@ import sys
 import traceback
 from argparse import ArgumentParser, Namespace
 from multiprocessing import freeze_support
-from typing import List, Optional, Protocol, Tuple
+from typing import Optional, Protocol
 
 
 class BootstrappableApplication(Protocol):
@@ -59,7 +59,7 @@ class Bootstrapper:
             current_dir = os.path.dirname(current_dir)
         return file_dir
 
-    def get_writeable_application_path(self, app_path: str, directory: str) -> Tuple[bool, str]:
+    def get_writeable_application_path(self, app_path: str, directory: str) -> tuple[bool, str]:
         """Get a writeable directory path for this application.
 
         First try to use the path of the application.  Then try APPDATA on Windows.  Finally try the home directory.
@@ -90,7 +90,7 @@ class Bootstrapper:
 
         return is_path_writeable(), writeable_application_path
 
-    def run(self, argv: Optional[List[str]] = None) -> int:
+    def run(self, argv: Optional[list[str]] = None) -> int:
         """Bootstrap the application and call its main method returning an exit code for the application."""
 
         # Allows pyinstaller Windows executables to support the use of concurrent.futures
@@ -326,7 +326,7 @@ class Launcher:
         return Loader(args, base_path, saves_path).run()
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: Optional[list[str]] = None) -> int:
     """Run the pyDragonWarrior Launcher via Bootstrapper"""
     try:
         return Bootstrapper(Launcher()).run(argv)

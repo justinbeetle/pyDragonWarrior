@@ -2,7 +2,6 @@
 
 # Imports to support type annotations
 import abc
-from typing import List
 
 from pydw.combat_character_state import CombatCharacterState
 
@@ -12,7 +11,7 @@ class CombatParty:
         pass
 
     @abc.abstractmethod
-    def get_combat_members(self) -> List[CombatCharacterState]:
+    def get_combat_members(self) -> list[CombatCharacterState]:
         pass
 
     def is_still_in_combat(self) -> bool:
@@ -21,7 +20,7 @@ class CombatParty:
                 return True
         return False
 
-    def get_still_in_combat_members(self) -> List[CombatCharacterState]:
+    def get_still_in_combat_members(self) -> list[CombatCharacterState]:
         still_in_combat_members = []
         for member in self.get_combat_members():
             if member.is_still_in_combat():

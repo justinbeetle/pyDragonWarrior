@@ -4,21 +4,21 @@
 from __future__ import annotations
 
 import math
-from typing import Tuple, Union
+from typing import Union
 
 PointTypeElemType = Union[float, int]
 
 
-class Point(Tuple[PointTypeElemType, PointTypeElemType]):
+class Point(tuple[PointTypeElemType, PointTypeElemType]):
     """Immutable 2D Point class extending a tuple for ease of use with pygame, where points are specified as tuples.
 
     WARNING:  Point addition adds the pairs of X and Y coordinates instead of concatenating the tuple.  Point
     multiplcation multiplies
-    intentional violation of the Liskov Substitution Principal.  As such, instances of Point and Tuple need to be used
+    intentional violation of the Liskov Substitution Principal.  As such, instances of Point and tuple need to be used
     together carefully.
     """
 
-    PointTupleType = Union["Point", Tuple[PointTypeElemType, PointTypeElemType]]
+    PointTupleType = Union["Point", tuple[PointTypeElemType, PointTypeElemType]]
     ScalarOrPointTupleType = Union[PointTypeElemType, PointTupleType]
 
     def __new__(cls, x: ScalarOrPointTupleType = 0, y: PointTypeElemType = 0) -> Point:
@@ -128,10 +128,10 @@ class Point(Tuple[PointTypeElemType, PointTypeElemType]):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.x!r}, {self.y!r})"
 
-    def get_as_int_tuple(self) -> Tuple[int, int]:
+    def get_as_int_tuple(self) -> tuple[int, int]:
         """Returns the Point as tuple of ints using the round function"""
         return int(round(self.x)), int(round(self.y))
 
-    def get_as_float_tuple(self) -> Tuple[float, float]:
+    def get_as_float_tuple(self) -> tuple[float, float]:
         """Returns the Point as tuple of floats"""
         return float(self.x), float(self.y)

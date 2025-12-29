@@ -1116,7 +1116,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
-            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" location="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAction type="PLAY_MUSIC" name="rainbow"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>

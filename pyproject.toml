@@ -85,7 +85,7 @@ max-line-length = 120
 profile = "black"
 
 [tool.mypy]
-# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src/pydw/launcher.py
+# Run mypy as: pip install .[dev]; mypy --config-file pyproject.toml src
 ignore_missing_imports = true
 strict = true
 

@@ -4,7 +4,7 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import pygame
 
@@ -42,8 +42,8 @@ class DialogManager:
         self.message_dialog_has_focus = True
 
         # Potentially cascading dialogs that may eclipse other dialogs
-        self.high_priority_cascading_dialogs: List[GameDialog] = []
-        self.cascading_dialogs: List[GameDialog] = []
+        self.high_priority_cascading_dialogs: list[GameDialog] = []
+        self.cascading_dialogs: list[GameDialog] = []
 
     def add_status_dialog(self, dialog: GameDialog, flip_buffer: bool = True, draw_display: bool = False) -> None:
         """Add a status dialog and optionally redraw the display."""
@@ -101,7 +101,7 @@ class DialogManager:
 
     def _add_cascading_dialog_helper(
         self,
-        cascading_dialogs: List[GameDialog],
+        cascading_dialogs: list[GameDialog],
         dialog: GameDialog,
         menu_selection: Optional[Union[str, tuple[int, int]]] = None,
         flip_buffer: bool = True,

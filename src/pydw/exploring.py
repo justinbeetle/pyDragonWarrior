@@ -4,7 +4,7 @@
 
 import logging
 import random
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import pygame
 
@@ -14,7 +14,7 @@ from pydw.game_dialog import GameDialog, GameDialogSpacing
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_map import CharacterSprite
 from pydw.game_mode import GameMode
-from pydw.game_state import GameState
+from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import DialogType, Direction, OutgoingTransition, Tool
 from pygame_utils import game_events
 from pygame_utils.audio_player import AudioPlayer
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class Exploring(GameMode):
     """Game mode for exploring, which is the main game loop."""
 
-    def __init__(self, game_state: GameState) -> None:
+    def __init__(self, game_state: GameStateInterface) -> None:
         super().__init__(game_state.get_dialog_manager())
         self.game_state = game_state
         self.gde = GameDialogEvaluator(game_state)
@@ -36,38 +36,54 @@ class Exploring(GameMode):
     def game_mode_loop(self) -> None:
         """The game loop for the exploring game mode."""
         map_name = ""
-
         while self.game_state.is_running:
-            # Generate the map state a mode or map change
+            # Handle a change in maps
             if map_name != self.game_state.get_map_name():
                 map_name = self.game_state.get_map_name()
+                self.activate()
 
-                # Play the music for the map
-                AudioPlayer().play_music(self.game_state.game_info.maps[self.game_state.get_map_name()].music)
-
-                # Draw the map to the screen
-                self.draw(flip_buffer=True)
-
-                # Clear the event queue for a clean start on the new map
-                game_events.clear_events()
-
-            if self.game_state.pending_dialog is not None:
-                self.gde.dialog_loop(self.game_state.pending_dialog)
-                self.game_state.pending_dialog = None
+            # Handle pending dialog
+            pending_dialog = self.game_state.get_pending_dialog()
+            if pending_dialog is not None:
+                self.gde.dialog_loop(pending_dialog)
+                self.game_state.clear_pending_dialog()
 
             self.process_events()
             self.advance_until_ready_for_more_user_input()
+
+    def activate(self) -> None:
+        """Handle a transition in control from one game mode to another by drawing the mode and playing music, if
+        any."""
+        # Set an appropriate status dialog before the superclass activate is called.
+        dm = self.game_state.get_dialog_manager()
+        if dm.message_dialog is not None or 0 < len(dm.cascading_dialogs):
+            self.dialog_manager.status_dialog = GameDialog.create_exploring_status_dialog(
+                self.game_state.get_hero_party()
+            )
+        else:
+            self.dialog_manager.status_dialog = GameDialog.create_persistent_status_dialog(
+                self.game_state.get_hero_party()
+            )
+        super().activate()
 
     def advance_state(self) -> bool:
         """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
         Return a boolean indicating if the state was updated, as state updates need to be followed by
         drawing the updated state to the display."""
-        self.game_state.game_map.update()
+        self.game_state.get_game_map().update()
         return True
 
     def draw_background(self, flip_buffer: bool = False) -> None:
         """Draw the background, which is the map in this game mode."""
-        self.game_state.draw_map(flip_buffer=flip_buffer, draw_status=False)
+        self.game_state.get_game_map().draw()
+
+        # Flip the screen buffer
+        if flip_buffer:
+            pygame.display.flip()
+
+    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+        """Implementation of GameMode.get_music for this game mode."""
+        return self.game_state.get_game_info().maps[self.game_state.get_map_name()].music, None, None, None, None
 
     def process_events(self) -> None:
         """Process user input via events off the pygame event queue."""
@@ -94,7 +110,7 @@ class Exploring(GameMode):
                     if direction is None:
                         logger.debug("Ignoring event %s", event)
                         continue
-                    self.game_state.hero_party.move(direction)
+                    self.game_state.get_hero_party().move(direction)
             else:
                 logger.debug("Ignoring event %s", event)
                 continue
@@ -107,11 +123,11 @@ class Exploring(GameMode):
     def smart_interactions(self) -> None:
         """Based on context, pick the most likely desired interaction.
         This bypasses the menu for improved quality of life."""
-        if self.game_state.get_npc_to_talk_to() is not None:
+        if self.game_state.get_game_map().get_npc_to_talk_to() is not None:
             self.handle_talking()
         elif self.game_state.is_facing_openable_item():
             self.handle_opening()
-        elif self.game_state.make_map_transition(self.game_state.get_point_transition()):
+        elif self.make_map_transition(self.get_point_transition()):
             # Transitioned to a new map
             pass
         else:
@@ -122,9 +138,9 @@ class Exploring(GameMode):
         # Clear any queued events
         game_events.clear_events()
 
-        if self.game_state.hero_party.is_moving():
+        if self.game_state.get_hero_party().is_moving():
             self.handle_moving()
-        elif self.game_state.hero_party.has_turned():
+        elif self.game_state.get_hero_party().has_turned():
             # On a direction change, unset first_block_occurred
             # if self.first_block_occurred: logger.debug("Clearing first_block_occurred on direction change")
             self.first_block_occurred = False
@@ -143,7 +159,7 @@ class Exploring(GameMode):
 
     def handle_talking(self) -> None:
         """Handle a user command to talk"""
-        npc = self.game_state.get_npc_to_talk_to()
+        npc = self.game_state.get_game_map().get_npc_to_talk_to()
         if npc:
             if npc.npc_info.dialog is not None:
                 dialog = npc.npc_info.dialog
@@ -165,16 +181,16 @@ class Exploring(GameMode):
     def handle_opening_or_searching(self, is_opening: bool) -> None:
         """Helper for handling a user command to open or search, as the two actions are very similar."""
         is_searching = not is_opening
-        decorations = self.game_state.get_decorations()
+        decorations = self.game_state.get_game_map().get_decorations()
         if is_searching:
             dialog: DialogType = ["[NAME] searched the ground and found nothing."]
         else:
             dialog = ["[NAME] found nothing to open."]
             dest_tile = (
-                self.game_state.hero_party.members[0].curr_pos_dat_tile
-                + self.game_state.hero_party.members[0].direction.get_vector()
+                self.game_state.get_hero_party().members[0].curr_pos_dat_tile
+                + self.game_state.get_hero_party().members[0].direction.get_vector()
             )
-            decorations += self.game_state.get_decorations(dest_tile)
+            decorations += self.game_state.get_game_map().get_decorations(dest_tile)
 
         for decoration in decorations:
             requires_removal = False
@@ -201,9 +217,9 @@ class Exploring(GameMode):
                             dialog = []
                         break
                     if decoration.type.remove_with_key:
-                        key_item = self.game_state.game_info.items["Key"]
+                        key_item = self.game_state.get_game_info().items["Key"]
                         if (
-                            self.game_state.hero_party.has_item(key_item.name)
+                            self.game_state.get_hero_party().has_item(key_item.name)
                             and isinstance(key_item, Tool)
                             and key_item.use_dialog is not None
                         ):
@@ -224,7 +240,7 @@ class Exploring(GameMode):
         """The loop for the exploring menu."""
         AudioPlayer().play_sound("select")
         dm = self.game_state.get_dialog_manager()
-        dm.status_dialog = GameDialog.create_exploring_status_dialog(self.game_state.hero_party)
+        dm.status_dialog = GameDialog.create_exploring_status_dialog(self.game_state.get_hero_party())
         dm.add_cascading_dialog(GameDialog.create_exploring_menu())
         while 0 < len(dm.cascading_dialogs):
             menu_result = self.gde.get_menu_result(dm.cascading_dialogs[-1])
@@ -244,11 +260,11 @@ class Exploring(GameMode):
             elif menu_result == "STAIRS":
                 AudioPlayer().play_sound("select")
                 dm.remove_cascading_dialog()
-                if not self.game_state.make_map_transition(self.game_state.get_point_transition()):
+                if not self.make_map_transition(self.get_point_transition()):
                     self.gde.dialog_loop("There are no stairs here.")
             elif menu_result == "STATUS":
                 AudioPlayer().play_sound("select")
-                dm.add_cascading_dialog(GameDialog.create_full_status_dialog(self.game_state.hero_party))
+                dm.add_cascading_dialog(GameDialog.create_full_status_dialog(self.game_state.get_hero_party()))
                 if self.gde.wait_for_acknowledgement():
                     # Only removing two dialogs when we exit out of the status dialog with acceptance
                     dm.remove_cascading_dialog(flip_buffer=False)
@@ -270,7 +286,7 @@ class Exploring(GameMode):
         """The loop for the exploring menu's item submenu."""
         dm = self.game_state.get_dialog_manager()
         # TODO: Need to choose the hero to use an item
-        actor = self.game_state.hero_party.main_character
+        actor = self.game_state.get_hero_party().main_character
         self.gde.set_actor(actor)
         item_cols = 2
         item_row_data = actor.get_item_row_data()
@@ -305,7 +321,7 @@ class Exploring(GameMode):
                     dm.remove_cascading_dialog()
                     break
 
-                item_options = self.game_state.hero_party.main_character.get_item_options(item_result)
+                item_options = self.game_state.get_hero_party().main_character.get_item_options(item_result)
                 if len(item_options) == 0:
                     self.gde.dialog_loop("[ACTOR] studied the object and was confounded by it.")
                 else:
@@ -335,21 +351,22 @@ class Exploring(GameMode):
                         )
                         confirm_result = self.gde.get_menu_result(dm.cascading_dialogs[-1])
                         if confirm_result is not None and confirm_result == "YES":
-                            self.game_state.hero_party.lose_item(item_result)
+                            self.game_state.get_hero_party().lose_item(item_result)
                         dm.remove_cascading_dialog(False)
                     elif action_result == "EQUIP":
-                        self.game_state.hero_party.main_character.equip_item(item_result)
+                        self.game_state.get_hero_party().main_character.equip_item(item_result)
                     elif action_result == "UNEQUIP":
-                        self.game_state.hero_party.main_character.unequip_item(item_result)
+                        self.game_state.get_hero_party().main_character.unequip_item(item_result)
                     elif action_result == "USE":
-                        item = self.game_state.hero_party.get_item(item_result)
+                        item = self.game_state.get_hero_party().get_item(item_result)
                         if item is not None and isinstance(item, Tool) and item.use_dialog is not None:
                             # TODO: Depending on the item may need to select the target(s)
                             targets = [actor]
-                            self.gde.set_targets(cast(List[CombatCharacterState], targets))
+                            self.gde.set_targets(cast(list[CombatCharacterState], targets))
                             self.gde.dialog_loop(item.use_dialog)
                         else:
                             self.gde.dialog_loop("[ACTOR] studied the object and was confounded by it.")
+                        dm.clear_cascading_dialogs()
                     dm.remove_cascading_dialog()
 
         # Restore the default actor and targets after using the item
@@ -359,7 +376,7 @@ class Exploring(GameMode):
         """The loop for the exploring menu's spell submenu."""
         dm = self.game_state.get_dialog_manager()
         # TODO: Need to choose the actor (spellcaster)
-        actor = self.game_state.hero_party.main_character
+        actor = self.game_state.get_hero_party().main_character
         self.gde.set_actor(actor)
         available_spell_names = actor.get_available_spell_names()
         if len(available_spell_names) == 0:
@@ -383,15 +400,16 @@ class Exploring(GameMode):
                 if menu_result is None:
                     break
 
-                spell = self.game_state.game_info.spells[menu_result]
+                spell = self.game_state.get_game_info().spells[menu_result]
                 if actor.mp >= spell.mp:
                     # TODO: Depending on the spell may need to select the target(s)
                     targets = [actor]
                     actor.mp -= spell.mp
-                    self.gde.set_targets(cast(List[CombatCharacterState], targets))
+                    self.gde.set_targets(cast(list[CombatCharacterState], targets))
                     self.gde.dialog_loop(spell.use_dialog)
 
-                    dm.add_status_dialog(GameDialog.create_exploring_status_dialog(self.game_state.hero_party))
+                    dm.add_status_dialog(GameDialog.create_exploring_status_dialog(self.game_state.get_hero_party()))
+                    dm.clear_cascading_dialogs()
                 else:
                     self.gde.dialog_loop("Thou dost not have enough magic to cast the spell.")
 
@@ -409,26 +427,30 @@ class Exploring(GameMode):
         transition: Optional[OutgoingTransition] = None
 
         # Determine the destination tile and pixel count for the scroll
-        hero_dest_dat_tile = self.game_state.hero_party.members[0].dest_pos_dat_tile
+        hero_dest_dat_tile = self.game_state.get_hero_party().members[0].dest_pos_dat_tile
 
         # Validate if the destination tile is navigable
-        movement_allowed = self.game_state.can_move_to_tile(hero_dest_dat_tile)
+        movement_allowed = self.game_state.get_game_map().can_move_to_tile(hero_dest_dat_tile)
 
         # Play a walking sound or bump sound based on whether the movement was allowed
         audio_player = AudioPlayer()
         movement_hp_penalty = 0
         if movement_allowed:
+            # On allowed movement, unset first_block_occurred
+            # if self.first_block_occurred: logger.debug("Clearing first_block_occurred on allowed movement")
+            self.first_block_occurred = False
+
             dest_tile_type = self.game_state.get_tile_info(hero_dest_dat_tile)
 
-            for hero_idx in range(1, len(self.game_state.hero_party.members)):
-                hero = self.game_state.hero_party.members[hero_idx]
-                hero.dest_pos_dat_tile = self.game_state.hero_party.members[hero_idx - 1].curr_pos_dat_tile
+            for hero_idx in range(1, len(self.game_state.get_hero_party().members)):
+                hero = self.game_state.get_hero_party().members[hero_idx]
+                hero.dest_pos_dat_tile = self.game_state.get_hero_party().members[hero_idx - 1].curr_pos_dat_tile
                 if hero.curr_pos_dat_tile != hero.dest_pos_dat_tile:
                     hero.direction = Direction.get_direction(hero.dest_pos_dat_tile - hero.curr_pos_dat_tile)
 
             # Determine if the movement should result in a transition to another map
-            map_size = self.game_state.game_map.size()
-            leaving_transition = self.game_state.game_info.maps[self.game_state.get_map_name()].leaving_transition
+            map_size = self.game_state.get_game_map().size()
+            leaving_transition = self.game_state.get_game_info().maps[self.game_state.get_map_name()].leaving_transition
             if leaving_transition is not None:
                 if leaving_transition.bounding_box:
                     if not leaving_transition.bounding_box.collidepoint(hero_dest_dat_tile.get_as_int_tuple()):
@@ -441,81 +463,55 @@ class Exploring(GameMode):
                 ):
                     transition = leaving_transition
             if transition is None:
-                logger.info(
-                    "Check for transitions at %s %s",
-                    hero_dest_dat_tile,
-                    self.game_state.get_encounter_background(hero_dest_dat_tile),
-                )
+                logger.info("Check for transitions at %s", hero_dest_dat_tile)
 
                 # See if this tile has any associated transitions
-                transition = self.game_state.get_point_transition(
-                    hero_dest_dat_tile, filter_to_automatic_transitions=True
-                )
+                transition = self.get_point_transition(hero_dest_dat_tile, filter_to_automatic_transitions=True)
             else:
                 # Map leaving transition
                 logger.debug("Leaving map %s", self.game_state.get_map_name())
 
             # Check for tile penalty effects
-            if dest_tile_type.hp_penalty > 0 and not self.game_state.hero_party.is_ignoring_tile_penalties():
-                audio_player.play_sound("hit_lvl_1")
+            if dest_tile_type.hp_penalty > 0 and not self.game_state.get_hero_party().is_ignoring_tile_penalties():
                 movement_hp_penalty = dest_tile_type.hp_penalty
 
             # Check for any status effect changes or healing to occur as the party moves
-            has_low_health = self.game_state.hero_party.has_low_health()
-            dialog_from_inc_step_count = self.game_state.hero_party.inc_step_counter()
-            if has_low_health != self.game_state.hero_party.has_low_health():
-                # Change default dialog font color
-                self.gde.update_default_dialog_font_color()
+            dialog_from_inc_step_count = self.game_state.get_hero_party().inc_step_counter()
 
-                # Redraw the map
-                self.draw()
-            if dialog_from_inc_step_count is not None:
-                self.gde.dialog_loop(dialog_from_inc_step_count)
-
-        # Handle being blocked by terrain.  Keep a counter in order to forgive the first occurrence as the blocked
-        # sound effect was otherwise a bit excessive.
-        if movement_allowed:
-            # On allowed movement, unset first_block_occurred
-            # if self.first_block_occurred: logger.debug("Clearing first_block_occurred on allowed movement")
-            self.first_block_occurred = False
-        else:
-            self.game_state.hero_party.members[0].dest_pos_dat_tile = self.game_state.hero_party.members[
-                0
-            ].curr_pos_dat_tile
-            if self.first_block_occurred:
-                # logger.debug("Successive block - playing blocked sound")
-                audio_player.play_sound("blocked")
-
-            # On blocked movement, set first_block_occurred
-            # if not self.first_block_occurred: logger.debug("First block - not playing blocked sound")
-            self.first_block_occurred = True
-
-        first_frame = True
-        while self.game_state.hero_party.is_moving():
-            # Redraws the characters when movement_allowed is True
-            # logger.debug("Advancing one tick")
-            if movement_allowed and movement_hp_penalty > 0 and first_frame:
-                flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
-                flicker_surface.fill("red")
-                flicker_surface.set_alpha(128)
-                self.advance_state()
-                self.draw(flip_buffer=False)
-                self.game_state.screen.blit(flicker_surface, (0, 0))
-                self.advance_time(flip_buffer=True)
-                first_frame = False
-            else:
-                self.advance_tick()
-
-        if movement_allowed:
-            # Apply health penalty and check for player death
-            for hero in self.game_state.hero_party.members:
+            # Apply health penalty
+            for hero in self.game_state.get_hero_party().members:
                 if not hero.is_ignoring_tile_penalties():
-                    hero.hp -= movement_hp_penalty
-            self.gde.update_default_dialog_font_color()
-            self.game_state.handle_death()
+                    hero.hp = max(0, hero.hp - movement_hp_penalty)
 
-            # At destination - now determine if an encounter should start
-            if not self.game_state.make_map_transition(transition):
+            first_frame = True
+            while self.game_state.get_hero_party().is_moving():
+                # Redraws the characters when movement_allowed is True
+                # logger.debug("Advancing one tick")
+                if movement_allowed and movement_hp_penalty > 0 and first_frame:
+                    audio_player.play_sound("hit_lvl_1")
+                    flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
+                    flicker_surface.fill("red")
+                    flicker_surface.set_alpha(128)
+                    self.advance_state()
+                    self.draw(flip_buffer=False)
+                    self.game_state.screen.blit(flicker_surface, (0, 0))
+                    self.advance_time(flip_buffer=True)
+                    first_frame = False
+                elif dialog_from_inc_step_count is not None:
+                    self.gde.dialog_loop(dialog_from_inc_step_count)
+                    dialog_from_inc_step_count = None
+                else:
+                    # Update the status dialog
+                    self.dialog_manager.status_dialog = GameDialog.create_persistent_status_dialog(
+                        self.game_state.get_hero_party()
+                    )
+                    self.advance_tick()
+
+            # Check for player death or combat at the destination
+            if not self.game_state.get_hero_party().has_surviving_members():
+                self.game_state.handle_death()
+            elif not self.make_map_transition(transition):
+                # At destination - now determine if an encounter should start
                 # Check for special monster encounters as well as random monsters
                 if self.game_state.get_special_monster() is not None or (
                     len(self.game_state.get_tile_monsters()) > 0 and random.uniform(0, 1) < dest_tile_type.spawn_rate
@@ -524,6 +520,92 @@ class Exploring(GameMode):
                     self.game_state.initiate_encounter()
                     game_events.clear_events()
         else:
+            # Reset the destination for each member of the hero party back to the current position
+            self.game_state.get_hero_party().members[0].dest_pos_dat_tile = (
+                self.game_state.get_hero_party().members[0].curr_pos_dat_tile
+            )
+
+            # Handle being blocked by terrain.  Use first_block_occurred in order to forgive the first occurrence as
+            # the blocked sound effect was otherwise a bit excessive.
+            if self.first_block_occurred:
+                # logger.debug("Successive block - playing blocked sound")
+                audio_player.play_sound("blocked")
+
+            # On blocked movement, set first_block_occurred
+            # if not self.first_block_occurred: logger.debug("First block - not playing blocked sound")
+            self.first_block_occurred = True
+
+            # On being blocked, advance the same number of frames as moving.
             # logger.debug("Advancing %s ticks", CharacterSprite.get_tile_movement_steps())
             for _ in range(CharacterSprite.get_tile_movement_steps()):
                 self.advance_tick()
+
+    def make_map_transition(self, transition: Optional[OutgoingTransition]) -> bool:
+        """Return a boolean indicating if a transition was made."""
+        if transition is None:
+            return False
+
+        src_map = self.game_state.get_game_info().maps[self.game_state.get_map_name()]
+        dest_map = self.game_state.get_game_info().maps[transition.dest_map]
+
+        # Find the destination transition corresponding to this transition
+        if transition.dest_name is None:
+            try:
+                dest_transition = dest_map.transitions_by_map[self.game_state.get_map_name()]
+            except KeyError:
+                logger.error("Failed to find destination transition by dest_map")
+                return False
+        else:
+            try:
+                dest_transition = dest_map.transitions_by_map_and_name[self.game_state.get_map_name()][
+                    transition.dest_name
+                ]
+            except KeyError:
+                try:
+                    dest_transition = dest_map.transitions_by_name[transition.dest_name]
+                except KeyError:
+                    logger.error("Failed to find destination transition by dest_name")
+                    return False
+
+        # If transitioning from outside to inside, save off last outside position
+        if src_map.is_outside and not dest_map.is_outside:
+            self.game_state.get_hero_party().set_last_outside_pos(
+                self.game_state.get_map_name(),
+                self.game_state.get_hero_party().get_curr_pos_dat_tile(),
+                self.game_state.get_hero_party().get_direction(),
+            )
+
+        # Make the transition and draw the map
+        AudioPlayer().play_sound("walk_away")
+        self.game_state.get_hero_party().set_pos(dest_transition.point, dest_transition.dir)
+        self.game_state.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
+        self.draw(flip_buffer=True)
+
+        # Slight pause on a map transition
+        pygame.time.wait(250)
+
+        return True
+
+    def get_point_transition(
+        self,
+        tile: Optional[Point] = None,
+        filter_to_automatic_transitions: bool = False,
+    ) -> Optional[OutgoingTransition]:
+        """Find point transitions for either the specified point or the current position of the player character.
+        If filter_to_automatic_transitions is true, only look for automatic point transitions"""
+        if tile is None:
+            tile = self.game_state.get_hero_party().get_curr_pos_dat_tile()
+        for point_transition in self.game_state.get_game_info().maps[self.game_state.get_map_name()].point_transitions:
+            if point_transition.point == tile and self.game_state.check_progress_markers(
+                point_transition.progress_marker,
+                point_transition.inverse_progress_marker,
+            ):
+                if filter_to_automatic_transitions:
+                    if point_transition.is_automatic is None and not self.game_state.is_light_restricted():
+                        # By default, make transitions manual in dark places
+                        return point_transition
+                    if point_transition.is_automatic:
+                        return point_transition
+                else:
+                    return point_transition
+        return None

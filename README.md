@@ -248,7 +248,7 @@ The pygame library is integral to this project. Migrating to using Tiled maps an
 been a really nice improvement, but one that you only see with the licensed assets that are not included in the repo. A
 future distribution of the game will include these.
 
-* [pygame](https://github.com/pygame/pygame): Python library for multimedia applications
+* [pygame-ce](https://github.com/pygame-community/pygame-ce): Python library for multimedia applications
 * [Leif Theden](https://github.com/bitcraft):
   * [pytmx](https://github.com/bitcraft/pytmx): Python library to read Tiled maps
   * [pyscroll](https://github.com/bitcraft/pyscroll): Python library to render Tiled maps
