@@ -1428,7 +1428,4 @@
    <object id="52" x="592" y="928" width="16" height="16"/>
   </objectgroup>
  </group>
- <imagelayer id="5" name="template" visible="0" locked="1" opacity="0.2" offsetx="432" offsety="463">
-  <image source="tantegel_lvl1.png" width="482" height="486"/>
- </imagelayer>
 </map>
