@@ -152,6 +152,12 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 else:
                     images.append(None)
             self.tmx.images = images
+
+        # FUTURE: Remove this after updating to a new pyscroll version with the fix.
+        # Manually clearing _animated_tile as this is otherwise missed in reload_animations.
+        # Fix in PR https://github.com/bitcraft/pyscroll/pull/73.
+        self._animated_tile.clear()
+
         self.reload_animations()
 
         # Add an image of black as the last image
