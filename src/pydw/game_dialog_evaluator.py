@@ -115,7 +115,6 @@ class GameDialogEvaluator:
 
     def wait_for_message_to_fully_display(self, message_dialog: GameDialog) -> None:
         message_dialog.blit(self.game_state.screen, True)
-        clock = pygame.time.Clock()
         while self.game_state.is_running and message_dialog.has_more_content():
             (
                 should_wait_for_acknowledgement,
@@ -252,6 +251,7 @@ class GameDialogEvaluator:
         menu_result = None
         while self.game_state.is_running and menu_result is None:
             events = game_events.get_events(True)
+
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -269,14 +269,17 @@ class GameDialogEvaluator:
                     self.game_state.handle_quit(force=True)
 
             if 0 == len(events):
-                pygame.time.wait(25)
+                if not self.game_state.get_game_mode().advance_tick():
+                    self.game_state.get_game_mode().advance_time(flip_buffer=True)
             else:
-                pygame.time.wait(200)
+                for _ in range(6):
+                    if not self.game_state.get_game_mode().advance_tick():
+                        self.game_state.get_game_mode().advance_time(flip_buffer=True)
 
         if menu_result == "":
             menu_result = None
 
-        if menu_result is not None:
+        if self.game_state.is_running:
             AudioPlayer().play_sound("select")
 
         return menu_result

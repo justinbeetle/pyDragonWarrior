@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import numpy as np
 import pygame
 
 # TODO: Factor these out of this module
@@ -134,11 +135,8 @@ def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -
 
 def rainbow_effect_across_background(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
     game_mode = game_state.get_game_mode()
-    game_mode.draw_background(flip_buffer=False)
-    background_surface = game_state.screen.copy()
 
     # Cycle through the rainbow colors
-    clock = pygame.time.Clock()
     fade_surface = pygame.surface.Surface(game_state.screen.get_size())
     for _ in range(2):
         for rainbow_color in rainbow_colors:
@@ -146,19 +144,20 @@ def rainbow_effect_across_background(game_state: GameStateInterface, message_dia
 
             def fade_step(fade_surface: pygame.surface.Surface, alpha: int) -> None:
                 fade_surface.set_alpha(alpha)
-                game_state.screen.blit(background_surface, (0, 0))
+                game_mode.advance_state()
+                game_mode.draw_background(flip_buffer=False)
                 game_state.screen.blit(fade_surface, (0, 0))
 
                 # Overlay the dialogs
                 game_mode.draw_dialogs(flip_buffer=False)
 
                 # Advance a tick
-                game_mode.advance_time(flip_buffer=True, frame_rate_hz=15)
+                game_mode.advance_time(flip_buffer=True)
 
-            for j in range(63, 196, 64):
+            for j in range(63, 196, 32):
                 fade_step(fade_surface, j)
 
-            for j in range(63, 196, 64):
+            for j in range(63, 196, 32):
                 fade_step(fade_surface, 196 - j)
 
 
@@ -184,3 +183,79 @@ def rainbow_effect_on_water(screen: pygame.surface.Surface, water_tile: pygame.s
     # Restore original screen
     screen.blit(orig_screen, (0, 0))
     pygame.display.flip()
+
+
+def alter_lighting(
+    surface: pygame.surface.Surface,
+    saturation_factor: float = 1.0,
+    blue_factor: float = 0.0,
+    darken_factor: float = 0.0,
+) -> pygame.surface.Surface:
+    """Return a surface where the saturation is decreased, the blue level is increased, and it is darkened.
+
+    :param saturation_factor: Adjusts the saturation of a pygame.Surface using numpy.
+        1.0 for original, 0.0 for grayscale, <1.0 for reduced saturation.
+    :param blue_factor: Blue is blit over the unsaturated output with this opacity
+        0.0 for original, 1.0 for blue
+    :param darken_factor: Black is blit over the blue shifted output with this opacity
+        0.0 for original, 1.0 for black
+    """
+    if saturation_factor == 1.0 and blue_factor == 0.0 and darken_factor == 0.0:
+        return surface
+
+    if saturation_factor != 1.0:
+        # Convert the Surface to a NumPy array for efficient pixel manipulation
+        pixels = pygame.surfarray.array3d(surface)
+
+        # Convert RGB to HSL color space (using a simple approximation or standard formula)
+        # Note: A full HSL conversion is complex, this is a simplified method using existing color logic.
+
+        # A common, simpler way to reduce saturation in RGB space is blending with grayscale
+        # Create a grayscale version of the image
+        grayscale_pixels = np.dot(pixels[..., :3], [0.2989, 0.5870, 0.1140])  # Standard luminosity weights
+        grayscale_pixels = np.stack([grayscale_pixels, grayscale_pixels, grayscale_pixels], axis=-1)
+
+        # Blend the original and grayscale versions based on the saturation factor
+        # new_color = original * saturation_factor + grayscale * (1 - saturation_factor)
+        adjusted_pixels = (pixels * saturation_factor + grayscale_pixels * (1.0 - saturation_factor)).astype(np.uint8)
+
+        # Convert the NumPy array back to a Pygame Surface
+        adjusted_surface = pygame.surfarray.make_surface(adjusted_pixels)
+
+        # Restore original alpha channel, if any
+        if surface.get_flags() & pygame.SRCALPHA:
+            adjusted_surface.set_alpha(surface.get_alpha())
+    else:
+        adjusted_surface = surface.copy()
+
+    fade_surface = None
+    if blue_factor != 0.0:
+        fade_surface = pygame.surface.Surface(surface.get_size())
+        fade_surface.convert_alpha()
+        fade_surface.fill("blue")
+        fade_surface.set_alpha(int(255 * blue_factor))
+        adjusted_surface.blit(fade_surface, (0, 0))
+
+    if darken_factor != 0.0:
+        if fade_surface is None:
+            fade_surface = pygame.surface.Surface(surface.get_size())
+        fade_surface.fill("black")
+        fade_surface.set_alpha(int(255 * darken_factor))
+        adjusted_surface.blit(fade_surface, (0, 0))
+
+    # Restore per pixel alphas from the source
+    try:
+        surface.lock()
+        adjusted_surface.lock()
+        src_alpha_array = pygame.surfarray.pixels_alpha(surface)
+        if saturation_factor != 0.0:
+            adjusted_surface = adjusted_surface.convert_alpha()
+        dst_alpha_array = pygame.surfarray.pixels_alpha(adjusted_surface)
+        dst_alpha_array[:] = src_alpha_array[:]
+    except ValueError:
+        pass
+    finally:
+        surface.unlock()
+        adjusted_surface.unlock()
+
+    return adjusted_surface

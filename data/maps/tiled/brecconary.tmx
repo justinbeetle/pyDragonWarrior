@@ -1132,4 +1132,7 @@
    <object id="45" x="864" y="240" width="112" height="80"/>
   </objectgroup>
  </group>
+ <imagelayer id="5" name="template" visible="0" locked="1" opacity="0.33" offsetx="424" offsety="193">
+  <image source="brecconary.png" width="600" height="600"/>
+ </imagelayer>
 </map>

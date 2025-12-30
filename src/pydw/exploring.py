@@ -99,12 +99,19 @@ class Exploring(GameMode):
                 if event.key == pygame.K_ESCAPE:
                     self.game_state.handle_quit()
                 elif event.key == pygame.K_RETURN:
+                    AudioPlayer().play_sound("select")
                     self.smart_interactions()
                 elif event.key == pygame.K_SPACE:
+                    AudioPlayer().play_sound("select")
                     self.menu_loop()
                 elif event.key == pygame.K_F1:
                     AudioPlayer().play_sound("select")
                     self.game_state.save(quick_save=True)
+                # TODO: Enable to play around with day vs night lighting
+                #elif event.key == pygame.K_F2:
+                #    self.game_state.get_game_map().set_lighting_mode(is_day=True)
+                #elif event.key == pygame.K_F3:
+                #    self.game_state.get_game_map().set_lighting_mode(is_day=False)
                 else:
                     direction = Direction.get_optional_direction(event.key)
                     if direction is None:
@@ -238,7 +245,6 @@ class Exploring(GameMode):
 
     def menu_loop(self) -> None:
         """The loop for the exploring menu."""
-        AudioPlayer().play_sound("select")
         dm = self.game_state.get_dialog_manager()
         dm.status_dialog = GameDialog.create_exploring_status_dialog(self.game_state.get_hero_party())
         dm.add_cascading_dialog(GameDialog.create_exploring_menu())
@@ -246,35 +252,28 @@ class Exploring(GameMode):
             menu_result = self.gde.get_menu_result(dm.cascading_dialogs[-1])
             logger.debug("menu_result = %s", menu_result)
             if menu_result == "TALK":
-                AudioPlayer().play_sound("select")
                 dm.remove_cascading_dialog()
                 self.handle_talking()
             elif menu_result == "SEARCH":
-                AudioPlayer().play_sound("select")
                 dm.remove_cascading_dialog()
                 self.handle_searching()
             elif menu_result == "OPEN":
-                AudioPlayer().play_sound("select")
                 dm.remove_cascading_dialog()
                 self.handle_opening()
             elif menu_result == "STAIRS":
-                AudioPlayer().play_sound("select")
                 dm.remove_cascading_dialog()
                 if not self.make_map_transition(self.get_point_transition()):
                     self.gde.dialog_loop("There are no stairs here.")
             elif menu_result == "STATUS":
-                AudioPlayer().play_sound("select")
                 dm.add_cascading_dialog(GameDialog.create_full_status_dialog(self.game_state.get_hero_party()))
                 if self.gde.wait_for_acknowledgement():
                     # Only removing two dialogs when we exit out of the status dialog with acceptance
                     dm.remove_cascading_dialog(flip_buffer=False)
                 dm.remove_cascading_dialog()
             elif menu_result == "SPELL":
-                AudioPlayer().play_sound("select")
                 # Not removing the menu dialog when done in the spell menu.
                 self.spell_submenu_loop()
             elif menu_result == "ITEM":
-                AudioPlayer().play_sound("select")
                 # Not removing the menu dialog when done in the item menu.
                 self.item_submenu_loop()
             elif menu_result is not None:

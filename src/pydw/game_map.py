@@ -355,6 +355,15 @@ class GameMap(GameMapInterface):
     def update(self) -> None:
         self.group.update()
 
+    def set_lighting_mode(self, is_day: bool) -> None:
+        """Set state for the map's lighting mode."""
+        if isinstance(self.map_data, PaddedTiledMapData):
+            if is_day:
+                self.map_data.set_lighting_mode(1.0, 0.0, 0.0)
+            else:
+                self.map_data.set_lighting_mode(0.5, 0.2, 0.4)
+            self.map_layer.reload()
+
     def draw(self, surface: Optional[pygame.surface.Surface] = None) -> None:
         if surface is None:
             surface = self.game_state.screen

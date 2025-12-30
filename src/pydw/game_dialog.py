@@ -501,24 +501,8 @@ class GameDialog:
             Point(-1, 1),
             None,
             "COMMANDS",
-            ["TALK", "SPELL", "ITEM", "STATUS", "SEARCH", "OPEN"],
-            3,
-        )
-
-    @staticmethod
-    def create_encounter_menu() -> GameDialog:
-        title: Optional[str] = "COMMANDS"
-        options: list[str] = ["FIGHT", "SPELL", "RUN", "ITEM"]
-        num_cols: int = len(options)
-        return GameDialog.create_menu_dialog(
-            Point(-1, 1),
-            Point(
-                GameDialog.get_size_for_menu(["TALK", "SPELL", "ITEM", "STATUS", "SEARCH", "OPEN"], 3, title).w,
-                GameDialog.get_size_for_menu(options, num_cols, title).h,
-            ),
-            title,
-            options,
-            num_cols,
+            ["ITEM", "SEARCH", "SPELL", "STATUS"],
+            2,
         )
 
     @staticmethod
@@ -1424,7 +1408,7 @@ def main() -> None:
             + "Word Wrap testing...  word Wrap testing...  Word Wrap testing..."
         )
     )
-    wait_for_menu_selection(GameDialog.create_encounter_menu())
+    wait_for_message_to_fully_display(message_dialog)
 
     screen.fill("pink")
     GameDialog.create_encounter_status_dialog(hero_party).blit(screen, False)

@@ -6,6 +6,7 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
+import logging
 import xml.etree.ElementTree as ET
 from typing import Any, Callable, Deque, Iterator, Optional, cast
 
@@ -14,6 +15,9 @@ import pyscroll
 import pytmx
 
 from generic_utils.point import Point
+from pygame_utils import surface_effects
+
+logger = logging.getLogger(__name__)
 
 
 class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
@@ -31,38 +35,19 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         desired_tile_size: Optional[int] = None,
     ):
         super().__init__()
+        self.desired_tile_size = desired_tile_size
 
-        # Extract out any image layers - image layers are only being used to compare the Tiled map to a template image.
-        # The template images are not being controlled and pytmx errors out upon failing to load an image.
-        xml_root = ET.parse(tmx_filename).getroot()
-        for image_layer_element in xml_root.findall(".//imagelayer"):
-            xml_root.remove(image_layer_element)
+        # Lighting mode state - applied in modify_images
+        self.saturation_factor = 1.0  # no-op
+        self.blue_factor = 0.0  # no-op
+        self.darken_factor = 0.0  # no-op
 
-        # load data from pytmx
-        self.tmx = pytmx.util_pygame.load_pygame(tmx_filename)
-
-        # Determine desired amount of pre-zoom
-        self.pre_zoom = 1.0
-        if desired_tile_size is not None:
-            self.pre_zoom = desired_tile_size / self.tmx.tilewidth
-
-        # Pre-zoom tile images
-        if self.pre_zoom != 1.0:
-            images: list[Optional[pygame.surface.Surface]] = []
-            for i in self.tmx.images:
-                if i is not None:
-                    images.append(pygame.transform.scale(i, self.tile_size))
-                else:
-                    images.append(None)
-            self.tmx.images = images
-
-        # Add an image of black
-        black_tile = self.tmx.images[-1].copy()
-        black_tile.fill("black")
-        self.tmx.images.append(black_tile)
+        # Load the map
+        self.tmx = self.load_pytmx_without_image_layers(tmx_filename)
+        # Modify the images for the needs of this implementation
+        self.modify_images()
 
         self.image_pad_tiles = image_pad_tiles.ceil()
-        self.reload_animations()
         self.overlay_layer_offset = 0
         self._base_tile_layers = self.calc_base_tile_layers()
         self._overlay_tile_layers = self.calc_overlay_tile_layers()
@@ -112,9 +97,72 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         print('decoration layer', self.decoration_layer, flush=True)
         print('character layer', self.character_layer, flush=True)"""
 
+    @staticmethod
+    def load_pytmx_without_image_layers(tmx_filename: str) -> pytmx.TiledMap:
+        """Load the TiledMap while stripping invisible image layers.  These image layers are only
+        being used to compare the Tiled map to a template image while creating the map in Tiled.
+        The template images are not being controlled and pytmx errors out upon failing to load an
+        image, making this neccessary.
+
+        If removing the image layers wasn't neccessary, loading a Tiled map would instead be as
+        simple as follows:  pytmx.util_pygame.load_pygame(tmx_filename)
+        """
+        # Remove invisible image layers from the XML ElementTree
+        xml_root = ET.parse(tmx_filename).getroot()
+        for image_layer_element in xml_root.findall(".//imagelayer"):
+            if "visible" in image_layer_element.attrib and not pytmx.convert_to_bool(
+                image_layer_element.attrib["visible"]
+            ):
+                xml_root.remove(image_layer_element)
+            else:
+                logger.warning("Retaining visible image layer in Tiled map.")
+
+        # Load map into pytmx manually from the modified ElementTree
+        tmx = pytmx.TiledMap(image_loader=pytmx.util_pygame.pygame_image_loader)
+        tmx.filename = tmx_filename
+        tmx.parse_xml(xml_root)
+        return tmx
+
+    def set_lighting_mode(self, saturation_factor: float, blue_factor: float, darken_factor: float) -> None:
+        """Set factors used in the alter_lighting for day/night lighting changes."""
+        self.saturation_factor = saturation_factor
+        self.blue_factor = blue_factor
+        self.darken_factor = darken_factor
+
+    def modify_images(self) -> None:
+        """Modify the images for the usage in PaddedTiledMapData"""
+        # Determine desired amount of pre-zoom
+        self.pre_zoom = 1.0
+        if self.desired_tile_size is not None:
+            self.pre_zoom = self.desired_tile_size / self.tmx.tilewidth
+
+        # Pre-zoom tile images
+        if self.pre_zoom != 1.0:
+            images: list[Optional[pygame.surface.Surface]] = []
+            for i in self.tmx.images:
+                if i is not None:
+                    images.append(
+                        pygame.transform.scale(
+                            surface_effects.alter_lighting(
+                                i, self.saturation_factor, self.blue_factor, self.darken_factor
+                            ),
+                            self.tile_size,
+                        )
+                    )
+                else:
+                    images.append(None)
+            self.tmx.images = images
+        self.reload_animations()
+
+        # Add an image of black as the last image
+        black_tile = self.tmx.images[-1].copy()
+        black_tile.fill("black")
+        self.tmx.images.append(black_tile)
+
     def reload_data(self) -> None:
         """Reload the tiles"""
-        self.tmx = pytmx.util_pygame.load_pygame(self.tmx.filename)
+        self.tmx = self.load_pytmx_without_image_layers(self.tmx.filename)
+        self.modify_images()
 
     def set_pc_character_tile(self, pos_dat_tile: Point) -> bool:
         """

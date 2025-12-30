@@ -25,6 +25,12 @@ class GameMapInterface(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def set_lighting_mode(self, is_day: bool) -> None:
+        """Set state for the map's lighting mode."""
+        # TODO: Consider how this should work.  Maybe we really want to do it by time of day so it can change
+        #       gradually instead of just being a day/night toggle.
+
+    @abc.abstractmethod
     def draw(self, surface: Optional[pygame.surface.Surface] = None) -> None:
         pass
 
