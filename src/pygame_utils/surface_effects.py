@@ -201,12 +201,14 @@ def alter_lighting(
         0.0 for original, 1.0 for black
     """
     if saturation_factor == 1.0 and blue_factor == 0.0 and darken_factor == 0.0:
+        # In the no-op case return the source surface
         return surface
 
-    if saturation_factor != 1.0:
-        # Convert the Surface to a NumPy array for efficient pixel manipulation
-        pixels = pygame.surfarray.array3d(surface)
+    # Convert the Surface to a NumPy array for efficient pixel manipulation
+    pixels = pygame.surfarray.array3d(surface)
 
+    # Desaturate the image
+    if saturation_factor != 1.0:
         # Convert RGB to HSL color space (using a simple approximation or standard formula)
         # Note: A full HSL conversion is complex, this is a simplified method using existing color logic.
 
@@ -217,45 +219,35 @@ def alter_lighting(
 
         # Blend the original and grayscale versions based on the saturation factor
         # new_color = original * saturation_factor + grayscale * (1 - saturation_factor)
-        adjusted_pixels = (pixels * saturation_factor + grayscale_pixels * (1.0 - saturation_factor)).astype(np.uint8)
+        pixels = (pixels * saturation_factor + grayscale_pixels * (1.0 - saturation_factor)).astype(np.uint8)
 
-        # Convert the NumPy array back to a Pygame Surface
-        adjusted_surface = pygame.surfarray.make_surface(adjusted_pixels)
+    def blend_with_color(pixels: np.ndarray, color: pygame.Color, blend_factor: float) -> None:
+        """Perform a blend using the numpy array (could alternately blit) since we've already created it
+        for desaturation."""
+        if blend_factor != 0.0:
+            color_pixels = np.zeros(pixels.shape)
+            if color.r != 0 or color.g != 0 or color.b != 0:
+                color_pixels[:] = color.r, color.g, color.b
+            pixels += ((color_pixels - pixels) * blend_factor).astype(np.uint8)
 
-        # Restore original alpha channel, if any
-        if surface.get_flags() & pygame.SRCALPHA:
-            adjusted_surface.set_alpha(surface.get_alpha())
-    else:
-        adjusted_surface = surface.copy()
+    # Increase the blue level in the image
+    blend_with_color(pixels, pygame.Color("blue"), blue_factor)
 
-    fade_surface = None
-    if blue_factor != 0.0:
-        fade_surface = pygame.surface.Surface(surface.get_size())
-        fade_surface.convert_alpha()
-        fade_surface.fill("blue")
-        fade_surface.set_alpha(int(255 * blue_factor))
-        adjusted_surface.blit(fade_surface, (0, 0))
+    # Darken the image
+    blend_with_color(pixels, pygame.Color("black"), darken_factor)
 
-    if darken_factor != 0.0:
-        if fade_surface is None:
-            fade_surface = pygame.surface.Surface(surface.get_size())
-        fade_surface.fill("black")
-        fade_surface.set_alpha(int(255 * darken_factor))
-        adjusted_surface.blit(fade_surface, (0, 0))
+    # Convert the numpy array back to a surface
+    altered_surface = pygame.surfarray.make_surface(pixels)
 
-    # Restore per pixel alphas from the source
+    # Restore alpha channel
+    altered_surface.set_alpha(surface.get_alpha())
+
+    # Restore per pixel alphas
     try:
-        surface.lock()
-        adjusted_surface.lock()
         src_alpha_array = pygame.surfarray.pixels_alpha(surface)
-        if saturation_factor != 0.0:
-            adjusted_surface = adjusted_surface.convert_alpha()
-        dst_alpha_array = pygame.surfarray.pixels_alpha(adjusted_surface)
-        dst_alpha_array[:] = src_alpha_array[:]
+        altered_surface = altered_surface.convert_alpha()
+        pygame.surfarray.pixels_alpha(altered_surface)[:] = src_alpha_array[:]
     except ValueError:
         pass
-    finally:
-        surface.unlock()
-        adjusted_surface.unlock()
 
-    return adjusted_surface
+    return altered_surface

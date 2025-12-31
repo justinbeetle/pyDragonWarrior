@@ -123,11 +123,18 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         tmx.parse_xml(xml_root)
         return tmx
 
-    def set_lighting_mode(self, saturation_factor: float, blue_factor: float, darken_factor: float) -> None:
-        """Set factors used in the alter_lighting for day/night lighting changes."""
+    def set_lighting_mode(self, saturation_factor: float, blue_factor: float, darken_factor: float) -> bool:
+        """Set factors used in the alter_lighting for day/night lighting changes.  Return a boolean
+        indicating if the lighting mode was changed."""
+        was_changed = (
+            self.saturation_factor != saturation_factor
+            or self.blue_factor != blue_factor
+            or self.darken_factor != darken_factor
+        )
         self.saturation_factor = saturation_factor
         self.blue_factor = blue_factor
         self.darken_factor = darken_factor
+        return was_changed
 
     def modify_images(self) -> None:
         """Modify the images for the usage in PaddedTiledMapData"""
