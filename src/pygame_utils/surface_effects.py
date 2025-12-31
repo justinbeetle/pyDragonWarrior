@@ -221,7 +221,7 @@ def alter_lighting(
         # new_color = original * saturation_factor + grayscale * (1 - saturation_factor)
         pixels = (pixels * saturation_factor + grayscale_pixels * (1.0 - saturation_factor)).astype(np.uint8)
 
-    def blend_with_color(pixels: np.ndarray[tuple[int, int, int]], color: pygame.Color, blend_factor: float) -> None:
+    def blend_with_color(pixels: np.typing.NDArray[np.uint8], color: pygame.Color, blend_factor: float) -> None:
         """Perform a blend using the numpy array (could alternately blit) since we've already created it
         for desaturation."""
         if blend_factor != 0.0:

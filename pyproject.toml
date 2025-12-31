@@ -44,7 +44,8 @@ dependencies = [
 [project.optional-dependencies]
 # Install dev dependencies as: pip install .[dev]
 dev = [
-    "black==25.12.0",
+    "black==25.11.0; python_version == '3.9'",
+    "black==25.12.0; python_version >= '3.10'",
     "coverage==7.10.7; python_version == '3.9'",
     "coverage==7.13.0; python_version >= '3.10'",
     "isort==7.0.0",
