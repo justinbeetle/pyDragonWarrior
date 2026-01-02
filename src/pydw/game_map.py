@@ -21,6 +21,7 @@ from pydw.game_types import (
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.legacy_map_data import LegacyMapData
+from pydw.light_engine import Light
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
 from pydw.padded_tiled_map_data import PaddedTiledMapData
@@ -392,51 +393,85 @@ class GameMap(GameMapInterface):
 
         light_diameter = self.game_state.get_hero_party().light_diameter
         if light_diameter is not None:
-            light_radius_px = light_diameter * self.game_state.get_game_info().tile_size_pixels / 2
+            light_radius_px = int(light_diameter * self.game_state.get_game_info().tile_size_pixels / 2)
 
-            # Left
-            surface.fill(
-                "black",
-                pygame.Rect(
-                    0,
-                    0,
-                    surface.get_width() / 2 - light_radius_px,
-                    surface.get_height(),
-                ),
-            )
+            # TODO: Replace with lighting engine
+            use_legacy_lighting = False
+            if use_legacy_lighting:
+                self.apply_lighting_legacy(surface, light_radius_px)
+            else:
+                self.apply_dynamic_lighting(surface, light_radius_px)
 
-            # Right
-            surface.fill(
-                "black",
-                pygame.Rect(
-                    surface.get_width() / 2 + light_radius_px,
-                    0,
-                    surface.get_width() / 2 - light_radius_px,
-                    surface.get_height(),
-                ),
-            )
+    def apply_lighting_legacy(self, surface: pygame.surface.Surface, light_radius_px: int) -> None:
+        # Left
+        surface.fill(
+            "black",
+            pygame.Rect(
+                0,
+                0,
+                surface.get_width() / 2 - light_radius_px,
+                surface.get_height(),
+            ),
+        )
 
-            # Top
-            surface.fill(
-                "black",
-                pygame.Rect(
-                    0,
-                    0,
-                    surface.get_width(),
-                    surface.get_height() / 2 - light_radius_px,
-                ),
-            )
+        # Right
+        surface.fill(
+            "black",
+            pygame.Rect(
+                surface.get_width() / 2 + light_radius_px,
+                0,
+                surface.get_width() / 2 - light_radius_px,
+                surface.get_height(),
+            ),
+        )
 
-            # Bottom
-            surface.fill(
-                "black",
-                pygame.Rect(
-                    0,
-                    surface.get_height() / 2 + light_radius_px,
-                    surface.get_width(),
-                    surface.get_height() / 2 - light_radius_px,
-                ),
-            )
+        # Top
+        surface.fill(
+            "black",
+            pygame.Rect(
+                0,
+                0,
+                surface.get_width(),
+                surface.get_height() / 2 - light_radius_px,
+            ),
+        )
+
+        # Bottom
+        surface.fill(
+            "black",
+            pygame.Rect(
+                0,
+                surface.get_height() / 2 + light_radius_px,
+                surface.get_width(),
+                surface.get_height() / 2 - light_radius_px,
+            ),
+        )
+
+    def apply_dynamic_lighting(self, surface: pygame.surface.Surface, light_radius_px: int) -> None:
+        # Iterate through tiles to get a list of tile rects which should cast shadows.
+        shadow_rects = []
+        image_pad_tiles = self.game_state.get_image_pad_tiles()
+        tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
+        tile_rect = pygame.Rect(0, 0, tile_size_pixels, tile_size_pixels)
+        map_size_x, map_size_y = self.size().get_as_int_tuple()
+        for x in range(map_size_x):
+            for y in range(map_size_y):
+                tile = Point(x, y)
+                if not self.get_tile_info(tile).walkable:
+                    # Use self.map_layer.translate_rect to translate from world pixels to screen pixels.
+                    shadow_rects.append(
+                        self.map_layer.translate_rect(
+                            tile_rect.move((MapSprite.image_pad_tiles + tile) * MapSprite.tile_size_pixels)
+                        )
+                    )
+
+        light_surface = pygame.Surface(surface.get_size())
+        # ambient_light = pygame.Surface(light_surface.get_size()).convert_alpha()
+        # ambient_light.fill((255, 255, 255, 50))
+        # light_surface.blit(ambient_light)
+        light = Light(light_radius_px, pygame.Color(255, 185, 9), 1)
+        light.add_light(light_surface, shadow_rects, surface.get_width() // 2, surface.get_height() // 2)
+        surface.blit(light_surface, special_flags=pygame.BLEND_RGBA_MULT)
 
     def draw_character_sprites(self) -> None:
         map_center_offset = self.group._map_layer.get_center_offset()
