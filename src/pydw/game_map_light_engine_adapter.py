@@ -72,7 +72,7 @@ class GameMapLightEngineAdapter:
             shadow_rects = []
             wall_tiles: list[list[bool]] = [
                 [
-                    self.game_map.get_tile_info(Point(x, y)).name in ["walls"]
+                    self.game_map.get_tile_info(Point(x, y)).name in ["stone", "walls"]
                     for y in range(min_y, max_y + 1)
                 ]
                 for x in range(min_x, max_x + 1)
@@ -256,7 +256,7 @@ class GameMapLightEngineAdapter:
             + self.game_state.get_hero_party().get_curr_pos_offset_img_px() / self.tile_size_pixels
             + Point(0.5, 0.5),
             int(light_diameter_tiles * self.tile_size_pixels / 2),
-            intensity=0.6,
+            intensity=0.4,
         )
 
         if self.is_debugging:
