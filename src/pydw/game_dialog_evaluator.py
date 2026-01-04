@@ -124,6 +124,15 @@ class GameDialogEvaluator:
                 AudioPlayer().play_sound("talking")
             if should_wait_for_acknowledgement:
                 self.wait_for_acknowledgement(message_dialog)
+            else:
+                # Process events
+                events = game_events.get_events()
+                for event in events:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            self.game_state.handle_quit()
+                    elif event.type == pygame.QUIT:
+                        self.game_state.handle_quit(force=True)
 
             if not self.game_state.get_game_mode().advance_tick():
                 message_dialog.blit(self.game_state.screen)

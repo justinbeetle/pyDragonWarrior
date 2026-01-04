@@ -135,3 +135,35 @@ class Point(tuple[PointTypeElemType, PointTypeElemType]):
     def get_as_float_tuple(self) -> tuple[float, float]:
         """Returns the Point as tuple of floats"""
         return float(self.x), float(self.y)
+
+    def get_upper_left(self) -> Point:
+        """Return a point shifted (-1, -1) (upper left in screen coords)"""
+        return Point(self.x - 1, self.y - 1)
+
+    def get_upper(self) -> Point:
+        """Return a point shifted (0, -1) (up in screen coords)"""
+        return Point(self.x, self.y - 1)
+
+    def get_upper_right(self) -> Point:
+        """Return a point shifted (1, -1) (upper right in screen coords)"""
+        return Point(self.x + 1, self.y - 1)
+
+    def get_left(self) -> Point:
+        """Return a point shifted (-1, 0) (left in screen coords)"""
+        return Point(self.x - 1, self.y)
+
+    def get_right(self) -> Point:
+        """Return a point shifted (1, 0) (right in screen coords)"""
+        return Point(self.x + 1, self.y)
+
+    def get_lower_left(self) -> Point:
+        """Return a point shifted (-1, 1) (lower left in screen coords)"""
+        return Point(self.x - 1, self.y + 1)
+
+    def get_lower(self) -> Point:
+        """Return a point shifted (0, 1) (lower in screen coords)"""
+        return Point(self.x, self.y + 1)
+
+    def get_lower_right(self) -> Point:
+        """Return a point shifted (1, 1) (lower right in screen coords)"""
+        return Point(self.x + 1, self.y + 1)

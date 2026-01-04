@@ -1,22 +1,15 @@
 #!/usr/bin/env python
 
 import logging
-from typing import NamedTuple, Optional, Union
+import math
+from typing import Optional
 
 import numpy as np
 import pygame
 
+from generic_utils.point import Point
+
 logger = logging.getLogger(__name__)
-
-
-class Point(NamedTuple):
-    x: int
-    y: int
-
-
-class FloatPoint(NamedTuple):
-    x: float
-    y: float
 
 
 class Light:
@@ -42,9 +35,17 @@ class Light:
         self.render_surface = pygame.Surface((self.size_px, self.size_px))
         self.color = color
         self.intensity = intensity
+        self.is_point = is_point
         self.angle = angle_deg
         self.angle_width_deg = angle_width_deg
-        self.is_point = is_point
+        self.beam_line: Optional[tuple[int, int, int, int]] = None
+        if self.is_point:
+            self.beam_line = (
+                self.radius_px,
+                self.radius_px,
+                int(self.radius_px + self.radius_px * math.cos(math.radians(self.angle))),
+                int(self.radius_px - self.radius_px * math.sin(math.radians(self.angle))),
+            )
         self.pixel_shader_surf = self.pixel_shader()
         self.render_surface.set_colorkey((0, 0, 0))
 
@@ -82,7 +83,7 @@ class Light:
 
         return pygame.surfarray.make_surface(final_array.astype(np.uint8))
 
-    def get_projection_to_edge(self, pt: Point) -> Union[FloatPoint, Point]:
+    def get_projection_to_edge(self, pt: Point) -> Point:
         """Get the center point of self.render_surface projected to the edge of the surface through pt."""
         dx = pt.x - self.radius_px
         dy = pt.y - self.radius_px
@@ -93,13 +94,13 @@ class Light:
         if dy == 0:
             return Point((0 if dx <= 0 else self.size_px), pt.y)
 
-        def calc_intersection(d1: int, d2: int, is_y_intercept: bool) -> FloatPoint:
+        def calc_intersection(d1: float, d2: float, is_y_intersection: bool) -> Point:
             gradient = d1 / d2
             intercept = self.radius_px - (self.radius_px * gradient)
             line = 0 if d2 <= 0 else self.size_px
-            if is_y_intercept:
-                return FloatPoint(line, (gradient * line) + intercept)
-            return FloatPoint((gradient * line) + intercept, line)
+            if is_y_intersection:
+                return Point(line, (gradient * line) + intercept)
+            return Point((gradient * line) + intercept, line)
 
         y_intersection = calc_intersection(dy, dx, True)
         if y_intersection.y >= 0 and y_intersection.y <= self.size_px:
@@ -107,7 +108,7 @@ class Light:
 
         return calc_intersection(dx, dy, False)
 
-    def get_shadow_polygon_points(self, rect: pygame.Rect) -> Optional[list[Union[FloatPoint, Point]]]:
+    def get_shadow_polygon_points(self, rect: pygame.Rect) -> Optional[list[Point]]:
         """Get a 3-tuple of points defining the points on the rectangle
         :param rect: Shadow tile rect in the coordinate frame of self.render_surface
 
@@ -123,14 +124,12 @@ class Light:
         Left       Center     Right
         """
 
-        def finalize_points(
-            outer_pt1: Point, outer_pt2: Point, middle_pt: Optional[Point] = None
-        ) -> list[Union[FloatPoint, Point]]:
+        def finalize_points(outer_pt1: Point, outer_pt2: Point, middle_pt: Optional[Point] = None) -> list[Point]:
             projected_pt1 = self.get_projection_to_edge(outer_pt1)
             projected_pt2 = self.get_projection_to_edge(outer_pt2)
 
             # Determine points between projected_pt1 and projected_pt2
-            projected_pt1_to_projected_pt2_pts: list[Union[FloatPoint, Point]] = []
+            projected_pt1_to_projected_pt2_pts: list[Point] = []
             if abs(projected_pt1.x - projected_pt2.x) == self.size_px:
                 if self.radius_px < projected_pt1.y:
                     # Upper center case where projections hit opposite sides
@@ -157,9 +156,9 @@ class Light:
                     # logger.debug("Center left opposite sides")
                     projected_pt1_to_projected_pt2_pts = [Point(0, 0), Point(0, self.size_px)]
             elif projected_pt1.x != self.size_px and projected_pt1.x != 0:
-                projected_pt1_to_projected_pt2_pts = [FloatPoint(projected_pt2.x, projected_pt1.y)]
+                projected_pt1_to_projected_pt2_pts = [Point(projected_pt2.x, projected_pt1.y)]
             else:
-                projected_pt1_to_projected_pt2_pts = [FloatPoint(projected_pt1.x, projected_pt2.y)]
+                projected_pt1_to_projected_pt2_pts = [Point(projected_pt1.x, projected_pt2.y)]
 
             return (
                 [outer_pt1, projected_pt1]
@@ -219,12 +218,12 @@ class Light:
             Point(rect.right, rect.top), Point(rect.left, rect.bottom), Point(rect.right, rect.bottom)
         )
 
-    def filter_shadow_rects(self, shadow_rects: list[pygame.Rect], x_px: int, y_px: int) -> list[pygame.Rect]:
+    def filter_shadow_rects(self, shadow_rects: list[pygame.Rect], pos_px: Point) -> list[pygame.Rect]:
         """Filter the shadow_rects to those that collide with this light source.."""
-        light_rect = pygame.Rect(x_px - self.radius_px, y_px - self.radius_px, self.size_px, self.size_px)
+        light_rect = pygame.Rect(pos_px.x - self.radius_px, pos_px.y - self.radius_px, self.size_px, self.size_px)
         filtered = []
         for shadow_rect in shadow_rects:
-            if shadow_rect.height == 0 and light_rect.clipline(
+            if (shadow_rect.height == 0 or shadow_rect.width == 0) and light_rect.clipline(
                 shadow_rect.left, shadow_rect.top, shadow_rect.right, shadow_rect.bottom
             ):
                 filtered.append(shadow_rect)
@@ -234,37 +233,37 @@ class Light:
 
     def check_cast(self, shadow_tile_rect: pygame.Rect) -> bool:
         """If the rect is fully in shadow, return True indicating this shadow tile can be ignored."""
-        if False and self.is_point:
-            # Disabled as this logic will miss a narrow bean going through a tile but not hitting its corners!!!
+        if self.is_point:
+            if self.beam_line is not None and shadow_tile_rect.clipline(self.beam_line):
+                # Center of beam collides with this rectangle.
+                return True
             for point in [
                 (shadow_tile_rect.right, shadow_tile_rect.top),
                 (shadow_tile_rect.left, shadow_tile_rect.top),
                 (shadow_tile_rect.left, shadow_tile_rect.bottom),
                 (shadow_tile_rect.right, shadow_tile_rect.bottom),
             ]:
+                # Center of beam doesn't touch the tile but its light may still hit it depending on
+                # beam width.  Check if any of the coorner coordinates are lit by the beam.
                 try:
-                    c = self.pixel_shader_surf.get_at(point)
-                    logger.debug(f"point={point}; c={c}; c!=(0, 0, 0, 255)={c!=(0, 0, 0, 255)}")
-                    if self.pixel_shader_surf.get_at(point) != (0, 0, 0, 255):
+                    if self.pixel_shader_surf.get_at(point) != pygame.Color(0, 0, 0, 255):
                         return True
                 except IndexError:
                     pass
             return False
         return True
 
-    def add_light(
-        self, light_surface: pygame.surface.Surface, shadow_rects: list[pygame.Rect], x_px: int, y_px: int
-    ) -> None:
+    def add_light(self, light_surface: pygame.surface.Surface, shadow_rects: list[pygame.Rect], pos_px: Point) -> None:
         """Add the light from this light source onto the provided light_surface at pixel coordinates
         x_px, y_px in the coordinate frame of light_surface."""
 
         self.render_surface.fill((0, 0, 0))
         self.render_surface.blit(self.pixel_shader_surf)
 
-        dx = x_px - self.radius_px
-        dy = y_px - self.radius_px
+        dx = pos_px.x - self.radius_px
+        dy = pos_px.y - self.radius_px
 
-        for shadow_tile_rect in self.filter_shadow_rects(shadow_rects, x_px, y_px):
+        for shadow_tile_rect in self.filter_shadow_rects(shadow_rects, pos_px):
             # Shift the rect to be in the coordinate system of self.render_surface
             shadow_tile_rect = shadow_tile_rect.move(-dx, -dy)
 
@@ -275,9 +274,8 @@ class Light:
                     logger.error("Light is inside a shadow tile")
                     return
                 pygame.draw.polygon(self.render_surface, (0, 0, 0), polygon_pts)
-                # pygame.draw.aalines(self.render_surface, (0, 0, 0), True, polygon_pts)
 
-        # pygame.draw.circle(self.render_surface, (255, 255, 255), (self.radius_px, self.radius_px), 2)
+        pygame.draw.circle(self.render_surface, (255, 255, 255), (self.radius_px, self.radius_px), 2)
 
         light_surface.blit(self.render_surface, (dx, dy), special_flags=pygame.BLEND_RGBA_ADD)
 
