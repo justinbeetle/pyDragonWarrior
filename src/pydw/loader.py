@@ -131,7 +131,9 @@ class Loader:
         # Attempt to load game using the licensed assets
         if not self.args.force_use_unlicensed_assets:
             game_xml_path = os.path.join(self.base_path, "data", "game_licensed_assets.xml")
-            game_state = self.load_from_game_xml(game_xml_path, "Failed to load using licensed assets")
+            game_state = self.load_from_game_xml(
+                game_xml_path, "Failed to load using licensed assets", is_final_attempt=False
+            )
             if game_state:
                 return game_state
 
@@ -149,9 +151,11 @@ class Loader:
 
         # Fallback to using unlicensed assets if the licensed weren't present or didn't work
         game_xml_path = os.path.join(self.base_path, "data", "game.xml")
-        return self.load_from_game_xml(game_xml_path, "ERROR: Failed to load unlicensed assets")
+        return self.load_from_game_xml(game_xml_path, "Failed to load unlicensed assets", is_final_attempt=True)
 
-    def load_from_game_xml(self, game_xml_path: str, error_msg: Optional[str] = None) -> Optional[GameState]:
+    def load_from_game_xml(
+        self, game_xml_path: str, error_msg: Optional[str] = None, is_final_attempt: bool = True
+    ) -> Optional[GameState]:
         """Load the game resources based on the specified xml file."""
         try:
             # Load the minimum amount of game info to launch the loading screen
@@ -169,7 +173,7 @@ class Loader:
                 self.saves_path, self.base_path, game_xml_path, self.win_size_tiles, self.tile_size_pixels, self.verbose
             )
         except Exception:
-            if self.verbose:
+            if is_final_attempt or self.verbose:
                 if error_msg is None:
                     error_msg = f"Failed to load game using {game_xml_path}"
                 print(f"ERROR: {error_msg}", flush=True)

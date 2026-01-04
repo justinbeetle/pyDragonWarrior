@@ -399,8 +399,7 @@ class GameMap(GameMapInterface):
         if use_dynamic_lighting:
             light_engine_adapter = GameMapLightEngineAdapter(self.game_state, self, self.map_layer)
             light_engine_adapter.apply_dynamic_lighting(surface)
-        else:
-            self._apply_lighting_legacy(surface)
+        self._apply_lighting_legacy(surface)
 
     def _apply_lighting_legacy(self, surface: pygame.surface.Surface) -> None:
         light_diameter = self.game_state.get_hero_party().light_diameter

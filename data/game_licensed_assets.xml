@@ -47,6 +47,7 @@
       <Tile name="cliff_walkable"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
       <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
       <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+      <Tile name="debris"                                           walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
    </Tiles>
 
    <Decorations imagePath="decorations_20">
@@ -1100,7 +1101,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
             <Dialog>[ACTOR] blew the Fairy Flute.</Dialog>
             <DialogAssert type="IS_IN_COMBAT"><Dialog>But nothing happened.</Dialog></DialogAssert>
             <DialogAssert type="IS_TARGET_MONSTER" name="Golem"><Dialog>But nothing happened.</Dialog></DialogAssert>
-            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool> 
+            <DialogAction type="SLEEP" category="PHYSICAL" name="Golem" bypass="yes"/></Tool>
 
          <Tool name="Erdrick's Token"                                droppable="no"  equippable="no">
             <Dialog>[ACTOR] held Erdrick's Token tightly.</Dialog>

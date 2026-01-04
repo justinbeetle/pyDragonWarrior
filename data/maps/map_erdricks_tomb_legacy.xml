@@ -5,7 +5,7 @@
       <PointTransition decoration="downstairs"          x="11"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl2"/>
    </Map>
 
-   <Map name="erdricks_tomb_lvl2" tiles="erdricks_tomb_lvl2.dat" music="dungeon_lvl_2" lightDiameter="1" isOutside="no">
+   <Map name="erdricks_tomb_lvl2" tiles="legacy/erdricks_tomb_lvl2.dat" music="dungeon_lvl_2" lightDiameter="1" isOutside="no">
       <PointTransition decoration="upstairs"            x="10"  y="11"  dir="SOUTH" toMap="erdricks_tomb_lvl1"/>
 
       <xi:include href="map_erdricks_tomb_common.xml" parse="xml"/>

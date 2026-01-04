@@ -713,22 +713,22 @@
  </tile>
  <tile id="142">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="143">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="144">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="145">
   <properties>
-   <property name="type" value=""/>
+   <property name="type" value="walls"/>
   </properties>
  </tile>
  <tile id="146">
@@ -1233,42 +1233,42 @@
  </tile>
  <tile id="246">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="247">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="248">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="249">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="250">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="251">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="252">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="253">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="254">
@@ -1333,42 +1333,42 @@
  </tile>
  <tile id="266">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="267">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="268">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="269">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="270">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="271">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="272">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="273">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="274">
@@ -1459,42 +1459,42 @@
  </tile>
  <tile id="286">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="287">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="288">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="289">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="290">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="291">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="292">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="293">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="294">
@@ -1570,7 +1570,7 @@
  </tile>
  <tile id="307">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="308">
@@ -1585,12 +1585,12 @@
  </tile>
  <tile id="310">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="311">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="312">
@@ -1605,7 +1605,7 @@
  </tile>
  <tile id="314">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="315">
@@ -1878,32 +1878,32 @@
  </tile>
  <tile id="365">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="366">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="367">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="368">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="369">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="370">
   <properties>
-   <property name="type" value="walls"/>
+   <property name="type" value="debris"/>
   </properties>
  </tile>
  <tile id="371">
