@@ -23,7 +23,7 @@ class GameMapLightEngineAdapter:
         self,
         game_state: GameStateInterface,
         game_map: GameMapInterface,
-        map_layer: pyscroll.BufferedRenderer,
+        map_layer: pyscroll.orthographic.BufferedRenderer,
     ) -> None:
         self.game_state = game_state
         self.game_map = game_map
@@ -36,7 +36,7 @@ class GameMapLightEngineAdapter:
         return Point(self.map_layer.translate_point(pt))
 
     def translate_rect_world_to_screen(self, rect: pygame.Rect) -> pygame.Rect:
-        return self.map_layer.translate_rect(rect)
+        return pygame.Rect(self.map_layer.translate_rect(rect))
 
     def apply_dynamic_lighting(self, surface: pygame.surface.Surface) -> None:
         light_diameter_tiles = self.game_state.get_hero_party().light_diameter
@@ -71,10 +71,7 @@ class GameMapLightEngineAdapter:
             # Iterate through tiles to get a list of tile rects which should cast shadows.
             shadow_rects = []
             wall_tiles: list[list[bool]] = [
-                [
-                    self.game_map.get_tile_info(Point(x, y)).name in ["stone", "walls"]
-                    for y in range(min_y, max_y + 1)
-                ]
+                [self.game_map.get_tile_info(Point(x, y)).name in ["walls"] for y in range(min_y, max_y + 1)]
                 for x in range(min_x, max_x + 1)
             ]
             tile_rect = pygame.Rect(

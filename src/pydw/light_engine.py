@@ -72,13 +72,15 @@ class Light:
         if self.is_point:
             point_angle = (180 / np.pi) * -np.arctan2((self.radius_px - x), (self.radius_px - y)) + 180
             diff_angle = np.abs(((self.angle - point_angle) + 180) % 360 - 180)
-            angular_falloff = ((self.angle_width_deg / 2) - diff_angle) * (1 / self.angle_width_deg)
+            angular_falloff = ((self.angle_width_deg / 2) - diff_angle) * (
+                1 / self.angle_width_deg
+            )
             angular_falloff[angular_falloff <= 0] = 0
+            final_intensity = radial_falloff * angular_falloff * self.intensity
         else:
-            angular_falloff = 1
+            final_intensity = radial_falloff * self.intensity
         # -----
 
-        final_intensity = radial_falloff * angular_falloff * self.intensity
         final_array *= final_intensity[..., np.newaxis]
 
         return pygame.surfarray.make_surface(final_array.astype(np.uint8))
