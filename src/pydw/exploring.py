@@ -134,9 +134,12 @@ class Exploring(GameMode):
             self.handle_talking()
         elif self.game_state.is_facing_openable_item():
             self.handle_opening()
-        elif self.make_map_transition(self.get_point_transition()):
-            # Transitioned to a new map
-            pass
+        # Uncomment to restore map transitions as a smart interaction.  On entering a cave, it is
+        # natural to launch the menu to use a torch of cast radiant.  It was frustrating that instead
+        # of opening the menu it was leaving the cave.
+        #elif self.make_map_transition(self.get_point_transition()):
+        #    # Transitioned to a new map
+        #    pass
         else:
             self.menu_loop()
 
