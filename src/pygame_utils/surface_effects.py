@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+from opensimplex import OpenSimplex
 import pygame
 
 # TODO: Factor these out of this module
@@ -207,6 +208,8 @@ def alter_lighting(
     # Convert the Surface to a NumPy array for efficient pixel manipulation
     pixels = pygame.surfarray.array3d(surface)
 
+    # TODO: Consider using pygame.transform.hsl(surface, saturation=saturation_factor, lightness=1-darken_factor)
+
     # Desaturate the image
     if saturation_factor != 1.0:
         # Convert RGB to HSL color space (using a simple approximation or standard formula)
@@ -251,3 +254,12 @@ def alter_lighting(
         pass
 
     return altered_surface
+
+
+def gen_cloud(size_pixels: tuple[int, int], color: pygame.Color) -> pygame.surface.Surface:
+    """Generate a partially transparent cloud to overlay over the game map."""
+    surface = pygame.Surface(size_pixels).convert_alpha()
+    surface.fill(pygame.Color(0, 0, 0, 0))
+    # TODO: Use noise to generate interesting clouds
+    pygame.draw.ellipse(surface, pygame.Color(255, 255, 255, 40), pygame.Rect((0, 0), size_pixels))
+    return surface

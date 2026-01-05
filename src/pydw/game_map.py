@@ -23,10 +23,10 @@ from pydw.game_types import (
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.legacy_map_data import LegacyMapData
-from pydw.light_engine import Light
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
 from pydw.padded_tiled_map_data import PaddedTiledMapData
+from pygame_utils import surface_effects
 from pygame_utils.audio_player import AudioPlayer
 
 logger = logging.getLogger(__name__)
@@ -36,13 +36,49 @@ class MapSprite(pygame.sprite.Sprite):
     image: pygame.surface.Surface
     image_pad_tiles = Point()
     tile_size_pixels = 16
+    map_size_pixels = Point()
     image_px_step_size = 4
 
     def __init__(self) -> None:
         super().__init__()
 
     def get_rect_from_tile(self, tile: Point) -> pygame.rect.Rect:
-        return self.image.get_rect().move((MapSprite.image_pad_tiles + tile) * MapSprite.tile_size_pixels)
+        return self.image.get_rect().move(
+            ((MapSprite.image_pad_tiles + tile) * MapSprite.tile_size_pixels).get_as_int_tuple()
+        )
+
+    def is_on_map(self) -> bool:
+        if self.rect is not None:
+            return self.rect.colliderect((0, 0), MapSprite.map_size_pixels)
+        return False
+
+
+class CloudSprite(MapSprite):
+    def __init__(self, align_to_left: bool = False) -> None:
+        super().__init__()
+
+        size_tiles = Point(
+            random.randint(4, int(MapSprite.image_pad_tiles.y // 2)),
+            random.randint(8, int(MapSprite.image_pad_tiles.y)),
+        )
+        size_pixels = size_tiles * MapSprite.tile_size_pixels
+        self.image = surface_effects.gen_cloud(size_pixels.get_as_int_tuple(), pygame.Color("white"))
+
+        self.position_pixels = Point(
+            (
+                int(-size_pixels.x)
+                if align_to_left
+                else random.randint(int(-size_pixels.x), int(MapSprite.map_size_pixels.x + size_pixels.x))
+            ),
+            random.randint(int(-size_pixels.y), int(MapSprite.map_size_pixels.y + size_pixels.y)),
+        )
+        self.velocity_pixels = Point(random.uniform(0.1, 0.6), random.uniform(-0.003, 0.003))
+        self.rect = pygame.Rect(self.position_pixels.get_as_int_tuple(), self.image.get_size())
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        self.position_pixels += self.velocity_pixels
+        self.rect = pygame.Rect(self.position_pixels.get_as_int_tuple(), self.image.get_size())
+        super().update(args, kwargs)
 
 
 class MapDecorationSprite(MapSprite):
@@ -326,6 +362,7 @@ class GameMap(GameMapInterface):
 
         MapSprite.image_pad_tiles = self.game_state.get_image_pad_tiles()
         MapSprite.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
+        MapSprite.map_size_pixels = Point(self.map_data.map_size) * MapSprite.tile_size_pixels
         MapSprite.image_px_step_size = self.game_state.get_game_info().image_px_step_size
         HeroSprite.character_types = self.game_state.get_game_info().character_types
 
@@ -342,6 +379,17 @@ class GameMap(GameMapInterface):
                     MapDecorationSprite(decoration, removed=True),
                     layer=self.map_data.decoration_layer,
                 )
+        if self.map.has_clouds:
+            # Create and add clouds
+            total_map_area_square_pixels = MapSprite.map_size_pixels.x * MapSprite.map_size_pixels.y
+            desired_cloud_coverage_ratio = random.uniform(0.1, 0.5)
+            desired_cloud_coverage_square_pixels = desired_cloud_coverage_ratio * total_map_area_square_pixels
+            cloud_coverage_square_pixels = 0
+            while cloud_coverage_square_pixels < desired_cloud_coverage_square_pixels:
+                cloud = CloudSprite()
+                cloud_size_x, cloud_size_y = cloud.image.get_size()
+                cloud_coverage_square_pixels += cloud_size_x * cloud_size_y
+                self.group.add(cloud, layer=self.map_data.cloud_layer)
 
         # Add characters to the group
         hero_party = self.game_state.get_hero_party()
@@ -359,6 +407,12 @@ class GameMap(GameMapInterface):
 
     def update(self) -> None:
         self.group.update()
+        if self.map.has_clouds:
+            # Remove clouds no longer on the map and replace with new clouds
+            for cloud in self.group.get_sprites_from_layer(self.map_data.cloud_layer):
+                if isinstance(cloud, CloudSprite) and not cloud.is_on_map():
+                    self.group.remove(cloud)
+                    self.group.add(CloudSprite(align_to_left=True), layer=self.map_data.cloud_layer)
 
     def set_lighting_mode(self, is_day: bool) -> None:
         """Set state for the map's lighting mode."""

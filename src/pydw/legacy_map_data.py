@@ -20,6 +20,7 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     DECORATION_LAYER = 1
     CHARACTER_LAYER = 2
     OVERLAY_MAP_LAYER = 3
+    CLOUD_LAYER = 4
 
     def __init__(self, game_info: GameInfo, map_name: str, image_pad_tiles: Point = Point(0, 0)):
         super().__init__()
@@ -153,6 +154,10 @@ class LegacyMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
     @property
     def character_layer(self) -> int:
         return LegacyMapData.CHARACTER_LAYER
+
+    @property
+    def cloud_layer(self) -> int:
+        return LegacyMapData.CLOUD_LAYER
 
     @property
     def overlay_tile_layers(self) -> list[int]:

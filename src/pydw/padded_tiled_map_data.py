@@ -297,6 +297,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return self._character_layer
 
     @property
+    def cloud_layer(self) -> int:
+        return len(self._all_tile_layers)
+
+    @property
     def overlay_tile_layers(self) -> list[int]:
         return self._overlay_tile_layers
 

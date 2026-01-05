@@ -1033,6 +1033,9 @@ class GameInfo:
             origin = None
             if "originX" in element.attrib and "originY" in element.attrib:
                 origin = Point(int(element.attrib["originX"]), int(element.attrib["originY"]))
+            has_clouds = False
+            if "hasClouds" in element.attrib:
+                has_clouds = element.attrib["hasClouds"] == "yes"
 
             # Parse transitions
             # logger.debug("Parse transitions")
@@ -1329,6 +1332,7 @@ class GameInfo:
                 special_monsters,
                 is_outside,
                 origin,
+                has_clouds,
             )
             self.map_being_parsed = None
         return maps

@@ -473,6 +473,7 @@ class Map(NamedTuple):
     special_monsters: list[SpecialMonster]
     is_outside: bool
     origin: Optional[Point] = None
+    has_clouds: bool = False
 
     @staticmethod
     def create(name: str, dat: list[str]) -> Map:

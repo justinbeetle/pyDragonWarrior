@@ -40,7 +40,7 @@ class GameMapViewer:
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
 
         # Initialize GameInfo
-        game_xml_path = os.path.join(base_path, "game.xml")
+        game_xml_path = os.path.join(base_path, "data", "game.xml")
         from pydw.game_info import GameInfo
 
         self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
