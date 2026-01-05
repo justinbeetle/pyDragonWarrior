@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-from opensimplex import OpenSimplex
 import pygame
 
 # TODO: Factor these out of this module
@@ -254,12 +253,3 @@ def alter_lighting(
         pass
 
     return altered_surface
-
-
-def gen_cloud(size_pixels: tuple[int, int], color: pygame.Color) -> pygame.surface.Surface:
-    """Generate a partially transparent cloud to overlay over the game map."""
-    surface = pygame.Surface(size_pixels).convert_alpha()
-    surface.fill(pygame.Color(0, 0, 0, 0))
-    # TODO: Use noise to generate interesting clouds
-    pygame.draw.ellipse(surface, pygame.Color(255, 255, 255, 40), pygame.Rect((0, 0), size_pixels))
-    return surface

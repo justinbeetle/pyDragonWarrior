@@ -26,7 +26,6 @@ from pydw.legacy_map_data import LegacyMapData
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
 from pydw.padded_tiled_map_data import PaddedTiledMapData
-from pygame_utils import surface_effects
 from pygame_utils.audio_player import AudioPlayer
 
 logger = logging.getLogger(__name__)
@@ -57,23 +56,48 @@ class CloudSprite(MapSprite):
     def __init__(self, align_to_left: bool = False) -> None:
         super().__init__()
 
+        # Determine a size for the cloud with width >= height
         size_tiles = Point(
-            random.randint(4, int(MapSprite.image_pad_tiles.y // 2)),
-            random.randint(8, int(MapSprite.image_pad_tiles.y)),
+            random.randint(6, int(MapSprite.image_pad_tiles.y // 2)),
+            random.randint(4, 6),
         )
         size_pixels = size_tiles * MapSprite.tile_size_pixels
-        self.image = surface_effects.gen_cloud(size_pixels.get_as_int_tuple(), pygame.Color("white"))
+        self.cloud_size_sq_px = int(size_pixels.x * size_pixels.y)
 
+        # Generate pixelated cloud image
+        # Add a bunch of ellipses of different sizes at random positions to create a cloud
+        pixelated_image_width, pixelated_image_height = (size_pixels / 4).get_as_int_tuple()
+        surface = pygame.Surface((pixelated_image_width, pixelated_image_height)).convert_alpha()
+        surface.fill(pygame.Color(0, 0, 0, 0))
+        cloud_color = pygame.Color("white")
+        max_semi_minor_axis = int(min(pixelated_image_width, pixelated_image_height) * 0.25)
+        for _ in range(20):
+            semi_minor_axis = random.randint(4, max_semi_minor_axis)
+            semi_major_axis = semi_minor_axis + random.randint(0, 10)
+            x_pos = random.randint(0, pixelated_image_width - 2 * semi_major_axis)
+            y_pos = random.randint(0, pixelated_image_height - 2 * semi_minor_axis)
+            pygame.draw.ellipse(surface, cloud_color, (x_pos, y_pos, 2 * semi_major_axis, 2 * semi_minor_axis))
+        # Set the alpha to 60 for all pixels of the cloud
+        alphas = pygame.surfarray.pixels_alpha(surface)
+        pygame.surfarray.pixels_alpha(surface)[alphas > 0] = 60
+        # Scale up and rotate to a random angle
+        self.image = pygame.transform.rotate(pygame.transform.scale(surface, size_pixels), random.randint(0, 179))
+        size_pixels = Point(self.image.get_size())
+
+        # Determine the starting position for the cloud and its velocity
         self.position_pixels = Point(
             (
                 int(-size_pixels.x)
                 if align_to_left
-                else random.randint(int(-size_pixels.x), int(MapSprite.map_size_pixels.x + size_pixels.x))
+                else random.randint(int(-size_pixels.x), int(MapSprite.map_size_pixels.x))
             ),
-            random.randint(int(-size_pixels.y), int(MapSprite.map_size_pixels.y + size_pixels.y)),
+            random.randint(int(-size_pixels.y * 0.85), int(MapSprite.map_size_pixels.y - size_pixels.y * 0.15)),
         )
         self.velocity_pixels = Point(random.uniform(0.1, 0.6), random.uniform(-0.003, 0.003))
         self.rect = pygame.Rect(self.position_pixels.get_as_int_tuple(), self.image.get_size())
+
+    def get_cloud_size_sq_px(self) -> int:
+        return self.cloud_size_sq_px
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         self.position_pixels += self.velocity_pixels
@@ -319,6 +343,7 @@ class GameMap(GameMapInterface):
         map_decorations: Optional[list[MapDecoration]] = None,
         removed_map_decorations: Optional[list[MapDecoration]] = None,
         npcs: Optional[list[NpcState]] = None,
+        clouds: Optional[list[CloudSprite]] = None,
     ) -> None:
         self.game_state = game_state
         self.map = self.game_state.get_game_info().maps[map_name]
@@ -379,16 +404,25 @@ class GameMap(GameMapInterface):
                     MapDecorationSprite(decoration, removed=True),
                     layer=self.map_data.decoration_layer,
                 )
+
+        # Add clouds
+        self.clouds = []
         if self.map.has_clouds:
-            # Create and add clouds
-            total_map_area_square_pixels = MapSprite.map_size_pixels.x * MapSprite.map_size_pixels.y
-            desired_cloud_coverage_ratio = random.uniform(0.1, 0.5)
-            desired_cloud_coverage_square_pixels = desired_cloud_coverage_ratio * total_map_area_square_pixels
-            cloud_coverage_square_pixels = 0
-            while cloud_coverage_square_pixels < desired_cloud_coverage_square_pixels:
-                cloud = CloudSprite()
-                cloud_size_x, cloud_size_y = cloud.image.get_size()
-                cloud_coverage_square_pixels += cloud_size_x * cloud_size_y
+            if clouds is not None:
+                # Use provided clouds
+                self.clouds = clouds
+            else:
+                # Procedurally create clouds
+                total_map_area_square_pixels = MapSprite.map_size_pixels.x * MapSprite.map_size_pixels.y
+                desired_cloud_coverage_ratio = random.uniform(0.1, 0.5)
+                desired_cloud_coverage_square_pixels = desired_cloud_coverage_ratio * total_map_area_square_pixels
+                cloud_coverage_square_pixels = 0
+                while cloud_coverage_square_pixels < desired_cloud_coverage_square_pixels:
+                    cloud = CloudSprite()
+                    self.clouds.append(cloud)
+                    cloud_coverage_square_pixels += cloud.get_cloud_size_sq_px()
+                    # logger.debug("percentage complete = %0.2f", cloud_coverage_square_pixels/desired_cloud_coverage_square_pixels*100)
+            for cloud in self.clouds:
                 self.group.add(cloud, layer=self.map_data.cloud_layer)
 
         # Add characters to the group
@@ -412,7 +446,10 @@ class GameMap(GameMapInterface):
             for cloud in self.group.get_sprites_from_layer(self.map_data.cloud_layer):
                 if isinstance(cloud, CloudSprite) and not cloud.is_on_map():
                     self.group.remove(cloud)
-                    self.group.add(CloudSprite(align_to_left=True), layer=self.map_data.cloud_layer)
+                    self.clouds.remove(cloud)
+                    cloud = CloudSprite(align_to_left=True)
+                    self.clouds.append(cloud)
+                    self.group.add(cloud, layer=self.map_data.cloud_layer)
 
     def set_lighting_mode(self, is_day: bool) -> None:
         """Set state for the map's lighting mode."""

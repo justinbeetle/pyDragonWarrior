@@ -147,8 +147,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
                         removed_map_decorations.append(decoration)
 
         if old_map_name == new_map_name:
-            # If loading up the same map, should retain the NPC positions
+            # If loading up the same map, should retain the NPC and cloud positions
             npcs = self.game_map.npcs
+            clouds = self.game_map.clouds
 
             # Remove any current NPCs which should be missing
             for npc_char in npcs[:]:
@@ -170,13 +171,14 @@ class GameState(GameStateInterface, DialogManagerMediator):
                 if is_missing:
                     npcs.append(NpcState(npc))
         else:
-            # On a map change load NPCs from scratch
+            # On a map change load NPCs and clouds from scratch
             npcs = []
             for npc in self.game_info.maps[new_map_name].npcs:
                 if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     npcs.append(NpcState(npc))
+            clouds = None
 
-        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs)
+        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs, clouds)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game
