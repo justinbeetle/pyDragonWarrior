@@ -99,7 +99,7 @@ class GameDialogEvaluator:
         self.traverse_dialog(dm.message_dialog, dialog, npc=npc)
 
         if self.game_state.is_running:
-            dm.status_dialog = None
+            dm.status_dialog = GameDialog.create_persistent_status_dialog(self.hero_party)
             dm.message_dialog = None
 
             # Restore initial background image - this is now only applicable when the game mode is a mock.

@@ -38,7 +38,8 @@ class Loader:
         GameDialog.force_use_menus_for_text_entry = args.gamepad
 
         # The tile size becomes fixed in determine_tile_size, which meaningfully sets these members.
-        self.tile_size_pixels = Loader.unscaled_tile_size_pixels * Loader.desired_tile_scaling_factor
+        self.tile_scaling_factor = Loader.desired_tile_scaling_factor
+        self.tile_size_pixels = Loader.unscaled_tile_size_pixels * self.tile_scaling_factor
         self.win_size_tiles = Point(0, 0)
 
         self.loading_screen: Optional[LoadingScreen] = None
@@ -104,23 +105,22 @@ class Loader:
         screen = pygame.display.get_surface()
         if screen is None:
             raise ValueError("No screen")
-        tile_scaling_factor = Loader.desired_tile_scaling_factor
         win_size_pixels = Point(screen.get_size())
         self.win_size_tiles = win_size_pixels / self.tile_size_pixels
 
         # Determine if the tile scaling factor should be reduced
         # Base this decision on the size of the message dialog
         dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(self.win_size_tiles)
-        while tile_scaling_factor > 1 and (dialog_size_tiles.x < 10 or dialog_size_tiles.y < 5):
-            tile_scaling_factor -= 1
+        while self.tile_scaling_factor > 1 and (dialog_size_tiles.x < 10 or dialog_size_tiles.y < 5):
+            self.tile_scaling_factor -= 1
 
             # Recompute the sizes after reducing tile_scaling_factor
-            self.tile_size_pixels = self.unscaled_tile_size_pixels * tile_scaling_factor
+            self.tile_size_pixels = self.unscaled_tile_size_pixels * self.tile_scaling_factor
             self.win_size_tiles = win_size_pixels / self.tile_size_pixels
             dialog_size_tiles = GameDialog.get_message_dialog_size_tiles(self.win_size_tiles)
 
-        if self.verbose and tile_scaling_factor < self.desired_tile_scaling_factor:
-            print(f"Reduced tile scaling factor to {tile_scaling_factor}", flush=True)
+        if self.verbose and self.tile_scaling_factor < self.desired_tile_scaling_factor:
+            print(f"Reduced tile scaling factor to {self.tile_scaling_factor}", flush=True)
 
     def load_game_assets(self) -> Optional[GameState]:
         """Attempt to load the game assets, returning a GameState on success."""
@@ -170,7 +170,13 @@ class Loader:
 
             # Load the full game state
             return GameState(
-                self.saves_path, self.base_path, game_xml_path, self.win_size_tiles, self.tile_size_pixels, self.verbose
+                self.saves_path,
+                self.base_path,
+                game_xml_path,
+                self.win_size_tiles,
+                self.tile_size_pixels,
+                self.tile_scaling_factor,
+                self.verbose,
             )
         except Exception:
             if is_final_attempt or self.verbose:

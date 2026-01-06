@@ -35,6 +35,7 @@ class MapSprite(pygame.sprite.Sprite):
     image: pygame.surface.Surface
     image_pad_tiles = Point()
     tile_size_pixels = 16
+    tile_scaling_factor = 1
     map_size_pixels = Point()
     image_px_step_size = 4
 
@@ -58,24 +59,25 @@ class CloudSprite(MapSprite):
 
         # Determine a size for the cloud with width >= height
         size_tiles = Point(
-            random.randint(6, int(MapSprite.image_pad_tiles.y // 2)),
+            random.randint(6, max(6, int(MapSprite.image_pad_tiles.y // 2))),
             random.randint(4, 6),
         )
         size_pixels = size_tiles * MapSprite.tile_size_pixels
         self.cloud_size_sq_px = int(size_pixels.x * size_pixels.y)
 
-        # Generate pixelated cloud image
+        # Generate pixelized cloud image
         # Add a bunch of ellipses of different sizes at random positions to create a cloud
-        pixelated_image_width, pixelated_image_height = (size_pixels / 4).get_as_int_tuple()
-        surface = pygame.Surface((pixelated_image_width, pixelated_image_height)).convert_alpha()
+        pixelize_factor = MapSprite.tile_scaling_factor
+        pixelized_image_width, pixelized_image_height = (size_pixels / pixelize_factor).get_as_int_tuple()
+        surface = pygame.Surface((pixelized_image_width, pixelized_image_height)).convert_alpha()
         surface.fill(pygame.Color(0, 0, 0, 0))
         cloud_color = pygame.Color("white")
-        max_semi_minor_axis = int(min(pixelated_image_width, pixelated_image_height) * 0.25)
+        max_semi_minor_axis = int(min(pixelized_image_width, pixelized_image_height) * 0.25)
         for _ in range(20):
             semi_minor_axis = random.randint(4, max_semi_minor_axis)
             semi_major_axis = semi_minor_axis + random.randint(0, 10)
-            x_pos = random.randint(0, pixelated_image_width - 2 * semi_major_axis)
-            y_pos = random.randint(0, pixelated_image_height - 2 * semi_minor_axis)
+            x_pos = random.randint(0, pixelized_image_width - 2 * semi_major_axis)
+            y_pos = random.randint(0, pixelized_image_height - 2 * semi_minor_axis)
             pygame.draw.ellipse(surface, cloud_color, (x_pos, y_pos, 2 * semi_major_axis, 2 * semi_minor_axis))
         # Set the alpha to 60 for all pixels of the cloud
         alphas = pygame.surfarray.pixels_alpha(surface)
@@ -390,6 +392,7 @@ class GameMap(GameMapInterface):
 
         MapSprite.image_pad_tiles = self.game_state.get_image_pad_tiles()
         MapSprite.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
+        MapSprite.tile_scaling_factor = self.game_state.get_game_info().tile_scaling_factor
         MapSprite.map_size_pixels = Point(self.map_data.map_size) * MapSprite.tile_size_pixels
         MapSprite.image_px_step_size = self.game_state.get_game_info().image_px_step_size
         HeroSprite.character_types = self.game_state.get_game_info().character_types

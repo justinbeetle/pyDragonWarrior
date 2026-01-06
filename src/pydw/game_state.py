@@ -47,6 +47,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         game_xml_path: str,
         win_size_tiles: Point,
         tile_size_pixels: int,
+        tile_scaling_factor: int,
         verbose: bool = False,
     ) -> None:
         screen = pygame.display.get_surface()
@@ -61,7 +62,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         self.image_pad_tiles = self.win_size_tiles // 2
         self.win_size_pixels = self.win_size_tiles * tile_size_pixels
         self.__should_add_math_problems_in_combat = True
-        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
+        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, tile_scaling_factor, self.win_size_pixels)
         self.removed_decorations_by_map: dict[str, list[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None

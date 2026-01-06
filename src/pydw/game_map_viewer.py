@@ -43,7 +43,7 @@ class GameMapViewer:
         game_xml_path = os.path.join(base_path, "data", "game.xml")
         from pydw.game_info import GameInfo
 
-        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
+        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, 2, self.win_size_pixels)
 
         # Initialize the hero party
         self.hero_party = HeroParty(

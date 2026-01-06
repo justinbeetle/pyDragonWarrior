@@ -73,10 +73,12 @@ class GameInfo:
         base_path: str,
         game_xml_path: str,
         tile_size_pixels: int,
+        tile_scaling_factor: int,
         win_size_pixels: Point,
     ) -> None:
         self.game_xml_path = game_xml_path
         self.tile_size_pixels = tile_size_pixels
+        self.tile_scaling_factor = tile_scaling_factor
         self.dialog_sequences: dict[str, DialogType] = {}
         self.map_being_parsed: Optional[str] = None
 

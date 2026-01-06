@@ -87,7 +87,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
 
         # Scale the encounter image
         # Pixelize the encounter backgrounds so they better fit with the pixelized graphics of the game
-        pixelize_factor = 5
+        pixelize_factor = 2 * self.game_info.tile_scaling_factor
         encounter_image_size_px = Point(encounter_background.image.get_size())
         encounter_image_size_px *= min(
             self.game_state.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
@@ -229,7 +229,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
         # Draw the background image, then the border, then the encounter image
         if render_background:
             self.draw_combat_encounter_background()
-        outside_border_width = 10
+        outside_border_width = 2 * self.game_info.tile_scaling_factor
         pygame.draw.rect(
             self.game_state.screen,
             "black",
@@ -776,7 +776,7 @@ def main() -> None:
     base_path = Bootstrapper.get_application_base_path()
     game_xml_path = os.path.join(base_path, "data", "game.xml")
     GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
-    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, win_size_pixels)
+    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, 3, win_size_pixels)
 
     # Find an encounter image to use
     encounter_background: Optional[EncounterBackground] = None
