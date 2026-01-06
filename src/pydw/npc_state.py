@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from pydw.game_types import NpcInfo
+from generic_utils.point import Point
+from pydw.game_types import Direction, NpcInfo
 from pydw.map_character_state import MapCharacterState
 
 
@@ -12,6 +13,26 @@ class NpcState(MapCharacterState):
             direction=npc_info.direction,
         )
         self.npc_info = npc_info
+        self.is_talking = False
+        self.talking_direction = Direction.SOUTH
+
+    def set_talking(self, talking_pos_dat_tile: Point, talking_direction: Direction) -> None:
+        """Update the NPC to move to and face the player character"""
+        self.is_talking = True
+        if self.is_moving() and talking_pos_dat_tile != self.dest_pos_dat_tile:
+            # Turn the NPC around if walking away from the tile they should be talking from.
+            self.direction = self.direction.get_opposite()
+            self.dest_pos_dat_tile = talking_pos_dat_tile
+        self.talking_direction = talking_direction
+
+    def done_talking(self) -> None:
+        """Update the NPC to resume their typical behavior once done talking."""
+        self.is_talking = False
+
+        # Stationary characters should resume looking in the default direction after talking to the
+        # player.
+        if not self.npc_info.walking:
+            self.direction = self.npc_info.direction
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({MapCharacterState.__str__(self)}, {self.npc_info})"

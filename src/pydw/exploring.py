@@ -137,7 +137,7 @@ class Exploring(GameMode):
         # Uncomment to restore map transitions as a smart interaction.  On entering a cave, it is
         # natural to launch the menu to use a torch of cast radiant.  It was frustrating that instead
         # of opening the menu it was leaving the cave.
-        #elif self.make_map_transition(self.get_point_transition()):
+        # elif self.make_map_transition(self.get_point_transition()):
         #    # Transitioned to a new map
         #    pass
         else:
@@ -173,12 +173,13 @@ class Exploring(GameMode):
         if npc:
             if npc.npc_info.dialog is not None:
                 dialog = npc.npc_info.dialog
-                self.draw()
             else:
                 dialog = ["They pay you no mind."]
         else:
             dialog = ["There is no one there."]
         self.gde.dialog_loop(dialog, npc)
+        if npc:
+            npc.done_talking()
 
     def handle_opening(self) -> None:
         """Handle a user command to open"""

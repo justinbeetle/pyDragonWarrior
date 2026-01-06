@@ -193,7 +193,7 @@ class CharacterSprite(MapSprite):
 
     def update(self, *args: Any, **kwargs: Any) -> None:
         # Move the character in steps to the destination tile
-        if self.character.curr_pos_dat_tile != self.character.dest_pos_dat_tile:
+        if self.character.is_moving():
             image_px_step_size = max(
                 1,
                 int(
@@ -289,7 +289,10 @@ class NpcSprite(CharacterSprite):
             self.updates_per_phase_change *= 5
 
     def update(self, *args: Any, **kwargs: Any) -> None:
-        if self.character.npc_info.walking:
+        if self.character.is_talking:
+            if not self.character.is_moving():
+                self.character.direction = self.character.talking_direction
+        elif self.character.npc_info.walking:
             # Start moving NPC by setting a destination tile
             if (self.update_count % self.updates_between_npc_moves) == self.updates_between_npc_moves - 1:
                 # Determine where to move instead of blindly moving forward
@@ -642,24 +645,13 @@ class GameMap(GameMapInterface):
                     continue
 
                 if npc_info is not None and (
-                    pos_dat_tile == sprite.character.curr_pos_dat_tile
-                    or pos_dat_tile == sprite.character.dest_pos_dat_tile
+                    pos_dat_tile in (npc_state.curr_pos_dat_tile, npc_state.dest_pos_dat_tile)
                 ):
                     # NPC should turn to face you if they have something to say
                     if npc_info.dialog is not None:
-                        sprite.character.curr_pos_dat_tile = sprite.character.dest_pos_dat_tile = pos_dat_tile
-                        sprite.character.curr_pos_offset_img_px = Point(0, 0)
-                        sprite.character.direction = (
-                            self.game_state.get_hero_party().members[0].direction.get_opposite()
+                        npc_state.set_talking(
+                            pos_dat_tile, self.game_state.get_hero_party().members[0].direction.get_opposite()
                         )
-                        sprite.update_count = 0
-                        sprite.update()
-
-                        # Stationary characters should resume looking in the default direction after talking to the
-                        # player.
-                        if not npc_info.walking:
-                            sprite.character.direction = npc_info.direction
-
                     return npc_state
             return None
 

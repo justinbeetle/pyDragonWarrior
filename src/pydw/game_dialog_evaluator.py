@@ -102,7 +102,7 @@ class GameDialogEvaluator:
             dm.status_dialog = None
             dm.message_dialog = None
 
-            # Restore initial background image
+            # Restore initial background image - this is now only applicable when the game mode is a mock.
             self.game_state.screen.blit(background_image, (0, 0))
 
             # Call game_state.draw but manually flip the buffer for the case where this method is a mock

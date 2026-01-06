@@ -16,7 +16,7 @@ class MapCharacterState:
 
     def is_moving(self) -> bool:
         """Return true is the character is moving, else false."""
-        return self.curr_pos_dat_tile != self.dest_pos_dat_tile
+        return self.curr_pos_dat_tile != self.dest_pos_dat_tile or self.curr_pos_offset_img_px != Point(0, 0)
 
     def move(self, direction: Direction) -> None:
         """Update the state for movement in the specified direction.  Treated as a no-op when already moving."""
