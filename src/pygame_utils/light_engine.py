@@ -1,4 +1,10 @@
-#!/usr/bin/env python
+"""Module defining the Light class.
+
+Adapted from LIGHT in
+https://github.com/LuckeyDuckey/Pygame_Lighting_Engine/blob/main/Dungeon_Example_Project/Light_Engine.py
+with my updates from
+https://github.com/justinbeetle/Pygame_Lighting_Engine/blob/main/Dungeon_Example_Project/Light_Engine.py.
+"""
 
 import logging
 import math
@@ -13,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 class Light:
+    """Light class to apply dynamic lighting from point or direction light sources onto a surface based
+    on the provided list of rectangles casting shadows."""
+
     def __init__(
         self,
         radius_px: int,
@@ -155,7 +164,7 @@ class Light:
                     # Center left case where projections hit opposite sides
                     # logger.debug("Center left opposite sides")
                     projected_pt1_to_projected_pt2_pts = [Point(0, 0), Point(0, self.size_px)]
-            elif projected_pt1.x != self.size_px and projected_pt1.x != 0:
+            elif projected_pt1.x not in (0, self.size_px):
                 projected_pt1_to_projected_pt2_pts = [Point(projected_pt2.x, projected_pt1.y)]
             else:
                 projected_pt1_to_projected_pt2_pts = [Point(projected_pt1.x, projected_pt2.y)]

@@ -81,9 +81,9 @@ class Exploring(GameMode):
         if flip_buffer:
             pygame.display.flip()
 
-    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+    def get_music(self) -> Optional[str]:
         """Implementation of GameMode.get_music for this game mode."""
-        return self.game_state.get_game_info().maps[self.game_state.get_map_name()].music, None, None, None, None
+        return self.game_state.get_game_info().maps[self.game_state.get_map_name()].music
 
     def process_events(self) -> None:
         """Process user input via events off the pygame event queue."""

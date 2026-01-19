@@ -331,7 +331,6 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         :param parent: pygame.surface.Surface
         :param alpha: preserve alpha channel or not
-        :return: None
         """
         images = []
         for image in self.tmx.images:
@@ -346,21 +345,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def tile_size(self) -> tuple[int, int]:
-        """This is the pixel size of tiles to be rendered
-
-        :return: (int, int)
-        """
+        """This is the pixel size of tiles to be rendered"""
         if self.pre_zoom == 1.0:
             return self.tmx.tilewidth, self.tmx.tileheight
-        else:
-            return int(self.pre_zoom * self.tmx.tilewidth), int(self.pre_zoom * self.tmx.tileheight)
+        return int(self.pre_zoom * self.tmx.tilewidth), int(self.pre_zoom * self.tmx.tileheight)
 
     @property
     def map_size(self) -> tuple[int, int]:
-        """This is the size of the map in tiles
-
-        :return: (int, int)
-        """
+        """This is the size of the map in tiles"""
         # This size INCLUDES the padding
         return (
             self.tmx.width + 2 * self.image_pad_tiles[0],
@@ -369,10 +361,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
     @property
     def visible_tile_layers(self) -> list[int]:
-        """This must return layer numbers, not objects
-
-        :return: [int, int, ...]
-        """
+        """This must return layer numbers, not objects"""
         return self.layers_to_render
 
     @property
@@ -385,7 +374,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """
         return (layer for layer in self.tmx.visible_layers if isinstance(layer, pytmx.TiledObjectGroup))
 
-    def get_tile_properties(self, x: int, y: int, layer_idx: int) -> Optional[dict[str, str]]:
+    def get_tile_properties(self, x: int, y: int, l: int) -> Optional[dict[str, str]]:
+        layer_idx = l
         if layer_idx not in self.base_tile_layers:
             layer_idx -= self.overlay_layer_offset
         if not isinstance(self.tmx.layers[layer_idx], pytmx.pytmx.TiledTileLayer):
@@ -398,10 +388,11 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self,
         x: int,
         y: int,
-        layer_idx: int,
+        l: int,
         image_indexing: bool = True,
         limit_to_visible: bool = True,
     ) -> Optional[pygame.surface.Surface]:
+        layer_idx = l
         if layer_idx not in self.visible_tile_layers and limit_to_visible:
             return None
         if layer_idx not in self.base_tile_layers:
@@ -440,9 +431,6 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """Return Image by a custom ID
 
         Used for animations.  Not required for static maps.
-
-        :param id:
-        :return:
         """
         return cast(Optional[pygame.surface.Surface], self.tmx.images[id])
 
@@ -564,11 +552,11 @@ class ScrollTest:
                 self.running = False
                 break
 
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
                     break
-                elif event.key == pygame.K_EQUALS:
+                if event.key == pygame.K_EQUALS:
                     self.map_layer.zoom *= 2.0
                 elif event.key == pygame.K_MINUS:
                     self.map_layer.zoom *= 0.5

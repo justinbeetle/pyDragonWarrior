@@ -104,7 +104,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
 
     def game_mode_loop(self) -> None:
         # Start encounter music
-        AudioPlayer().play_music(self.encounter_music, self.encounter_music)
+        AudioPlayer().play_music(self.encounter_music)
 
         # Phase in the encounter background
         self.render_encounter_background_phase_in()
@@ -195,9 +195,9 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
             return self.background_game_mode.advance_state()
         return False
 
-    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+    def get_music(self) -> Optional[str]:
         """Implementation of GameMode.get_music for this game mode."""
-        return self.encounter_music, self.encounter_music, None, None, None
+        return self.encounter_music
 
     def render_encounter_background_phase_in(self) -> None:
         for percent in range(5, 100, 5):

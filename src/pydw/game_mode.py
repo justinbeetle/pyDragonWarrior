@@ -84,33 +84,22 @@ class GameMode(ABC):
         return False
 
     @abstractmethod
-    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
-        """Get paramters for invoking AudioPlayer().play_music for the mode.  Returns a tuple matching the arguments
-        of AudioPlayer().play_music, except that the first parameter is optional and a None for this parameter
-        will result in stopping any playing music."""
+    def get_music(self) -> Optional[str]:
+        """Get the track name of the defai;t background music for the game mode, or None if no music should
+        be played upon activation of the game mode."""
 
     def activate(self) -> None:
         """Handle a transition in control from one game mode to another by drawing the mode and playing music, if
         any."""
         # Play music, if any
-        music_rel_file_path1, music_rel_file_path2, interrupt, music_file_start1_sec, music_file_start2_sec = (
-            self.get_music()
-        )
-        if music_rel_file_path1 is None:
+        track_name = self.get_music()
+        if track_name is None:
             AudioPlayer().stop_music()
         else:
-            if interrupt is None:
-                interrupt = False
-            if music_file_start1_sec is None:
-                music_file_start1_sec = 0.0
-            if music_file_start2_sec is None:
-                music_file_start2_sec = 0.0
-            AudioPlayer().play_music(
-                music_rel_file_path1, music_rel_file_path2, interrupt, music_file_start1_sec, music_file_start2_sec
-            )
+            AudioPlayer().play_music(track_name)
 
         # Draw the display
         self.draw(flip_buffer=True)
 
-        # Clear the event queue for a clean start on the new map
+        # Clear the event queue for a clean start in a new mode.
         game_events.clear_events()

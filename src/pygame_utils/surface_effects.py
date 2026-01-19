@@ -122,7 +122,7 @@ rainbow_colors = [
 ]
 
 
-def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
+def rainbow_effect(game_state: GameStateInterface) -> None:
     game_info = game_state.get_game_info()
 
     if game_info.maps[game_state.get_map_name()].tiled_filename is None:
@@ -130,10 +130,10 @@ def rainbow_effect(game_state: GameStateInterface, message_dialog: GameDialog) -
         rainbow_effect_on_water(game_state.screen, game_info.tiles["water"].images[0][0])
     else:
         # On a tiled map, use the new effect
-        rainbow_effect_across_background(game_state, message_dialog)
+        rainbow_effect_across_background(game_state)
 
 
-def rainbow_effect_across_background(game_state: GameStateInterface, message_dialog: GameDialog) -> None:
+def rainbow_effect_across_background(game_state: GameStateInterface) -> None:
     game_mode = game_state.get_game_mode()
 
     # Cycle through the rainbow colors

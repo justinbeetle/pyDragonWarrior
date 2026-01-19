@@ -53,6 +53,6 @@ class EvilDeath(GameMode):
         drawing the updated state to the display."""
         return self.background_game_mode.advance_state()
 
-    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+    def get_music(self) -> Optional[str]:
         """Implementation of GameMode.get_music for this game mode."""
         return self.background_game_mode.get_music()

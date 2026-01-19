@@ -7,7 +7,7 @@ from heapq import heappop, heappush
 from typing import Any, Callable, Optional
 
 import pygame
-import pyscroll
+from pyscroll import PyscrollGroup
 
 from generic_utils.point import Point
 from pydw.game_map_interface import GameMapInterface
@@ -25,8 +25,9 @@ from pydw.hero_state import HeroState
 from pydw.legacy_map_data import LegacyMapData
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
-from pydw.padded_tiled_map_data import PaddedTiledMapData
 from pygame_utils.audio_player import AudioPlayer
+from pyscroll_utils.buffered_renderer import BufferedRenderer
+from pyscroll_utils.padded_tiled_map_data import PaddedTiledMapData
 
 logger = logging.getLogger(__name__)
 
@@ -385,10 +386,13 @@ class GameMap(GameMapInterface):
             )
 
         # Create renderer
-        self.map_layer = pyscroll.BufferedRenderer(self.map_data, self.game_state.screen.get_size())
+        self.map_layer = BufferedRenderer(self.map_data, self.game_state.screen.get_size())
+        # Change the default sprite, overlapping tile blit order to be based on layer, then
+        # bottom y coordinate, then whether sprite or tile.
+        self.map_layer.set_blit_list_sort_key(lambda x: (x[0], x[3] + x[5].get_height(), x[1]))
 
         # Create the pyscroll group to support character and decoration sprites
-        self.group = pyscroll.PyscrollGroup(map_layer=self.map_layer, default_layer=self.map_data.decoration_layer)
+        self.group = PyscrollGroup(map_layer=self.map_layer, default_layer=self.map_data.decoration_layer)
 
         MapSprite.image_pad_tiles = self.game_state.get_image_pad_tiles()
         MapSprite.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels

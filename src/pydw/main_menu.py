@@ -61,7 +61,7 @@ class MainMenu(GameMode):
                 if event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
                     return
-                elif event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN:
                     AudioPlayer().play_sound("select")
                     waiting_for_user_input = False
                     break
@@ -168,6 +168,6 @@ class MainMenu(GameMode):
         drawing the updated state to the display."""
         return False
 
-    def get_music(self) -> tuple[Optional[str], Optional[str], Optional[bool], Optional[float], Optional[float]]:
+    def get_music(self) -> Optional[str]:
         """Implementation of GameMode.get_music for this game mode."""
-        return self.game_state.game_info.title_music, None, None, None, None
+        return self.game_state.game_info.title_music

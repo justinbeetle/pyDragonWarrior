@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Module defining the GameMapLightEngineAdapter class."""
 
 import logging
 import math
@@ -10,13 +10,13 @@ import pyscroll
 from generic_utils.point import Point
 from pydw.game_map_interface import GameMapInterface
 from pydw.game_state_interface import GameStateInterface
-from pydw.light_engine import Light
+from pygame_utils.light_engine import Light
 
 logger = logging.getLogger(__name__)
 
 
 class GameMapLightEngineAdapter:
-    """Logic for setting up the shadow rects for light_engine.Ligh tbased on the GameMap state in
+    """Logic for setting up the shadow rects for light_engine.Light based on the GameMap state in
     order to use dynamic lighting."""
 
     def __init__(
@@ -33,12 +33,18 @@ class GameMapLightEngineAdapter:
         self.is_debugging = False
 
     def translate_point_world_to_screen(self, pt: Point) -> Point:
+        """Translate a point from world to screen coordinates."""
         return Point(self.map_layer.translate_point(pt))
 
     def translate_rect_world_to_screen(self, rect: pygame.Rect) -> pygame.Rect:
+        """Translate a rectangle from world to screen coordinates."""
         return pygame.Rect(self.map_layer.translate_rect(rect))
 
     def apply_dynamic_lighting(self, surface: pygame.surface.Surface) -> None:
+        """Apply dynamic lighting onto the provided surface based on the current game state.
+        The dynamic lighting is applied onto an already rendered map (in screen coordinates)
+        so when determining where to apply shadows based on the map the coordinates need to
+        be translated from world to screen coordinates."""
         light_diameter_tiles = self.game_state.get_hero_party().light_diameter
         if light_diameter_tiles is None:
             return
@@ -56,6 +62,32 @@ class GameMapLightEngineAdapter:
             color: Optional[pygame.Color] = None,
             intensity: float = 1.0,
         ) -> None:
+            """Add a point light in the specified position casting light of the specified radius,
+            color, and intensity.  The real work in doing this is determining where shadows should
+            be cast, which is a factor of the location of wall tiles relative to the light.  In
+            maintaining the lighting feel of Dragon Warrior, we want the light to propagate into the
+            lower half of upper wall tiles, the upper half of lower wall tiles, and the entirety of
+            left and right wall tiles.
+
+                Upper      Upper      Upper
+                Left       Center     Right
+                        __________
+                        |          |
+                Center  |  Center  |  Center
+                Left    |  Center  |  Right
+                        |__________|
+
+                Lower      Lower      Lower
+                Left       Center     Right
+
+            The algorithm used here to identify the shadow rentangles operates on each of the
+            diagnals (upper left, lower left, upper right, and lower right).  For each diagnal,
+            it iterates though the tiles in the quaderant of the diagnal from the light source
+            out in two passes.  In the first pass, where wall tiles are present it determines if
+            the wall tile is visible.  In the second, operating only on the visible wall tiles,
+            it ands recntangles to the list shadow_rects for the sides away from the light source
+            that are not adjacent to another visible wall.
+            """
             if color is None:
                 color = pygame.Color("white")
             # Calculate light posisition in screen pixels.
@@ -93,7 +125,8 @@ class GameMapLightEngineAdapter:
                     wall_tiles[x - min_x][y - min_y] = False
                 except IndexError:
                     logger.exception(
-                        "Enccounter index error for tile %s where min_x=%s; max_x=%s; min_y=%s; max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
+                        "Enccounter index error for tile %s where min_x=%s; max_x=%s; min_y=%s; \
+max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                         tile,
                         min_x,
                         max_x,
@@ -110,6 +143,12 @@ class GameMapLightEngineAdapter:
                 check_lr: bool = True,
                 check_ll: bool = True,
             ) -> bool:
+                """Determine whether or not a wall tile is visible from the light source
+                by building a list of lines from the light source to the coorners of the
+                tile and checking whether any of the lines do not collide with any of the
+                rectangles of the visible wall tiles (wall_tile_rects).  Where a wall tile
+                is visible, add its rectange to wall_tile_rects.  Where a wall tile is
+                not visible, remove it from wall_tiles."""
                 light_x, light_y = light_screen_pos_px.get_as_int_tuple()
                 this_tile_rect = self.translate_rect_world_to_screen(tile_rect.move(tile * self.tile_size_pixels))
                 lines: list[tuple[int, int, int, int]] = []
