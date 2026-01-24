@@ -243,9 +243,8 @@ class GameDialogEvaluator:
                     self.game_state.handle_quit(force=True)
 
             if 0 == len(events):
-                pygame.time.wait(25)
-            else:
-                pygame.time.wait(100)
+                if not self.game_state.get_game_mode().advance_tick():
+                    self.game_state.get_game_mode().advance_time()
 
         stop_time = time.time()
 

@@ -34,7 +34,7 @@ Note: Running launcher.py runs a subshell command to install the required Python
 |----------------------------|--------------------|------------------|
 | Move                       | WASD or Arrow Keys | D-Pad            |
 | Interact or Make Selection | Enter or E         | A                |
-| Enter Menu or Leave Menu   | Space or Q         | B                |
+| Cancel / Leave Menu        | Space or Q         | B                |
 | Exit                       | Escape             | Select           |
 | Quick Save                 | F1                 | Menu             |
 

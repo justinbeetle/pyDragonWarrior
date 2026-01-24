@@ -64,6 +64,7 @@ class Loader:
 
     def initialize_pygame(self) -> None:
         """Initialize pygame"""
+        AudioPlayer.pre_init()
         pygame.init()
         pygame.mouse.set_visible(False)
         pygame.display.set_caption(Launcher.application_name)

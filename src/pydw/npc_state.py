@@ -19,10 +19,15 @@ class NpcState(MapCharacterState):
     def set_talking(self, talking_pos_dat_tile: Point, talking_direction: Direction) -> None:
         """Update the NPC to move to and face the player character"""
         self.is_talking = True
-        if self.is_moving() and talking_pos_dat_tile != self.dest_pos_dat_tile:
-            # Turn the NPC around if walking away from the tile they should be talking from.
-            self.direction = self.direction.get_opposite()
-            self.dest_pos_dat_tile = talking_pos_dat_tile
+        if talking_pos_dat_tile != self.dest_pos_dat_tile:
+            if self.is_moving():
+                # Turn the NPC around if walking away from the tile they should be talking from.
+                self.direction = self.direction.get_opposite()
+                self.dest_pos_dat_tile = talking_pos_dat_tile
+            else:
+                direction = Direction.get_optional_direction(talking_pos_dat_tile - self.curr_pos_dat_tile)
+                self.direction = direction if direction else talking_direction
+                self.dest_pos_dat_tile = talking_pos_dat_tile
         self.talking_direction = talking_direction
 
     def done_talking(self) -> None:
@@ -43,7 +48,6 @@ class NpcState(MapCharacterState):
 
 def main() -> None:
     # TODO: Convert to unit test
-    from pydw.game_types import Direction
 
     # Test out character states
     state = NpcState(NpcInfo.create_null())

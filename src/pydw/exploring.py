@@ -16,6 +16,7 @@ from pydw.game_map import CharacterSprite
 from pydw.game_mode import GameMode
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import DialogType, Direction, OutgoingTransition, Tool
+from pydw.npc_state import NpcState
 from pygame_utils import game_events
 from pygame_utils.audio_player import AudioPlayer
 
@@ -101,16 +102,13 @@ class Exploring(GameMode):
                 elif event.key == pygame.K_RETURN:
                     AudioPlayer().play_sound("select")
                     self.smart_interactions()
-                elif event.key == pygame.K_SPACE:
-                    AudioPlayer().play_sound("select")
-                    self.menu_loop()
                 elif event.key == pygame.K_F1:
                     AudioPlayer().play_sound("select")
                     self.game_state.save(quick_save=True)
                 # TODO: Enable to play around with day vs night lighting
-                #elif event.key == pygame.K_F2:
+                # elif event.key == pygame.K_F2:
                 #    self.game_state.get_game_map().set_lighting_mode(is_day=True)
-                #elif event.key == pygame.K_F3:
+                # elif event.key == pygame.K_F3:
                 #    self.game_state.get_game_map().set_lighting_mode(is_day=False)
                 else:
                     direction = Direction.get_optional_direction(event.key)
@@ -130,16 +128,11 @@ class Exploring(GameMode):
     def smart_interactions(self) -> None:
         """Based on context, pick the most likely desired interaction.
         This bypasses the menu for improved quality of life."""
-        if self.game_state.get_game_map().get_npc_to_talk_to() is not None:
-            self.handle_talking()
+        npc = self.game_state.get_game_map().get_npc_to_talk_to()
+        if npc is not None:
+            self.handle_talking(npc)
         elif self.game_state.is_facing_openable_item():
             self.handle_opening()
-        # Uncomment to restore map transitions as a smart interaction.  On entering a cave, it is
-        # natural to launch the menu to use a torch of cast radiant.  It was frustrating that instead
-        # of opening the menu it was leaving the cave.
-        # elif self.make_map_transition(self.get_point_transition()):
-        #    # Transitioned to a new map
-        #    pass
         else:
             self.menu_loop()
 
@@ -167,11 +160,12 @@ class Exploring(GameMode):
             # logger.debug("Advancing one tick")
             self.advance_tick()
 
-    def handle_talking(self) -> None:
+    def handle_talking(self, npc: Optional[NpcState] = None) -> None:
         """Handle a user command to talk"""
-        npc = self.game_state.get_game_map().get_npc_to_talk_to()
+        if npc is None:
+            npc = self.game_state.get_game_map().get_npc_to_talk_to()
         if npc:
-            if npc.npc_info.dialog is not None:
+            if npc.npc_info and npc.npc_info.dialog:
                 dialog = npc.npc_info.dialog
             else:
                 dialog = ["They pay you no mind."]
@@ -284,6 +278,7 @@ class Exploring(GameMode):
                 logger.error("ERROR: Unsupported menu_result = %s", menu_result)
             elif menu_result is None:
                 dm.remove_cascading_dialog()
+        dm.status_dialog = GameDialog.create_persistent_status_dialog(self.game_state.get_hero_party())
 
     def item_submenu_loop(self) -> None:
         """The loop for the exploring menu's item submenu."""
@@ -436,7 +431,6 @@ class Exploring(GameMode):
         movement_allowed = self.game_state.get_game_map().can_move_to_tile(hero_dest_dat_tile)
 
         # Play a walking sound or bump sound based on whether the movement was allowed
-        audio_player = AudioPlayer()
         movement_hp_penalty = 0
         if movement_allowed:
             # On allowed movement, unset first_block_occurred
@@ -491,7 +485,7 @@ class Exploring(GameMode):
                 # Redraws the characters when movement_allowed is True
                 # logger.debug("Advancing one tick")
                 if movement_allowed and movement_hp_penalty > 0 and first_frame:
-                    audio_player.play_sound("hit_lvl_1")
+                    AudioPlayer().play_sound("hit_lvl_1")
                     flicker_surface = pygame.surface.Surface(self.game_state.screen.get_size())
                     flicker_surface.fill("red")
                     flicker_surface.set_alpha(128)
@@ -532,7 +526,7 @@ class Exploring(GameMode):
             # the blocked sound effect was otherwise a bit excessive.
             if self.first_block_occurred:
                 # logger.debug("Successive block - playing blocked sound")
-                audio_player.play_sound("blocked")
+                AudioPlayer().play_sound("blocked")
 
             # On blocked movement, set first_block_occurred
             # if not self.first_block_occurred: logger.debug("First block - not playing blocked sound")

@@ -3,6 +3,7 @@
 import logging
 import math
 import random
+import time
 from heapq import heappop, heappush
 from typing import Any, Callable, Optional
 
@@ -211,6 +212,8 @@ class CharacterSprite(MapSprite):
             direction_vector = self.character.direction.get_vector()
             self.character.curr_pos_offset_img_px += direction_vector * image_px_step_size
             if self.character.curr_pos_offset_img_px.mag() / MapSprite.tile_size_pixels >= direction_vector.mag():
+                self.character.last_pos_dat_tile = self.character.curr_pos_dat_tile
+                self.character.last_pos_time_seconds_since_epoch = time.time()
                 self.character.curr_pos_dat_tile = self.character.dest_pos_dat_tile
                 self.character.curr_pos_offset_img_px = Point(0, 0)
 
@@ -644,23 +647,26 @@ class GameMap(GameMapInterface):
 
     def get_npc_to_talk_to(self) -> Optional[NpcState]:
         def get_npc_sprite_at_tile(pos_dat_tile: Point) -> Optional[NpcState]:
-            for sprite in self.group:
-                if isinstance(sprite, NpcSprite):
-                    npc_state = sprite.character
-                    npc_info = npc_state.npc_info
-                else:
-                    continue
+            def get_npc_sprite_matching_lambda(npc_at_tile_func: Callable[[NpcState], bool]) -> Optional[NpcState]:
+                for sprite in self.group:
+                    if isinstance(sprite, NpcSprite) and npc_at_tile_func(sprite.character):
+                        return sprite.character
+                return None
 
-                if npc_info is not None and (
-                    pos_dat_tile in (npc_state.curr_pos_dat_tile, npc_state.dest_pos_dat_tile)
-                ):
-                    # NPC should turn to face you if they have something to say
-                    if npc_info.dialog is not None:
-                        npc_state.set_talking(
-                            pos_dat_tile, self.game_state.get_hero_party().members[0].direction.get_opposite()
-                        )
-                    return npc_state
-            return None
+            # First look for an NPC at or heading to the tile
+            npc_state = get_npc_sprite_matching_lambda(
+                lambda x: pos_dat_tile in (x.curr_pos_dat_tile, x.dest_pos_dat_tile)
+            )
+
+            # Second look for an NPC that was just at the tile
+            if npc_state is None:
+                last_pos_time_seconds_since_epoch_threshold = time.time() - 0.4
+                npc_state = get_npc_sprite_matching_lambda(
+                    lambda x: pos_dat_tile == x.last_pos_dat_tile
+                    and last_pos_time_seconds_since_epoch_threshold < x.last_pos_time_seconds_since_epoch
+                )
+
+            return npc_state
 
         talk_dest_dat_tile = (
             self.game_state.get_hero_party().members[0].curr_pos_dat_tile
@@ -699,6 +705,12 @@ class GameMap(GameMapInterface):
                     talk_dest_dat_tile + self.game_state.get_hero_party().members[0].direction.get_vector()
                 )
                 npc_to_talk_to = get_npc_sprite_at_tile(talk_dest_dat_tile)
+
+        # NPC should turn to face you if they have something to say
+        if npc_to_talk_to and npc_to_talk_to.npc_info and npc_to_talk_to.npc_info.dialog:
+            npc_to_talk_to.set_talking(
+                talk_dest_dat_tile, self.game_state.get_hero_party().members[0].direction.get_opposite()
+            )
 
         return npc_to_talk_to
 

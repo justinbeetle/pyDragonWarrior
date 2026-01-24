@@ -149,6 +149,7 @@ class AudioPlayer:
     """Multi-threaded singleton utility for playing music and sound tracks."""
 
     _instance: Optional["AudioPlayer"] = None
+    _initialized = False
 
     def __new__(cls) -> "AudioPlayer":
         if cls._instance is None:
@@ -157,8 +158,12 @@ class AudioPlayer:
         return cls._instance
 
     def __init__(self) -> None:
-        # Choose a desired audio format
-        pygame.mixer.init(11025)  # Raises exception on fail
+        if self._initialized:
+            return
+        self._initialized = True
+
+        if not pygame.mixer.get_init():
+            pygame.mixer.init(buffer=4096)
         pygame.mixer.set_num_channels(32)
 
         self.music_path = "./"
@@ -175,6 +180,13 @@ class AudioPlayer:
         self.music_thread = threading.Thread(target=self.__music_thread)
         self.music_thread.start()
         self.channel_end_event_type = pygame.event.custom_type()
+
+    @staticmethod
+    def pre_init() -> None:
+        """Call this method prior to pygame.init(), which calls pygame.mixer.init(),
+        to increase the buffer size and eliminate crackling audio when initially playing
+        music or a sound."""
+        pygame.mixer.pre_init(buffer=4096)
 
     def set_music_path(self, music_path: str) -> None:
         """Set the base path for music files."""
@@ -280,6 +292,8 @@ class AudioPlayer:
                 music_track.file_start1_sec,
                 music_track.file_start2_sec,
             )
+        else:
+            logger.error("Failed to play track %s", track)
 
     def play_music_from_filepath(
         self,
@@ -360,6 +374,8 @@ class AudioPlayer:
                         if self.music_rel_file_path1 not in failed_to_play:
                             logger.exception("Failed to load %s", self.music_rel_file_path1)
                             failed_to_play.add(self.music_rel_file_path1)
+                else:
+                    pygame.mixer.music.unload()
 
             pygame.time.wait(100)
 
@@ -404,6 +420,8 @@ class AudioPlayer:
 
         if file_path is not None:
             self.play_sound_from_filepath(file_path, is_blocking=is_blocking)
+        else:
+            logger.error("Failed to play track %s", track)
 
     def play_sound_from_filepath(
         self,

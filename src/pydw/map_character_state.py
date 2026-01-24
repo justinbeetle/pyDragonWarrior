@@ -14,6 +14,10 @@ class MapCharacterState:
         self.curr_pos_offset_img_px = Point(0, 0)
         self.direction = direction
 
+        # Track the last position and time of a charater
+        self.last_pos_dat_tile = Point(pos_dat_tile)
+        self.last_pos_time_seconds_since_epoch = 0.0
+
     def is_moving(self) -> bool:
         """Return true is the character is moving, else false."""
         return self.curr_pos_dat_tile != self.dest_pos_dat_tile or self.curr_pos_offset_img_px != Point(0, 0)
