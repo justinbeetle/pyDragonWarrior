@@ -1,12 +1,22 @@
 #!/usr/bin/env python
+
 """Module defining methods wrapping pygame.event and pygame.joystick"""
 
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 import pygame
 
 # Mapping from unique instance IDs to initialized joysticks/gamepads
-joysticks: Dict[int, pygame.joystick.JoystickType] = {}
+joysticks: dict[int, pygame.joystick.JoystickType] = {}
+
+# Optional event handlers
+focus_gain_handler: Optional[Callable[[], None]] = None
+window_resize_handler: Optional[Callable[[], None]] = None
+
+
+def is_pygame_ce() -> bool:
+    """Return true if running in pygame-ce, else false if running in pygame."""
+    return getattr(pygame, "IS_CE", False)
 
 
 def setup_joystick() -> bool:
@@ -53,11 +63,27 @@ def setup_joystick() -> bool:
     return len(joysticks) > 0
 
 
+def set_focus_gain_handler(handler_method: Optional[Callable[[], None]]) -> None:
+    """Set (or unset) the optional focus gain handler."""
+    # pygame-ce appears to have fixed this issue, so disabling this handler for the time being
+    if not is_pygame_ce():
+        global focus_gain_handler
+        focus_gain_handler = handler_method
+
+
+def set_window_resize_handler(handler_method: Optional[Callable[[], None]]) -> None:
+    """Set (or unset) the optional window resize handler."""
+    # pygame-ce appears to have fixed this issue, so disabling this handler for the time being
+    if not is_pygame_ce():
+        global window_resize_handler
+        window_resize_handler = handler_method
+
+
 def get_events(
     is_keyboard_repeat_enabled: bool = False,
     translate_wasd_to_uldr: bool = True,
     translate_e_to_enter: bool = True,
-) -> List[pygame.event.Event]:
+) -> list[pygame.event.Event]:
     """Wrapper for pygame.event.get() translating keyboard and joystick/gamepad events into a reduced set of events.
 
     :param is_keyboard_repeat_enabled: Allow a held key to continue generating events, defaults to False
@@ -67,17 +93,14 @@ def get_events(
 
     :param translate_e_to_enter: translate events on the E key to events on the ENTER key, defaults to True
 
-    :return: List of events
+    :return: list of events
     """
 
     # Allow joysticks to be rediscovered if they get uninitialized.
     setup_joystick()
 
-    events: List[pygame.event.Event] = []
+    events: list[pygame.event.Event] = []
     for event in pygame.event.get():
-        # if event.type == pygame.ACTIVEEVENT and 'gain' in event.__dict__ and event.gain:
-        #     print('Detected gain focus event', flush=True)
-
         # Drop mouse events
         if event.type in [
             pygame.MOUSEMOTION,
@@ -91,11 +114,28 @@ def get_events(
         if event.type in [pygame.KEYUP]:
             continue
 
+        # Optionally handle focus gained events
+        if event.type == pygame.ACTIVEEVENT and "gain" in event.__dict__ and event.gain:
+            # print("Detected gain focus event", flush=True)
+            if focus_gain_handler:
+                focus_gain_handler()
+
+        # Optionally window size changed events
+        if event.type == pygame.WINDOWSIZECHANGED:
+            # print("Detected window size changed event", flush=True)
+            if window_resize_handler:
+                window_resize_handler()
+
+        # print(f"event before remapping: {event}", flush=True)
+
         # Remap keyboard events
-        event = _remap_keyboard_event(translate_wasd_to_uldr, translate_e_to_enter, event)
+        remapped_event = _remap_keyboard_event(translate_wasd_to_uldr, translate_e_to_enter, event)
 
         # Remap joystick/gamepad events
-        remapped_event = _remap_joystick_event(event)
+        if remapped_event is not None:
+            remapped_event = _remap_joystick_event(remapped_event)
+
+        # print(f"event after remapping: {remapped_event}", flush=True)
 
         if remapped_event is not None:
             _add_event_if_not_duplicate(events, remapped_event)
@@ -112,24 +152,22 @@ def get_events(
 
 def clear_events() -> None:
     """Clear the event queue"""
-
-    # Allow joysticks to be rediscovered if they get uninitialized.
-    setup_joystick()
-
-    pygame.event.clear()
+    get_events(False, False, False)
 
 
 def _remap_keyboard_event(
     translate_wasd_to_uldr: bool, translate_e_to_enter: bool, event: pygame.event.Event
-) -> pygame.event.Event:
+) -> Optional[pygame.event.Event]:
     """Perform remapping of keydown events to change which key is pressed to support multiple keys for the same actions
 
     FUTURE: Potentially implement keybinding support here
     """
 
     # Sometimes the KEYDOWN events seems to stop while TEXTINPUT events continue.  Translate TEXTINPUT event to KEYDOWN
-    # events where possible to better handle instances of missing KEYDOWN events.
-    if pygame.TEXTINPUT == event.type:
+    # events where possible to better handle instances of missing KEYDOWN events.  Disabling this hack for pygame-ce for
+    # the time being to assess whether this "feature" from pygame has been fixed in pygame-ce.
+    drop_keydown_in_favor_of_textinput = not is_pygame_ce()
+    if drop_keydown_in_favor_of_textinput and pygame.TEXTINPUT == event.type:
         try:
             # orig_event = event
             event = pygame.event.Event(
@@ -137,10 +175,20 @@ def _remap_keyboard_event(
                 {"key": pygame.key.key_code(event.text), "unicode": event.text},
             )
             # print(f'Translated {orig_event} to {event}', flush=True)
+
+            # After remapping a TEXTINPUT to a KEYDOWN, unset the drop_keydown_in_favor_of_textinput flag so we don't
+            # subsequently drop the remapped event.
+            drop_keydown_in_favor_of_textinput = False
         except (ValueError, NotImplementedError):
             print(f"Failed to translate {event} to a KEYDOWN event", flush=True)
 
     if pygame.KEYDOWN == event.type:
+        if drop_keydown_in_favor_of_textinput:
+            # When converting TEXTINPUT events to KEYDOWN events, drop the KEYDOWN events for the letter keys to avoid
+            # duplicate events.
+            event_unicode = str(event.__dict__.get("unicode", ""))
+            if event_unicode.isalpha():
+                return None
         if event.key in [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d]:
             # Optionally convert WASD events to arrow key events
             if translate_wasd_to_uldr:
@@ -249,7 +297,7 @@ def _remap_joystick_event(event: pygame.event.Event) -> Optional[pygame.event.Ev
     return remapped_event
 
 
-def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pygame.event.Event]) -> None:
+def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: list[pygame.event.Event]) -> None:
     """Generate key down events from pressed keys
 
     The translation of TEXTINPUT events to KEYDOWN events takes care of this for letters (while handling capitalization)
@@ -287,7 +335,7 @@ def _add_keyboard_keydown_events(translate_wasd_to_uldr: bool, events: List[pyga
         _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_BACKSPACE}))
 
 
-def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
+def _add_joystick_keydown_events(events: list[pygame.event.Event]) -> None:
     """Generate key down events from pressed joystick hat"""
     for joystick_id in range(pygame.joystick.get_count()):
         joystick = pygame.joystick.Joystick(joystick_id)
@@ -306,31 +354,18 @@ def _add_joystick_keydown_events(events: List[pygame.event.Event]) -> None:
                 _add_event_if_not_duplicate(events, pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_UP}))
 
 
-def _add_event_if_not_duplicate(events: List[pygame.event.Event], event: pygame.event.Event) -> None:
+def _add_event_if_not_duplicate(events: list[pygame.event.Event], event: pygame.event.Event) -> None:
     """Append event to events unless doing so would result in multiple KEYDOWN events for a single key"""
     if pygame.KEYDOWN == event.type:
         for existing_event in events:
             if pygame.KEYDOWN == existing_event.type and existing_event.key == event.key:
-                # A KEYDOWN event of this type is already in events
-                if ("unicode" not in existing_event.__dict__ or "" == existing_event.__dict__["unicode"]) and (
-                    "unicode" in event.__dict__ and "" != event.__dict__["unicode"]
-                ):
-                    # Sometimes the unicode field of the KEYDOWN (and KEYUP) events is incorrectly set to ''.  If this
-                    # event has it where the existing event was missing it, then populate it in the existing event.
-                    # The TEXTINPUT events don't seem to have this glitch, but this implementation is all in on the
-                    # KEYDOWN events and translates TEXTINPUT events to KEYDOWN events.  This if statement will repair
-                    # offending KEYDOWN events using the TEXTINPUT event we have translated to a KEYDOWN event.
-                    #
-                    # TODO: Get a better handle on this issue and submit an issue against pygame.  It looks to be
-                    #       related to https://github.com/pygame/pygame/issues/3229.
-                    # print(f"Setting unicode for event {existing_event} to {event.__dict__['unicode']}", flush=True)
-                    existing_event.__dict__["unicode"] = event.__dict__["unicode"]
-                # print('Not adding event as a duplicate is already present:', event, flush=True)
                 return
     events.append(event)
 
 
-def _get_event_for_joystick_hat_position(hat_position: Tuple[float, float]) -> Optional[pygame.event.Event]:
+def _get_event_for_joystick_hat_position(
+    hat_position: tuple[float, float],
+) -> Optional[pygame.event.Event]:
     """Generate key down events from pressed joystick hat - doesn't support one event becoming multiple events"""
     event = None
     if hat_position == (0, -1):

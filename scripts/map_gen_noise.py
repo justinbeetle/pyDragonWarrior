@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from typing import List
-
 import os
+from typing import List
 
 from opensimplex import OpenSimplex
 

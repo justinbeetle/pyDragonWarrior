@@ -14,6 +14,8 @@ out-and-out clone or reimagining.
 [![CodeQL](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+See a [game play demo on YouTube](https://www.youtube.com/watch?v=Hi8MjgoCKsM).
+
 ## Installation
 
 1. Install python: Install the latest Python 3 version from https://www.python.org/downloads
@@ -22,25 +24,24 @@ out-and-out clone or reimagining.
  
 ## Running
 
-Execute pyDragonWarrior/src/pydw/game.py
+Execute pyDragonWarrior/src/pydw/launcher.py
 
-Note: Running game.py runs a subshell command to install the required Python libraries in a venv using pip.
+Note: Running launcher.py runs a subshell command to install the required Python libraries in a venv using pip.
 
 ## Controls
 
-| Control                      | Keyboard Bindings  | Gamepad Bindings |
-| ---------------------------- | ------------------ | ---------------- |
-| Move                         | WASD or Arrow Keys | D-Pad            |
-| Interact or Make Selection   | Enter or E         | A                |
-| Enter Menu or Leave Menu     | Space or Q         | B                |
-| Exit                         | Escape             | Select           |
-| Quick Save                   | F1                 | Menu             |
+| Control                    | Keyboard Bindings  | Gamepad Bindings |
+|----------------------------|--------------------|------------------|
+| Move                       | WASD or Arrow Keys | D-Pad            |
+| Interact or Make Selection | Enter or E         | A                |
+| Cancel / Leave Menu        | Space or Q         | B                |
+| Exit                       | Escape             | Select           |
+| Quick Save                 | F1                 | Menu             |
 
 The interact control does the following in order of precedence:
 1. Talks to an NPC if the player character is facing one
 2. Opens a chest or door if the player character is on or facing one
-3. Takes the stairs if the player character is on a staircase
-4. Searches in all other cases
+3. Enters the menu in all other cases
 
 Note: Gamepad support is based on an XBox One controller.  Other controllers have not been tested and may have different
 button naming schemes.
@@ -78,7 +79,7 @@ of problems in the add_problem_to_use_dialog method.
 3. pip install .
 4. pip install pyinstaller
 5. pyinstaller --onefile --name pyDragonWarrior --add-data "data;data" --icon data/images/icon.ico --splash
-data/images/title.png src/pydw/game.py
+data/images/title.png src/pydw/launcher.py
 
 ### Using Docker
 
@@ -248,7 +249,7 @@ The pygame library is integral to this project. Migrating to using Tiled maps an
 been a really nice improvement, but one that you only see with the licensed assets that are not included in the repo. A
 future distribution of the game will include these.
 
-* [pygame](https://github.com/pygame/pygame): Python library for multimedia applications
+* [pygame-ce](https://github.com/pygame-community/pygame-ce): Python library for multimedia applications
 * [Leif Theden](https://github.com/bitcraft):
   * [pytmx](https://github.com/bitcraft/pytmx): Python library to read Tiled maps
   * [pyscroll](https://github.com/bitcraft/pyscroll): Python library to render Tiled maps

@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 
+import os
 from typing import Optional
 
-import os
 import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
-
 from pydw.game_map import GameMap
 from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import Direction
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
 class GameMapViewer:
@@ -42,10 +40,10 @@ class GameMapViewer:
         self.image_pad_tiles = self.win_size_tiles // 2 * 4
 
         # Initialize GameInfo
-        game_xml_path = os.path.join(base_path, "game.xml")
+        game_xml_path = os.path.join(base_path, "data", "game.xml")
         from pydw.game_info import GameInfo
 
-        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, self.win_size_pixels)
+        self.game_info = GameInfo(base_path, game_xml_path, self.tile_size_pixels, 2, self.win_size_pixels)
 
         # Initialize the hero party
         self.hero_party = HeroParty(
@@ -91,7 +89,7 @@ class GameMapViewer:
         god_mode = False
 
         while self.is_running and not done_with_map:
-            for event in GameEvents.get_events(True):
+            for event in game_events.get_events(True):
                 move_direction: Optional[Direction] = None
 
                 if event.type == pygame.KEYDOWN:

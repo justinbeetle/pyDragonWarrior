@@ -761,7 +761,7 @@
    <object id="24" x="336" y="576" width="240" height="480"/>
    <object id="25" x="576" y="816" width="240" height="240"/>
   </objectgroup>
-  <objectgroup id="45" name="Monster Set 0">
+  <objectgroup id="45" name="Monster Set 0" locked="1">
    <object id="52" x="576" y="576" width="160" height="240"/>
    <object id="53" x="736" y="576" width="160" height="144"/>
    <object id="54" x="736" y="800" width="160" height="16"/>

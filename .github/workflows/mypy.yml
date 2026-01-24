@@ -21,4 +21,4 @@ jobs:
         pip install mypy
     - name: Analysing the code with mypy
       run: |
-        python -m mypy --config-file pyproject.toml src/pydw/game.py
+        python -m mypy --config-file pyproject.toml src

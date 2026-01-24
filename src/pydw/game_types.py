@@ -2,12 +2,13 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Any, Dict, List, Literal, NamedTuple, Optional, Tuple, Union
 
+import random
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Literal, NamedTuple, Optional, Union
+
 import pygame
-import random
 
 from generic_utils.point import Point
 
@@ -20,7 +21,7 @@ class GameTypes:
         return float(value)
 
     @staticmethod
-    def parse_int_range(value: Union[str, int]) -> Tuple[int, int]:
+    def parse_int_range(value: Union[str, int]) -> tuple[int, int]:
         if isinstance(value, str) and "-" in value:
             min_val = int(value.split("-")[0])
             max_val = int(value.split("-")[1])
@@ -192,12 +193,12 @@ class TargetTypeEnum(Enum):
 
 
 # Dialog type
-# The correct type for the branching dialog is Dict[str, 'DialogType'] but the type of Dict[str, Any] is used instead
+# The correct type for the branching dialog is dict[str, 'DialogType'] but the type of dict[str, Any] is used instead
 # since mypy does not yet support recursive types and cannot handle the correct type.
-DialogType = List[
+DialogType = list[
     Union[
         str,  # a string of dialog
-        Dict[str, Any],  # branching dialog, actual type is Dict[str, 'DialogType']
+        dict[str, Any],  # branching dialog, actual type is dict[str, 'DialogType']
         "DialogVariable",
         "DialogGoTo",
         "DialogVendorBuyOptions",
@@ -232,10 +233,10 @@ class DialogGoTo:
     label: str
 
 
-# List of items that can be bought from the vendor where each item is a 2 element list
+# list of items that can be bought from the vendor where each item is a 2 element list
 # consisting of item name and gold cost (as str)
 # Optionally could also be a string for replacement by a DialogVariable
-DialogVendorBuyOptionsParamWithoutReplacementType = List[List[str]]
+DialogVendorBuyOptionsParamWithoutReplacementType = list[list[str]]
 DialogVendorBuyOptionsParamType = Union[DialogVendorBuyOptionsParamWithoutReplacementType, str]
 
 
@@ -245,9 +246,9 @@ class DialogVendorBuyOptions:
     name_and_gp_row_data: DialogVendorBuyOptionsParamType
 
 
-# List of the classes of items that can be sold to the vendor
+# list of the classes of items that can be sold to the vendor
 # Optionally could also be a string for replacement by a DialogVariable
-DialogVendorSellOptionsParamWithoutReplacementType = List[str]
+DialogVendorSellOptionsParamWithoutReplacementType = list[str]
 DialogVendorSellOptionsParamType = Union[DialogVendorSellOptionsParamWithoutReplacementType, str]
 
 
@@ -305,15 +306,15 @@ class DialogAction:
 # Type to aggregate all the different dialog replacement variables
 class DialogReplacementVariables:
     def __init__(self) -> None:
-        self.generic: Dict[str, str] = {}
-        self.vendor_buy_options: Dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = {}
-        self.vendor_sell_options: Dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = {}
+        self.generic: dict[str, str] = {}
+        self.vendor_buy_options: dict[str, DialogVendorBuyOptionsParamWithoutReplacementType] = {}
+        self.vendor_sell_options: dict[str, DialogVendorSellOptionsParamWithoutReplacementType] = {}
 
 
 class Tile(NamedTuple):
     name: str
     symbol: str
-    images: List[List[pygame.surface.Surface]]
+    images: list[list[pygame.surface.Surface]]
     walkable: bool
     can_talk_over: bool
     hp_penalty: int
@@ -343,8 +344,8 @@ class Decoration(NamedTuple):
 
 class CharacterType(NamedTuple):
     name: str
-    images: Dict[Direction, Dict[int, pygame.surface.Surface]]
-    levels: List[Level] = []
+    images: dict[Direction, dict[int, pygame.surface.Surface]]
+    levels: list[Level] = []
     num_phases: int = 2
     movement_speed_factor: float = 1.0
     ticks_per_step: int = 30
@@ -395,7 +396,7 @@ class NpcInfo(NamedTuple):
     progress_marker: Optional[str] = None
     inverse_progress_marker: Optional[str] = None
     name: Optional[str] = None
-    waypoints: List[Point] = []
+    waypoints: list[Point] = []
 
     @staticmethod
     def create_null(name: str = "null") -> NpcInfo:
@@ -455,26 +456,27 @@ class SpecialMonster(NamedTuple):
 class Map(NamedTuple):
     name: str
     tiled_filename: Optional[str]
-    dat: List[str]
-    overlay_dat: Optional[List[str]]
+    dat: list[str]
+    overlay_dat: Optional[list[str]]
     music: str
     light_diameter: Optional[int]
     leaving_transition: Optional[OutgoingTransition]
-    point_transitions: List[OutgoingTransition]
-    incoming_transitions: List[IncomingTransition]
-    transitions_by_map: Dict[str, AnyTransition]
-    transitions_by_map_and_name: Dict[str, Dict[str, AnyTransition]]
-    transitions_by_name: Dict[str, AnyTransition]
-    map_decorations: List[MapDecoration]
-    npcs: List[NpcInfo]
-    monster_zones: List[MonsterZone]
+    point_transitions: list[OutgoingTransition]
+    incoming_transitions: list[IncomingTransition]
+    transitions_by_map: dict[str, AnyTransition]
+    transitions_by_map_and_name: dict[str, dict[str, AnyTransition]]
+    transitions_by_name: dict[str, AnyTransition]
+    map_decorations: list[MapDecoration]
+    npcs: list[NpcInfo]
+    monster_zones: list[MonsterZone]
     encounter_background: Optional[EncounterBackground]
-    special_monsters: List[SpecialMonster]
+    special_monsters: list[SpecialMonster]
     is_outside: bool
     origin: Optional[Point] = None
+    has_clouds: bool = False
 
     @staticmethod
-    def create(name: str, dat: List[str]) -> Map:
+    def create(name: str, dat: list[str]) -> Map:
         return Map(
             name,
             None,
@@ -521,7 +523,7 @@ class MonsterAction(NamedTuple):
     def is_fire_attack(self) -> bool:
         return GameTypes.dialog_contains_action_category(self.use_dialog, ActionCategoryTypeEnum.FIRE)
 
-    def get_damage_range(self) -> Tuple[int, int]:
+    def get_damage_range(self) -> tuple[int, int]:
         dialog_action = GameTypes.get_dialog_action(self.use_dialog, DialogActionEnum.DAMAGE_TARGET)
         if dialog_action is not None:
             return GameTypes.parse_int_range(dialog_action.count)
@@ -549,7 +551,7 @@ class MonsterInfo(NamedTuple):
     xp: int
     min_gp: int
     max_gp: int
-    monster_action_rules: List[MonsterActionRule]
+    monster_action_rules: list[MonsterActionRule]
     allows_critical_hits: bool
     may_run_away: bool
 
@@ -559,7 +561,7 @@ PygameSurfaceFormatType = Union[Literal["P"], Literal["RGB"], Literal["RGBX"], L
 
 class SurfacePickable(NamedTuple):
     pixels: bytes
-    size: Tuple[int, int]
+    size: tuple[int, int]
     format: PygameSurfaceFormatType
 
     @staticmethod
@@ -585,7 +587,7 @@ class MonsterInfoPicklable(NamedTuple):
     xp: int
     min_gp: int
     max_gp: int
-    monster_action_rules: List[MonsterActionRule]
+    monster_action_rules: list[MonsterActionRule]
     allows_critical_hits: bool
     may_run_away: bool
 

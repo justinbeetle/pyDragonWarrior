@@ -22,7 +22,7 @@
       <Tile name="desert"           image="desert.png"   symbol="-" walkable="yes" boatable="no"  hpPenalty="0"  speed="0.875" spawnRate="1/8"  type="simple"/>
       <Tile name="swamp"            image="swamp.png"    symbol="s" walkable="yes" boatable="no"  hpPenalty="2"  speed="0.5"   spawnRate="1/8"  type="simple"/>
       <Tile name="bridge"           image="bridge.png"   symbol="b" walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24" type="complex"/>
-      <Tile name="stone"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="complex"/>
+      <Tile name="walls"            image="stone.png"    symbol="S" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="complex"/>
       <Tile name="roof"             image="roof.png"     symbol="R" walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"    type="simple"/>
       <Tile name="path"             image="path.png"     symbol=" " walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/16" type="simple"/>
       <Tile name="counter"          image="counter.png"  symbol="n" walkable="no"  boatable="no"  canTalkOver="yes"                             type="complex"/>
@@ -46,7 +46,8 @@
       <Tile name="cliff"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
       <Tile name="cliff_walkable"                                   walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="1/24"/>
       <Tile name="gate"                                             walkable="yes" boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
-      <Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
+  <!--<Tile name="walls"                                            walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>-->
+      <Tile name="debris"                                           walkable="no"  boatable="no"  hpPenalty="0"  speed="1.0"   spawnRate="0"/>
    </Tiles>
 
    <Decorations imagePath="decorations_20">
@@ -93,8 +94,8 @@
 
       <xi:include href="data/maps/map_cantlin_legacy.xml" parse="xml"/>
 
-      <!--<xi:include href="data/maps/map_erdricks_tomb_legacy.xml" parse="xml"/>-->
-      <xi:include href="data/maps/map_erdricks_tomb_tiled.xml" parse="xml"/>
+      <xi:include href="data/maps/map_erdricks_tomb_legacy.xml" parse="xml"/>
+      <!--<xi:include href="data/maps/map_erdricks_tomb_tiled.xml" parse="xml"/>-->
 
       <Map name="mountain_cave_lvl1" tiles="legacy/mountain_cave_lvl1.dat" music="dungeon_lvl_1" monsterSet="19" lightDiameter="1" isOutside="no">
          <PointTransition decoration="upstairs"            x="2"   y="9"   dir="EAST"  toMap="overworld"/>
@@ -1116,7 +1117,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
 
          <Tool name="Rainbow Drop"                                   droppable="no"  equippable="no">
             <Dialog>[ACTOR] held the Rainbow Drop toward the sky.</Dialog>
-            <DialogAssert type="IS_AT_COORDINATES" map="overworld" name="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
+            <DialogAssert type="IS_AT_COORDINATES" map="overworld" location="Rainbow Bridge Formation Point"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But no rainbow appeared here.</Dialog></DialogAssert>
             <DialogAction type="PLAY_MUSIC" name="rainbow"/>
             <DialogAction type="VISUAL_EFFECT" name="rainbowEffect"/>

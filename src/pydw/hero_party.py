@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import cast, List, Optional, Union
+from typing import Optional, Union, cast
 
 from generic_utils.point import Point
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_party import CombatParty
 from pydw.game_types import DialogType, Direction, ItemType
@@ -14,12 +13,14 @@ from pydw.monster_party import MonsterParty
 
 
 class HeroParty(CombatParty):
+    """Data structure for the state of the party of heroes."""
+
     def __init__(self, main_character: HeroState) -> None:
         super().__init__()
         self.main_character = main_character
         self.members = [main_character]  # in party order
         self.gp = 0
-        self.progress_markers: List[str] = []
+        self.progress_markers: list[str] = []
 
         self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
         self.light_diameter_decay_steps: Optional[int] = None
@@ -33,12 +34,14 @@ class HeroParty(CombatParty):
         self.last_outside_pos_dat_tile = Point()
         self.last_outside_dir = Direction.SOUTH
 
+        self.last_direction: Optional[Direction] = None
+
     @property
-    def combat_members(self) -> List[HeroState]:
+    def combat_members(self) -> list[HeroState]:
         return [member for member in self.members if member.is_combat_character]
 
-    def get_combat_members(self) -> List[CombatCharacterState]:
-        return cast(List[CombatCharacterState], self.combat_members)
+    def get_combat_members(self) -> list[CombatCharacterState]:
+        return cast(list[CombatCharacterState], self.combat_members)
 
     def add_member(
         self,
@@ -209,6 +212,20 @@ class HeroParty(CombatParty):
                 return False
         return True
 
+    def is_moving(self) -> bool:
+        """Return true if the hero party is moving, else false."""
+        return self.members[0].is_moving()
+
+    def has_turned(self) -> bool:
+        """Return true if the hero party has turned since this method was last called, else false."""
+        return_value = self.last_direction != self.members[0].direction
+        self.last_direction = self.members[0].direction
+        return return_value
+
+    def move(self, direction: Direction) -> None:
+        """Move the first member in the party.  ."""
+        self.members[0].move(direction)
+
     def get_curr_pos_dat_tile(self) -> Point:
         return self.members[0].curr_pos_dat_tile
 
@@ -274,9 +291,9 @@ class HeroParty(CombatParty):
 
     # Get listing of all unequipped items for the party
     def get_item_row_data(
-        self, limit_to_droppable: bool = False, filter_types: Optional[List[str]] = None
-    ) -> List[List[str]]:
-        item_row_data: List[List[str]] = []
+        self, limit_to_droppable: bool = False, filter_types: Optional[list[str]] = None
+    ) -> list[list[str]]:
+        item_row_data: list[list[str]] = []
         for member in self.members:
             member_item_row_data = member.get_item_row_data(limit_to_droppable, True, filter_types)
             if 0 == len(item_row_data):

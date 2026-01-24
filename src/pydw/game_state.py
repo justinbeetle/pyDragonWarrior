@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 
-from typing import Dict, List, Optional
-
 import os
-import pygame
 import random
-import xml.etree.ElementTree as ET
 import xml.dom.minidom
+import xml.etree.ElementTree as ET
+from typing import Optional
+
+import pygame
 
 from generic_utils.point import Point
-
-from pygame_utils.audio_player import AudioPlayer
-import pygame_utils.game_events as GameEvents
-
 from pydw.combat_encounter import CombatEncounter
+from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog
 from pydw.game_dialog_evaluator import GameDialogEvaluator
+from pydw.game_info import GameInfo
+from pydw.game_map import GameMap
+from pydw.game_mode import GameMode
+from pydw.game_state_interface import GameStateInterface
 from pydw.game_types import (
     DialogReplacementVariables,
     DialogType,
@@ -23,22 +24,20 @@ from pydw.game_types import (
     EncounterBackground,
     MapDecoration,
     MonsterInfo,
-    OutgoingTransition,
     SpecialMonster,
     Tile,
 )
-from pydw.game_info import GameInfo
-from pydw.game_map import GameMap
-from pydw.game_state_interface import GameStateInterface
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.map_character_state import MapCharacterState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
 from pydw.npc_state import NpcState
+from pygame_utils import game_events
+from pygame_utils.audio_player import AudioPlayer
 
 
-class GameState(GameStateInterface):
+class GameState(GameStateInterface, DialogManagerMediator):
     game_map: GameMap
 
     def __init__(
@@ -48,35 +47,56 @@ class GameState(GameStateInterface):
         game_xml_path: str,
         win_size_tiles: Point,
         tile_size_pixels: int,
+        tile_scaling_factor: int,
+        verbose: bool = False,
     ) -> None:
-        self.saves_path = saves_path
-        self.win_size_tiles = win_size_tiles
-        self.image_pad_tiles = self.win_size_tiles // 2
-        self.win_size_pixels = self.win_size_tiles * tile_size_pixels
-        self.__should_add_math_problems_in_combat = True
-
         screen = pygame.display.get_surface()
         if screen is None:
             raise ValueError("No screen")
         super().__init__(screen)
 
-        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, self.win_size_pixels)
-        self.removed_decorations_by_map: Dict[str, List[MapDecoration]] = {}
+        self.saves_path = saves_path
+        self.win_size_tiles = win_size_tiles
+        self.verbose = verbose
+
+        self.image_pad_tiles = self.win_size_tiles // 2
+        self.win_size_pixels = self.win_size_tiles * tile_size_pixels
+        self.__should_add_math_problems_in_combat = True
+        self.game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, tile_scaling_factor, self.win_size_pixels)
+        self.removed_decorations_by_map: dict[str, list[MapDecoration]] = {}
 
         self.pending_dialog: Optional[DialogType] = None
         self.load()
 
-        self.clock = pygame.time.Clock()
-        self.tick_count = 0
+        self.dialog_manager = DialogManager(self)
+        self.current_game_mode: Optional[GameMode] = None
 
-        # TODO: Migrate these to here
-        # self.message_dialog: Optional[GameDialog] = None
-        self.combat_encounter: Optional[CombatEncounter] = None
+    def run(self, pc_name_or_file_name: Optional[str] = None) -> int:
+        """Run the game loop."""
+
+        # Register the focus gain handler - needed so that we don't end up with an empty black screen after losing focus
+        game_events.set_focus_gain_handler(self.focus_gain_handlder)
+        game_events.set_window_resize_handler(self.window_resize_handlder)
+
+        # Transition from the loading screen to the main menu
+        from pydw.main_menu import MainMenu
+
+        self.current_game_mode = MainMenu(self, pc_name_or_file_name)
+        self.current_game_mode.game_mode_loop()
+
+        # Transition from the main menu to exploring
+        if self.is_running:
+            from pydw.exploring import Exploring
+
+            self.current_game_mode = Exploring(self)
+            self.current_game_mode.game_mode_loop()
+
+        return 0
 
     def set_map(
         self,
         new_map_name: str,
-        one_time_decorations: Optional[List[MapDecoration]] = None,
+        one_time_decorations: Optional[list[MapDecoration]] = None,
         respawn_decorations: bool = False,
         init: bool = False,
     ) -> None:
@@ -112,7 +132,7 @@ class GameState(GameStateInterface):
             self.removed_decorations_by_map = {}
 
         map_decorations = self.game_info.maps[new_map_name].map_decorations.copy()
-        removed_map_decorations: List[MapDecoration] = []
+        removed_map_decorations: list[MapDecoration] = []
         if one_time_decorations is not None:
             map_decorations += one_time_decorations
         # Prune out decorations where the progress marker conditions are not met
@@ -128,8 +148,9 @@ class GameState(GameStateInterface):
                         removed_map_decorations.append(decoration)
 
         if old_map_name == new_map_name:
-            # If loading up the same map, should retain the NPC positions
+            # If loading up the same map, should retain the NPC and cloud positions
             npcs = self.game_map.npcs
+            clouds = self.game_map.clouds
 
             # Remove any current NPCs which should be missing
             for npc_char in npcs[:]:
@@ -151,13 +172,14 @@ class GameState(GameStateInterface):
                 if is_missing:
                     npcs.append(NpcState(npc))
         else:
-            # On a map change load NPCs from scratch
+            # On a map change load NPCs and clouds from scratch
             npcs = []
             for npc in self.game_info.maps[new_map_name].npcs:
                 if self.check_progress_markers(npc.progress_marker, npc.inverse_progress_marker):
                     npcs.append(NpcState(npc))
+            clouds = None
 
-        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs)
+        self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs, clouds)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
         # Set character state for new game
@@ -201,7 +223,7 @@ class GameState(GameStateInterface):
             xml_root = ET.parse(save_game_file_path).getroot()
 
             map = xml_root.attrib["map"]
-            party_members: List[HeroState] = []
+            party_members: list[HeroState] = []
 
             # Local helper method for parsing party members
             def parse_party_member(member_element: ET.Element) -> None:
@@ -340,10 +362,12 @@ class GameState(GameStateInterface):
         """
 
         # Initialize the default dialog font color based on the state of the hero party
-        gde = GameDialogEvaluator(self.game_info, self)
+        gde = GameDialogEvaluator(self)
         gde.update_default_dialog_font_color()
 
     def save(self, quick_save: bool = False) -> None:
+        """Save the state of the game to the filesystem.  If the save not associated dialog on load,
+        set quick_save to true."""
         # Save the overall state of the party
         xml_root = ET.Element("SaveState")
         xml_root.attrib["name"] = self.hero_party.main_character.name
@@ -488,45 +512,18 @@ class GameState(GameStateInterface):
                 )
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
+        """Get the tile info for the specified position, or if not specified, the location of the player character."""
         return self.game_map.get_tile_info(tile)
-
-    # Find point transitions for either the specified point or the current position of the player character.
-    # If auto is true, only look for automatic point transitions
-    def get_point_transition(
-        self,
-        tile: Optional[Point] = None,
-        filter_to_automatic_transitions: bool = False,
-    ) -> Optional[OutgoingTransition]:
-        if tile is None:
-            tile = self.hero_party.get_curr_pos_dat_tile()
-        for point_transition in self.game_info.maps[self.get_map_name()].point_transitions:
-            if point_transition.point == tile and self.check_progress_markers(
-                point_transition.progress_marker,
-                point_transition.inverse_progress_marker,
-            ):
-                if filter_to_automatic_transitions:
-                    if point_transition.is_automatic is None and not self.is_light_restricted():
-                        # By default, make transitions manual in dark places
-                        return point_transition
-                    elif point_transition.is_automatic:
-                        return point_transition
-                else:
-                    return point_transition
-        return None
 
     def get_encounter_background(self, tile: Optional[Point] = None) -> Optional[EncounterBackground]:
         return self.game_map.get_encounter_background(tile)
-
-    def get_decorations(self, tile: Optional[Point] = None) -> List[MapDecoration]:
-        return self.game_map.get_decorations(tile)
-
-    def get_npc_to_talk_to(self) -> Optional[NpcState]:
-        return self.game_map.get_npc_to_talk_to()
 
     def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
         return self.game_map.get_npc_by_name(name)
 
     def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
+        """Get the special monster at the specified position, or if not specified, the location of the player
+        character."""
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for special_monster in self.game_info.maps[self.get_map_name()].special_monsters:
@@ -565,19 +562,9 @@ class GameState(GameStateInterface):
             return True
         return False
 
-    def can_move_to_tile(
-        self,
-        tile: Point,
-        enforce_npc_hp_penalty_limit: bool = False,
-        enforce_npc_dof_limit: bool = False,
-        is_npc: bool = False,
-        prev_tile: Optional[Point] = None,
-    ) -> bool:
-        return self.game_map.can_move_to_tile(
-            tile, enforce_npc_hp_penalty_limit, enforce_npc_dof_limit, is_npc, prev_tile
-        )
-
-    def get_tile_monsters(self, tile: Optional[Point] = None) -> List[str]:
+    def get_tile_monsters(self, tile: Optional[Point] = None) -> list[str]:
+        """Get the list of monster names which may spawn at the specified position, or if not specified, the location
+        of the player character."""
         if tile is None:
             tile = self.hero_party.get_curr_pos_dat_tile()
         for mz in self.game_info.maps[self.get_map_name()].monster_zones:
@@ -598,49 +585,6 @@ class GameState(GameStateInterface):
 
     def is_inside(self) -> bool:
         return not self.is_outside()
-
-    def make_map_transition(self, transition: Optional[OutgoingTransition]) -> bool:
-        if transition is None:
-            return False
-
-        src_map = self.game_info.maps[self.get_map_name()]
-        dest_map = self.game_info.maps[transition.dest_map]
-
-        # Find the destination transition corresponding to this transition
-        if transition.dest_name is None:
-            try:
-                dest_transition = dest_map.transitions_by_map[self.get_map_name()]
-            except KeyError:
-                print("Failed to find destination transition by dest_map", flush=True)
-                return False
-        else:
-            try:
-                dest_transition = dest_map.transitions_by_map_and_name[self.get_map_name()][transition.dest_name]
-            except KeyError:
-                try:
-                    dest_transition = dest_map.transitions_by_name[transition.dest_name]
-                except KeyError:
-                    print("Failed to find destination transition by dest_name", flush=True)
-                    return False
-
-        # If transitioning from outside to inside, save off last outside position
-        if src_map.is_outside and not dest_map.is_outside:
-            self.hero_party.set_last_outside_pos(
-                self.get_map_name(),
-                self.hero_party.get_curr_pos_dat_tile(),
-                self.hero_party.get_direction(),
-            )
-
-        # Make the transition and draw the map
-        AudioPlayer().play_sound("walk_away")
-        self.hero_party.set_pos(dest_transition.point, dest_transition.dir)
-        self.set_map(transition.dest_map, respawn_decorations=transition.respawn_decorations)
-        self.draw_map(True)
-
-        # Slight pause on a map transition
-        pygame.time.wait(250)
-
-        return True
 
     def is_facing_locked_item(self) -> bool:
         return self.game_map.is_facing_locked_item()
@@ -663,60 +607,17 @@ class GameState(GameStateInterface):
                 self.removed_decorations_by_map[self.get_map_name()] = []
             self.removed_decorations_by_map[self.get_map_name()].append(removed_decoration)
 
-    def draw_map(
-        self,
-        flip_buffer: bool = True,
-        draw_background: bool = True,
-        draw_combat: bool = True,
-        draw_status: bool = True,
-        draw_only_character_sprites: bool = False,
-    ) -> None:
-        if draw_only_character_sprites:
-            self.game_map.draw_character_sprites()
-            return
-
-        # Draw the map to the screen
-        if draw_background:
-            self.game_map.draw()
-
-        # If in combat, refresh the background image and render the monsters.
-        if draw_combat and self.combat_encounter is not None:
-            self.combat_encounter.background_image = self.screen.copy()
-            self.combat_encounter.render_monsters()
-        elif draw_status:
-            GameDialog.create_persistent_status_dialog(self.hero_party).blit(self.screen, False)
-
-        # Flip the screen buffer
-        if flip_buffer:
-            pygame.display.flip()
-
-    def advance_tick(
-        self,
-        update_map: bool = True,
-        draw_map: bool = True,
-        advance_time: bool = True,
-        flip_buffer: bool = True,
-    ) -> None:
-        if update_map:
-            self.game_map.update()
-
-        if draw_map:
-            self.draw_map(flip_buffer=False)
-
-        if advance_time:
-            # Allow pygame to process internal events for interacting with the OS every frame
-            pygame.event.pump()
-
-            self.clock.tick(30)
-            # self.tick_count += 1
-            # if 10 == self.tick_count % 100:
-            #     print(f'FPS = {self.clock.get_fps()}', flush=True)
-
-        if flip_buffer:
-            pygame.display.flip()
-
     def get_game_info(self) -> GameInfo:
         return self.game_info
+
+    def get_game_map(self) -> GameMap:
+        return self.game_map
+
+    def get_pending_dialog(self) -> Optional[DialogType]:
+        return self.pending_dialog
+
+    def clear_pending_dialog(self) -> None:
+        self.pending_dialog = None
 
     def get_image_pad_tiles(self) -> Point:
         return self.image_pad_tiles
@@ -744,7 +645,7 @@ class GameState(GameStateInterface):
         return variables
 
     def is_in_combat(self) -> bool:
-        return self.combat_encounter is not None
+        return isinstance(self.current_game_mode, CombatEncounter)
 
     def is_combat_allowed(self) -> bool:
         return len(self.get_tile_monsters()) > 0
@@ -762,7 +663,6 @@ class GameState(GameStateInterface):
         victory_dialog: Optional[DialogType] = None,
         run_away_dialog: Optional[DialogType] = None,
         encounter_music: Optional[str] = None,
-        message_dialog: Optional[GameDialog] = None,
     ) -> None:
         # TODO: Make the conditions for no monsters configurable
         if self.hero_party.has_item("Ball of Light"):
@@ -807,40 +707,43 @@ class GameState(GameStateInterface):
 
         # Perform the combat encounter
         CombatEncounter.static_init("combat")
-        self.combat_encounter = CombatEncounter(
+        combat_encounter = CombatEncounter(
             game_info=self.game_info,
             game_state=self,
             monster_party=monster_party,
             encounter_background=encounter_background,
-            message_dialog=message_dialog,
             approach_dialog=approach_dialog,
             victory_dialog=victory_dialog,
             run_away_dialog=run_away_dialog,
             encounter_music=encounter_music,
         )
-        self.combat_encounter.encounter_loop()
-        self.combat_encounter = None
+        original_game_mode = self.get_game_mode()
+        self.current_game_mode = combat_encounter
+        combat_encounter.game_mode_loop()
+        self.current_game_mode = original_game_mode
 
-        # Play the music for the current map
-        AudioPlayer().play_music(self.game_info.maps[self.get_map_name()].music)
+        # Render the original game mode and play the music for the current map
+        original_game_mode.activate()
 
         # Clear event queue
-        GameEvents.clear_events()
+        game_events.clear_events()
 
-    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
+    def handle_death(self) -> None:
         if not self.hero_party.has_surviving_members():
             # Player death
             self.hero_party.main_character.hp = 0
-            AudioPlayer().stop_music()
-            AudioPlayer().play_sound("player_died")
-            GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.screen, False)
-            gde = GameDialogEvaluator(self.game_info, self)
-            if message_dialog is None:
-                message_dialog = GameDialog.create_message_dialog()
+            self.dialog_manager.add_status_dialog(
+                GameDialog.create_encounter_status_dialog(self.hero_party), flip_buffer=False
+            )
+            gde = GameDialogEvaluator(self)
+            if self.dialog_manager.message_dialog is None:
+                self.dialog_manager.message_dialog = GameDialog.create_message_dialog()
             else:
-                message_dialog.add_message("")
-            gde.add_and_wait_for_message("Thou art dead.", message_dialog)
-            gde.wait_for_acknowledgement(message_dialog)
+                self.dialog_manager.message_dialog.add_message("")
+            gde.add_and_wait_for_message("Thou art dead.", self.dialog_manager.message_dialog)
+            AudioPlayer().stop_music()
+            AudioPlayer().play_sound("player_died", is_blocking=True)
+            gde.wait_for_acknowledgement(self.dialog_manager.message_dialog)
             for hero in self.hero_party.members:
                 hero.curr_pos_dat_tile = hero.dest_pos_dat_tile = self.game_info.death_hero_pos_dat_tile
                 hero.curr_pos_offset_img_px = Point(0, 0)
@@ -853,24 +756,63 @@ class GameState(GameStateInterface):
             self.set_map(self.game_info.death_map, respawn_decorations=True)
 
     def handle_quit(self, force: bool = False) -> None:
-        AudioPlayer().play_sound("select")
         if force:
             self.is_running = False
 
-        # Save off initial background image
-        background_surface = self.screen.copy()
-
-        menu_dialog = GameDialog.create_yes_no_menu(Point(1, 1), "Do you really want to quit?")
-        menu_dialog.blit(self.screen, flip_buffer=True)
-        menu_result = GameDialogEvaluator(self.game_info, self).get_menu_result(menu_dialog, allow_quit=False)
+        AudioPlayer().play_sound("select")
+        menu_dialog = self.dialog_manager.add_high_priority_cascading_dialog(
+            GameDialog.create_yes_no_menu(Point(0.5, 0.5), "Do you really want to quit?")
+        )
+        menu_result = GameDialogEvaluator(self).get_menu_result(menu_dialog, allow_quit=False)
         if menu_result is not None and menu_result == "YES":
             self.is_running = False
-
-        # Restore initial background image
-        menu_dialog.erase(self.screen, background_surface, flip_buffer=True)
+            return
+        self.dialog_manager.remove_cascading_dialog()
 
     def should_add_math_problems_in_combat(self) -> bool:
         return self.__should_add_math_problems_in_combat
 
     def toggle_should_add_math_problems_in_combat(self) -> None:
         self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat
+
+    def get_dialog_manager(self) -> DialogManager:
+        """Get the dialog manager."""
+        return self.dialog_manager
+
+    def get_game_mode(self) -> GameMode:
+        """Get the game mode."""
+        if self.current_game_mode is None:
+            raise ValueError("No game mode")
+        return self.current_game_mode
+
+    def set_game_mode(self, game_mode: GameMode) -> None:
+        """Set the game mode."""
+        self.current_game_mode = game_mode
+
+    def draw_background(self, flip_buffer: bool = True) -> None:
+        """DialogManagerMediator interface method to draw the current state of the game mode's background to the
+        display.  The background is whatever is behind the dialogs."""
+        self.get_game_mode().draw_background(flip_buffer=flip_buffer)
+
+    def get_foreground_dialog_font_color(self) -> pygame.Color:
+        """DialogManagerMediator interface method to get the color to use for the font and border of the foreground
+        dialogs."""
+        if self.hero_party and self.hero_party.has_low_health():
+            return GameDialog.LOW_HEALTH_FONT_COLOR
+        return GameDialog.NOMINAL_HEALTH_FONT_COLOR
+
+    def focus_gain_handlder(self) -> None:
+        """Handler for focus gain events to render the latest content to the display surface.
+        Since pygame 2.5.2, the display surface is cleared when focus is lost and gained
+        (see https://github.com/pygame/pygame/issues/4133).
+        """
+        if self.verbose:
+            print("Re-drawing to the display due to invocation of focus_gain_handlder", flush=True)
+        self.get_game_mode().draw()
+
+    def window_resize_handlder(self) -> None:
+        """Handler for window resize events needed to implement a resizeable window."""
+        # TODO: What needs to be done to resize things on the fly?
+        if self.verbose:
+            print("Re-drawing to the display due to invocation of window_resize_handlder", flush=True)
+        self.get_game_mode().draw()

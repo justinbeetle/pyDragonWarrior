@@ -2,13 +2,12 @@
 
 # Imports to support type annotations
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple
 
 import math
 import random
+from typing import Optional
 
 from generic_utils.point import Point
-
 from pydw.combat_character_state import CombatCharacterState
 from pydw.game_types import (
     ActionCategoryTypeEnum,
@@ -52,8 +51,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.helm: Optional[Helm] = None
         self.armor: Optional[Armor] = None
         self.shield: Optional[Shield] = None
-        self.other_equipped_items: List[Tool] = []
-        self.unequipped_items: Dict[ItemType, int] = {}  # Dict where keys are items and values are the item counts
+        self.other_equipped_items: list[Tool] = []
+        self.unequipped_items: dict[ItemType, int] = {}  # dict where keys are items and values are the item counts
 
         self.hp_regen_tiles_remaining: Optional[int] = None
 
@@ -65,9 +64,9 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self,
         limit_to_droppable: bool = False,
         limit_to_unequipped: bool = False,
-        filter_types: Optional[List[str]] = None,
-    ) -> List[List[str]]:
-        item_row_data: List[List[str]] = []
+        filter_types: Optional[list[str]] = None,
+    ) -> list[list[str]]:
+        item_row_data: list[list[str]] = []
         if not limit_to_unequipped:
             if self.weapon is not None:
                 HeroState.add_item_to_item_row_data(self.weapon, "E", limit_to_droppable, filter_types, item_row_data)
@@ -84,7 +83,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
             HeroState.add_item_to_item_row_data(item, item_count_str, limit_to_droppable, filter_types, item_row_data)
 
         # Flip the data
-        flipped_item_row_data: List[List[str]] = []
+        flipped_item_row_data: list[list[str]] = []
         for i in range((len(item_row_data) + 1) // 2):
             flipped_item_row_data.append(item_row_data[i])
             old_index = (len(item_row_data) + 1) // 2 + i
@@ -97,8 +96,8 @@ class HeroState(MapCharacterState, CombatCharacterState):
         item: ItemType,
         col_value: str,
         limit_to_droppable: bool,
-        filter_types: Optional[List[str]],
-        item_row_data: List[List[str]],
+        filter_types: Optional[list[str]],
+        item_row_data: list[list[str]],
     ) -> None:
         item_passed_type_filter = False
         if filter_types is None:
@@ -172,7 +171,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
                         return item
         return None
 
-    def get_item_options(self, item_name: str) -> List[str]:
+    def get_item_options(self, item_name: str) -> list[str]:
         item_options = []
         is_equipped = False
         if self.is_item_equipped(item_name):
@@ -345,7 +344,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         target: CombatCharacterState,
         damage_type: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL,
         is_critical_hit: Optional[bool] = None,
-    ) -> Tuple[int, bool]:
+    ) -> tuple[int, bool]:
         if is_critical_hit is None:
             is_critical_hit = target.allows_critical_hits() and random.uniform(0, 1) < 1 / 32
         if is_critical_hit and target.allows_critical_hits():
@@ -369,7 +368,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
     # TODO: Add spell checks and damage calc methods
 
     # TODO: Add method for determining available spells
-    def get_castable_spells(self, is_in_combat: bool, is_inside: bool) -> List[Spell]:
+    def get_castable_spells(self, is_in_combat: bool, is_inside: bool) -> list[Spell]:
         castable_spells = []
         for spell in self.get_available_spells():
             if spell.mp <= self.mp:
@@ -384,17 +383,17 @@ class HeroState(MapCharacterState, CombatCharacterState):
                 castable_spells.append(spell)
         return castable_spells
 
-    def get_available_spells(self) -> List[Spell]:
+    def get_available_spells(self) -> list[Spell]:
         available_spells = []
         for level in self.character_type.levels:
             if level.number <= self.level.number and level.spell is not None:
                 available_spells.append(level.spell)
         return available_spells
 
-    def get_castable_spell_names(self, is_in_combat: bool, is_inside: bool) -> List[str]:
+    def get_castable_spell_names(self, is_in_combat: bool, is_inside: bool) -> list[str]:
         return HeroState.get_spell_names(self.get_castable_spells(is_in_combat, is_inside))
 
-    def get_available_spell_names(self) -> List[str]:
+    def get_available_spell_names(self) -> list[str]:
         return HeroState.get_spell_names(self.get_available_spells())
 
     def get_spell(self, name: str) -> Optional[Spell]:
@@ -404,7 +403,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return None
 
     @staticmethod
-    def get_spell_names(spells: List[Spell]) -> List[str]:
+    def get_spell_names(spells: list[Spell]) -> list[str]:
         spell_names = []
         for spell in spells:
             spell_names.append(spell.name)

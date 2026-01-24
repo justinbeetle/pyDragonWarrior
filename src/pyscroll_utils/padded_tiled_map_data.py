@@ -6,15 +6,18 @@ ScrollTest was copied and modified from pyscroll/apps/demo.py.
 
 Source copied and modified from https://github.com/bitcraft/pyscroll
 """
-from typing import Any, Callable, cast, Deque, Dict, Iterator, List, Optional, Tuple
-
+import logging
 import xml.etree.ElementTree as ET
+from typing import Any, Callable, Deque, Iterator, Optional, cast
 
 import pygame
 import pyscroll
 import pytmx
 
 from generic_utils.point import Point
+from pygame_utils import surface_effects
+
+logger = logging.getLogger(__name__)
 
 
 class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
@@ -32,41 +35,19 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         desired_tile_size: Optional[int] = None,
     ):
         super().__init__()
+        self.desired_tile_size = desired_tile_size
 
-        # Extract out any image layers - image layers are only being used to compare the Tiled map to a template image.
-        # The template images are not being controlled and pytmx errors out upon failing to load an image.
-        xml_root = ET.parse(tmx_filename).getroot()
-        for image_layer_element in xml_root.findall(".//imagelayer"):
-            xml_root.remove(image_layer_element)
+        # Lighting mode state - applied in modify_images
+        self.saturation_factor = 1.0  # no-op
+        self.blue_factor = 0.0  # no-op
+        self.darken_factor = 0.0  # no-op
 
-        # load data from pytmx
-        # Would use the following if not for the imagelayer issue: pytmx.util_pygame.load_pygame(tmx_filename)
-        self.tmx = pytmx.TiledMap(image_loader=pytmx.util_pygame.pygame_image_loader)
-        self.tmx.filename = tmx_filename
-        self.tmx.parse_xml(xml_root)
-
-        # Determine desired amount of pre-zoom
-        self.pre_zoom = 1.0
-        if desired_tile_size is not None:
-            self.pre_zoom = desired_tile_size / self.tmx.tilewidth
-
-        # Pre-zoom tile images
-        if self.pre_zoom != 1.0:
-            images: List[Optional[pygame.surface.Surface]] = []
-            for i in self.tmx.images:
-                if i is not None:
-                    images.append(pygame.transform.scale(i, self.tile_size))
-                else:
-                    images.append(None)
-            self.tmx.images = images
-
-        # Add an image of black
-        black_tile = self.tmx.images[-1].copy()
-        black_tile.fill("black")
-        self.tmx.images.append(black_tile)
+        # Load the map
+        self.tmx = self.load_pytmx_without_image_layers(tmx_filename)
+        # Modify the images for the needs of this implementation
+        self.modify_images()
 
         self.image_pad_tiles = image_pad_tiles.ceil()
-        self.reload_animations()
         self.overlay_layer_offset = 0
         self._base_tile_layers = self.calc_base_tile_layers()
         self._overlay_tile_layers = self.calc_overlay_tile_layers()
@@ -115,6 +96,86 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
             print('overlay_tile_layers: layer', idx, '=', l, flush=True)
         print('decoration layer', self.decoration_layer, flush=True)
         print('character layer', self.character_layer, flush=True)"""
+
+    @staticmethod
+    def load_pytmx_without_image_layers(tmx_filename: str) -> pytmx.TiledMap:
+        """Load the TiledMap while stripping invisible image layers.  These image layers are only
+        being used to compare the Tiled map to a template image while creating the map in Tiled.
+        The template images are not being controlled and pytmx errors out upon failing to load an
+        image, making this neccessary.
+
+        If removing the image layers wasn't neccessary, loading a Tiled map would instead be as
+        simple as follows:  pytmx.util_pygame.load_pygame(tmx_filename)
+        """
+        # Remove invisible image layers from the XML ElementTree
+        xml_root = ET.parse(tmx_filename).getroot()
+        for image_layer_element in xml_root.findall(".//imagelayer"):
+            if "visible" in image_layer_element.attrib and not pytmx.convert_to_bool(
+                image_layer_element.attrib["visible"]
+            ):
+                xml_root.remove(image_layer_element)
+            else:
+                logger.warning("Retaining visible image layer in Tiled map.")
+
+        # Load map into pytmx manually from the modified ElementTree
+        tmx = pytmx.TiledMap(image_loader=pytmx.util_pygame.pygame_image_loader)
+        tmx.filename = tmx_filename
+        tmx.parse_xml(xml_root)
+        return tmx
+
+    def set_lighting_mode(self, saturation_factor: float, blue_factor: float, darken_factor: float) -> bool:
+        """Set factors used in the alter_lighting for day/night lighting changes.  Return a boolean
+        indicating if the lighting mode was changed."""
+        was_changed = (
+            self.saturation_factor != saturation_factor
+            or self.blue_factor != blue_factor
+            or self.darken_factor != darken_factor
+        )
+        self.saturation_factor = saturation_factor
+        self.blue_factor = blue_factor
+        self.darken_factor = darken_factor
+        return was_changed
+
+    def modify_images(self) -> None:
+        """Modify the images for the usage in PaddedTiledMapData"""
+        # Determine desired amount of pre-zoom
+        self.pre_zoom = 1.0
+        if self.desired_tile_size is not None:
+            self.pre_zoom = self.desired_tile_size / self.tmx.tilewidth
+
+        # Pre-zoom tile images
+        if self.pre_zoom != 1.0:
+            images: list[Optional[pygame.surface.Surface]] = []
+            for i in self.tmx.images:
+                if i is not None:
+                    images.append(
+                        pygame.transform.scale(
+                            surface_effects.alter_lighting(
+                                i, self.saturation_factor, self.blue_factor, self.darken_factor
+                            ),
+                            self.tile_size,
+                        )
+                    )
+                else:
+                    images.append(None)
+            self.tmx.images = images
+
+        # FUTURE: Remove this after updating to a new pyscroll version with the fix.
+        # Manually clearing _animated_tile as this is otherwise missed in reload_animations.
+        # Fix in PR https://github.com/bitcraft/pyscroll/pull/73.
+        self._animated_tile.clear()
+
+        self.reload_animations()
+
+        # Add an image of black as the last image
+        black_tile = self.tmx.images[-1].copy()
+        black_tile.fill("black")
+        self.tmx.images.append(black_tile)
+
+    def reload_data(self) -> None:
+        """Reload the tiles"""
+        self.tmx = self.load_pytmx_without_image_layers(self.tmx.filename)
+        self.modify_images()
 
     def set_pc_character_tile(self, pos_dat_tile: Point) -> bool:
         """
@@ -166,7 +227,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self,
         pos_dat_tile: Point,
         layer_filter: Optional[Callable[[pytmx.pytmx.TiledObjectGroup], bool]] = None,
-    ) -> Optional[Tuple[int, Optional[str]]]:
+    ) -> Optional[tuple[int, Optional[str]]]:
         # Iterate through TiledOjbectGroup layers looking for any layer which the PC collides with tile
         for idx, layer in enumerate(self.tmx.layers):
             if not isinstance(layer, pytmx.pytmx.TiledObjectGroup):
@@ -185,7 +246,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                     return idx, layer.name
         return None
 
-    def set_tile_layers_to_render(self, layers_to_render: List[int]) -> None:
+    def set_tile_layers_to_render(self, layers_to_render: list[int]) -> None:
         if self.layers_to_render != layers_to_render:
             self.layers_to_render = layers_to_render
 
@@ -205,17 +266,17 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self.layers_to_render = new_layers
 
     @property
-    def all_tile_layers(self) -> List[int]:
+    def all_tile_layers(self) -> list[int]:
         return self._all_tile_layers
 
-    def calc_all_tile_layers(self) -> List[int]:
+    def calc_all_tile_layers(self) -> list[int]:
         return self.calc_base_tile_layers() + self.calc_overlay_tile_layers()
 
     @property
-    def base_tile_layers(self) -> List[int]:
+    def base_tile_layers(self) -> list[int]:
         return self._base_tile_layers
 
-    def calc_base_tile_layers(self) -> List[int]:
+    def calc_base_tile_layers(self) -> list[int]:
         tile_layers = []
         for layer_idx, layer in enumerate(self.tmx.layers):
             # Skip non-tile layers
@@ -236,10 +297,14 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         return self._character_layer
 
     @property
-    def overlay_tile_layers(self) -> List[int]:
+    def cloud_layer(self) -> int:
+        return len(self._all_tile_layers)
+
+    @property
+    def overlay_tile_layers(self) -> list[int]:
         return self._overlay_tile_layers
 
-    def calc_overlay_tile_layers(self) -> List[int]:
+    def calc_overlay_tile_layers(self) -> list[int]:
         tile_layers = []
         for layer_idx, layer in enumerate(self.tmx.layers):
             # Skip non-tile layers
@@ -251,7 +316,7 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
                 tile_layers.append(layer_idx + self.overlay_layer_offset)
         return tile_layers
 
-    def get_animations(self) -> Iterator[Tuple[int, Any]]:
+    def get_animations(self) -> Iterator[tuple[int, Any]]:
         for gid, d in self.tmx.tile_properties.items():
             try:
                 frames = d["frames"]
@@ -266,9 +331,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
 
         :param parent: pygame.surface.Surface
         :param alpha: preserve alpha channel or not
-        :return: None
         """
-        images = list()
+        images = []
         for image in self.tmx.images:
             try:
                 if alpha:
@@ -280,22 +344,15 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         self.tmx.images = images
 
     @property
-    def tile_size(self) -> Tuple[int, int]:
-        """This is the pixel size of tiles to be rendered
-
-        :return: (int, int)
-        """
+    def tile_size(self) -> tuple[int, int]:
+        """This is the pixel size of tiles to be rendered"""
         if self.pre_zoom == 1.0:
             return self.tmx.tilewidth, self.tmx.tileheight
-        else:
-            return int(self.pre_zoom * self.tmx.tilewidth), int(self.pre_zoom * self.tmx.tileheight)
+        return int(self.pre_zoom * self.tmx.tilewidth), int(self.pre_zoom * self.tmx.tileheight)
 
     @property
-    def map_size(self) -> Tuple[int, int]:
-        """This is the size of the map in tiles
-
-        :return: (int, int)
-        """
+    def map_size(self) -> tuple[int, int]:
+        """This is the size of the map in tiles"""
         # This size INCLUDES the padding
         return (
             self.tmx.width + 2 * self.image_pad_tiles[0],
@@ -303,11 +360,8 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         )
 
     @property
-    def visible_tile_layers(self) -> List[int]:
-        """This must return layer numbers, not objects
-
-        :return: [int, int, ...]
-        """
+    def visible_tile_layers(self) -> list[int]:
+        """This must return layer numbers, not objects"""
         return self.layers_to_render
 
     @property
@@ -320,23 +374,25 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """
         return (layer for layer in self.tmx.visible_layers if isinstance(layer, pytmx.TiledObjectGroup))
 
-    def get_tile_properties(self, x: int, y: int, layer_idx: int) -> Optional[Dict[str, str]]:
+    def get_tile_properties(self, x: int, y: int, l: int) -> Optional[dict[str, str]]:
+        layer_idx = l
         if layer_idx not in self.base_tile_layers:
             layer_idx -= self.overlay_layer_offset
         if not isinstance(self.tmx.layers[layer_idx], pytmx.pytmx.TiledTileLayer):
             return None
         x = min(max(0, x), self.tmx.width - 1)
         y = min(max(0, y), self.tmx.height - 1)
-        return cast(Optional[Dict[str, str]], self.tmx.get_tile_properties(x, y, layer_idx))
+        return cast(Optional[dict[str, str]], self.tmx.get_tile_properties(x, y, layer_idx))
 
     def _get_tile_image(
         self,
         x: int,
         y: int,
-        layer_idx: int,
+        l: int,
         image_indexing: bool = True,
         limit_to_visible: bool = True,
     ) -> Optional[pygame.surface.Surface]:
+        layer_idx = l
         if layer_idx not in self.visible_tile_layers and limit_to_visible:
             return None
         if layer_idx not in self.base_tile_layers:
@@ -375,13 +431,10 @@ class PaddedTiledMapData(pyscroll.data.PyscrollDataAdapter):  # type: ignore
         """Return Image by a custom ID
 
         Used for animations.  Not required for static maps.
-
-        :param id:
-        :return:
         """
         return cast(Optional[pygame.surface.Surface], self.tmx.images[id])
 
-    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[Tuple[int, int, int, pygame.surface.Surface]]:
+    def get_tile_images_by_rect(self, rect: pygame.Rect) -> Iterator[tuple[int, int, int, pygame.surface.Surface]]:
         """Speed up data access
 
         More efficient because data is accessed and cached locally
@@ -499,11 +552,11 @@ class ScrollTest:
                 self.running = False
                 break
 
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
                     break
-                elif event.key == pygame.K_EQUALS:
+                if event.key == pygame.K_EQUALS:
                     self.map_layer.zoom *= 2.0
                 elif event.key == pygame.K_MINUS:
                     self.map_layer.zoom *= 0.5

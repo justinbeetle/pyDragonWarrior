@@ -1,20 +1,22 @@
 #!/usr/bin/env python
 
 # Imports to support type annotations
-from typing import List, Optional
+from abc import ABC, abstractmethod
+from typing import Optional
 
-import abc
 import pygame
 
 from generic_utils.point import Point
-
-from pydw.game_dialog import GameDialog
+from pydw.dialog_manager import DialogManager
 from pydw.game_info import GameInfo
+from pydw.game_map_interface import GameMapInterface
+from pydw.game_mode import GameMode
 from pydw.game_types import (
     DialogReplacementVariables,
     DialogType,
     MapDecoration,
     MonsterInfo,
+    SpecialMonster,
     Tile,
 )
 from pydw.generic_game_state import GenericGameState
@@ -22,108 +24,126 @@ from pydw.hero_party import HeroParty
 from pydw.map_character_state import MapCharacterState
 
 
-class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
+class GameStateInterface(ABC, GenericGameState):
     def __init__(self, screen: pygame.surface.Surface) -> None:
         super().__init__(screen)
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_game_info(self) -> GameInfo:
-        pass
+        """Get the static game info"""
 
-    @abc.abstractmethod
+    @abstractmethod
+    def get_game_map(self) -> GameMapInterface:
+        """Get the game map"""
+
+    @abstractmethod
+    def get_pending_dialog(self) -> Optional[DialogType]:
+        """Get pending dialog"""
+
+    @abstractmethod
+    def clear_pending_dialog(self) -> None:
+        """Clear pending dialog"""
+
+    @abstractmethod
+    def get_tile_monsters(self, tile: Optional[Point] = None) -> list[str]:
+        """Get the list of monster names which may spawn at the specified position, or if not specified, the location
+        of the player character."""
+
+    @abstractmethod
+    def get_special_monster(self, tile: Optional[Point] = None) -> Optional[SpecialMonster]:
+        """Get the special monster at the specified position, or if not specified, the location of the player
+        character."""
+
+    @abstractmethod
     def get_tile_info(self, tile: Optional[Point]) -> Tile:
-        pass
+        """Get the tile info for the specified position, or if not specified, the location of the player character."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_image_pad_tiles(self) -> Point:
-        pass
+        """Get a point where the width and height indicate how many times to repeat the outermost tiles so that the
+        maps extend to the edge of the screen."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_hero_party(self) -> HeroParty:
-        pass
+        """Get the hero party."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def check_progress_markers(self, progress_marker: Optional[str], inverse_progress_marker: Optional[str]) -> bool:
-        pass
+        """Return True if the progress marker conditions are met.  Else return False."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_dialog_replacement_variables(self) -> DialogReplacementVariables:
-        pass
+        """Get the dialog replacement variables used based on the current game state."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_outside(self) -> bool:
-        pass
+        """Return True if the player character is outside a dungeon where the outside spell cannot be used and the
+        return spell can be used.  Else return False.  This is the negation of is_inside."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_inside(self) -> bool:
-        pass
+        """Return True if the player character is inside a dungeon where the outside spell can be used and the return.
+        spell cannot be used.  Else return False.  This is the negation of is_outside."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_in_combat(self) -> bool:
-        pass
+        """Return True if the player character is in combat.  Else return False."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_combat_allowed(self) -> bool:
-        pass
+        """Return True if the player character is in a location where a combat encounter could start.
+        Else return False."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_light_restricted(self) -> bool:
-        pass
+        """Return True if the entire map is not lit.  Else return False."""
 
     # TODO: Move this into the HeroParty
-    @abc.abstractmethod
+    @abstractmethod
     def get_map_name(self) -> str:
-        pass
+        """Get the name of the current map."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def set_map(
         self,
         new_map_name: str,
-        one_time_decorations: Optional[List[MapDecoration]] = None,
+        one_time_decorations: Optional[list[MapDecoration]] = None,
         respawn_decorations: bool = False,
     ) -> None:
-        pass
+        """Set to a new map."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_facing_locked_item(self) -> bool:
-        pass
+        """Return True is the player character is standing on or looking at (next tile over in the direction they are
+        facing) a locked item (ie a locked door or chest which requires a key to open).  Else return False."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_facing_openable_item(self) -> bool:
-        pass
+        """Return True is the player character is standing on or looking at (next tile over in the direction they are
+        facing) a locked or unlocked item (ie any door or chest).  Else return False."""
 
-    @abc.abstractmethod
+    @abstractmethod
     def open_locked_item(self) -> Optional[MapDecoration]:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def remove_decoration(self, decoration: MapDecoration) -> None:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
         pass
 
-    @abc.abstractmethod
-    def draw_map(
-        self,
-        flip_buffer: bool = True,
-        draw_background: bool = True,
-        draw_combat: bool = True,
-        draw_status: bool = True,
-        draw_only_character_sprites: bool = False,
-    ) -> None:
-        pass
+    @abstractmethod
+    def save(self, quick_save: bool = False) -> None:
+        """Save the state of the game to the filesystem.  If the save not associated dialog on load,
+        set quick_save to true."""
 
-    @abc.abstractmethod
-    def save(self) -> None:
-        pass
-
-    @abc.abstractmethod
+    @abstractmethod
     def get_win_size_pixels(self) -> Point:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def initiate_encounter(
         self,
         monster_info: Optional[MonsterInfo] = None,
@@ -131,18 +151,29 @@ class GameStateInterface(GenericGameState, metaclass=abc.ABCMeta):
         victory_dialog: Optional[DialogType] = None,
         run_away_dialog: Optional[DialogType] = None,
         encounter_music: Optional[str] = None,
-        message_dialog: Optional[GameDialog] = None,
     ) -> None:
         pass
 
-    @abc.abstractmethod
-    def handle_death(self, message_dialog: Optional[GameDialog] = None) -> None:
+    @abstractmethod
+    def handle_death(self) -> None:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def handle_quit(self, force: bool = False) -> None:
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def should_add_math_problems_in_combat(self) -> bool:
         pass
+
+    @abstractmethod
+    def get_dialog_manager(self) -> DialogManager:
+        """Get the dialog manager."""
+
+    @abstractmethod
+    def get_game_mode(self) -> GameMode:
+        """Get the game mode."""
+
+    @abstractmethod
+    def set_game_mode(self, game_mode: GameMode) -> None:
+        """Set the game mode."""

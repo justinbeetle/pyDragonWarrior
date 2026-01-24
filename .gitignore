@@ -88,8 +88,6 @@ env/
 venv/
 pyinstaller_venv/
 ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -107,6 +105,10 @@ venv.bak/
 # Ignore large files
 *.ogg
 *.wav
+
+# Temporary files
+*.bak
+*.swp
 
 # Ignore archived saves
 saves
