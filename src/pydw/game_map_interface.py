@@ -85,6 +85,7 @@ class GameMapInterface(metaclass=abc.ABCMeta):
 
     def compute_npc_path(self, start: Point, goal: Point, verbose: bool = False) -> Optional[list[Point]]:
         """Compute a path from start to goal for an NPC using A* search"""
+        # TODO: Move this somewhere else
         if verbose:
             print(f"in compute_npc_path; start={start}; goal={goal}", flush=True)
 

@@ -150,8 +150,6 @@ class GameDialogEvaluator:
         # Clear event queue
         game_events.clear_events()
 
-        # AudioPlayer().play_sound('prompt')
-
         is_awaiting_acknowledgement = True
         is_waiting_indicator_drawn = False
         frame_count = 0
@@ -208,8 +206,6 @@ class GameDialogEvaluator:
         message_dialog.prompt_for_user_text(prompt, allowed_input)
         self.wait_for_message_to_fully_display(message_dialog)
 
-        # AudioPlayer().play_sound('prompt')
-
         is_waiting_for_user_input = True
         start_time = time.time()
         while self.game_state.is_running and is_waiting_for_user_input:
@@ -254,8 +250,6 @@ class GameDialogEvaluator:
         return message_dialog.get_user_text(), stop_time - start_time
 
     def get_menu_result(self, menu_dialog: GameDialog, allow_quit: bool = True) -> Optional[str]:
-        # AudioPlayer().play_sound('prompt')
-
         menu_result = None
         while self.game_state.is_running and menu_result is None:
             events = game_events.get_events(True)

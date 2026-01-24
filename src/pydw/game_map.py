@@ -646,8 +646,18 @@ class GameMap(GameMapInterface):
         return decoration
 
     def get_npc_to_talk_to(self) -> Optional[NpcState]:
+        """Get the state of an NPC for the player character to talk to, if there is
+        one present in the field of view of the player.  This logic handles the case
+        where the player is facing a tile where an NPC is, is about to be, or was very
+        recently.  If the player is facing a tile or decoration than can be talked over,
+        this also includes checking the next adjacent tile."""
+
         def get_npc_sprite_at_tile(pos_dat_tile: Point) -> Optional[NpcState]:
+            """Get the state of an NPC that is, is about to be, or very recently was
+            as the specified tile."""
+
             def get_npc_sprite_matching_lambda(npc_at_tile_func: Callable[[NpcState], bool]) -> Optional[NpcState]:
+                """Get the state of an NPC where the provided function returns true."""
                 for sprite in self.group:
                     if isinstance(sprite, NpcSprite) and npc_at_tile_func(sprite.character):
                         return sprite.character
@@ -714,13 +724,11 @@ class GameMap(GameMapInterface):
 
         return npc_to_talk_to
 
-    def get_npc_by_name(self, name: str) -> Optional[MapCharacterState]:
+    def get_npc_by_name(self, name: str) -> Optional[NpcState]:
+        """Get the state of an NPC by name, if present in the map."""
         for sprite in self.group:
-            if isinstance(sprite, NpcSprite):
-                npc_state = sprite.character
-                if name == npc_state.npc_info.name:
-                    return npc_state
-
+            if isinstance(sprite, NpcSprite) and name == sprite.character.npc_info.name:
+                return sprite.character
         return None
 
     def get_tile_degrees_of_freedom(
@@ -729,6 +737,9 @@ class GameMap(GameMapInterface):
         enforce_npc_hp_penalty_limit: bool,
         prev_tile: Optional[Point],
     ) -> int:
+        """Calculate the number of the adjacent tiles to which an NPC could move.  This is
+        used to limit NPCs from moving into locations (like a hallway) with limited degrees
+        of freedom in which they could obstruct the player character."""
         degrees_of_freedom = 0
         for x in [tile.x - 1, tile.x + 1]:
             if self.can_move_to_tile(Point(x, tile.y), enforce_npc_hp_penalty_limit, False, True, prev_tile):
