@@ -163,7 +163,7 @@ class AudioPlayer:
         self._initialized = True
 
         if not pygame.mixer.get_init():
-            pygame.mixer.init(buffer=4096)
+            pygame.mixer.init()
         pygame.mixer.set_num_channels(32)
 
         self.music_path = "./"
@@ -183,10 +183,9 @@ class AudioPlayer:
 
     @staticmethod
     def pre_init() -> None:
-        """Call this method prior to pygame.init(), which calls pygame.mixer.init(),
-        to increase the buffer size and eliminate crackling audio when initially playing
-        music or a sound."""
-        pygame.mixer.pre_init(buffer=4096)
+        """Call this method prior to pygame.init(), which calls pygame.mixer.init(), to
+        set any desired settings for pygame.mixer.init() via pygame.mixer.pre_init()."""
+        pygame.mixer.pre_init()
 
     def set_music_path(self, music_path: str) -> None:
         """Set the base path for music files."""
@@ -328,6 +327,7 @@ class AudioPlayer:
         """Entry point for the persistent background music thread which plays the current
         music track, if any, until the the player is terminated."""
         first_time = True
+        first_time_for_track = True
         current_music_rel_file_path1: Optional[str] = None
         current_music_rel_file_path2: Optional[str] = None
         failed_to_play = set()
@@ -341,18 +341,27 @@ class AudioPlayer:
                 ):
                     current_music_rel_file_path1 = self.music_rel_file_path1
                     current_music_rel_file_path2 = self.music_rel_file_path2
-                    first_time = True
+                    first_time_for_track = True
 
                 if self.music_rel_file_path1 is not None and self.music_rel_file_path2 is not None:
                     # load the music
-                    if first_time:
-                        first_time = False
+                    if first_time_for_track:
+                        first_time_for_track = False
                     else:
                         self.music_rel_file_path1 = self.music_rel_file_path2
                         self.music_file_start1_sec = self.music_file_start2_sec
 
                     try:
                         pygame.mixer.music.load(self.music_rel_file_path1)
+                        if first_time:
+                            # The first time music is played it crackles, so lets get
+                            # this out of the way quietly
+                            pygame.mixer.music.set_volume(0.0)
+                            pygame.mixer.music.play(start=self.music_file_start1_sec)
+                            pygame.time.wait(250)
+                            pygame.mixer.music.stop()
+                            pygame.mixer.music.set_volume(1.0)
+                            first_time = False
 
                         # start playing
                         pygame.mixer.music.play(start=self.music_file_start1_sec)

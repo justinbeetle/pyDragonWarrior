@@ -8,6 +8,8 @@
    <MapLocation x="5"  y="8"  name="girl outside blacksmith"/>
    <MapLocation x="11" y="27" name="dying guard"/>
    <MapLocation x="29" y="14" name="guard at east gate"/>
+   <MapLocation x="29" y="14" name="guard at east gate (north)"/>
+   <MapLocation x="29" y="14" name="guard at east gate (south)"/>
    <MapLocation x="21" y="11" name="boy in house"/>
    <MapLocation x="25" y="11" name="healer"/>
    <MapLocation x="29" y="2"  name="warrior in north east corner of town"/>

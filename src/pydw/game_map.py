@@ -312,18 +312,12 @@ class NpcSprite(CharacterSprite):
                         # Randomly choose a waypoint
                         self.destination_waypoint = random.choice(self.character.npc_info.waypoints)
                         new_waypoint = True
-                        print(
-                            f"NPC moving to waypoint {self.destination_waypoint}",
-                            flush=True,
-                        )
+                        logger.debug("NPC moving to waypoint %s", self.destination_waypoint)
 
                     # Determine path to waypoint
                     path = self.game_map.compute_npc_path(self.character.curr_pos_dat_tile, self.destination_waypoint)
                     if new_waypoint:
-                        print(
-                            f"NPC path to waypoint={path} from {self.character.curr_pos_dat_tile}",
-                            flush=True,
-                        )
+                        logger.debug("NPC path to waypoint=%s from %s", path, self.character.curr_pos_dat_tile)
                     if path is not None and 0 < len(path):
                         self.character.dest_pos_dat_tile = path[0]
                         self.character.direction = Direction.get_direction(
@@ -696,7 +690,7 @@ class GameMap(GameMapInterface):
                         and decoration.overlaps(talk_dest_dat_tile)
                     ):
                         can_talk_over = False
-                        # print('Talking over not allowed: decoration', decoration, flush=True)
+                        # logger.debug("Talking over not allowed: decoration %s", decoration)
                         break
             # Check if a decoration allows talking over a tile to where talking was otherwise prevented
             if not can_talk_over:
@@ -707,7 +701,7 @@ class GameMap(GameMapInterface):
                         and decoration.overlaps(talk_dest_dat_tile)
                     ):
                         can_talk_over = True
-                        # print('Talking over allowed: decoration', decoration, flush=True)
+                        # logger.debug("Talking over allowed: decoration %s", decoration)
                         break
 
             if can_talk_over:
@@ -747,7 +741,7 @@ class GameMap(GameMapInterface):
         for y in [tile.y - 1, tile.y + 1]:
             if self.can_move_to_tile(Point(tile.x, y), enforce_npc_hp_penalty_limit, False, True, prev_tile):
                 degrees_of_freedom += 1
-        # print('DOF for tile', tile, 'is', degrees_of_freedom, flush=True)
+        # logger.debug("DOF for tile %s is %s", tile, degrees_of_freedom)
         return degrees_of_freedom
 
     def can_move_to_tile(
@@ -763,27 +757,27 @@ class GameMap(GameMapInterface):
         # Check if native tile allows movement
         if 0 <= tile.x < self.size().w and 0 <= tile.y < self.size().h:
             movement_allowed = self.get_tile_info(tile).walkable
-            # print('Tile info =', self.get_tile_info(tile), self.get_tile_info(tile), flush=True)
+            # logger.debug("Tile info = %s", self.get_tile_info(tile))
 
         # Check if a decoration prevents movement to the tile that otherwise allowed movement
         if movement_allowed:
             for decoration in self.map_decorations:
                 if decoration.type is not None and decoration.type.walkable is False and decoration.overlaps(tile):
                     movement_allowed = False
-                    # print('Movement not allowed: decoration not walkable', decoration, flush=True)
+                    # logger.debug("Movement not allowed: decoration not walkable %s", decoration)
                     break
         # Check if a decoration allows movement to a tile to which movement was otherwise prevented
         if not movement_allowed:
             for decoration in self.map_decorations:
                 if decoration.type is not None and decoration.type.walkable is True and decoration.overlaps(tile):
                     movement_allowed = True
-                    # print('Movement allowed: decoration walkable', decoration, flush=True)
+                    # logger.debug("Movement allowed: decoration walkable %s", decoration)
                     break
 
         if movement_allowed:
             if movement_allowed and enforce_npc_hp_penalty_limit and self.get_tile_info(tile).hp_penalty != 0:
                 movement_allowed = False
-                # print('Movement not allowed: NPC HP penalty limited', flush=True)
+                # logger.debug("Movement not allowed: NPC HP penalty limited")
             if (
                 movement_allowed
                 and enforce_npc_hp_penalty_limit
@@ -791,28 +785,28 @@ class GameMap(GameMapInterface):
                 and self.is_interior(tile) != self.is_interior(prev_tile)
             ):
                 movement_allowed = False
-                # print('Movement not allowed: NPC cannot move between interior and exterior tiles', flush=True)
+                # logger.debug("Movement not allowed: NPC cannot move between interior and exterior tiles")
             if (
                 movement_allowed
                 and enforce_npc_dof_limit
                 and self.get_tile_degrees_of_freedom(tile, enforce_npc_hp_penalty_limit, prev_tile) < 2
             ):
                 movement_allowed = False
-                # print('Movement not allowed: NPC degree-of-freedom limit not met', flush=True)
+                # logger.debug("Movement not allowed: NPC degree-of-freedom limit not met")
             if movement_allowed and is_npc:
                 for hero in self.game_state.get_hero_party().members:
                     if tile == hero.curr_pos_dat_tile or tile == hero.dest_pos_dat_tile:
                         movement_allowed = False
-                        # print('Movement not allowed: PC in the way', flush=True)
+                        # logger.debug("Movement not allowed: PC in the way")
                         break
             if movement_allowed:
                 for npc in self.npcs:
                     if tile == npc.curr_pos_dat_tile or tile == npc.dest_pos_dat_tile:
                         movement_allowed = False
-                        # print('Movement not allowed: NPC in the way', flush=True)
+                        # logger.debug("Movement not allowed: NPC in the way")
                         break
         # else:
-        #     print('Movement not allowed: tile not walkable', flush=True)
+        #     logger.debug("Movement not allowed: tile not walkable")
 
         # If the PC is stuck somewhere it shouldn't be able to go, allow it to escape
         if not movement_allowed and not is_npc and tile != self.game_state.get_hero_party().get_curr_pos_dat_tile():
@@ -830,7 +824,7 @@ class GameMap(GameMapInterface):
             or curr_pos_dat_tile.x > self.size().w - 1
             or curr_pos_dat_tile.y > self.size().h - 1
         ):
-            print("ERROR: Invalid hero position, defaulting to middle tile", flush=True)
+            logger.error("ERROR: Invalid hero position, defaulting to middle tile")
             self.game_state.get_hero_party().set_pos(Point(self.size().w // 2, self.size().h // 2), Direction.SOUTH)
 
     def is_interior(self, pos_dat_tile: Optional[Point] = None) -> bool:
@@ -1045,7 +1039,7 @@ class GameMap(GameMapInterface):
             if backgrounds is not None:
                 if background in backgrounds:
                     return background_prefix + background
-                # print(f'WARN: No encounter background for {background} at {tile}', flush=True)
+                # logger.warning("WARN: No encounter background for %s at %s", background, tile)
 
                 background = tile_name + vegetation_suffix
                 if background in backgrounds:
@@ -1057,7 +1051,7 @@ class GameMap(GameMapInterface):
 
         # For all other tiles, just use the tile name
         if tile_name == "DEFAULT TILE":
-            print("WARN: default tile at", tile, flush=True)
+            logger.warning("WARN: default tile at %s", tile)
 
         return tile_name
 
@@ -1115,10 +1109,7 @@ class GameMap(GameMapInterface):
                     gate_background.image_url,
                 )
 
-        print(
-            f"WARN: No encounter background for {encounter_background_name} at {tile}",
-            flush=True,
-        )
+        logger.warning("WARN: No encounter background for %s at %s", encounter_background_name, tile)
         return None
 
     def dump_encounter_backgrounds(self) -> None:

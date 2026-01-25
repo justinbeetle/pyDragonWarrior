@@ -21,6 +21,8 @@
    <MapLocation x="31" y="22" name="girl outside blacksmith"/>
    <MapLocation x="40" y="45" dir="WEST" name="dying guard"/>
    <MapLocation x="65" y="28" dir="EAST" name="guard at east gate"/>
+   <MapLocation x="65" y="24" dir="EAST" name="guard at east gate (north)"/>
+   <MapLocation x="65" y="32" dir="EAST" name="guard at east gate (south)"/>
    <MapLocation x="51" y="24" name="boy in house"/>
    <MapLocation x="56" y="25" name="healer"/>
    <MapLocation x="66" y="7"  name="warrior in north east corner of town"/>

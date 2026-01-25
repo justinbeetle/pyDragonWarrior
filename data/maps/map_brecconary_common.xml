@@ -11,8 +11,10 @@
       <DialogAssert type="LACKS_ITEM" name="PM_Rescued_Princess"><Dialog>"Who touches me?  I see nothing, nor can I hear."</Dialog></DialogAssert>
       <Dialog>"Tell King Lorik that the search for his daughter hath failed.  I am almost gone..."</Dialog></NonPlayerCharacter>
 
-   <NonPlayerCharacter type="guard" location="guard at east gate" dir="SOUTH" walking="no">
-      <Dialog>"See King Lorik when thy experience levels are raised."</Dialog></NonPlayerCharacter>
+   <NonPlayerCharacter type="guard" location="guard at east gate" dir="SOUTH" walking="yes">
+      <Dialog>"See King Lorik when thy experience levels are raised."</Dialog>
+      <Waypoint location="guard at east gate (north)"/>
+      <Waypoint location="guard at east gate (south)"/></NonPlayerCharacter>
 
    <NonPlayerCharacter type="boy" location="boy in house" dir="SOUTH" walking="no">
       <Dialog>"There is a town where magic keys can be purchased."</Dialog></NonPlayerCharacter>
