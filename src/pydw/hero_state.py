@@ -24,6 +24,7 @@ from pydw.game_types import (
     Weapon,
 )
 from pydw.map_character_state import MapCharacterState
+from pygame_utils.light_engine import Light
 
 
 class HeroState(MapCharacterState, CombatCharacterState):
@@ -55,6 +56,14 @@ class HeroState(MapCharacterState, CombatCharacterState):
         self.unequipped_items: dict[ItemType, int] = {}  # dict where keys are items and values are the item counts
 
         self.hp_regen_tiles_remaining: Optional[int] = None
+
+        self.light_diameter_tiles: Optional[float] = None  # None indicates the light diameter is unlimited
+        self.light_diameter_tiles_decay_per_step = 0.0  # None indicates the light diameter is unlimited
+        self.light_position_jitter_tiles = Point(0.0, 0.0)
+        self.light_color: Optional[tuple[int, int, int, int]] = None
+        self.ambient_light_color: Optional[tuple[int, int, int, int]] = None
+        self.ambient_light: Optional[Light] = None
+        self.light: Optional[Light] = None
 
     @staticmethod
     def create_null(name: str = "null") -> HeroState:
@@ -441,6 +450,7 @@ class HeroState(MapCharacterState, CombatCharacterState):
         return 0
 
     def inc_step_counter(self) -> None:
+        # Apply health regen over time
         if self.armor is not None and self.armor.hp_regen_tiles is not None:
             if self.hp_regen_tiles_remaining is None:
                 self.hp_regen_tiles_remaining = self.armor.hp_regen_tiles
@@ -448,6 +458,26 @@ class HeroState(MapCharacterState, CombatCharacterState):
             if 0 >= self.hp_regen_tiles_remaining:
                 self.hp = min(self.max_hp, self.hp + 1)
                 self.hp_regen_tiles_remaining = self.armor.hp_regen_tiles
+
+        # Decay the light radius effect over time
+        if self.light_diameter_tiles is not None and self.light_diameter_tiles_decay_per_step > 0:
+            self.light_diameter_tiles = max(0.5, self.light_diameter_tiles - self.light_diameter_tiles_decay_per_step)
+
+    def set_light_diameter(
+        self,
+        diameter_tiles: float,
+        decay_steps: Optional[int],
+        light_color: Optional[tuple[int, int, int, int]],
+        ambient_light_color: Optional[tuple[int, int, int, int]],
+    ) -> None:
+        self.light_diameter_tiles = diameter_tiles
+        self.light_diameter_tiles_decay_per_step = 2 / decay_steps if decay_steps else 0
+        self.light_color = light_color
+        self.ambient_light_color = ambient_light_color
+
+    def unset_light_diameter(self) -> None:
+        self.light_diameter_tiles = None
+        self.light_diameter_tiles_decay_per_step = 0.0
 
     def __str__(self) -> str:
         return (

@@ -282,7 +282,6 @@ class DialogCheck:
     is_assert: bool = True
 
 
-# Conditionally branch dialog if the check condition is not met
 @dataclass
 class DialogAction:
     type: DialogActionEnum
@@ -301,6 +300,8 @@ class DialogAction:
     category: ActionCategoryTypeEnum = ActionCategoryTypeEnum.PHYSICAL  # TODO: Change to list of categories?
     target_type: TargetTypeEnum = TargetTypeEnum.SINGLE_ALLY
     problem: Optional[Problem] = None
+    color: Optional[tuple[int, int, int, int]] = None
+    ambient_color: Optional[tuple[int, int, int, int]] = None
 
 
 # Type to aggregate all the different dialog replacement variables
@@ -459,7 +460,7 @@ class Map(NamedTuple):
     dat: list[str]
     overlay_dat: Optional[list[str]]
     music: str
-    light_diameter: Optional[int]
+    light_diameter_tiles: Optional[float]
     leaving_transition: Optional[OutgoingTransition]
     point_transitions: list[OutgoingTransition]
     incoming_transitions: list[IncomingTransition]

@@ -240,6 +240,7 @@ class HeroSprite(CharacterSprite):
     def __init__(self, hero: HeroState, hero_party: HeroParty, game_map: GameMapInterface) -> None:
         self.hero_party = hero_party
         super().__init__(hero, game_map)
+        self.last_phase = self.phase
 
     def get_character_movement_speed_factor(self) -> float:
         """Get the movement speed factor for the slowest member of the hero party"""
@@ -273,6 +274,14 @@ class HeroSprite(CharacterSprite):
         return character_images[self.character.direction][
             self.get_phase_image_index() % len(character_images[self.character.direction])
         ]
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        """In update, adjust the character's light jiiter position on a phase change."""
+        if self.character.light_diameter_tiles is not None and self.phase != self.last_phase:
+            self.last_phase = self.phase
+            self.character.light_position_jitter_tiles = Point(random.gauss(0.0, 0.01), random.gauss(0.0, 0.01))
+
+        super().update(args, kwargs)
 
 
 class NpcSprite(CharacterSprite):
@@ -497,12 +506,14 @@ class GameMap(GameMapInterface):
         if use_dynamic_lighting:
             light_engine_adapter = GameMapLightEngineAdapter(self.game_state, self, self.map_layer)
             light_engine_adapter.apply_dynamic_lighting(surface)
-        self._apply_lighting_legacy(surface)
+        else:
+            self._apply_lighting_legacy(surface)
 
     def _apply_lighting_legacy(self, surface: pygame.surface.Surface) -> None:
-        light_diameter = self.game_state.get_hero_party().light_diameter
-        if light_diameter is not None:
-            light_radius_px = int(light_diameter * self.game_state.get_game_info().tile_size_pixels / 2)
+        light_radius_px = 0
+        for hero in self.game_state.get_hero_party().members:
+            if hero.light_diameter_tiles is not None:
+                light_radius_px = int(hero.light_diameter_tiles * self.game_state.get_game_info().tile_size_pixels / 2)
         else:
             return
 
@@ -942,7 +953,7 @@ class GameMap(GameMapInterface):
         self, tile: Optional[Point] = None, backgrounds: Optional[list[str]] = None
     ) -> str:
         # Handle the background for dark maps
-        if self.game_state.get_hero_party().light_diameter is not None:
+        if self.map.light_diameter_tiles is not None:
             return "darkness"
 
         # Determine the base tile

@@ -81,7 +81,7 @@ class GameMapViewer:
         game_map = GameMap(self.mock_game_state, map_name)
 
         # Center hero party in map
-        self.hero_party.light_diameter = self.game_info.maps[map_name].light_diameter
+        self.hero_party.members[0].light_diameter_tiles = self.game_info.maps[map_name].light_diameter_tiles
         self.hero_party.set_pos(Point(-1, -1), Direction.SOUTH)
         game_map.bounds_check_pc_position()
 
@@ -98,11 +98,13 @@ class GameMapViewer:
                     elif event.key == pygame.K_RETURN:
                         done_with_map = True
                     elif event.key == pygame.K_EQUALS:
-                        if self.hero_party.light_diameter is not None:
-                            self.hero_party.light_diameter += 1
+                        if self.hero_party.members[0].light_diameter_tiles is not None:
+                            self.hero_party.members[0].light_diameter_tiles += 1
                     elif event.key == pygame.K_MINUS:
-                        if self.hero_party.light_diameter is not None:
-                            self.hero_party.light_diameter = max(1, self.hero_party.light_diameter - 1)
+                        if self.hero_party.members[0].light_diameter_tiles is not None:
+                            self.hero_party.members[0].light_diameter_tiles = max(
+                                1, self.hero_party.members[0].light_diameter_tiles - 1
+                            )
                     elif event.key == pygame.K_e:
                         if game_map.is_facing_locked_item():
                             print("Opened door", flush=True)

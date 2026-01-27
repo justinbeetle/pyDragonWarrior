@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import os
 import random
 import xml.dom.minidom
@@ -35,6 +36,8 @@ from pydw.monster_state import MonsterState
 from pydw.npc_state import NpcState
 from pygame_utils import game_events
 from pygame_utils.audio_player import AudioPlayer
+
+logger = logging.getLogger(__name__)
 
 
 class GameState(GameStateInterface, DialogManagerMediator):
@@ -110,22 +113,23 @@ class GameState(GameStateInterface, DialogManagerMediator):
         # diameters between the old and new maps are different and either the old map default light
         # diameters was unlimited or the current diameter is less than the default light diameter of the
         # new map.
-        new_map_light_diameter = self.game_info.maps[new_map_name].light_diameter
-        if (
-            not old_map_name
-            or new_map_light_diameter is None
-            or (
-                new_map_light_diameter != self.game_info.maps[old_map_name].light_diameter
-                and (
-                    self.game_info.maps[old_map_name].light_diameter is None
-                    or (
-                        self.hero_party.light_diameter is not None
-                        and self.hero_party.light_diameter < new_map_light_diameter
+        new_map_light_diameter_tiles = self.game_info.maps[new_map_name].light_diameter_tiles
+        for hero in self.hero_party.members:
+            if (
+                not old_map_name
+                or new_map_light_diameter_tiles is None
+                or (
+                    new_map_light_diameter_tiles != self.game_info.maps[old_map_name].light_diameter_tiles
+                    and (
+                        self.game_info.maps[old_map_name].light_diameter_tiles is None
+                        or (
+                            hero.light_diameter_tiles is not None
+                            and hero.light_diameter_tiles < new_map_light_diameter_tiles
+                        )
                     )
                 )
-            )
-        ):
-            self.hero_party.light_diameter = new_map_light_diameter
+            ):
+                hero.light_diameter_tiles = new_map_light_diameter_tiles
 
         # If changing maps and set to respawn decorations, clear the history of removed decorations
         if respawn_decorations:
@@ -271,6 +275,40 @@ class GameState(GameStateInterface, DialogManagerMediator):
                     else:
                         print("ERROR: Unsupported item", item_name, flush=True)
 
+                # Load state related to light diameter
+                if "light_diameter_tiles" in member_element.attrib:
+                    member.light_diameter_tiles = float(member_element.attrib["light_diameter_tiles"])
+                if "light_diameter_tiles_decay_per_step" in xml_root.attrib:
+                    member.light_diameter_tiles_decay_per_step = float(
+                        xml_root.attrib["light_diameter_tiles_decay_per_step"]
+                    )
+                if "light_color" in member_element.attrib:
+                    color_values = member_element.attrib["light_color"].split(",")
+                    if len(color_values) == 4:
+                        member.light_color = (
+                            int(color_values[0]),
+                            int(color_values[1]),
+                            int(color_values[2]),
+                            int(color_values[3]),
+                        )
+                    else:
+                        logger.error(
+                            "Failed to parse the following as a color: %s", member_element.attrib["light_color"]
+                        )
+                if "ambient_light_color" in member_element.attrib:
+                    color_values = member_element.attrib["ambient_light_color"].split(",")
+                    if len(color_values) == 4:
+                        member.ambient_light_color = (
+                            int(color_values[0]),
+                            int(color_values[1]),
+                            int(color_values[2]),
+                            int(color_values[3]),
+                        )
+                    else:
+                        logger.error(
+                            "Failed to parse the following as a color: %s", member_element.attrib["ambient_light_color"]
+                        )
+
                 party_members.append(member)
 
             # Parse the party members
@@ -339,26 +377,32 @@ class GameState(GameStateInterface, DialogManagerMediator):
 
             self.set_map(map, init=True)
 
-            # Load state related to light diameter
-            if "light_diameter" in xml_root.attrib:
-                self.hero_party.light_diameter = int(xml_root.attrib["light_diameter"])
-            if "light_diameter_decay_steps" in xml_root.attrib:
-                self.hero_party.light_diameter_decay_steps = int(xml_root.attrib["light_diameter_decay_steps"])
-            if "light_diameter_decay_steps_remaining" in xml_root.attrib:
-                self.hero_party.light_diameter_decay_steps_remaining = int(
-                    xml_root.attrib["light_diameter_decay_steps_remaining"]
-                )
+            # Load state related to light diameter for legacy saves.  In legacy saves, light diameter
+            # was at the party level instead of the party member level.
+            # FUTURE: At some point, remove this logic providing legacy save support.
+            if "light_diameter" in xml_root.attrib and "light_diameter_decay_steps" in xml_root.attrib:
+                for hero in self.hero_party.members:
+                    hero.set_light_diameter(
+                        float(xml_root.attrib["light_diameter"]),
+                        int(xml_root.attrib["light_diameter_decay_steps"]),
+                        None,
+                        None,
+                    )
 
             self.pending_dialog = self.game_info.parse_dialog(xml_root)
 
         # TODO: Remove Mocha from party
         """
-        mocha = HeroState(self.game_info.character_types['mocha'],
-                          self.game_info.initial_hero_pos_dat_tile,
-                          self.game_info.initial_hero_pos_dir,
-                          'Mocha',
-                          0)
+        mocha = HeroState(
+            self.game_info.character_types["mocha"],
+            self.game_info.initial_hero_pos_dat_tile,
+            self.game_info.initial_hero_pos_dir,
+            "Mocha",
+            0,
+        )
+        mocha.light_diameter_tiles = 12
         self.hero_party.add_member(mocha)
+        self.set_map(self.get_map_name())
         """
 
         # Initialize the default dialog font color based on the state of the hero party
@@ -373,16 +417,6 @@ class GameState(GameStateInterface, DialogManagerMediator):
         xml_root.attrib["name"] = self.hero_party.main_character.name
         xml_root.attrib["map"] = self.get_map_name()
         xml_root.attrib["gp"] = str(self.hero_party.gp)
-
-        # Save state related to light diameter
-        if self.hero_party.light_diameter is not None:
-            xml_root.attrib["light_diameter"] = str(self.hero_party.light_diameter)
-        if self.hero_party.light_diameter_decay_steps is not None:
-            xml_root.attrib["light_diameter_decay_steps"] = str(self.hero_party.light_diameter_decay_steps)
-        if self.hero_party.light_diameter_decay_steps_remaining is not None:
-            xml_root.attrib["light_diameter_decay_steps_remaining"] = str(
-                self.hero_party.light_diameter_decay_steps_remaining
-            )
 
         # Save state related to repel monsters
         xml_root.attrib["repel_monsters"] = "yes" if self.hero_party.repel_monsters else "no"
@@ -446,6 +480,18 @@ class GameState(GameStateInterface, DialogManagerMediator):
                     item_element = ET.SubElement(items_element, "Item")
                     item_element.attrib["name"] = item.name
                     item_element.attrib["count"] = str(item_count)
+
+            # Save state related to light diameter
+            if member.light_diameter_tiles is not None:
+                member_element.attrib["light_diameter_tiles"] = str(member.light_diameter_tiles)
+            if member.light_diameter_tiles_decay_per_step is not None:
+                member_element.attrib["light_diameter_tiles_decay_per_step"] = str(
+                    member.light_diameter_tiles_decay_per_step
+                )
+            if member.light_color is not None:
+                member_element.attrib["light_color"] = ",".join([str(x) for x in member.light_color])
+            if member.ambient_light_color is not None:
+                member_element.attrib["ambient_light_color"] = ",".join([str(x) for x in member.ambient_light_color])
 
         progress_markers_element = ET.SubElement(xml_root, "ProgressMarkers")
         for progress_marker in self.hero_party.progress_markers:
@@ -574,11 +620,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         return self.game_map.get_tile_monsters(tile)
 
     def is_light_restricted(self) -> bool:
-        return (
-            self.hero_party.light_diameter is not None
-            and self.hero_party.light_diameter <= self.win_size_tiles.w
-            and self.hero_party.light_diameter <= self.win_size_tiles.h
-        )
+        return self.game_map.map.light_diameter_tiles is not None
 
     def is_outside(self) -> bool:
         return self.game_info.maps[self.get_map_name()].is_outside

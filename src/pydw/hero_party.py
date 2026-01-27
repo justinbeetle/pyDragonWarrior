@@ -22,10 +22,6 @@ class HeroParty(CombatParty):
         self.gp = 0
         self.progress_markers: list[str] = []
 
-        self.light_diameter: Optional[float] = None  # None indicates the light diameter is unlimited
-        self.light_diameter_decay_steps: Optional[int] = None
-        self.light_diameter_decay_steps_remaining: Optional[int] = None
-
         self.repel_monsters = False
         self.repel_monsters_decay_steps_remaining: Optional[int] = None
         self.repel_monster_fade_dialog: Optional[DialogType] = None
@@ -255,13 +251,6 @@ class HeroParty(CombatParty):
         for member in self.members:
             if member.is_alive():
                 member.inc_step_counter()
-
-        # Decay the light radius effect over time
-        if self.light_diameter is not None and self.light_diameter_decay_steps_remaining is not None:
-            self.light_diameter_decay_steps_remaining -= 1
-            if 0 >= self.light_diameter_decay_steps_remaining:
-                self.light_diameter = max(0.5, self.light_diameter - 2)
-                self.light_diameter_decay_steps_remaining = self.light_diameter_decay_steps
 
         # Decay the repel monsters effect over time
         if self.repel_monsters and self.repel_monsters_decay_steps_remaining is not None:

@@ -45,26 +45,17 @@ class GameMapLightEngineAdapter:
         The dynamic lighting is applied onto an already rendered map (in screen coordinates)
         so when determining where to apply shadows based on the map the coordinates need to
         be translated from world to screen coordinates."""
-        light_diameter_tiles = self.game_state.get_hero_party().light_diameter
-        if light_diameter_tiles is None:
-            return
 
-        # Apply ambient light
-        light_surface = pygame.Surface(surface.get_size())
-        ambient_light = pygame.Surface(light_surface.get_size()).convert_alpha()
-        ambient_light.fill((255, 255, 255, 50))
-        light_surface.blit(ambient_light)
-
-        # Add point lights
-        def add_point_light(
+        def add_point_lights(
             light_position_tiles: Point,
             light_radius_px: int,
-            color: Optional[pygame.Color] = None,
-            intensity: float = 1.0,
+            ambient_light: Optional[Light],
+            light: Optional[Light],
         ) -> None:
-            """Add a point light in the specified position casting light of the specified radius,
-            color, and intensity.  The real work in doing this is determining where shadows should
-            be cast, which is a factor of the location of wall tiles relative to the light.  In
+            """Optionally add both an ambient and non-ambient point light sources at the specified
+            position and radius using the color and intensity settings of the provided lights.  The
+            real work in doing this is determining where shadows should be cast for the non-ambient
+            light, which is a factor of the location of wall tiles relative to the light.  In
             maintaining the lighting feel of Dragon Warrior, we want the light to propagate into the
             lower half of upper wall tiles, the upper half of lower wall tiles, and the entirety of
             left and right wall tiles.
@@ -88,11 +79,15 @@ class GameMapLightEngineAdapter:
             it ands recntangles to the list shadow_rects for the sides away from the light source
             that are not adjacent to another visible wall.
             """
-            if color is None:
-                color = pygame.Color("white")
             # Calculate light posisition in screen pixels.
             light_map_pos_px = (self.image_pad_tiles + light_position_tiles) * self.tile_size_pixels
             light_screen_pos_px = self.translate_point_world_to_screen(light_map_pos_px)
+
+            if ambient_light:
+                ambient_light.add_light(light_surface, [], light_screen_pos_px)
+
+            if light is None:
+                return
 
             light_radius_tiles = light_radius_px / self.tile_size_pixels
             min_x = math.floor(max(0, light_position_tiles.x - light_radius_tiles))
@@ -283,24 +278,73 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                         if not is_wall(tile.get_right()):
                             add_shadow_right(tile)
 
-            light = Light(light_radius_px, color, intensity)
             light.add_light(light_surface, shadow_rects, light_screen_pos_px)
 
-        # Add player character light
-        add_point_light(
-            self.game_state.get_hero_party().get_curr_pos_dat_tile()
-            + self.game_state.get_hero_party().get_curr_pos_offset_img_px() / self.tile_size_pixels
-            + Point(0.5, 0.5),
-            int(light_diameter_tiles * self.tile_size_pixels / 2),
-            intensity=0.4,
-        )
+        # Create a surface to act as a light map
+        light_surface = pygame.Surface(surface.get_size())
 
-        if self.is_debugging:
-            pc_x, pc_y = self.translate_point_world_to_screen(
-                (self.image_pad_tiles + self.game_state.get_hero_party().get_curr_pos_dat_tile())
-                * self.tile_size_pixels
-            ).get_as_int_tuple()
-            surface.fill((0, 0, 255, 40), (pc_x, pc_y, self.tile_size_pixels, self.tile_size_pixels))
+        # Add point lights to the light map
+        orig_is_debugging = self.is_debugging
+        for hero in self.game_state.get_hero_party().members:
+            light_diameter_tiles = hero.light_diameter_tiles
+            if light_diameter_tiles is None or 0 == light_diameter_tiles:
+                continue
+
+            light_radius_px = int(light_diameter_tiles * self.tile_size_pixels / 2)
+            if hero.ambient_light_color:
+                ambient_color = pygame.Color(
+                    hero.ambient_light_color[0], hero.ambient_light_color[1], hero.ambient_light_color[2], 255
+                )
+                ambient_intensity = hero.ambient_light_color[3] / 255
+            else:
+                ambient_color = pygame.Color("White")
+                ambient_intensity = 0.45
+            if hero.light_color:
+                light_color = pygame.Color(hero.light_color[0], hero.light_color[1], hero.light_color[2], 255)
+                light_intensity = hero.light_color[3] / 255
+            else:
+                light_color = pygame.Color("White")
+                light_intensity = 0.2
+            if ambient_intensity > 0:
+                if (
+                    hero.ambient_light is None
+                    or hero.ambient_light.radius_px != light_radius_px
+                    or hero.ambient_light.intensity != ambient_intensity
+                    or hero.ambient_light.color != ambient_color
+                ):
+                    hero.ambient_light = Light(light_radius_px, ambient_color, ambient_intensity, flicker=False)
+            else:
+                hero.ambient_light = None
+            if light_intensity > 0:
+                if (
+                    hero.light is None
+                    or hero.light.radius_px != light_radius_px
+                    or hero.light.intensity != light_intensity
+                    or hero.light.color != light_color
+                ):
+                    hero.light = Light(light_radius_px, light_color, light_intensity, flicker=True)
+            else:
+                hero.light = None
+
+            light_pos_dat_tile = (
+                hero.curr_pos_dat_tile
+                + hero.curr_pos_offset_img_px / self.tile_size_pixels
+                + Point(0.5, 0.5)
+                + hero.direction.get_vector() * 0.15
+                + hero.light_position_jitter_tiles
+            )
+            add_point_lights(light_pos_dat_tile, light_radius_px, hero.ambient_light, hero.light)
+
+            if self.is_debugging:
+                pc_x, pc_y = self.translate_point_world_to_screen(
+                    (self.image_pad_tiles + self.game_state.get_hero_party().get_curr_pos_dat_tile())
+                    * self.tile_size_pixels
+                ).get_as_int_tuple()
+                surface.fill((0, 0, 255, 40), (pc_x, pc_y, self.tile_size_pixels, self.tile_size_pixels))
+
+            # Only add the debugging visualizations for the first member of the hero party with lights
+            self.is_debugging = False
+        self.is_debugging = orig_is_debugging
 
         # Apply light map to surface
         surface.blit(light_surface, special_flags=pygame.BLEND_RGBA_MULT)

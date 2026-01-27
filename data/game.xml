@@ -934,7 +934,7 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <DialogAction type="VISUAL_EFFECT" name="flickering"/>
          <DialogAssert type="IS_NOT_IN_COMBAT"><Dialog>But that spell will not work.</Dialog></DialogAssert>
          <DialogAssert type="IS_DARK"><Dialog>But nothing happened.</Dialog></DialogAssert>
-         <DialogAction type="SET_LIGHT_DIAMETER" count="7" decay="70"/></Spell>
+         <DialogAction type="SET_LIGHT_DIAMETER" count="7" decay="70" ambientColor="255,255,255,115" color="255,255,255,51"/></Spell>
 
       <Spell name="Stopspell" mp="2"  availableInCombat="yes" availableOutsideCombat="no"  target="ALL_ENEMIES">
          <Dialog>[ACTOR] cast the spell of stopspell.</Dialog>
@@ -1076,12 +1076,12 @@ All part members gain # experience points.  You obtain X pieces of gold.
          <Tool name="Torch"                                gp="8"    droppable="yes" equippable="no"  availableInCombat="no">
             <DialogAssert type="IS_DARK"><Dialog>A torch will come in handy in the dark places of the world.</Dialog></DialogAssert>
             <DialogAction type="LOSE_ITEM" name="Torch"/>
-            <DialogAction type="SET_LIGHT_DIAMETER" count="3" decay="unlimited"/>
+            <DialogAction type="SET_LIGHT_DIAMETER" count="3" decay="unlimited" ambientColor="253,207,88,115" color="253,207,88,51"/>
             <Dialog>[ACTOR] lit a torch.</Dialog></Tool>
 
          <Tool name="Lantern"                              gp="125"  droppable="yes" equippable="no"  availableInCombat="no"> <!-- TODO: Make this available somewhere in the world -->
             <DialogAssert type="IS_DARK"><Dialog>A latern will come in handy in the dark places of the world.  Unlike a torch it is reusable.</Dialog></DialogAssert>
-            <DialogAction type="SET_LIGHT_DIAMETER" count="5" decay="unlimited"/>
+            <DialogAction type="SET_LIGHT_DIAMETER" count="5" decay="unlimited" ambientColor="253,207,88,115" color="253,207,88,51"/>
             <Dialog>[ACTOR] lit a lattern.</Dialog></Tool>
 
          <Tool name="Wings"                                gp="70"   droppable="yes" equippable="no">

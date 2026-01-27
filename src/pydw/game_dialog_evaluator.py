@@ -710,13 +710,16 @@ class GameDialogEvaluator:
                             self.hero_party.lose_progress_marker(item_name)
 
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
-                    if isinstance(item.count, int):
-                        self.hero_party.light_diameter = item.count
-                        self.hero_party.light_diameter_decay_steps = item.decay_steps
-                        self.hero_party.light_diameter_decay_steps_remaining = item.decay_steps
+                    if isinstance(self.actor, HeroState):
+                        if isinstance(item.count, int):
+                            self.actor.set_light_diameter(item.count, item.decay_steps, item.ambient_color, item.color)
+                        else:
+                            self.actor.unset_light_diameter()
+                        self.game_state.get_game_mode().draw()
                     else:
-                        self.hero_party.light_diameter = None
-                    self.game_state.get_game_mode().draw()
+                        logger.error(
+                            "Could not set light diameter of actor %s of type %s", self.actor, type(self.actor).__name__
+                        )
 
                 elif item.type == DialogActionEnum.REPEL_MONSTERS:
                     self.hero_party.repel_monsters = True

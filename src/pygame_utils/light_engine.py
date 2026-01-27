@@ -8,6 +8,7 @@ https://github.com/justinbeetle/Pygame_Lighting_Engine/blob/main/Dungeon_Example
 
 import logging
 import math
+import random
 from typing import Optional
 
 import numpy as np
@@ -30,6 +31,7 @@ class Light:
         is_point: bool = False,
         angle_deg: float = 0.0,
         angle_width_deg: float = 360.0,
+        flicker: bool = False,
     ) -> None:
         """
         :param radius_px: The radius of the light in pixels
@@ -55,10 +57,15 @@ class Light:
                 int(self.radius_px + self.radius_px * math.cos(math.radians(self.angle))),
                 int(self.radius_px - self.radius_px * math.sin(math.radians(self.angle))),
             )
-        self.pixel_shader_surf = self.pixel_shader()
+        self.pixel_shader_surfs = [self.pixel_shader()]
+        if flicker:
+            flicker_increment_px = int(self.radius_px / 16)
+            self.pixel_shader_surfs.extend(
+                [self.pixel_shader(flicker_increment_px), self.pixel_shader(2 * flicker_increment_px)]
+            )
         self.render_surface.set_colorkey((0, 0, 0))
 
-    def pixel_shader(self) -> pygame.surface.Surface:
+    def pixel_shader(self, radius_offset_px: int = 0) -> pygame.surface.Surface:
         """Return a surface with the full light map (no shadows) for this light source."""
 
         final_array = np.full(
@@ -73,7 +80,7 @@ class Light:
 
         # Radial -----
         distance = np.sqrt((x - self.radius_px) ** 2 + (y - self.radius_px) ** 2)
-        radial_falloff = (self.radius_px - distance) / self.radius_px
+        radial_falloff = (self.radius_px + radius_offset_px - distance) / (self.radius_px + radius_offset_px)
         radial_falloff[radial_falloff <= 0] = 0
         # -----
 
@@ -240,7 +247,7 @@ class Light:
                 filtered.append(shadow_rect)
         return filtered
 
-    def check_cast(self, shadow_tile_rect: pygame.Rect) -> bool:
+    def check_cast(self, pixel_shader_surf: pygame.surface.Surface, shadow_tile_rect: pygame.Rect) -> bool:
         """If the rect is fully in shadow, return True indicating this shadow tile can be ignored."""
         if self.is_point:
             if self.beam_line is not None and shadow_tile_rect.clipline(self.beam_line):
@@ -255,7 +262,7 @@ class Light:
                 # Center of beam doesn't touch the tile but its light may still hit it depending on
                 # beam width.  Check if any of the coorner coordinates are lit by the beam.
                 try:
-                    if self.pixel_shader_surf.get_at(point) != pygame.Color(0, 0, 0, 255):
+                    if pixel_shader_surf.get_at(point) != pygame.Color(0, 0, 0, 255):
                         return True
                 except IndexError:
                     pass
@@ -266,8 +273,10 @@ class Light:
         """Add the light from this light source onto the provided light_surface at pixel coordinates
         x_px, y_px in the coordinate frame of light_surface."""
 
+        pixel_shader_surf = random.choice(self.pixel_shader_surfs)
+
         self.render_surface.fill((0, 0, 0))
-        self.render_surface.blit(self.pixel_shader_surf)
+        self.render_surface.blit(pixel_shader_surf)
 
         dx = pos_px.x - self.radius_px
         dy = pos_px.y - self.radius_px
@@ -276,15 +285,13 @@ class Light:
             # Shift the rect to be in the coordinate system of self.render_surface
             shadow_tile_rect = shadow_tile_rect.move(-dx, -dy)
 
-            if self.check_cast(shadow_tile_rect):
+            if self.check_cast(pixel_shader_surf, shadow_tile_rect):
                 polygon_pts = self.get_shadow_polygon_points(shadow_tile_rect)
                 if polygon_pts is None:
                     # Light is inside the shadow tile
                     logger.error("Light is inside a shadow tile")
                     return
                 pygame.draw.polygon(self.render_surface, (0, 0, 0), polygon_pts)
-
-        pygame.draw.circle(self.render_surface, (255, 255, 255), (self.radius_px, self.radius_px), 2)
 
         light_surface.blit(self.render_surface, (dx, dy), special_flags=pygame.BLEND_RGBA_ADD)
 

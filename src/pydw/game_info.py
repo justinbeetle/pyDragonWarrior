@@ -1026,9 +1026,9 @@ class GameInfo:
             self.map_being_parsed = map_name
             # logger.debug("mapName = %s", map_name)
             music = element.attrib["music"]
-            light_diameter = None
+            light_diameter_tiles = None
             if "lightDiameter" in element.attrib and element.attrib["lightDiameter"] != "unlimited":
-                light_diameter = int(element.attrib["lightDiameter"])
+                light_diameter_tiles = float(element.attrib["lightDiameter"])
             is_outside = True
             if "isOutside" in element.attrib:
                 is_outside = element.attrib["isOutside"] == "yes"
@@ -1320,7 +1320,7 @@ class GameInfo:
                 map_dat,
                 map_overlay_dat,
                 music,
-                light_diameter,
+                light_diameter_tiles,
                 leaving_transition,
                 point_transitions,
                 incoming_transitions,
@@ -1589,6 +1589,27 @@ class GameInfo:
                 ):
                     count = "default"
 
+                color = None
+                if "color" in element.attrib:
+                    color_values = element.attrib["color"].split(",")
+                    if len(color_values) == 4:
+                        color = int(color_values[0]), int(color_values[1]), int(color_values[2]), int(color_values[3])
+                    else:
+                        logger.error("Failed to parse the following as a color: %s", element.attrib["color"])
+
+                ambient_color = None
+                if "ambientColor" in element.attrib:
+                    color_values = element.attrib["ambientColor"].split(",")
+                    if len(color_values) == 4:
+                        ambient_color = (
+                            int(color_values[0]),
+                            int(color_values[1]),
+                            int(color_values[2]),
+                            int(color_values[3]),
+                        )
+                    else:
+                        logger.error("Failed to parse the following as a color: %s", element.attrib["ambientColor"])
+
                 dialog.append(
                     DialogAction(
                         DialogActionEnum[element.attrib["type"]],
@@ -1605,6 +1626,8 @@ class GameInfo:
                         victory_dialog=victory_dialog,
                         run_away_dialog=run_away_dialog,
                         encounter_music=encounter_music,
+                        color=color,
+                        ambient_color=ambient_color,
                     )
                 )
 
