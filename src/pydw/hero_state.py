@@ -461,14 +461,14 @@ class HeroState(MapCharacterState, CombatCharacterState):
 
         # Decay the light radius effect over time
         if self.light_diameter_tiles is not None and self.light_diameter_tiles_decay_per_step > 0:
-            self.light_diameter_tiles = max(0.5, self.light_diameter_tiles - self.light_diameter_tiles_decay_per_step)
+            self.light_diameter_tiles = max(1, self.light_diameter_tiles - self.light_diameter_tiles_decay_per_step)
 
     def set_light_diameter(
         self,
         diameter_tiles: float,
-        decay_steps: Optional[int],
-        light_color: Optional[tuple[int, int, int, int]],
-        ambient_light_color: Optional[tuple[int, int, int, int]],
+        decay_steps: Optional[int] = None,
+        light_color: Optional[tuple[int, int, int, int]] = None,
+        ambient_light_color: Optional[tuple[int, int, int, int]] = None,
     ) -> None:
         self.light_diameter_tiles = diameter_tiles
         self.light_diameter_tiles_decay_per_step = 2 / decay_steps if decay_steps else 0

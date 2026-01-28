@@ -103,33 +103,20 @@ class GameState(GameStateInterface, DialogManagerMediator):
         respawn_decorations: bool = False,
         init: bool = False,
     ) -> None:
-        # print('setMap to', new_map_name, flush=True)
+        # logger.debug("Setting map to %s", new_map_name)
         old_map_name = ""
         if not init:
             old_map_name = self.get_map_name()
 
-        # Set light diameter for the new map if there was not an old map or if the new default map
-        # diameter is unlimited.  Also update the light diameter for the new map if the default light
-        # diameters between the old and new maps are different and either the old map default light
-        # diameters was unlimited or the current diameter is less than the default light diameter of the
-        # new map.
+        # Set light diameter where it is currently unlimited (None) but the map has a limited light
+        # diameter or if the light diameter is currently limit but the map has an unlimited (None)
+        # light diameter.
         new_map_light_diameter_tiles = self.game_info.maps[new_map_name].light_diameter_tiles
         for hero in self.hero_party.members:
-            if (
-                not old_map_name
-                or new_map_light_diameter_tiles is None
-                or (
-                    new_map_light_diameter_tiles != self.game_info.maps[old_map_name].light_diameter_tiles
-                    and (
-                        self.game_info.maps[old_map_name].light_diameter_tiles is None
-                        or (
-                            hero.light_diameter_tiles is not None
-                            and hero.light_diameter_tiles < new_map_light_diameter_tiles
-                        )
-                    )
-                )
-            ):
-                hero.light_diameter_tiles = new_map_light_diameter_tiles
+            if hero.light_diameter_tiles is None and new_map_light_diameter_tiles is not None:
+                hero.set_light_diameter(new_map_light_diameter_tiles)
+            elif hero.light_diameter_tiles is not None and new_map_light_diameter_tiles is None:
+                hero.unset_light_diameter()
 
         # If changing maps and set to respawn decorations, clear the history of removed decorations
         if respawn_decorations:
@@ -263,7 +250,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
                     elif item_name in self.game_info.tools:
                         member.other_equipped_items.append(self.game_info.tools[item_name])
                     else:
-                        print("ERROR: Unsupported item", item_name, flush=True)
+                        logger.error("ERROR: Unsupported item %s", item_name)
 
                 for item_element in member_element.findall("./UnequippedItems/Item"):
                     item_name = item_element.attrib["name"]
@@ -273,14 +260,14 @@ class GameState(GameStateInterface, DialogManagerMediator):
                     if item_name in self.game_info.items:
                         member.unequipped_items[self.game_info.items[item_name]] = item_count
                     else:
-                        print("ERROR: Unsupported item", item_name, flush=True)
+                        logger.error("ERROR: Unsupported item %s", item_name)
 
                 # Load state related to light diameter
                 if "light_diameter_tiles" in member_element.attrib:
                     member.light_diameter_tiles = float(member_element.attrib["light_diameter_tiles"])
-                if "light_diameter_tiles_decay_per_step" in xml_root.attrib:
+                if "light_diameter_tiles_decay_per_step" in member_element.attrib:
                     member.light_diameter_tiles_decay_per_step = float(
-                        xml_root.attrib["light_diameter_tiles_decay_per_step"]
+                        member_element.attrib["light_diameter_tiles_decay_per_step"]
                     )
                 if "light_color" in member_element.attrib:
                     color_values = member_element.attrib["light_color"].split(",")
@@ -308,7 +295,6 @@ class GameState(GameStateInterface, DialogManagerMediator):
                         logger.error(
                             "Failed to parse the following as a color: %s", member_element.attrib["ambient_light_color"]
                         )
-
                 party_members.append(member)
 
             # Parse the party members
@@ -373,7 +359,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             # Parse the progress markers
             for progress_marker_element in xml_root.findall("./ProgressMarkers/ProgressMarker"):
                 self.hero_party.progress_markers.append(progress_marker_element.attrib["name"])
-                # print('Loaded progress marker ' + progressMarkerElement.attrib['name'], flush=True)
+                # logger.debug("Loaded progress marker %s", progressMarkerElement.attrib["name"])
 
             self.set_map(map, init=True)
 
@@ -524,13 +510,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
             with open(save_game_file_path, "w") as save_game_file:
                 save_game_file.write(xml_string)
 
-            print("Saved game to file", save_game_file_path, flush=True)
-        except Exception as exc:
-            print(
-                "ERROR: Exception encountered while attempting to save game file:",
-                exc,
-                flush=True,
-            )
+            logger.info("Saved game to file %s", save_game_file_path)
+        except Exception:
+            logger.exception("ERROR: Exception encountered while attempting to save game file")
 
     def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str = "archive") -> None:
         if os.path.isfile(save_game_file_path):
@@ -549,13 +531,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
                 if not os.path.isfile(rename_file_path):
                     os.rename(save_game_file_path, rename_file_path)
                 else:
-                    print("ERROR: File already exists:", rename_file_path, flush=True)
-            except Exception as exc:
-                print(
-                    "ERROR: Exception encountered while attempting to archived saved game file:",
-                    exc,
-                    flush=True,
-                )
+                    logger.error("ERROR: File already exists: %s", rename_file_path)
+            except Exception:
+                logger.exception("ERROR: Exception encountered while attempting to archived saved game file")
 
     def get_tile_info(self, tile: Optional[Point] = None) -> Tile:
         """Get the tile info for the specified position, or if not specified, the location of the player character."""
@@ -576,7 +554,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             if special_monster.point == tile and self.check_progress_markers(
                 special_monster.progress_marker, special_monster.inverse_progress_marker
             ):
-                # print('Found monster at point: ', tile, flush=True)
+                # logger.debug("Found monster at point: %s", tile)
                 return special_monster
         return None
 
@@ -615,7 +593,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             tile = self.hero_party.get_curr_pos_dat_tile()
         for mz in self.game_info.maps[self.get_map_name()].monster_zones:
             if mz.x <= tile.x <= mz.x + mz.w and mz.y <= tile.y <= mz.y + mz.h:
-                # print('in monsterZone of set ' + mz.setName + ':', self.gameInfo.monsterSets[mz.setName], flush=True)
+                # logger.debug("in monsterZone of set %s: %s", mz.setName, self.gameInfo.monsterSets[mz.setName])
                 return self.game_info.monster_sets[mz.name]
         return self.game_map.get_tile_monsters(tile)
 
@@ -722,10 +700,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             else:
                 random_monster = random.choice(self.get_tile_monsters())
                 if random_monster not in self.game_info.monsters:
-                    print(
-                        f"ERROR: Failed to initiate combat encounter due to lack of monster {random_monster}",
-                        flush=True,
-                    )
+                    logger.error("ERROR: Failed to initiate combat encounter due to lack of monster %s", random_monster)
                     return
                 monster_info = self.game_info.monsters[random_monster]
                 monster_party = MonsterParty([MonsterState(monster_info)])
@@ -740,10 +715,9 @@ class GameState(GameStateInterface, DialogManagerMediator):
         if encounter_background is None:
             encounter_background = self.get_encounter_background()
             if encounter_background is None:
-                print(
-                    "ERROR: Failed to initiate combat encounter due to lack of encounter image in map",
+                logger.error(
+                    "ERROR: Failed to initiate combat encounter due to lack of encounter image in map %s",
                     self.get_map_name(),
-                    flush=True,
                 )
                 return
 
@@ -849,12 +823,12 @@ class GameState(GameStateInterface, DialogManagerMediator):
         (see https://github.com/pygame/pygame/issues/4133).
         """
         if self.verbose:
-            print("Re-drawing to the display due to invocation of focus_gain_handlder", flush=True)
+            logger.debug("Re-drawing to the display due to invocation of focus_gain_handlder")
         self.get_game_mode().draw()
 
     def window_resize_handlder(self) -> None:
         """Handler for window resize events needed to implement a resizeable window."""
         # TODO: What needs to be done to resize things on the fly?
         if self.verbose:
-            print("Re-drawing to the display due to invocation of window_resize_handlder", flush=True)
+            logger.debug("Re-drawing to the display due to invocation of window_resize_handlder")
         self.get_game_mode().draw()

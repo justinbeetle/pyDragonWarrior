@@ -512,10 +512,9 @@ class GameMap(GameMapInterface):
     def _apply_lighting_legacy(self, surface: pygame.surface.Surface) -> None:
         light_radius_px = 0
         for hero in self.game_state.get_hero_party().members:
-            if hero.light_diameter_tiles is not None:
-                light_radius_px = int(hero.light_diameter_tiles * self.game_state.get_game_info().tile_size_pixels / 2)
-        else:
-            return
+            if hero.light_diameter_tiles is None:
+                return
+            light_radius_px = int(hero.light_diameter_tiles * self.game_state.get_game_info().tile_size_pixels / 2)
 
         # Left
         surface.fill(
