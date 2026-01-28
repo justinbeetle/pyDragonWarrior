@@ -298,6 +298,12 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             if self.is_debugging:
                 pygame.draw.circle(surface, (255, 255, 255), light_screen_pos_px, 4)
 
+        # Check for the no-op case of a fully lit map
+        orig_is_debugging = self.is_debugging
+        for hero in self.game_state.get_hero_party().members:
+            if hero.light_diameter_tiles is None:
+                return
+
         # Create a surface to act as a light map
         light_surface = pygame.Surface(surface.get_size())
 

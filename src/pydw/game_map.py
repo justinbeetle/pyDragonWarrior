@@ -23,11 +23,11 @@ from pydw.game_types import (
 )
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
-from pydw.legacy_map_data import LegacyMapData
 from pydw.map_character_state import MapCharacterState
 from pydw.npc_state import NpcState
 from pygame_utils.audio_player import AudioPlayer
 from pyscroll_utils.buffered_renderer import BufferedRenderer
+from pyscroll_utils.legacy_map_data import LegacyMapData
 from pyscroll_utils.padded_tiled_map_data import PaddedTiledMapData
 
 logger = logging.getLogger(__name__)
