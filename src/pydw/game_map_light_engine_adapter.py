@@ -62,7 +62,7 @@ class GameMapLightEngineAdapter:
 
                 Upper      Upper      Upper
                 Left       Center     Right
-                        __________
+                         __________
                         |          |
                 Center  |  Center  |  Center
                 Left    |  Center  |  Right
@@ -159,7 +159,11 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 for line in lines:
                     this_line_visible = True
                     for rect in wall_tile_rects:
-                        clipped_line = rect.clipline(line)
+                        # Expand the width and height by one pixel as clipline treat rect.bottom and rect.right attributes
+                        # of a pygame.Rect object for storing rectangular coordinates always lie one pixel outside of its
+                        # actual border.
+                        # TODO: Make a clipline utility method to handle this
+                        clipped_line = pygame.Rect(rect.left, rect.top, rect.width + 1, rect.height + 1).clipline(line)
                         # If the line doesn't colide with the rect or it colisdes only at a single point, then it is visible
                         if clipped_line and clipped_line[0] != clipped_line[1]:
                             this_line_visible = False
@@ -170,15 +174,26 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 if visible:
                     wall_tile_rects.append(this_tile_rect)
                     if self.is_debugging:
-                        surface.fill((255, 0, 0, 40), this_tile_rect)
+                        surface.fill((0, 255, 0), this_tile_rect)
+                        surface.blit(
+                            pygame.font.Font(pygame.font.get_default_font(), 16).render(
+                                f"{tile.x}, {tile.y}", False, pygame.Color("black")
+                            ),
+                            this_tile_rect.topleft,
+                        )
                 else:
                     if self.is_debugging:
-                        surface.fill((0, 255, 0, 40), this_tile_rect)
+                        surface.fill((255, 0, 0), this_tile_rect)
+                        surface.blit(
+                            pygame.font.Font(pygame.font.get_default_font(), 16).render(
+                                f"{tile.x}, {tile.y}", False, pygame.Color("black")
+                            ),
+                            this_tile_rect.topleft,
+                        )
                     unset_wall(tile)
                 return visible
 
-            light_x = int(light_position_tiles.x)
-            light_y = int(light_position_tiles.y)
+            light_x, light_y = light_position_tiles.get_as_int_tuple()
             max_left_x = light_x
             min_right_x = max_left_x
             max_upper_y = light_y
@@ -280,17 +295,25 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
 
             light.add_light(light_surface, shadow_rects, light_screen_pos_px)
 
+            if self.is_debugging:
+                pygame.draw.circle(surface, (255, 255, 255), light_screen_pos_px, 4)
+
         # Create a surface to act as a light map
         light_surface = pygame.Surface(surface.get_size())
 
         # Add point lights to the light map
         orig_is_debugging = self.is_debugging
         for hero in self.game_state.get_hero_party().members:
-            light_diameter_tiles = hero.light_diameter_tiles
-            if light_diameter_tiles is None or 0 == light_diameter_tiles:
+            if hero.light_diameter_tiles is None:
+                # This case doesn't exist (see return above) and is only here to appease mypy
                 continue
 
-            light_radius_px = int(light_diameter_tiles * self.tile_size_pixels / 2)
+            light_radius_px = int(hero.light_diameter_tiles * self.tile_size_pixels / 2)
+
+            # Check for no-op case - no light output for this character
+            if 0 == light_radius_px:
+                continue
+
             if hero.ambient_light_color:
                 ambient_color = pygame.Color(
                     hero.ambient_light_color[0], hero.ambient_light_color[1], hero.ambient_light_color[2], 255
@@ -334,13 +357,6 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 + hero.light_position_jitter_tiles
             )
             add_point_lights(light_pos_dat_tile, light_radius_px, hero.ambient_light, hero.light)
-
-            if self.is_debugging:
-                pc_x, pc_y = self.translate_point_world_to_screen(
-                    (self.image_pad_tiles + self.game_state.get_hero_party().get_curr_pos_dat_tile())
-                    * self.tile_size_pixels
-                ).get_as_int_tuple()
-                surface.fill((0, 0, 255, 40), (pc_x, pc_y, self.tile_size_pixels, self.tile_size_pixels))
 
             # Only add the debugging visualizations for the first member of the hero party with lights
             self.is_debugging = False
