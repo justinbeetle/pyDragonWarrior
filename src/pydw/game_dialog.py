@@ -117,9 +117,9 @@ class GameDialog:
         # Determine font size by sizing it based on the tile size
         def calc_font_size(font_name: Optional[str]) -> int:
             message_dialog_size_tiles = GameDialog.get_message_dialog_size_tiles()
-            if message_dialog_size_tiles.x < 10 or message_dialog_size_tiles.y < 5:
+            if message_dialog_size_tiles.x < 30 or message_dialog_size_tiles.y < 8:
                 print("Reducing font size for small window size", flush=True)
-                desired_font_height = tile_size_pixels / 2
+                desired_font_height = tile_size_pixels * 0.8
             else:
                 desired_font_height = tile_size_pixels
             font_size = 1

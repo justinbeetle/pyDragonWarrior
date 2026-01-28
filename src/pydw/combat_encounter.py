@@ -87,19 +87,26 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
 
         # Scale the encounter image
         # Pixelize the encounter backgrounds so they better fit with the pixelized graphics of the game
-        pixelize_factor = 2 * self.game_info.tile_scaling_factor
-        encounter_image_size_px = Point(encounter_background.image.get_size())
-        encounter_image_size_px *= min(
-            self.game_state.get_win_size_pixels().w * 0.6 / encounter_image_size_px.w,
-            self.game_state.get_win_size_pixels().h * 0.4 / encounter_image_size_px.h,
+        src_image_size_px = Point(encounter_background.image.get_size())
+        src_image_size_px_sq = src_image_size_px[0] * src_image_size_px[1]
+        dst_image_size_px = src_image_size_px * min(
+            self.game_state.get_win_size_pixels().w * 0.6 / src_image_size_px.w,
+            self.game_state.get_win_size_pixels().h * 0.4 / src_image_size_px.h,
         )
-        encounter_image_size_px = encounter_image_size_px // pixelize_factor * pixelize_factor
+        dst_image_size_px_sq = dst_image_size_px[0] * dst_image_size_px[1]
+        if dst_image_size_px_sq < src_image_size_px_sq:
+            # Some pixelation will happen due to downscaling
+            pixelize_factor = self.game_info.tile_scaling_factor
+        else:
+            pixelize_factor = 2 * self.game_info.tile_scaling_factor
+
+        dst_image_size_px = dst_image_size_px // pixelize_factor * pixelize_factor
         self.encounter_image = pygame.transform.scale(
             pygame.transform.smoothscale(
                 encounter_background.image,
-                (encounter_image_size_px // pixelize_factor).get_as_int_tuple(),
+                (dst_image_size_px // pixelize_factor).get_as_int_tuple(),
             ),
-            encounter_image_size_px.get_as_int_tuple(),
+            dst_image_size_px.get_as_int_tuple(),
         )
 
     def game_mode_loop(self) -> None:
@@ -274,7 +281,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
                     encounter_image_dest_px.y
                     + encounter_image_size_px.y
                     - monster.monster_info.image.get_height()
-                    - self.game_info.tile_size_pixels,
+                    - min(self.game_info.tile_size_pixels, int(self.encounter_image.get_size()[0] * 0.05)),
                 )
                 self.game_state.screen.blit(monster_image, monster_image_dest_px)
 

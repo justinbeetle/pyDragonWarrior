@@ -154,7 +154,6 @@ class GameDialogEvaluator:
         is_waiting_indicator_drawn = False
         frame_count = 0
         frames_to_hold_indicator = 4
-        clock = pygame.time.Clock()
         while self.game_state.is_running and is_awaiting_acknowledgement:
             # Process events
             events = game_events.get_events()
