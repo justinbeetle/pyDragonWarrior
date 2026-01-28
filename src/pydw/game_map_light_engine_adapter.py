@@ -32,6 +32,11 @@ class GameMapLightEngineAdapter:
         self.tile_size_pixels = self.game_state.get_game_info().tile_size_pixels
         self.is_debugging = False
 
+        # Indicates that with the tileset the bottom of a wall tile is split in half with the bottom
+        # halve depicting a vertical face of the wall and the top halve depicting a horizontal cross
+        # section of the top of the wall.
+        self.bottom_wall_tiles_split_in_middle = True
+
     def translate_point_world_to_screen(self, pt: Point) -> Point:
         """Translate a point from world to screen coordinates."""
         return Point(self.map_layer.translate_point(pt))
@@ -162,9 +167,10 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                         # Expand the width and height by one pixel as clipline treat rect.bottom and rect.right attributes
                         # of a pygame.Rect object for storing rectangular coordinates always lie one pixel outside of its
                         # actual border.
-                        # TODO: Make a clipline utility method to handle this
+                        # TODO: Make a clipline utility method to handle this!!!
                         clipped_line = pygame.Rect(rect.left, rect.top, rect.width + 1, rect.height + 1).clipline(line)
-                        # If the line doesn't colide with the rect or it colisdes only at a single point, then it is visible
+
+                        # If the line doesn't collide with the rect or it collides only at a single point, then it is visible
                         if clipped_line and clipped_line[0] != clipped_line[1]:
                             this_line_visible = False
                             break
@@ -193,7 +199,8 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                     unset_wall(tile)
                 return visible
 
-            light_x, light_y = light_position_tiles.get_as_int_tuple()
+            light_x = int(light_position_tiles.x)
+            light_y = int(light_position_tiles.y)
             max_left_x = light_x
             min_right_x = max_left_x
             max_upper_y = light_y
@@ -201,7 +208,8 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             left_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (0, self.tile_size_pixels))]
             right_line_rects = [left_line_rects[0].move(self.tile_size_pixels, 0)]
             top_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (self.tile_size_pixels, 0))]
-            bottom_line_rects = [
+            bottom_line_rects = [top_line_rects[0].move(0, self.tile_size_pixels)]
+            bottom_line_top_half_rects = [
                 top_line_rects[0].move(0, self.tile_size_pixels / 2),
                 pygame.Rect(
                     (self.image_pad_tiles + Point(0, 0.5)) * self.tile_size_pixels, (0, self.tile_size_pixels / 2)
@@ -210,6 +218,7 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                     (self.image_pad_tiles + Point(1, 0.5)) * self.tile_size_pixels, (0, self.tile_size_pixels / 2)
                 ),
             ]
+            bottom_line_below_top_half_rects = [top_line_rects[0].move(0, self.tile_size_pixels)]
 
             def add_shadow(tile_pos: Point, rects: list[pygame.Rect]) -> None:
                 for rect in rects:
@@ -227,7 +236,13 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 add_shadow(tile_pos, top_line_rects)
 
             def add_shadow_bottom(tile_pos: Point) -> None:
-                add_shadow(tile_pos, bottom_line_rects)
+                if self.bottom_wall_tiles_split_in_middle:
+                    if light_position_tiles.y <= tile_pos.y + 0.5:
+                        add_shadow(tile_pos, bottom_line_top_half_rects)
+                    else:
+                        add_shadow(tile_pos, bottom_line_below_top_half_rects)
+                else:
+                    add_shadow(tile_pos, bottom_line_rects)
 
             # Handle upper left diagnal
             wall_tile_rects = []
@@ -299,22 +314,35 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 pygame.draw.circle(surface, (255, 255, 255), light_screen_pos_px, 4)
 
         # Check for the no-op case of a fully lit map
-        orig_is_debugging = self.is_debugging
         for hero in self.game_state.get_hero_party().members:
             if hero.light_diameter_tiles is None:
                 return
 
         # Create a surface to act as a light map
         light_surface = pygame.Surface(surface.get_size())
+        map_wide_ambient_itensity = 0.0
+        if self.is_debugging:
+            map_wide_ambient_itensity = 0.25
+        if map_wide_ambient_itensity:
+            ambient_light = pygame.Surface(light_surface.get_size()).convert_alpha()
+            ambient_light.fill((255, 255, 255, int(map_wide_ambient_itensity * 255)))
+            light_surface.blit(ambient_light)
 
         # Add point lights to the light map
+        # Where the debugging graphics are being applied, ensure they are only applied for
+        # a single (currently using the first) light.
         orig_is_debugging = self.is_debugging
         for hero in self.game_state.get_hero_party().members:
             if hero.light_diameter_tiles is None:
                 # This case doesn't exist (see return above) and is only here to appease mypy
                 continue
 
-            light_radius_px = int(hero.light_diameter_tiles * self.tile_size_pixels / 2)
+            # In calculating the radius, increasing it by a 4/pi factor (about 1.27) to account for the
+            # decrease in visible area in changing from lighting a square to the circle inscribed in the
+            # square.  This change restores the maximum area of visibility as this is the ratio of the
+            # area of a square to its inscribed circle based on a unit circle (area pi units squared)
+            # versus the square inscribing a unit circle (area=4 units squared).
+            light_radius_px = int(hero.light_diameter_tiles * self.tile_size_pixels / 2 * 4 / math.pi)
 
             # Check for no-op case - no light output for this character
             if 0 == light_radius_px:
@@ -355,12 +383,20 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             else:
                 hero.light = None
 
+            # When self.bottom_wall_tiles_split_in_middle is True, only apply jitter in the x-dimension.
+            # That is because the y-coordinate is used to determine whether or not to shade the bottom
+            # of wall tiles with the same y-coordinate, leading to possible cases of unsightly
+            # oscillations between shading and not shading the bottom on a wall tile.
+            jitter = Point(
+                hero.light_position_jitter_tiles.x,
+                0.0 if self.bottom_wall_tiles_split_in_middle else hero.light_position_jitter_tiles.y,
+            )
             light_pos_dat_tile = (
                 hero.curr_pos_dat_tile
                 + hero.curr_pos_offset_img_px / self.tile_size_pixels
                 + Point(0.5, 0.5)
                 + hero.direction.get_vector() * 0.15
-                + hero.light_position_jitter_tiles
+                + jitter
             )
             add_point_lights(light_pos_dat_tile, light_radius_px, hero.ambient_light, hero.light)
 

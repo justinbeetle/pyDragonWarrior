@@ -470,12 +470,21 @@ class HeroState(MapCharacterState, CombatCharacterState):
         light_color: Optional[tuple[int, int, int, int]] = None,
         ambient_light_color: Optional[tuple[int, int, int, int]] = None,
     ) -> None:
+        """Set the light diameter along with properties of the light.
+        :param decay_steps: Number of steps for the diameter to decrease by 2 (or radius by 1).
+            None or 0 means the light does not decay.
+        :param light_color: The color and intensity (where the alpha value provides the intensity)
+            of the light with is obstructed by walls and casts shadows.  An alpha of 0 turns this off.
+        :param ambient_light_color: The color and intensity (where the alpha value provides the intensity)
+            of the light with is unobstructed by walls and does not cast shadows.  An alpha of 0 turns this off.
+        """
         self.light_diameter_tiles = diameter_tiles
-        self.light_diameter_tiles_decay_per_step = 2 / decay_steps if decay_steps else 0
+        self.light_diameter_tiles_decay_per_step = 2 / decay_steps if decay_steps else 0.0
         self.light_color = light_color
         self.ambient_light_color = ambient_light_color
 
     def unset_light_diameter(self) -> None:
+        """Set the light diameter to None (unlimited) so that it can see the whole screen."""
         self.light_diameter_tiles = None
         self.light_diameter_tiles_decay_per_step = 0.0
 

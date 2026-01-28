@@ -712,7 +712,7 @@ class GameDialogEvaluator:
                 elif item.type == DialogActionEnum.SET_LIGHT_DIAMETER:
                     if isinstance(self.actor, HeroState):
                         if isinstance(item.count, int):
-                            self.actor.set_light_diameter(item.count, item.decay_steps, item.ambient_color, item.color)
+                            self.actor.set_light_diameter(item.count, item.decay_steps, item.color, item.ambient_color)
                         else:
                             self.actor.unset_light_diameter()
                         self.game_state.get_game_mode().draw()
