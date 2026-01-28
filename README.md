@@ -14,7 +14,7 @@ out-and-out clone or reimagining.
 [![CodeQL](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml/badge.svg)](https://github.com/justinbeetle/pyDragonWarrior/actions/workflows/codeql.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-See a [game play demo on YouTube](https://www.youtube.com/watch?v=Hi8MjgoCKsM).
+See a [game play demo on YouTube](https://youtu.be/KofVYZXZa3Q).
 
 ## Installation
 
