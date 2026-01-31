@@ -323,7 +323,7 @@ class Launcher:
 
         from pydw.loader import Loader
 
-        return Loader(args, base_path, saves_path).run()
+        return Loader(self.application_name, args, base_path, saves_path).run()
 
 
 def main(argv: Optional[list[str]] = None) -> int:

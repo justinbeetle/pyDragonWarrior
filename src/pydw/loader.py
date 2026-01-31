@@ -14,7 +14,6 @@ from generic_utils.point import Point
 from pydw.game_dialog import GameDialog
 from pydw.game_info import GameInfo
 from pydw.game_state import GameState
-from pydw.launcher import Launcher
 from pydw.loading_screen import LoadingScreen
 from pygame_utils import game_events
 from pygame_utils.audio_player import AudioPlayer
@@ -29,7 +28,8 @@ class Loader:
     unscaled_tile_size_pixels = 16
     desired_tile_scaling_factor = 3
 
-    def __init__(self, args: Namespace, base_path: str, saves_path: str) -> None:
+    def __init__(self, application_name: str, args: Namespace, base_path: str, saves_path: str) -> None:
+        self.application_name = application_name
         self.args = args
         self.verbose = args.verbose
         self.base_path = base_path
@@ -67,7 +67,7 @@ class Loader:
         AudioPlayer.pre_init()
         pygame.init()
         pygame.mouse.set_visible(False)
-        pygame.display.set_caption(Launcher.application_name)
+        pygame.display.set_caption(self.application_name)
         icon_image_filename = os.path.join(self.base_path, "data", "images", "icon.png")
         if os.path.exists(icon_image_filename):
             try:

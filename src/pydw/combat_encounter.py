@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-
 import logging
 import random
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 import pygame
 
 from generic_utils.point import Point
 from pydw.combat_character_state import CombatCharacterState
 from pydw.combat_encounter_interface import CombatEncounterInterface
-from pydw.dialog_manager import DialogManager, DialogManagerMediator
 from pydw.game_dialog import GameDialog, GameDialogSpacing
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_info import GameInfo
@@ -22,13 +19,10 @@ from pydw.game_types import (
     EncounterBackground,
     GameTypes,
     MonsterAction,
-    MonsterInfo,
     Problem,
-    SpecialMonster,
     TargetTypeEnum,
     Tool,
 )
-from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
@@ -761,142 +755,3 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
         if 2 == random_val:
             return CombatEncounter.gen_multiplication_problem(min_term=0, max_term=12)
         return CombatEncounter.gen_division_problem(min_term=0, max_term=12)
-
-
-def main() -> None:
-    # Initialize pygame
-    pygame.init()
-    pygame.font.init()
-
-    # Setup the screen
-    win_size_pixels = Point(1280, 960)
-    tile_size_pixels = 48
-    win_size_tiles = (win_size_pixels / tile_size_pixels).ceil()
-    win_size_pixels = win_size_tiles * tile_size_pixels
-    screen = pygame.display.set_mode(win_size_pixels.get_as_int_tuple(), pygame.SRCALPHA | pygame.HWSURFACE)
-
-    # Initialize GameInfo
-    import os
-
-    from pydw.launcher import Bootstrapper
-
-    base_path = Bootstrapper.get_application_base_path()
-    game_xml_path = os.path.join(base_path, "data", "game.xml")
-    GameInfo.static_init(base_path, game_xml_path, win_size_tiles, tile_size_pixels)
-    game_info = GameInfo(base_path, game_xml_path, tile_size_pixels, 3, win_size_pixels)
-
-    # Find an encounter image to use
-    encounter_background: Optional[EncounterBackground] = None
-    for game_map in game_info.maps.values():
-        if game_map.encounter_background is not None:
-            encounter_background = game_map.encounter_background
-            break
-
-    # Verify an encounter image was found
-    if encounter_background is None:
-        logger.error("Failed to find an encounter image")
-        AudioPlayer().terminate()
-        pygame.quit()
-        return
-
-    # Setup a mock game state
-    from unittest import mock
-    from unittest.mock import MagicMock
-
-    from pydw.game_types import DialogReplacementVariables
-
-    mock_dialog_manager_mediator = mock.create_autospec(spec=DialogManagerMediator)
-    dialog_manager = DialogManager(mock_dialog_manager_mediator)
-    mock_game_state = mock.create_autospec(spec=GameStateInterface)
-    mock_game_state.screen = screen
-    mock_game_state.is_running = True
-    mock_game_state.is_light_restricted.return_value = True
-    mock_game_state.get_win_size_pixels.return_value = win_size_pixels
-    mock_game_state.get_dialog_replacement_variables.return_value = DialogReplacementVariables()
-    mock_game_state.should_add_math_problems_in_combat.return_value = False
-    mock_game_state.get_dialog_manager.return_value = dialog_manager
-
-    def handle_quit_side_effect(force: bool = False) -> None:
-        _ = force  # appease pylint - force is needed to conform to the interface
-        mock_game_state.is_running = False
-
-    mock_game_state.handle_quit = handle_quit_side_effect
-
-    mock_background_game_mode = mock.create_autospec(spec=GameMode)
-
-    def background_game_mode_draw_background(flip_buffer: bool = False) -> None:
-        screen.fill("pink")
-        if flip_buffer:
-            pygame.display.flip()
-
-    mock_background_game_mode.draw_background = background_game_mode_draw_background
-
-    # Create a series of hero party and monster party tuples for encounters
-    from pydw.game_types import Direction
-
-    combat_parties = []
-    for i in range(1, 4):
-        hero_party = HeroParty(
-            HeroState(
-                game_info.character_types["hero"],
-                Point(),
-                Direction.NORTH,
-                "Camden",
-                20000,
-            )
-        )
-        monster_party = MonsterParty(
-            cast(
-                list[Union[MonsterInfo, SpecialMonster, MonsterState]],
-                list(game_info.monsters.values())[0:i],
-            )
-        )
-        monster_party.add_monster(list(game_info.monsters.values())[0])
-        combat_parties.append((hero_party, monster_party))
-    for monster_name in [
-        "Metal Slime",
-        "Golem",
-        "Knight",
-        "Magiwyvern",
-        "Starwyvern",
-        "Red Dragon",
-    ]:
-        hero_party = HeroParty(
-            HeroState(
-                game_info.character_types["hero"],
-                Point(),
-                Direction.NORTH,
-                "Camden",
-                20000,
-            )
-        )
-        hero_party.main_character.gain_item(game_info.items["Fairy Flute"])
-        monster_party = MonsterParty([game_info.monsters[monster_name]])
-        combat_parties.append((hero_party, monster_party))
-
-    # Run a series of combat encounters
-    CombatEncounter.static_init("combat")
-    for hero_party, monster_party in combat_parties:
-        if not mock_game_state.is_running:
-            break
-        mock_game_state.get_hero_party = MagicMock(return_value=hero_party)
-        mock_game_state.get_game_mode.return_value = mock_background_game_mode
-        combat_encounter = CombatEncounter(game_info, mock_game_state, monster_party, encounter_background)
-        mock_game_state.get_game_mode.return_value = combat_encounter
-        mock_dialog_manager_mediator.draw_background = combat_encounter.draw_background
-        mock_dialog_manager_mediator.get_foreground_dialog_font_color = GameDialog.get_default_font_color
-        combat_encounter.game_mode_loop()
-        pygame.time.wait(200)
-
-    # Terminate pygame
-    AudioPlayer().terminate()
-    pygame.quit()
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception:
-        import traceback
-
-        traceback.print_exc()

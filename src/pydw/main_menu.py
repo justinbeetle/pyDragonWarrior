@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """Module defining MainMenu class."""
 
 import glob
@@ -12,7 +10,7 @@ from pydw.game_dialog import GameDialog
 from pydw.game_dialog_evaluator import GameDialogEvaluator
 from pydw.game_info import GameInfo
 from pydw.game_mode import GameMode
-from pydw.game_state import GameState
+from pydw.game_state_interface import GameStateInterface
 from pydw.loading_screen import LoadingScreen
 from pygame_utils import game_events
 from pygame_utils.audio_player import AudioPlayer
@@ -22,12 +20,13 @@ class MainMenu(GameMode):
     """Game mode for the game's main menu supporting user selections for creating, loading, and deleting saved game
     files and selecting game settings."""
 
-    def __init__(self, game_state: GameState, pc_name_or_file_name: Optional[str] = None) -> None:
+    def __init__(
+        self, game_state: GameStateInterface, saves_path: str, pc_name_or_file_name: Optional[str] = None
+    ) -> None:
         super().__init__(game_state.get_dialog_manager())
         self.game_state = game_state
+        self.saves_path = saves_path
         self.pc_name_or_file_name = pc_name_or_file_name
-
-        self.saves_path = self.game_state.saves_path
 
         self.background_text = "Press any key"
 
@@ -170,4 +169,4 @@ class MainMenu(GameMode):
 
     def get_music(self) -> Optional[str]:
         """Implementation of GameMode.get_music for this game mode."""
-        return self.game_state.game_info.title_music
+        return GameInfo.title_music

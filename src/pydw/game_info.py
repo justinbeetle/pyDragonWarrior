@@ -1359,84 +1359,13 @@ class GameInfo:
             return Direction[element.attrib["dir"]]
         return None
 
-    def parse_initial_game_state(self, pc_name: Optional[str] = None) -> None:
-        # TODO: Introduce a game type to hold this information
-        # TODO: Better yet, replace this method entirely with GameState.load as this is game state information and not
-        #       generic game info information.
-
-        self.pc_name = ""
-
-        if pc_name is not None:
-            self.pc_name = pc_name
-
-        xml_root = ET.parse(self.game_xml_path).getroot()
-        initial_state_element = xml_root.find("InitialState")
+    def get_initial_game_state_element(self) -> ET.Element:
+        """Get the initial state element, which should have the same formatting as a saved game file
+        and gets parsed by GameState."""
+        initial_state_element = ET.parse(self.game_xml_path).getroot().find("InitialState")
         if initial_state_element is None:
-            logger.error("ERROR: InitialState element is missing")
-            raise Exception("Missing required InitialState element")
-
-        self.initial_map = initial_state_element.attrib["map"]
-        self.initial_hero_pos_dat_tile = self.get_location(self.initial_map, initial_state_element)
-        self.initial_hero_pos_dir = self.get_direction(self.initial_map, initial_state_element)
-        self.initial_state_dialog = self.parse_dialog(initial_state_element)
-
-        if not self.pc_name:
-            self.pc_name = initial_state_element.attrib["name"]
-        self.pc_xp = 0
-        self.pc_gp = 0
-        self.pc_hp = None
-        self.pc_mp = None
-        if "hp" in initial_state_element.attrib:
-            self.pc_hp = int(initial_state_element.attrib["hp"])
-        if "mp" in initial_state_element.attrib:
-            self.pc_mp = int(initial_state_element.attrib["mp"])
-        self.pc_weapon: Optional[Weapon] = None
-        self.pc_armor: Optional[Armor] = None
-        self.pc_shield: Optional[Shield] = None
-        self.pc_other_equipped_items: list[Tool] = []
-        for item_element in initial_state_element.findall("./EquippedItems/Item"):
-            item_name = item_element.attrib["name"]
-            if item_name in self.weapons:
-                self.pc_weapon = self.weapons[item_name]
-            elif item_name in self.armors:
-                self.pc_armor = self.armors[item_name]
-            elif item_name in self.shields:
-                self.pc_shield = self.shields[item_name]
-            elif item_name in self.tools:
-                self.pc_other_equipped_items.append(self.tools[item_name])
-            else:
-                logger.error("ERROR: Unsupported item", item_name)
-
-        self.pc_unequipped_items: dict[ItemType, int] = {}
-        for item_element in initial_state_element.findall("./UnequippedItems/Item"):
-            item_name = item_element.attrib["name"]
-            item_count = 1
-            if "count" in item_element.attrib:
-                item_count = int(item_element.attrib["count"])
-            if item_name in self.items:
-                self.pc_unequipped_items[self.items[item_name]] = item_count
-            else:
-                logger.error("ERROR: Unsupported item", item_name)
-
-        self.pc_progress_markers: list[str] = []
-        for progress_marker_element in initial_state_element.findall("./ProgressMarkers/ProgressMarker"):
-            self.pc_progress_markers.append(progress_marker_element.attrib["name"])
-            # logger.debug("Loaded progress marker %s", progressMarkerElement.attrib["name"])
-
-        self.initial_map_decorations: list[MapDecoration] = []
-        for decoration_element in initial_state_element.findall("./MapDecoration"):
-            decoration = None
-            if "type" in decoration_element.attrib and decoration_element.attrib["type"] in self.decorations:
-                decoration = self.decorations[decoration_element.attrib["type"]]
-            self.initial_map_decorations.append(
-                MapDecoration.create(
-                    decoration,
-                    self.get_location(self.initial_map, decoration_element),
-                    self.parse_dialog(decoration_element),
-                    None,
-                    None,
-                )
-            )
+            raise ValueError(f"Missing InitialState element in {self.game_xml_path}")
+        return initial_state_element
 
     def parse_dialog(self, dialog_root_element: Optional[ET.Element]) -> Optional[DialogType]:
         if dialog_root_element is None:

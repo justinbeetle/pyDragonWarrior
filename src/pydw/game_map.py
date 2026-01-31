@@ -4,7 +4,6 @@ import logging
 import math
 import random
 import time
-from heapq import heappop, heappush
 from typing import Any, Callable, Optional
 
 import pygame

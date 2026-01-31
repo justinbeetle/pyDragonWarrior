@@ -180,8 +180,7 @@ class GameDialog:
                 for option_col in option:
                     option_pixels += GameDialog.get_font_width(option_col) + 2 * GameDialog.internal_spacing_pixels
 
-            if option_pixels > longest_option_pixels:
-                longest_option_pixels = option_pixels
+            longest_option_pixels = max(longest_option_pixels, option_pixels)
 
         width_pixels = 2 * GameDialog.outside_spacing_pixels + num_cols * (
             1.1 * longest_option_pixels + 2 * GameDialog.internal_spacing_pixels + GameDialog.selection_indicator_pixels

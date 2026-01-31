@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Imports to support type annotations
 from abc import ABC, abstractmethod
 from typing import Optional
@@ -27,6 +25,15 @@ from pydw.map_character_state import MapCharacterState
 class GameStateInterface(ABC, GenericGameState):
     def __init__(self, screen: pygame.surface.Surface) -> None:
         super().__init__(screen)
+
+    @abstractmethod
+    def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str = "archive") -> None:
+        """Archived an existing saved game file to have a backup to potentially revert to a prior save."""
+
+    @abstractmethod
+    def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
+        """Load the game state for the specified player character name or filename.  Saved game
+        files can be renamed, but on a saved they are saved as <player character name>.xml."""
 
     @abstractmethod
     def get_game_info(self) -> GameInfo:
@@ -164,6 +171,12 @@ class GameStateInterface(ABC, GenericGameState):
 
     @abstractmethod
     def should_add_math_problems_in_combat(self) -> bool:
+        """Return flag indicating if combat is in math mode."""
+        pass
+
+    @abstractmethod
+    def toggle_should_add_math_problems_in_combat(self) -> None:
+        """Toggle the flag indicating if combat is in math mode."""
         pass
 
     @abstractmethod

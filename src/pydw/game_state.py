@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import logging
 import os
 import random
@@ -30,6 +28,7 @@ from pydw.game_types import (
 )
 from pydw.hero_party import HeroParty
 from pydw.hero_state import HeroState
+from pydw.main_menu import MainMenu
 from pydw.map_character_state import MapCharacterState
 from pydw.monster_party import MonsterParty
 from pydw.monster_state import MonsterState
@@ -82,9 +81,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         game_events.set_window_resize_handler(self.window_resize_handlder)
 
         # Transition from the loading screen to the main menu
-        from pydw.main_menu import MainMenu
-
-        self.current_game_mode = MainMenu(self, pc_name_or_file_name)
+        self.current_game_mode = MainMenu(self, self.saves_path, pc_name_or_file_name)
         self.current_game_mode.game_mode_loop()
 
         # Transition from the main menu to exploring
@@ -173,6 +170,8 @@ class GameState(GameStateInterface, DialogManagerMediator):
         self.game_map = GameMap(self, new_map_name, map_decorations, removed_map_decorations, npcs, clouds)
 
     def load(self, pc_name_or_file_name: Optional[str] = None) -> None:
+        """Load the game state for the specified player character name or filename.  Saved game
+        files can be renamed, but on a saved they are saved as <player character name>.xml."""
         # Set character state for new game
         save_game_file_path: Optional[str] = None
         if pc_name_or_file_name is not None:
@@ -181,201 +180,172 @@ class GameState(GameStateInterface, DialogManagerMediator):
             else:
                 save_game_file_path = os.path.join(self.saves_path, pc_name_or_file_name + ".xml")
 
+        pc_name = None
         if save_game_file_path is None or not os.path.isfile(save_game_file_path):
-            self.game_info.parse_initial_game_state(pc_name_or_file_name)
-
-            self.pending_dialog = self.game_info.initial_state_dialog
-            pc = HeroState(
-                self.game_info.character_types["hero"],
-                self.game_info.initial_hero_pos_dat_tile,
-                self.game_info.initial_hero_pos_dir,
-                self.game_info.pc_name,
-                self.game_info.pc_xp,
-            )
-            if self.game_info.pc_hp is not None and self.game_info.pc_hp < pc.hp:
-                pc.hp = self.game_info.pc_hp
-            if self.game_info.pc_mp is not None and self.game_info.pc_mp < pc.mp:
-                pc.mp = self.game_info.pc_mp
-            pc.weapon = self.game_info.pc_weapon
-            pc.armor = self.game_info.pc_armor
-            pc.shield = self.game_info.pc_shield
-            pc.other_equipped_items = self.game_info.pc_other_equipped_items
-            pc.unequipped_items = self.game_info.pc_unequipped_items
-            self.hero_party = HeroParty(pc)
-            self.hero_party.gp = self.game_info.pc_gp
-            self.hero_party.progress_markers = self.game_info.pc_progress_markers
-
-            self.set_map(
-                self.game_info.initial_map,
-                self.game_info.initial_map_decorations,
-                init=True,
-            )
+            pc_name = pc_name_or_file_name
+            save_root = self.game_info.get_initial_game_state_element()
         else:
-            xml_root = ET.parse(save_game_file_path).getroot()
+            save_root = ET.parse(save_game_file_path).getroot()
 
-            map = xml_root.attrib["map"]
-            party_members: list[HeroState] = []
+        map = save_root.attrib["map"]
+        party_members: list[HeroState] = []
 
-            # Local helper method for parsing party members
-            def parse_party_member(member_element: ET.Element) -> None:
-                member_type = self.game_info.character_types["hero"]
-                if "type" in member_element.attrib:
-                    member_type = self.game_info.character_types[member_element.attrib["type"]]
+        # Local helper method for parsing party members
+        def parse_party_member(member_element: ET.Element) -> None:
+            member_type = self.game_info.character_types["hero"]
+            if "type" in member_element.attrib:
+                member_type = self.game_info.character_types[member_element.attrib["type"]]
 
-                member_is_combat_character = True
-                if "is_combat_character" in member_element.attrib:
-                    member_is_combat_character = member_element.attrib["is_combat_character"] == "yes"
+            member_is_combat_character = True
+            if "is_combat_character" in member_element.attrib:
+                member_is_combat_character = member_element.attrib["is_combat_character"] == "yes"
 
-                member = HeroState(
-                    member_type,
-                    self.game_info.get_location(map, member_element),
-                    self.game_info.get_direction(map, member_element),
-                    member_element.attrib["name"],
-                    int(member_element.attrib["xp"]),
-                    member_is_combat_character,
+            member = HeroState(
+                member_type,
+                self.game_info.get_location(map, member_element),
+                self.game_info.get_direction(map, member_element),
+                member_element.attrib["name"] if not pc_name else pc_name,
+                int(member_element.attrib["xp"]) if "xp" in member_element.attrib else 0,
+                member_is_combat_character,
+            )
+            if "hp" in member_element.attrib:
+                member.hp = int(member_element.attrib["hp"])
+            if "mp" in member_element.attrib:
+                member.mp = int(member_element.attrib["mp"])
+
+            for item_element in member_element.findall("./EquippedItems/Item"):
+                item_name = item_element.attrib["name"]
+                if item_name in self.game_info.weapons:
+                    member.weapon = self.game_info.weapons[item_name]
+                elif item_name in self.game_info.armors:
+                    member.armor = self.game_info.armors[item_name]
+                elif item_name in self.game_info.shields:
+                    member.shield = self.game_info.shields[item_name]
+                elif item_name in self.game_info.tools:
+                    member.other_equipped_items.append(self.game_info.tools[item_name])
+                else:
+                    logger.error("ERROR: Unsupported item %s", item_name)
+
+            for item_element in member_element.findall("./UnequippedItems/Item"):
+                item_name = item_element.attrib["name"]
+                item_count = 1
+                if "count" in item_element.attrib:
+                    item_count = int(item_element.attrib["count"])
+                if item_name in self.game_info.items:
+                    member.unequipped_items[self.game_info.items[item_name]] = item_count
+                else:
+                    logger.error("ERROR: Unsupported item %s", item_name)
+
+            # Load state related to light diameter
+            if "light_diameter_tiles" in member_element.attrib:
+                member.light_diameter_tiles = float(member_element.attrib["light_diameter_tiles"])
+            if "light_diameter_tiles_decay_per_step" in member_element.attrib:
+                member.light_diameter_tiles_decay_per_step = float(
+                    member_element.attrib["light_diameter_tiles_decay_per_step"]
                 )
-                if "hp" in member_element.attrib:
-                    member.hp = int(member_element.attrib["hp"])
-                if "mp" in member_element.attrib:
-                    member.mp = int(member_element.attrib["mp"])
-
-                for item_element in member_element.findall("./EquippedItems/Item"):
-                    item_name = item_element.attrib["name"]
-                    if item_name in self.game_info.weapons:
-                        member.weapon = self.game_info.weapons[item_name]
-                    elif item_name in self.game_info.armors:
-                        member.armor = self.game_info.armors[item_name]
-                    elif item_name in self.game_info.shields:
-                        member.shield = self.game_info.shields[item_name]
-                    elif item_name in self.game_info.tools:
-                        member.other_equipped_items.append(self.game_info.tools[item_name])
-                    else:
-                        logger.error("ERROR: Unsupported item %s", item_name)
-
-                for item_element in member_element.findall("./UnequippedItems/Item"):
-                    item_name = item_element.attrib["name"]
-                    item_count = 1
-                    if "count" in item_element.attrib:
-                        item_count = int(item_element.attrib["count"])
-                    if item_name in self.game_info.items:
-                        member.unequipped_items[self.game_info.items[item_name]] = item_count
-                    else:
-                        logger.error("ERROR: Unsupported item %s", item_name)
-
-                # Load state related to light diameter
-                if "light_diameter_tiles" in member_element.attrib:
-                    member.light_diameter_tiles = float(member_element.attrib["light_diameter_tiles"])
-                if "light_diameter_tiles_decay_per_step" in member_element.attrib:
-                    member.light_diameter_tiles_decay_per_step = float(
-                        member_element.attrib["light_diameter_tiles_decay_per_step"]
+            if "light_color" in member_element.attrib:
+                color_values = member_element.attrib["light_color"].split(",")
+                if len(color_values) == 4:
+                    member.light_color = (
+                        int(color_values[0]),
+                        int(color_values[1]),
+                        int(color_values[2]),
+                        int(color_values[3]),
                     )
-                if "light_color" in member_element.attrib:
-                    color_values = member_element.attrib["light_color"].split(",")
-                    if len(color_values) == 4:
-                        member.light_color = (
-                            int(color_values[0]),
-                            int(color_values[1]),
-                            int(color_values[2]),
-                            int(color_values[3]),
-                        )
-                    else:
-                        logger.error(
-                            "Failed to parse the following as a color: %s", member_element.attrib["light_color"]
-                        )
-                if "ambient_light_color" in member_element.attrib:
-                    color_values = member_element.attrib["ambient_light_color"].split(",")
-                    if len(color_values) == 4:
-                        member.ambient_light_color = (
-                            int(color_values[0]),
-                            int(color_values[1]),
-                            int(color_values[2]),
-                            int(color_values[3]),
-                        )
-                    else:
-                        logger.error(
-                            "Failed to parse the following as a color: %s", member_element.attrib["ambient_light_color"]
-                        )
-                party_members.append(member)
-
-            # Parse the party members
-            for member_element in xml_root.findall("./PartyMember"):
-                parse_party_member(member_element)
-            if 0 == len(party_members):
-                # This is an old save, attempt to parse the root element as if it were a PartyMember
-                parse_party_member(xml_root)
-
-            # Create the hero party from the party members
-            self.hero_party = HeroParty(party_members[0])
-            for member in party_members[1:]:
-                self.hero_party.add_member(member)
-            self.hero_party.set_main_character(xml_root.attrib["name"])
-
-            # Parse properties of the entire party
-            self.hero_party.gp = int(xml_root.attrib["gp"])
-
-            # Load state related to repel monsters
-            if "repel_monsters" in xml_root.attrib:
-                self.hero_party.repel_monsters = xml_root.attrib["repel_monsters"] == "yes"
-            if "repel_monsters_decay_steps_remaining" in xml_root.attrib:
-                self.hero_party.repel_monsters_decay_steps_remaining = int(
-                    xml_root.attrib["repel_monsters_decay_steps_remaining"]
-                )
-            if "repel_monster_fade_dialog" in xml_root.attrib:
-                self.hero_party.repel_monster_fade_dialog = [xml_root.attrib["repel_monster_fade_dialog"]]
-
-            # Load state related to last outside position
-            if "last_outside_map" in xml_root.attrib:
-                self.hero_party.last_outside_map_name = xml_root.attrib["last_outside_map"]
-                self.hero_party.last_outside_pos_dat_tile = Point(
-                    int(xml_root.attrib["last_outside_x"]),
-                    int(xml_root.attrib["last_outside_y"]),
-                )
-                self.hero_party.last_outside_dir = Direction[xml_root.attrib["last_outside_dir"]]
-
-            # Load state related to removed decorations
-            for removed_decoration_element in xml_root.findall("./RemovedDecorations/RemovedDecoration"):
-                removed_decoration_map_name = removed_decoration_element.attrib["map"]
-                removed_decoration_x = int(removed_decoration_element.attrib["x"])
-                removed_decoration_y = int(removed_decoration_element.attrib["y"])
-                removed_decoration_type_name = (
-                    None
-                    if "type" not in removed_decoration_element.attrib
-                    else removed_decoration_element.attrib["type"]
-                )
-
-                # Find the removed map decoration and insert it into self.removed_decorations_by_map
-                for decoration in self.game_info.maps[removed_decoration_map_name].map_decorations:
-                    decoration_type_name = None if decoration.type is None else decoration.type.name
-                    if (
-                        decoration_type_name == removed_decoration_type_name
-                        and decoration.point.x == removed_decoration_x
-                        and decoration.point.y == removed_decoration_y
-                    ):
-                        if removed_decoration_map_name not in self.removed_decorations_by_map:
-                            self.removed_decorations_by_map[removed_decoration_map_name] = []
-                        self.removed_decorations_by_map[removed_decoration_map_name].append(decoration)
-                        break
-
-            # Parse the progress markers
-            for progress_marker_element in xml_root.findall("./ProgressMarkers/ProgressMarker"):
-                self.hero_party.progress_markers.append(progress_marker_element.attrib["name"])
-                # logger.debug("Loaded progress marker %s", progressMarkerElement.attrib["name"])
-
-            self.set_map(map, init=True)
-
-            # Load state related to light diameter for legacy saves.  In legacy saves, light diameter
-            # was at the party level instead of the party member level.
-            # FUTURE: At some point, remove this logic providing legacy save support.
-            if "light_diameter" in xml_root.attrib and "light_diameter_decay_steps" in xml_root.attrib:
-                for hero in self.hero_party.members:
-                    hero.set_light_diameter(
-                        float(xml_root.attrib["light_diameter"]),
-                        int(xml_root.attrib["light_diameter_decay_steps"]),
-                        None,
-                        None,
+                else:
+                    logger.error("Failed to parse the following as a color: %s", member_element.attrib["light_color"])
+            if "ambient_light_color" in member_element.attrib:
+                color_values = member_element.attrib["ambient_light_color"].split(",")
+                if len(color_values) == 4:
+                    member.ambient_light_color = (
+                        int(color_values[0]),
+                        int(color_values[1]),
+                        int(color_values[2]),
+                        int(color_values[3]),
                     )
+                else:
+                    logger.error(
+                        "Failed to parse the following as a color: %s", member_element.attrib["ambient_light_color"]
+                    )
+            party_members.append(member)
 
-            self.pending_dialog = self.game_info.parse_dialog(xml_root)
+        # Parse the party members
+        for member_element in save_root.findall("./PartyMember"):
+            parse_party_member(member_element)
+        if 0 == len(party_members):
+            # This is an old save, attempt to parse the root element as if it were a PartyMember
+            parse_party_member(save_root)
+
+        # Create the hero party from the party members
+        self.hero_party = HeroParty(party_members[0])
+        for member in party_members[1:]:
+            self.hero_party.add_member(member)
+        self.hero_party.set_main_character(save_root.attrib["name"] if not pc_name else pc_name)
+
+        # Parse properties of the entire party
+        self.hero_party.gp = int(save_root.attrib["gp"]) if "gp" in save_root.attrib else 0
+
+        # Load state related to repel monsters
+        if "repel_monsters" in save_root.attrib:
+            self.hero_party.repel_monsters = save_root.attrib["repel_monsters"] == "yes"
+        if "repel_monsters_decay_steps_remaining" in save_root.attrib:
+            self.hero_party.repel_monsters_decay_steps_remaining = int(
+                save_root.attrib["repel_monsters_decay_steps_remaining"]
+            )
+        if "repel_monster_fade_dialog" in save_root.attrib:
+            self.hero_party.repel_monster_fade_dialog = [save_root.attrib["repel_monster_fade_dialog"]]
+
+        # Load state related to last outside position
+        if "last_outside_map" in save_root.attrib:
+            self.hero_party.last_outside_map_name = save_root.attrib["last_outside_map"]
+            self.hero_party.last_outside_pos_dat_tile = Point(
+                int(save_root.attrib["last_outside_x"]),
+                int(save_root.attrib["last_outside_y"]),
+            )
+            self.hero_party.last_outside_dir = Direction[save_root.attrib["last_outside_dir"]]
+
+        # Load state related to removed decorations
+        for removed_decoration_element in save_root.findall("./RemovedDecorations/RemovedDecoration"):
+            removed_decoration_map_name = removed_decoration_element.attrib["map"]
+            removed_decoration_x = int(removed_decoration_element.attrib["x"])
+            removed_decoration_y = int(removed_decoration_element.attrib["y"])
+            removed_decoration_type_name = (
+                None if "type" not in removed_decoration_element.attrib else removed_decoration_element.attrib["type"]
+            )
+
+            # Find the removed map decoration and insert it into self.removed_decorations_by_map
+            for decoration in self.game_info.maps[removed_decoration_map_name].map_decorations:
+                decoration_type_name = None if decoration.type is None else decoration.type.name
+                if (
+                    decoration_type_name == removed_decoration_type_name
+                    and decoration.point.x == removed_decoration_x
+                    and decoration.point.y == removed_decoration_y
+                ):
+                    if removed_decoration_map_name not in self.removed_decorations_by_map:
+                        self.removed_decorations_by_map[removed_decoration_map_name] = []
+                    self.removed_decorations_by_map[removed_decoration_map_name].append(decoration)
+                    break
+
+        # Parse the progress markers
+        for progress_marker_element in save_root.findall("./ProgressMarkers/ProgressMarker"):
+            self.hero_party.progress_markers.append(progress_marker_element.attrib["name"])
+            # logger.debug("Loaded progress marker %s", progressMarkerElement.attrib["name"])
+
+        self.set_map(map, init=True)
+
+        # Load state related to light diameter for legacy saves.  In legacy saves, light diameter
+        # was at the party level instead of the party member level.
+        # FUTURE: At some point, remove this logic providing legacy save support.
+        if "light_diameter" in save_root.attrib and "light_diameter_decay_steps" in save_root.attrib:
+            for hero in self.hero_party.members:
+                hero.set_light_diameter(
+                    float(save_root.attrib["light_diameter"]),
+                    int(save_root.attrib["light_diameter_decay_steps"]),
+                    None,
+                    None,
+                )
+
+        self.pending_dialog = self.game_info.parse_dialog(save_root)
 
         # TODO: Remove Mocha from party
         """
@@ -515,6 +485,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             logger.exception("ERROR: Exception encountered while attempting to save game file")
 
     def archive_saved_game_file(self, save_game_file_path: str, archive_dir_name: str = "archive") -> None:
+        """Archived an existing saved game file to have a backup to potentially revert to a prior save."""
         if os.path.isfile(save_game_file_path):
             # Archive old save game files
             archive_dir = os.path.join(self.saves_path, archive_dir_name)
@@ -786,9 +757,11 @@ class GameState(GameStateInterface, DialogManagerMediator):
         self.dialog_manager.remove_cascading_dialog()
 
     def should_add_math_problems_in_combat(self) -> bool:
+        """Return flag indicating if combat is in math mode."""
         return self.__should_add_math_problems_in_combat
 
     def toggle_should_add_math_problems_in_combat(self) -> None:
+        """Toggle the flag indicating if combat is in math mode."""
         self.__should_add_math_problems_in_combat = not self.__should_add_math_problems_in_combat
 
     def get_dialog_manager(self) -> DialogManager:
