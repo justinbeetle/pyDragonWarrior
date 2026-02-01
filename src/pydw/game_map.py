@@ -60,8 +60,8 @@ class CloudSprite(MapSprite):
 
         # Determine a size for the cloud with width >= height
         size_tiles = Point(
-            random.randint(6, max(6, int(MapSprite.image_pad_tiles.y // 2))),
-            random.randint(4, 6),
+            random.randint(6, max(6, int(MapSprite.image_pad_tiles.x // 2))),
+            random.randint(4, max(6, int(MapSprite.image_pad_tiles.y // 2))),
         )
         size_pixels = size_tiles * MapSprite.tile_size_pixels
         self.cloud_size_sq_px = int(size_pixels.x * size_pixels.y)
@@ -74,7 +74,7 @@ class CloudSprite(MapSprite):
         surface.fill(pygame.Color(0, 0, 0, 0))
         cloud_color = pygame.Color("white")
         max_semi_minor_axis = int(min(pixelized_image_width, pixelized_image_height) * 0.25)
-        for _ in range(20):
+        for _ in range(max(20, size_tiles.w * size_tiles.h // 3)):
             semi_minor_axis = random.randint(4, max_semi_minor_axis)
             semi_major_axis = int(semi_minor_axis * random.uniform(1.0, 1.5))
             x_pos = random.randint(0, pixelized_image_width - 2 * semi_major_axis)
