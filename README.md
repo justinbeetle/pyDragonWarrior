@@ -249,7 +249,7 @@ The pygame library is integral to this project. Migrating to using Tiled maps an
 been a really nice improvement, but one that you only see with the licensed assets that are not included in the repo. A
 future distribution of the game will include these.
 
-* [pygame-ce](https://github.com/pygame-community/pygame-ce): Python library for multimedia applications
+* [pygame-ce](https://github.com/pygame-community/pygame-ce): Python library for multimedia applications<br>![](https://pyga.me/docs/_static/pygame_ce_tiny.webp)
 * [Leif Theden](https://github.com/bitcraft):
   * [pytmx](https://github.com/bitcraft/pytmx): Python library to read Tiled maps
   * [pyscroll](https://github.com/bitcraft/pyscroll): Python library to render Tiled maps
@@ -259,7 +259,7 @@ future distribution of the game will include these.
 #### Python Development Tools
 
 * [mypy](https://github.com/python/mypy): I wouldn't want to work on a large Python project without type annotations.
-And without a tool, mypy, to validate them, the type annotations wouldn't be trustworthy.
+And without a tool, mypy, to validate them, the type annotations wouldn't be trustworthy.<br><img src="https://github.com/python/mypy/blob/master/docs/source/mypy_light.svg" alt="mypy logo" width="300px"/>
 * [PyCharm](https://www.jetbrains.com/pycharm/): Python IDE
 * [Pylint](https://github.com/PyCQA/pylint): Python static code analysis
 
