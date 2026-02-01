@@ -76,7 +76,7 @@ class CloudSprite(MapSprite):
         max_semi_minor_axis = int(min(pixelized_image_width, pixelized_image_height) * 0.25)
         for _ in range(20):
             semi_minor_axis = random.randint(4, max_semi_minor_axis)
-            semi_major_axis = semi_minor_axis + random.randint(0, 10)
+            semi_major_axis = int(semi_minor_axis * random.uniform(1.0, 1.5))
             x_pos = random.randint(0, pixelized_image_width - 2 * semi_major_axis)
             y_pos = random.randint(0, pixelized_image_height - 2 * semi_minor_axis)
             pygame.draw.ellipse(surface, cloud_color, (x_pos, y_pos, 2 * semi_major_axis, 2 * semi_minor_axis))
