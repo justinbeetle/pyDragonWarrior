@@ -488,7 +488,6 @@
                <DialogAssert type="HAS_ITEM" name="gp" count="[COST]">
                   <Dialog>"Thou dost not have enough gold."</Dialog>
                   <Dialog>"I will see thee later."</Dialog></DialogAssert>
-               <Dialog>"Here you go."</Dialog>
                <DialogAction type="GAIN_ITEM" name="[ITEM]"/>
                <DialogAction type="LOSE_ITEM" name="gp" count="[COST]"/>
                <Dialog>"Here, take this key.  Dost thou wish to purchase more?"</Dialog>

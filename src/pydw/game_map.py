@@ -74,7 +74,7 @@ class CloudSprite(MapSprite):
         surface.fill(pygame.Color(0, 0, 0, 0))
         cloud_color = pygame.Color("white")
         max_semi_minor_axis = int(min(pixelized_image_width, pixelized_image_height) * 0.25)
-        for _ in range(max(20, size_tiles.w * size_tiles.h // 3)):
+        for _ in range(max(20, int(size_tiles.w * size_tiles.h // 3))):
             semi_minor_axis = random.randint(4, max_semi_minor_axis)
             semi_major_axis = int(semi_minor_axis * random.uniform(1.0, 1.5))
             x_pos = random.randint(0, pixelized_image_width - 2 * semi_major_axis)

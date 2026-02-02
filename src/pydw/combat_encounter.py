@@ -202,9 +202,10 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
 
     def render_encounter_background_phase_in(self) -> None:
         for percent in range(5, 100, 5):
+            self.advance_state()
             self.render_encounter_background(True, percent)
             GameDialog.create_encounter_status_dialog(self.hero_party).blit(self.game_state.screen)
-            self.advance_time(frame_rate_hz=40)
+            self.advance_time()
 
         # Final render to drop to complete the background and drop in the monsters
         self.render_monsters()
@@ -314,9 +315,11 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
 
     def render_flickering_monsters(self, monsters: list[CombatCharacterState], flicker_color: pygame.Color) -> None:
         for _ in range(10):
+            self.advance_state()
             self.render_monsters(monsters, flicker_color=flicker_color)
             self.advance_time()
 
+            self.advance_state()
             self.render_monsters()
             self.advance_time()
 
@@ -324,6 +327,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
         status_dialog = GameDialog.create_encounter_status_dialog(self.hero_party)
         offset_pixels = Point(CombatEncounter.DAMAGE_FLICKER_PIXELS, CombatEncounter.DAMAGE_FLICKER_PIXELS)
         for _ in range(10):
+            self.advance_state()
             if not self.hero_party.is_still_in_combat():
                 # On a death blow, the background flickers red
                 self.game_state.screen.fill("red")
@@ -334,6 +338,7 @@ class CombatEncounter(GameMode, CombatEncounterInterface):
             self.message_dialog.blit(self.game_state.screen, offset_pixels=offset_pixels)
             self.advance_time()
 
+            self.advance_state()
             self.render_monsters(render_dialogs=False)
             status_dialog.blit(self.game_state.screen)
             self.message_dialog.blit(self.game_state.screen)

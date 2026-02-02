@@ -45,14 +45,15 @@ class GameMode(ABC):
 
     @abstractmethod
     def advance_state(self) -> bool:
-        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
-        Return a boolean indicating if the state was updated, as state updates need to be followed by
-        drawing the updated state to the display."""
+        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode,
+        without advancing the time.  To advance the time, a caller should call advance_tick to both advance
+        the state and time.  Return a boolean indicating if the state was updated, as state updates need to
+        be followed by drawing the updated state to the display."""
 
     def advance_time(self, flip_buffer: bool = True, frame_rate_hz: int = 30) -> None:
-        """Update the state of the game mode for one tick (frame) of game time, if applicable for the mode.
-        Return a boolean indicating if the state was updated, as state updates need to be followed by
-        drawing the updated state to the display."""
+        """Advance the time for the game mode by one tick.  This does not update the state.  Generally call
+        advance_tick to advance both the state and the time, unless the advance of state and time need to
+        be decoupled."""
         # Allow pygame to process internal events for interacting with the OS every frame
         pygame.event.pump()
 
@@ -71,6 +72,8 @@ class GameMode(ABC):
         """Advance the state of the game mode by one tick (frame), if applicable to the mode.  If the game state
         changes, redraw the display and advance time to maintain the frame rate.  Return a boolean indicating
         if the the state was advanced, the display redrawn, and the buffer flipped.
+
+        This is the method that should be called to advance game state for a mode.
         """
         if self.advance_state():
             # First do the work
