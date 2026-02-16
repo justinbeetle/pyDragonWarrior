@@ -207,6 +207,7 @@ def _remap_keyboard_event(
         elif pygame.K_e == event.key:
             if translate_e_to_enter:
                 event.__dict__["key"] = pygame.K_RETURN
+                event.__dict__["from_e"] = True
         elif pygame.K_q == event.key:
             event.__dict__["key"] = pygame.K_SPACE
 
