@@ -121,7 +121,7 @@ class GameMapInterface(metaclass=abc.ABCMeta):
                 if not self.can_npc_move_to_tile(neighbor, enforce_npc_dof_limit=False, prev_tile=current):
                     if verbose:
                         print(
-                            f"\t\t\tin compute_npc_path; cannot move to tile",
+                            "\t\t\tin compute_npc_path; cannot move to tile",
                             flush=True,
                         )
                     continue
@@ -147,7 +147,7 @@ class GameMapInterface(metaclass=abc.ABCMeta):
                 reverse_path.append(goal)
                 goal = came_from[goal]
             return list(reversed(reverse_path))
-        elif verbose:
+        if verbose:
             print(f"in compute_npc_path; goal is not in came_from={came_from}", flush=True)
 
         # No path exists

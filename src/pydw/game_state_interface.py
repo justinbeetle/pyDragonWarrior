@@ -172,12 +172,10 @@ class GameStateInterface(ABC, GenericGameState):
     @abstractmethod
     def should_add_math_problems_in_combat(self) -> bool:
         """Return flag indicating if combat is in math mode."""
-        pass
 
     @abstractmethod
     def toggle_should_add_math_problems_in_combat(self) -> None:
         """Toggle the flag indicating if combat is in math mode."""
-        pass
 
     @abstractmethod
     def get_dialog_manager(self) -> DialogManager:

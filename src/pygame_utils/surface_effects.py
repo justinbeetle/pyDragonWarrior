@@ -4,7 +4,6 @@ import numpy as np
 import pygame
 
 # TODO: Factor these out of this module
-from pydw.game_dialog import GameDialog
 from pydw.game_state_interface import GameStateInterface
 
 

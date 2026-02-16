@@ -173,13 +173,14 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                 for line in lines:
                     this_line_visible = True
                     for rect in wall_tile_rects:
-                        # Expand the width and height by one pixel as clipline treat rect.bottom and rect.right attributes
-                        # of a pygame.Rect object for storing rectangular coordinates always lie one pixel outside of its
-                        # actual border.
+                        # Expand the width and height by one pixel as clipline treat rect.bottom and rect.right
+                        # attributes of a pygame.Rect object for storing rectangular coordinates always lie one
+                        # pixel outside of its actual border.
                         # TODO: Make a clipline utility method to handle this!!!
                         clipped_line = pygame.Rect(rect.left, rect.top, rect.width + 1, rect.height + 1).clipline(line)
 
-                        # If the line doesn't collide with the rect or it collides only at a single point, then it is visible
+                        # If the line doesn't collide with the rect or it collides only at a single point, then it
+                        # is visible.
                         if clipped_line and clipped_line[0] != clipped_line[1]:
                             this_line_visible = False
                             break
