@@ -254,9 +254,6 @@ class GameDialogEvaluator:
 
         stop_time = time.time()
 
-        # if self.game_state.is_running:
-        #    AudioPlayer().play_sound('select')
-
         return message_dialog.get_user_text(), stop_time - start_time
 
     def get_menu_result(self, menu_dialog: GameDialog, allow_quit: bool = True) -> Optional[str]:

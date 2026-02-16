@@ -330,6 +330,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     """Run the pyDragonWarrior Launcher via Bootstrapper"""
     try:
         return Bootstrapper(Launcher()).run(argv)
+    except KeyboardInterrupt:
+        return 0
     except Exception:
         traceback.print_exc()
     return 1

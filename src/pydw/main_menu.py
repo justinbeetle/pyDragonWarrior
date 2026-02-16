@@ -129,6 +129,8 @@ class MainMenu(GameMode):
                     pc_name_or_file_name = gde.wait_for_user_input(begin_quest_dialog, "What is your name?")[0]
 
                     if pc_name_or_file_name:
+                        AudioPlayer().play_sound("select")
+
                         if pc_name_or_file_name in saved_games:
                             gde.add_and_wait_for_message(
                                 "Thou hast already started a quest.  Dost thou want to start over?",

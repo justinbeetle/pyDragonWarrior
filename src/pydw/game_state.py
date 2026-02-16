@@ -480,7 +480,10 @@ class GameState(GameStateInterface, DialogManagerMediator):
             with open(save_game_file_path, "w") as save_game_file:
                 save_game_file.write(xml_string)
 
-            logger.info("Saved game to file %s", save_game_file_path)
+            if logger.getEffectiveLevel() <= logging.INFO:
+                logger.info("Saved game to file %s", save_game_file_path)
+            else:
+                print(f"Saved game to file {save_game_file_path}")
         except Exception:
             logger.exception("ERROR: Exception encountered while attempting to save game file")
 
