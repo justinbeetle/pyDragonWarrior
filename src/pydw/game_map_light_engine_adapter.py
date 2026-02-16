@@ -2,6 +2,7 @@
 
 import logging
 import math
+from copy import deepcopy
 from typing import Optional
 
 import pygame
@@ -106,6 +107,7 @@ class GameMapLightEngineAdapter:
                 [self.game_map.get_tile_info(Point(x, y)).name in ["walls"] for y in range(min_y, max_y + 1)]
                 for x in range(min_x, max_x + 1)
             ]
+            visible_wall_tiles = deepcopy(wall_tiles)
             tile_rect = pygame.Rect(
                 self.image_pad_tiles * self.tile_size_pixels,
                 (self.tile_size_pixels, self.tile_size_pixels),
@@ -119,21 +121,28 @@ class GameMapLightEngineAdapter:
                 except IndexError:
                     return False
 
-            def unset_wall(tile: Point) -> None:
+            def is_visible_wall(tile: Point) -> bool:
                 try:
                     x, y = tile.get_as_int_tuple()
-                    wall_tiles[x - min_x][y - min_y] = False
+                    return visible_wall_tiles[x - min_x][y - min_y]
+                except IndexError:
+                    return False
+
+            def unset_visible_wall(tile: Point) -> None:
+                try:
+                    x, y = tile.get_as_int_tuple()
+                    visible_wall_tiles[x - min_x][y - min_y] = False
                 except IndexError:
                     logger.exception(
                         "Enccounter index error for tile %s where min_x=%s; max_x=%s; min_y=%s; \
-max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
+max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                         tile,
                         min_x,
                         max_x,
                         min_y,
                         max_y,
-                        len(wall_tiles),
-                        len(wall_tiles[0]),
+                        len(visible_wall_tiles),
+                        len(visible_wall_tiles[0]),
                     )
 
             def is_visible(
@@ -196,15 +205,13 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                             ),
                             this_tile_rect.topleft,
                         )
-                    unset_wall(tile)
+                    unset_visible_wall(tile)
                 return visible
 
             light_x = int(light_position_tiles.x)
             light_y = int(light_position_tiles.y)
-            max_left_x = light_x
-            min_right_x = max_left_x
-            max_upper_y = light_y
-            min_lower_y = max_upper_y
+            max_left_x = min_right_x = light_x
+            max_upper_y = min_lower_y = light_y
             left_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (0, self.tile_size_pixels))]
             right_line_rects = [left_line_rects[0].move(self.tile_size_pixels, 0)]
             top_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (self.tile_size_pixels, 0))]
@@ -244,20 +251,48 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
                 else:
                     add_shadow(tile_pos, bottom_line_rects)
 
+            # Handle upper
+            for y in range(max_upper_y, min_y - 1, -1):
+                tile = Point(light_x, y)
+                if is_wall(tile):
+                    add_shadow_top(tile)
+                    break
+
+            # Handle lower
+            for y in range(min_lower_y, max_y + 1):
+                tile = Point(light_x, y)
+                if is_wall(tile):
+                    add_shadow_bottom(tile)
+                    break
+
+            # Handle left
+            for x in range(max_left_x, min_x - 1, -1):
+                tile = Point(x, light_y)
+                if is_wall(tile):
+                    add_shadow_left(tile)
+                    break
+
+            # Handle right
+            for x in range(min_right_x, max_x + 1):
+                tile = Point(x, light_y)
+                if is_wall(tile):
+                    add_shadow_right(tile)
+                    break
+
             # Handle upper left diagnal
             wall_tile_rects = []
             for x in range(max_left_x, min_x - 1, -1):
                 for y in range(max_upper_y, min_y - 1, -1):
                     tile = Point(x, y)
-                    if is_wall(tile):
+                    if is_visible_wall(tile):
                         is_visible(tile, check_ul=False, check_ur=True, check_lr=True, check_ll=True)
             for x in range(max_left_x, min_x - 1, -1):
                 for y in range(max_upper_y, min_y - 1, -1):
                     tile = Point(x, y)
-                    if is_wall(tile):
-                        if not is_wall(tile.get_upper()):
+                    if is_visible_wall(tile):
+                        if not is_wall(tile.get_upper()) or is_wall(tile.get_right()):
                             add_shadow_top(tile)
-                        if not is_wall(tile.get_left()):
+                        if not is_wall(tile.get_left()) or is_wall(tile.get_lower()):
                             add_shadow_left(tile)
 
             # Handle lower left diagnal
@@ -265,15 +300,15 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             for x in range(max_left_x, min_x - 1, -1):
                 for y in range(min_lower_y, max_y + 1):
                     tile = Point(x, y)
-                    if is_wall(tile):
+                    if is_visible_wall(tile):
                         is_visible(tile, check_ul=True, check_ur=True, check_lr=True, check_ll=False)
             for x in range(max_left_x, min_x - 1, -1):
                 for y in range(min_lower_y, max_y + 1):
                     tile = Point(x, y)
-                    if is_wall(tile):
-                        if not is_wall(tile.get_lower()):
+                    if is_visible_wall(tile):
+                        if not is_wall(tile.get_lower()) or is_wall(tile.get_right()):
                             add_shadow_bottom(tile)
-                        if not is_wall(tile.get_left()):
+                        if not is_wall(tile.get_left()) or is_wall(tile.get_upper()):
                             add_shadow_left(tile)
 
             # Handle upper right diagnal
@@ -281,15 +316,15 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             for x in range(min_right_x, max_x + 1):
                 for y in range(max_upper_y, min_y - 1, -1):
                     tile = Point(x, y)
-                    if is_wall(tile):
+                    if is_visible_wall(tile):
                         is_visible(tile, check_ul=True, check_ur=False, check_lr=True, check_ll=True)
             for x in range(min_right_x, max_x + 1):
                 for y in range(max_upper_y, min_y - 1, -1):
                     tile = Point(x, y)
-                    if is_wall(tile):
-                        if not is_wall(tile.get_upper()):
+                    if is_visible_wall(tile):
+                        if not is_wall(tile.get_upper()) or is_wall(tile.get_left()):
                             add_shadow_top(tile)
-                        if not is_wall(tile.get_right()):
+                        if not is_wall(tile.get_right()) or is_wall(tile.get_lower()):
                             add_shadow_right(tile)
 
             # Handle lower right diagnal
@@ -297,15 +332,15 @@ max_y=%s; len(wall_tiles)=%s; len(wall_tiles[0])=%s",
             for x in range(min_right_x, max_x + 1):
                 for y in range(min_lower_y, max_y + 1):
                     tile = Point(x, y)
-                    if is_wall(tile):
+                    if is_visible_wall(tile):
                         is_visible(tile, check_ul=True, check_ur=True, check_lr=False, check_ll=True)
             for x in range(min_right_x, max_x + 1):
                 for y in range(min_lower_y, max_y + 1):
                     tile = Point(x, y)
-                    if is_wall(tile):
-                        if not is_wall(tile.get_lower()):
+                    if is_visible_wall(tile):
+                        if not is_wall(tile.get_lower()) or is_wall(tile.get_left()):
                             add_shadow_bottom(tile)
-                        if not is_wall(tile.get_right()):
+                        if not is_wall(tile.get_right()) or is_wall(tile.get_upper()):
                             add_shadow_right(tile)
 
             light.add_light(light_surface, shadow_rects, light_screen_pos_px)
