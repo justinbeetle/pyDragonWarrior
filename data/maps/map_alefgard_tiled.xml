@@ -4,8 +4,10 @@
    <PointTransition    decoration="pass"          x="52"  y="46"                         toMap="brecconary"            respawnDecorations="yes"/>
    <PointTransition    decoration="pass"          x="52"  y="47"                         toMap="brecconary"            respawnDecorations="yes"/>
    <IncomingTransition decoration="pass"          x="51"  y="47"             dir="WEST"  toMap="brecconary"/>
-   <PointTransition    decoration="pass"          x="5"   y="7"              dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
-   <PointTransition    decoration="pass"          x="112" y="15"             dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
+   <PointTransition    decoration="pass"          x="5"   y="6"              dir="SOUTH" toMap="garinham"              respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="5"   y="7"              dir="SOUTH" toMap="garinham"/>
+   <PointTransition    decoration="pass"          x="112" y="14"             dir="SOUTH" toMap="kol"                   respawnDecorations="yes"/>
+   <IncomingTransition decoration="pass"          x="112" y="15"             dir="SOUTH" toMap="kol"/>
    <PointTransition    decoration="pass"          x="111" y="78"                         toMap="rimuldar"              respawnDecorations="yes"/>
    <IncomingTransition decoration="pass"          x="112" y="78"             dir="EAST"  toMap="rimuldar"/>
    <PointTransition    decoration="pass"          x="31"  y="95"             dir="SOUTH" toMap="hauksness"             respawnDecorations="yes"/>
