@@ -1341,7 +1341,7 @@ def main() -> None:
         is_waiting_for_user_input = True
         wait_for_message_to_fully_display(dialog_with_user_input)
         while is_waiting_for_user_input:
-            events = game_events.get_events(True)
+            events = game_events.get_events()
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:

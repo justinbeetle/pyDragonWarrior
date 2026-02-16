@@ -207,16 +207,28 @@ class GameDialogEvaluator:
 
         is_waiting_for_user_input = True
         start_time = time.time()
+
+        # Don't translate WASD to arrow keys in text entry where W, A, S, or D are allowed text inputs.
+        translate_wasd_to_uldr = not (allowed_input is None or set("WASDwasd").intersection(set(allowed_input)))
+
+        # Don't translate E to the enter key in text entry where E is an allowed text input.
+        translate_e_to_enter = GameDialog.use_menus_for_text_entry() and not (
+            allowed_input is None or set("Ee").intersection(set(allowed_input))
+        )
         while self.game_state.is_running and is_waiting_for_user_input:
             # Process events
-            events = game_events.get_events(True, translate_e_to_enter=GameDialog.use_menus_for_text_entry())
+            events = game_events.get_events(
+                translate_wasd_to_uldr=translate_wasd_to_uldr, translate_e_to_enter=translate_e_to_enter
+            )
             for event in events:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state.handle_quit()
                     elif event.key == pygame.K_RETURN:
-                        if GameDialog.use_menus_for_text_entry():
-                            # Get a menu selection and turn that into an event
+                        if GameDialog.use_menus_for_text_entry() and "from_joystick" in event.__dict__:
+                            # Get a menu selection and turn that into an event on an enter keydown event
+                            # mapped from a joystick key press.  Limiting to joystick so that keyboard and
+                            # joystick input can better coexist.
                             menu_result = message_dialog.get_selected_menu_option()
                             if menu_result == GameDialog.ENTER_UNICODE:
                                 is_waiting_for_user_input = False
@@ -237,9 +249,8 @@ class GameDialogEvaluator:
                 elif event.type == pygame.QUIT:
                     self.game_state.handle_quit(force=True)
 
-            if 0 == len(events):
-                if not self.game_state.get_game_mode().advance_tick():
-                    self.game_state.get_game_mode().advance_time()
+            if not self.game_state.get_game_mode().advance_tick():
+                self.game_state.get_game_mode().advance_time()
 
         stop_time = time.time()
 
