@@ -125,6 +125,7 @@ class MainMenu(GameMode):
                     dm.remove_cascading_dialog(False)
                 elif menu_result == "Begin a Quest":
                     begin_quest_dialog = GameDialog.create_message_dialog()
+                    dm.add_cascading_dialog(begin_quest_dialog)
                     pc_name_or_file_name = gde.wait_for_user_input(begin_quest_dialog, "What is your name?")[0]
 
                     if pc_name_or_file_name:
