@@ -212,16 +212,6 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
             lower_right_line_rects = [lower_left_line_rects[0].move(self.tile_size_pixels, 0)]
             top_line_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
             bottom_line_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 1.0)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
-            bottom_line_top_half_rects = [
-                pygame.Rect((self.image_pad_tiles + Point(0, 0.5)) * self.tile_size_pixels, (self.tile_size_pixels, 0)),
-                pygame.Rect(
-                    (self.image_pad_tiles + Point(0, 0.5)) * self.tile_size_pixels, (0, self.tile_size_pixels // 2)
-                ),
-                pygame.Rect(
-                    (self.image_pad_tiles + Point(1, 0.5)) * self.tile_size_pixels, (0, self.tile_size_pixels // 2)
-                ),
-            ]
-            bottom_line_below_top_half_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.5)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
             top_of_tile_rect = pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (self.tile_size_pixels, self.tile_size_pixels // 2))
             bottom_of_tile_rect = top_of_tile_rect.move(0, self.tile_size_pixels // 2)
 
@@ -247,14 +237,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                 add_shadow(tile_pos, top_line_rects)
 
             def add_shadow_bottom(tile_pos: Point) -> None:
-                if self.bottom_wall_tiles_split_in_middle:
-                    if light_position_tiles.y <= tile_pos.y + 0.5:
-                        add_shadow(tile_pos, bottom_line_top_half_rects)
-                    else:
-                        #add_shadow(tile_pos, bottom_line_below_top_half_rects)
-                        add_shadow(tile_pos, bottom_line_rects)
-                else:
-                    add_shadow(tile_pos, bottom_line_rects)
+                add_shadow(tile_pos, bottom_line_rects)
 
             # Handle upper
             added_wall = False
@@ -360,27 +343,22 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                         if not is_wall(tile.get_right()) or is_wall(tile.get_upper()):
                             add_shadow_right(tile)
 
-            # Find visible forward facing walls
+            # Find visible forward facing walls and tops of walls
             forward_facing_rects = []
-            for x in range(min_x, max_x + 1):
-                for y in range(min_y, max_upper_y + 1):
-                    tile = Point(x, y)
-                    if is_wall(tile) and not is_wall(tile.get_lower()):
-                        forward_facing_rects.append(
-                            self.translate_rect_world_to_screen(bottom_of_tile_rect.move(tile * self.tile_size_pixels))
-                        )
-
-            # Find tops of walls
             wall_top_rects = []
             for x in range(min_x, max_x + 1):
                 for y in range(min_y, max_y + 1):
                     tile = Point(x, y)
                     if is_wall(tile):
-                        wall_top_rects.append(
-                            self.translate_rect_world_to_screen(top_of_tile_rect.move(tile * self.tile_size_pixels))
-                        )
                         if is_wall(tile.get_lower()):
                             wall_top_rects.append(
+                                self.translate_rect_world_to_screen(tile_rect.move(tile * self.tile_size_pixels))
+                            )
+                        else:
+                            wall_top_rects.append(
+                                self.translate_rect_world_to_screen(top_of_tile_rect.move(tile * self.tile_size_pixels))
+                            )
+                            forward_facing_rects.append(
                                 self.translate_rect_world_to_screen(bottom_of_tile_rect.move(tile * self.tile_size_pixels))
                             )
 
@@ -453,7 +431,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                     or hero.ambient_light.intensity != ambient_intensity
                     or hero.ambient_light.color != ambient_color
                 ):
-                    hero.ambient_light = Light(light_radius_px*2, ambient_color, ambient_intensity, flicker=False)
+                    hero.ambient_light = Light(light_radius_px, ambient_color, ambient_intensity, flicker=False)
             else:
                 hero.ambient_light = None
             if light_intensity > 0:

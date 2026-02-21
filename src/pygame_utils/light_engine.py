@@ -65,7 +65,7 @@ class Light:
                 [self.pixel_shader(flicker_increment_px), self.pixel_shader(2 * flicker_increment_px)]
             )
         self.render_surface.set_colorkey((0, 0, 0))
-        self.is_debugging = True
+        self.is_debugging = False
 
     def pixel_shader(self, radius_offset_px: int = 0) -> pygame.surface.Surface:
         """Return a surface with the full light map (no shadows) for this light source."""
@@ -305,9 +305,10 @@ class Light:
         dy = pos_px.y - self.radius_px
 
         # Draw the shadows on the ground
-        for shadow_tile_screen_rect in self.filter_shadow_rects(shadow_rects, pos_px):
+        filtered_shadow_rects = self.filter_shadow_rects(shadow_rects, pos_px)
+        for idx, screen_rect in enumerate(filtered_shadow_rects):
             # Shift the rect to be in the coordinate system of self.render_surface
-            shadow_tile_rect = shadow_tile_screen_rect.move(-dx, -dy)
+            shadow_tile_rect = screen_rect.move(-dx, -dy)
 
             if self.check_cast(pixel_shader_surf, shadow_tile_rect):
                 polygon_pts = self.get_shadow_polygon_points(shadow_tile_rect)
@@ -316,6 +317,9 @@ class Light:
                     logger.error("Light is inside a shadow tile")
                     return
                 pygame.draw.polygon(self.render_surface, (0, 0, 0), polygon_pts)
+
+                if False and self.is_debugging and surface:
+                    pygame.draw.polygon(surface, (255, 0, 0), [p + (dx, dy) for p in polygon_pts])
 
         # Shift the shadows for the top of wall tiles
         render_surface_rect = pygame.Rect((0, 0), self.render_surface.get_size())
@@ -338,47 +342,51 @@ class Light:
                 continue
 
             if self.is_debugging and surface:
-                surface.fill((128, 128, 0, 50), screen_rect)
+                surface.fill((128, 128, 0), screen_rect)
                 surface.blit(
                     pygame.font.Font(pygame.font.get_default_font(), 16).render(
                         f"{idx}", False, pygame.Color("black")
                     ),
                     screen_rect.topleft,
                 )
-            self.render_surface.blit(self.render_surface, dest_rect.topleft, source_rect)
+                #logger.debug(f"blit from {source_rect} to {dest_rect} in {render_surface_rect}; {pygame.transform.average_color(self.render_surface, source_rect)} / {pygame.transform.average_color(self.render_surface, dest_rect)}")
+
+            #self.render_surface.blit(self.render_surface, dest_rect, source_rect)
+            source_subsurface = self.render_surface.subsurface(source_rect) #.copy()
+            dest_subsurface = self.render_surface.subsurface(dest_rect.topleft, source_rect.size)
+            pygame.transform.scale(source_subsurface, source_rect.size, dest_subsurface)
+            #self.render_surface.blit(source_surface, dest_rect)
+
             if dest_rect.size != source_rect.size:
                 self.render_surface.fill(
                     (0, 0, 0), pygame.Rect(dest_rect.x, dest_rect.y + source_rect.height, dest_rect.w, dest_rect.h - source_rect.height)
                 )
 
-        # Apply the shadows up forward facing walls
+        # Apply shadows up forward facing walls
         for screen_rect in forward_facing_wall_rects:
             # Shift the rects to be in the coordinate system of self.render_surface
             dest_rect = rect_intersection(screen_rect.move(-dx, -dy), render_surface_rect)
             if dest_rect is None:
                 continue
-            source_rect = pygame.Rect(dest_rect.x, dest_rect.y + dest_rect.h, dest_rect.w, 1)
-            try:
-                source_subsurface = self.render_surface.subsurface(source_rect)
-                dest_subsurface = self.render_surface.subsurface(dest_rect)
-                pygame.transform.scale(source_subsurface, dest_rect.size, dest_subsurface)
-            except ValueError:
-                logger.exception(
-                    f"screen_rect={screen_rect}; dest_rect={dest_rect}; source_rect={source_rect}; self.render_surface.size={self.render_surface.size}"
-                )
-                if self.is_debugging and surface:
-                    surface.fill((128, 128, 0), screen_rect)
-                    surface.blit(
-                        pygame.font.Font(pygame.font.get_default_font(), 16).render(
-                            f"{screen_rect.x}, {screen_rect.y}", False, pygame.Color("black")
-                        ),
-                        screen_rect.topleft,
-                    )
+            source_rect = rect_intersection(pygame.Rect(dest_rect.x, dest_rect.y + dest_rect.h, dest_rect.w, 1), render_surface_rect)
+            if source_rect is None:
+                self.render_surface.fill((0, 0, 0), dest_rect)
+                continue
 
-        # Draw the shadows on the ground
+            source_subsurface = self.render_surface.subsurface(source_rect)
+            dest_subsurface = self.render_surface.subsurface(dest_rect)
+            pygame.transform.scale(source_subsurface, dest_rect.size, dest_subsurface)
+
+        # Draw the shadow rects for debugging
         if self.is_debugging and surface:
-            for shadow_tile_screen_rect in shadow_rects:
-                pygame.draw.line(surface, (0, 0, 255), shadow_tile_screen_rect.topleft, shadow_tile_screen_rect.bottomright, 5)
+            for idx, screen_rect in enumerate(filtered_shadow_rects):
+                pygame.draw.rect(surface, (0, 0, 255), screen_rect, 5)
+                surface.blit(
+                    pygame.font.Font(pygame.font.get_default_font(), 16).render(
+                        f"{idx}", False, pygame.Color("blue")
+                    ),
+                    screen_rect.move(5, 0).topleft,
+                )
 
         self.render_surface.blit(pixel_shader_surf, special_flags=pygame.BLEND_RGBA_MIN)
 
