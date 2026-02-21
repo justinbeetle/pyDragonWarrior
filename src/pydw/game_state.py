@@ -187,7 +187,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
         else:
             save_root = ET.parse(save_game_file_path).getroot()
 
-        map = save_root.attrib["map"]
+        map_name = save_root.attrib["map"]
         party_members: list[HeroState] = []
 
         # Local helper method for parsing party members
@@ -202,8 +202,8 @@ class GameState(GameStateInterface, DialogManagerMediator):
 
             member = HeroState(
                 member_type,
-                self.game_info.get_location(map, member_element),
-                self.game_info.get_direction(map, member_element),
+                self.game_info.get_location(map_name, member_element),
+                self.game_info.get_direction(map_name, member_element),
                 member_element.attrib["name"] if not pc_name else pc_name,
                 int(member_element.attrib["xp"]) if "xp" in member_element.attrib else 0,
                 member_is_combat_character,
@@ -331,7 +331,7 @@ class GameState(GameStateInterface, DialogManagerMediator):
             self.hero_party.progress_markers.append(progress_marker_element.attrib["name"])
             # logger.debug("Loaded progress marker %s", progressMarkerElement.attrib["name"])
 
-        self.set_map(map, init=True)
+        self.set_map(map_name, init=True)
 
         # Load state related to light diameter for legacy saves.  In legacy saves, light diameter
         # was at the party level instead of the party member level.
