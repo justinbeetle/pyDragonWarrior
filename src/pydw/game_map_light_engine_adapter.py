@@ -103,7 +103,8 @@ class GameMapLightEngineAdapter:
             max_y = math.ceil(min(light_position_tiles.y + light_radius_tiles, self.game_map.size().y - 1))
 
             # Iterate through tiles to get a list of tile rects which should cast shadows.
-            shadow_rects = []
+            # shadow_rects is just tuples as pygame.Rect is not hashable and can't be used in a set.
+            shadow_rects = set()
             wall_tiles: list[list[bool]] = [
                 [self.game_map.get_tile_info(Point(x, y)).name in ["walls"] for y in range(min_y, max_y + 1)]
                 for x in range(min_x, max_x + 1)
@@ -112,6 +113,10 @@ class GameMapLightEngineAdapter:
             tile_rect = pygame.Rect(
                 self.image_pad_tiles * self.tile_size_pixels,
                 (self.tile_size_pixels, self.tile_size_pixels),
+            )
+            top_tile_rect = pygame.Rect(
+                (self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels,
+                (self.tile_size_pixels, 3 * self.tile_size_pixels // 4),
             )
             wall_tile_rects: list[pygame.Rect] = []
 
@@ -160,7 +165,10 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                 is visible, add its rectange to wall_tile_rects.  Where a wall tile is
                 not visible, remove it from wall_tiles."""
                 light_x, light_y = light_screen_pos_px.get_as_int_tuple()
-                this_tile_rect = self.translate_rect_world_to_screen(tile_rect.move(tile * self.tile_size_pixels))
+                if is_wall(tile.get_upper()):
+                    this_tile_rect = self.translate_rect_world_to_screen(tile_rect.move(tile * self.tile_size_pixels))
+                else:
+                    this_tile_rect = self.translate_rect_world_to_screen(top_tile_rect.move(tile * self.tile_size_pixels))
                 lines: list[tuple[int, int, int, int]] = []
                 if check_ul:
                     lines.append((light_x, light_y, this_tile_rect.left, this_tile_rect.top))
@@ -199,7 +207,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                             ),
                             this_tile_rect.topleft,
                         )
-                    #unset_visible_wall(tile)
+                    # unset_visible_wall(tile)
                 return visible
 
             light_x = int(light_position_tiles.x)
@@ -207,34 +215,57 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
             max_left_x = min_right_x = light_x
             max_upper_y = min_lower_y = light_y
             left_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (0, self.tile_size_pixels))]
+            upper_left_line_rects = [pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (0, self.tile_size_pixels // 4))]
             lower_left_line_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels, (0, 3 * self.tile_size_pixels // 4))]
             right_line_rects = [left_line_rects[0].move(self.tile_size_pixels, 0)]
+            upper_right_line_rects = [upper_left_line_rects[0].move(self.tile_size_pixels, 0)]
             lower_right_line_rects = [lower_left_line_rects[0].move(self.tile_size_pixels, 0)]
-            top_line_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
+            top_line_end_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
+            top_line_mid_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.5)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
+            left_line_top_mid_connector_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 0.25)) * self.tile_size_pixels, (0, self.tile_size_pixels // 4))]
+            right_line_top_mid_connector_rects = [left_line_top_mid_connector_rects[0].move(self.tile_size_pixels, 0)]
             bottom_line_rects = [pygame.Rect((self.image_pad_tiles + Point(0, 1.0)) * self.tile_size_pixels, (self.tile_size_pixels, 0))]
             top_of_tile_rect = pygame.Rect(self.image_pad_tiles * self.tile_size_pixels, (self.tile_size_pixels, self.tile_size_pixels // 2))
             bottom_of_tile_rect = top_of_tile_rect.move(0, self.tile_size_pixels // 2)
 
             def add_shadow(tile_pos: Point, rects: list[pygame.Rect]) -> None:
                 for rect in rects:
-                    shadow_rects.append(
-                        self.translate_rect_world_to_screen(rect.move(tile_pos * self.tile_size_pixels))
-                    )
+                    screen_rect = self.translate_rect_world_to_screen(rect.move(tile_pos * self.tile_size_pixels))
+                    shadow_rects.add((screen_rect.x, screen_rect.y, screen_rect.w, screen_rect.h))
 
             def add_shadow_left(tile_pos: Point) -> None:
                 if is_wall(tile.get_upper()):
-                    add_shadow(tile_pos, left_line_rects)
+                    if is_wall(tile.get_lower()) or is_wall(tile.get_right()) or not is_visible_wall(tile.get_left()):
+                        add_shadow(tile_pos, left_line_rects)
+                    else:
+                        add_shadow(tile_pos, upper_left_line_rects)
                 else:
                     add_shadow(tile_pos, lower_left_line_rects)
 
             def add_shadow_right(tile_pos: Point) -> None:
                 if is_wall(tile.get_upper()):
-                    add_shadow(tile_pos, right_line_rects)
+                    if is_wall(tile.get_lower()) or is_wall(tile.get_left()) or not is_visible_wall(tile.get_right()):
+                        add_shadow(tile_pos, right_line_rects)
+                    else:
+                        add_shadow(tile_pos, upper_right_line_rects)
                 else:
                     add_shadow(tile_pos, lower_right_line_rects)
 
             def add_shadow_top(tile_pos: Point) -> None:
-                add_shadow(tile_pos, top_line_rects)
+                # TODO: Actually need to add logic to find this notch!!!!
+                if is_wall(tile.get_upper()):
+                    # Add the mid to ensure the tops of walls go into shadow as expected
+                    add_shadow(tile_pos, top_line_mid_rects)
+
+                    for other_tile, connector in [(tile.get_left(), left_line_top_mid_connector_rects), (tile.get_right(), right_line_top_mid_connector_rects)]:
+                        if is_wall(other_tile) and not is_wall(other_tile.get_upper()):
+                            add_shadow(tile_pos, connector)
+                else:
+                    add_shadow(tile_pos, top_line_end_rects)
+
+                # Always add end.  Even when we also have added mid, and end also to prevent light
+                # excaping between adjacent tiles on a transitio from one to the other.
+                #add_shadow(tile_pos, top_line_end_rects)
 
             def add_shadow_bottom(tile_pos: Point) -> None:
                 add_shadow(tile_pos, bottom_line_rects)
@@ -292,7 +323,9 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                     if is_visible_wall(tile):
                         if not is_wall(tile.get_upper()) or is_wall(tile.get_right()):
                             add_shadow_top(tile)
-                        if not is_wall(tile.get_left()) or is_wall(tile.get_lower()):
+                        if not is_visible_wall(tile.get_left()) or is_wall(tile.get_lower()):
+                            add_shadow_left(tile)
+                        elif is_wall(tile.get_left()) and is_wall(tile.get_upper()):
                             add_shadow_left(tile)
 
             # Handle lower left diagnal
@@ -324,7 +357,9 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                     if is_visible_wall(tile):
                         if not is_wall(tile.get_upper()) or is_wall(tile.get_left()):
                             add_shadow_top(tile)
-                        if not is_wall(tile.get_right()) or is_wall(tile.get_lower()):
+                        if not is_visible_wall(tile.get_right()) or is_wall(tile.get_lower()):
+                            add_shadow_right(tile)
+                        elif is_wall(tile.get_right()) and is_wall(tile.get_upper()):
                             add_shadow_right(tile)
 
             # Handle lower right diagnal
@@ -365,7 +400,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
             light.add_light(
                 light_surface,
                 light_screen_pos_px,
-                shadow_rects,
+                [pygame.Rect(x, y, w, h) for x, y, w, h in shadow_rects],
                 forward_facing_rects,
                 wall_top_rects,
                 self.tile_size_pixels // 2,
