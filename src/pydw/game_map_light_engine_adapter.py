@@ -235,24 +235,17 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
 
             def add_shadow_left(tile_pos: Point) -> None:
                 if is_wall(tile.get_upper()):
-                    if is_wall(tile.get_lower()) or is_wall(tile.get_right()) or not is_visible_wall(tile.get_left()):
-                        add_shadow(tile_pos, left_line_rects)
-                    else:
-                        add_shadow(tile_pos, upper_left_line_rects)
+                    add_shadow(tile_pos, left_line_rects)
                 else:
                     add_shadow(tile_pos, lower_left_line_rects)
 
             def add_shadow_right(tile_pos: Point) -> None:
                 if is_wall(tile.get_upper()):
-                    if is_wall(tile.get_lower()) or is_wall(tile.get_left()) or not is_visible_wall(tile.get_right()):
-                        add_shadow(tile_pos, right_line_rects)
-                    else:
-                        add_shadow(tile_pos, upper_right_line_rects)
+                    add_shadow(tile_pos, right_line_rects)
                 else:
                     add_shadow(tile_pos, lower_right_line_rects)
 
             def add_shadow_top(tile_pos: Point) -> None:
-                # TODO: Actually need to add logic to find this notch!!!!
                 if is_wall(tile.get_upper()):
                     # Add the mid to ensure the tops of walls go into shadow as expected
                     add_shadow(tile_pos, top_line_mid_rects)
@@ -262,10 +255,6 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                             add_shadow(tile_pos, connector)
                 else:
                     add_shadow(tile_pos, top_line_end_rects)
-
-                # Always add end.  Even when we also have added mid, and end also to prevent light
-                # excaping between adjacent tiles on a transitio from one to the other.
-                #add_shadow(tile_pos, top_line_end_rects)
 
             def add_shadow_bottom(tile_pos: Point) -> None:
                 add_shadow(tile_pos, bottom_line_rects)
@@ -326,7 +315,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                         if not is_visible_wall(tile.get_left()) or is_wall(tile.get_lower()):
                             add_shadow_left(tile)
                         elif is_wall(tile.get_left()) and is_wall(tile.get_upper()):
-                            add_shadow_left(tile)
+                            add_shadow(tile, upper_left_line_rects)
 
             # Handle lower left diagnal
             wall_tile_rects = []
@@ -360,7 +349,7 @@ max_y=%s; len(visible_wall_tiles)=%s; len(visible_wall_tiles[0])=%s",
                         if not is_visible_wall(tile.get_right()) or is_wall(tile.get_lower()):
                             add_shadow_right(tile)
                         elif is_wall(tile.get_right()) and is_wall(tile.get_upper()):
-                            add_shadow_right(tile)
+                            add_shadow(tile, upper_right_line_rects)
 
             # Handle lower right diagnal
             wall_tile_rects = []
